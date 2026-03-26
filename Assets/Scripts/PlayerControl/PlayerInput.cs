@@ -1,12 +1,11 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-public class PlayerInput : MonoBehaviour
+public class PlayerInput : MonoBehaviour , IAgentMovementInput
 {
     public PlayerInputCommands inputActions;
     
-    // 위아래 입력 시 Vector2 사용
-    public float Horizontal { get; private set; }
+    public Vector2 Horizontal { get; private set; }
     public bool JumpPressed { get; private set; }
 
     private void Awake()
@@ -17,17 +16,27 @@ public class PlayerInput : MonoBehaviour
         inputActions.gamePlay.Move.canceled += MoveInput;
 
         inputActions.gamePlay.Jump.performed += JumpInput;
+        inputActions.gamePlay.Jump.canceled += JumpInput;
+    }
+
+    public Vector2 GetMovementInput()
+    {
+        return Horizontal;
+    }
+    public bool IsJumpPressed()
+    {
+        return JumpPressed;
     }
 
     public void MoveInput(InputAction.CallbackContext context)
     {
         if(context.canceled)
         {
-            Horizontal = 0f; 
+            Horizontal = Vector2.zero;
             return;
         }
         Vector2 input = context.ReadValue<Vector2>();
-        Horizontal = input.x;
+        Horizontal = input.normalized;
     }
 
     public void JumpInput(InputAction.CallbackContext context)
@@ -36,11 +45,10 @@ public class PlayerInput : MonoBehaviour
         {
             JumpPressed = true;
         }
-    }
-
-    public void AfterUseJump()
-    {
-        JumpPressed = false; 
+        else if (context.canceled)
+        {
+            JumpPressed = false;
+        }
     }
 
     private void OnEnable()

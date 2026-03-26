@@ -1,3 +1,4 @@
+using System;
 using DG.Tweening;
 using UniRx;
 using UnityEngine;
@@ -39,11 +40,12 @@ public class PlayerAnimator : MonoBehaviour
         }
     }
     #region Animation Control
-    public void ApplyMovementAnimation(float velocity)
+    public void ApplyMovementAnimation(Vector2 horizontalInput)
     {
-        _anim.SetFloat(MoveDirHash, Mathf.Abs(velocity));
+        float velocity = horizontalInput.x;
+        _anim.SetFloat(MoveDirHash, Math.Abs(velocity));
 
-        if(Mathf.Abs(velocity) > 0.01f)
+        if(Math.Abs(velocity) > 0.01f)
         {
             if (velocity > 0) _spriteRenderer.flipX = false;
             else if (velocity < 0) _spriteRenderer.flipX = true;
@@ -56,9 +58,9 @@ public class PlayerAnimator : MonoBehaviour
         _anim.SetBool(IsGroundedHash, isGrounded);
     }
 
-    public void ApplyFallingAnimation(bool isGrounded)
+    public void ApplyFallingAnimation(bool isFalling)
     {
-        _anim.SetBool(IsGroundedHash, isGrounded);
+        _anim.SetBool(IsGroundedHash, !isFalling);
     }
 
     public void ApplyDieAnimation()

@@ -1,7 +1,7 @@
 using UnityEngine;
 
 [RequireComponent(typeof(Rigidbody2D))]
-public class PlayerMotor : MonoBehaviour
+public class AgentMotor2D : MonoBehaviour
 {
     Rigidbody2D _rb;
     public Vector2 Velocity => _rb.linearVelocity;
@@ -12,15 +12,15 @@ public class PlayerMotor : MonoBehaviour
         _rb = GetComponent<Rigidbody2D>();
     }
 
-    public void Move(float velocityX)
+    public void Move(Vector2 horizontalInput, float moveSpeed)
     {
-        _rb.linearVelocity = new Vector2(velocityX, _rb.linearVelocity.y);
+        _rb.linearVelocity = new Vector2(horizontalInput.x * moveSpeed, _rb.linearVelocity.y);
     }
 
-    public void Jump(float velocityX, float jumpForce)
+    public void Jump(Vector2 horizontalInput, float jumpForce)
     {
-        // Á¡ÇÁ Àü¿¡ ¼öÁ÷ ¼Óµµ¸¦ ÃÊ±âÈ­
-        _rb.linearVelocity = new Vector2(velocityX, 0); 
+        // Xì¶• ì†ë„ë¥¼ ì´ˆê¸°í™”í•˜ê³  ì í”„ í˜ì„ ì ìš©
+        _rb.linearVelocity = new Vector2(horizontalInput.x, 0);
         _rb.AddForce(Vector2.up * jumpForce, ForceMode2D.Impulse);
     }
 
