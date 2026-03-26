@@ -10,38 +10,39 @@ public class PlayerController : MonoBehaviour
     private PlayerMotor _playerMotor;
     [SerializeField] private PlayerAnimator _playerAnimator;
     [SerializeField] private PlayerStateData _playerStateData;
+    private GroundDetector _groundDetector;
+
 
     [Header("Player Stats")]
     [SerializeField] private PlayerStatData _playerStatData;
     [SerializeField] private Health _playerHealth;
 
-    List<IState> _playerStates;
+    Dictionary<PlayerStateType, IState> _playerStates;
     public PlayerInput PlayerInput => _playerInput;
     public PlayerMotor PlayerMotor => _playerMotor;
     public PlayerAnimator PlayerAnimator => _playerAnimator;
     public PlayerStateData PlayerStateData => _playerStateData;
+    public bool IsGrounded => _groundDetector.IsGrounded;
 
 
     private IState _currentState;
-    [SerializeField] Vector2 rayBoxSize = new Vector2(0.5f, 0.1f);
-    [SerializeField] Vector3 playerFootPos = new Vector3(0f, 0.6f, 0f);
-    public bool IsGrounded { get; private set; }
     private void Awake()
     {
         _playerMotor = GetComponent<PlayerMotor>();
         _playerStateFactory = new PlayerStateFactory();
         _playerInput = GetComponent<PlayerInput>();
-        _playerStates = new List<IState>(_playerStateFactory.CreateStates(this));
+        _groundDetector = GetComponent<GroundDetector>();
+
+        _playerStates = _playerStateFactory.CreateStates(this);
 
         _playerHealth.Initialize(_playerStatData.maxHealth);
         _playerAnimator.Initialize(_playerHealth);
-        // ÇÃ·¹ÀÌ¾î°¡ Á×¾úÀ» ¶§ »óÅÂ¸¦ º¯°æÇÏ´Â ÀÌº¥Æ® ±¸µ¶
     }
     private void Start()
     {
         _playerHealth.IsDead
-            .Pairwise() // ÀÌÀü °ª°ú ÇöÀç °ªÀ» ½ÖÀ¸·Î ¹­À½ (ÀÌÀü, ÇöÀç)
-            .Where(pair => pair.Current != pair.Previous) // °ªÀÌ ½ÇÁ¦·Î º¯ÇßÀ» ¶§¸¸ ½ÇÇà
+            .Pairwise() // IsDead ìƒíƒœì˜ ì´ì „ ê°’ê³¼ í˜„ìž¬ ê°’ì„ ìŒìœ¼ë¡œ ë§Œë“¤ì–´ì„œ ì „ë‹¬
+            .Where(pair => pair.Current != pair.Previous) // ìƒíƒœê°€ ë³€ê²½ë˜ì—ˆì„ ë•Œë§Œ ë°˜ì‘
             .Subscribe(_ =>
             {
                 ChangeState(PlayerStateType.Die);
@@ -53,52 +54,22 @@ public class PlayerController : MonoBehaviour
     private void Update()
     {
         _currentState?.Execute();
-        OnGround();
+        _groundDetector.UpdateGroundedStatus();
     }
 
     public void ChangeState(PlayerStateType type)
     {
-        int index = (int)type;
-        if (index < 0 || index >= _playerStates.Count)
+        if (!_playerStates.ContainsKey(type))
         {
-            Debug.LogError("Invalid state index: " + index);
+            Debug.LogError("Invalid state type: " + type);
             return;
         }
-        IState newState = _playerStates[index];
+        IState newState = _playerStates[type];
 
         if (_currentState == newState) return;
 
         _currentState?.Exit();   
         _currentState = newState;
         _currentState.Enter();  
-    }
-
-    private void OnGround()
-    {
-        RaycastHit2D hit = Physics2D.BoxCast(transform.position - playerFootPos, rayBoxSize, 0f, Vector2.down, 0.1f, LayerMask.GetMask("Ground"));
-        IsGrounded = hit.collider != null;
-
-        // °øÁß Á¡ÇÁ ±ÝÁö
-        if(!IsGrounded && _playerInput.JumpPressed) _playerInput.AfterUseJump();
-    }
-
-    private void OnDrawGizmos()
-    {
-        // 1. ½ÃÀÛ ÁöÁ¡ °è»ê (ÄÚµå¿Í µ¿ÀÏ)
-        Vector3 startPos = transform.position - playerFootPos;
-
-        // 2. ÃÖÁ¾ µµ´Þ ÁöÁ¡ °è»ê
-        Vector3 endPos = startPos + Vector3.down * 0.1f;
-
-        // 3. ½ÃÀÛ À§Ä¡ÀÇ ¹Ú½º (¿ÍÀÌ¾î ÇÁ·¹ÀÓ)
-        Gizmos.DrawWireCube(startPos, new Vector3(rayBoxSize.x, rayBoxSize.y, 0.1f));
-
-        // 4. °æ·Î¸¦ º¸¿©ÁÖ´Â ¼±
-        Gizmos.DrawLine(startPos, endPos);
-        Gizmos.color = Color.red;
-        if (IsGrounded) Gizmos.color = Color.green; // ¶¥¿¡ ´êÀ¸¸é ÃÊ·Ï»öÀ¸·Î º¯°æ
-
-        // ½ÃÀÛ À§Ä¡¿¡ ¹Ú½º ±×¸®±â
-        Gizmos.DrawWireCube(endPos, new Vector3(rayBoxSize.x, rayBoxSize.y, 0.1f));
     }
 }
