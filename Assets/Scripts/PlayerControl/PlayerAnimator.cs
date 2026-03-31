@@ -31,7 +31,7 @@ public class PlayerAnimator : MonoBehaviour
         {
             _playerHealth.CurrentHealth
             .Pairwise() 
-            .Where(pair => pair.Current != pair.Previous) 
+            .Where(pair => pair.Current < pair.Previous) 
             .Subscribe( _ =>
             {
                 PlayHurtSequence();
