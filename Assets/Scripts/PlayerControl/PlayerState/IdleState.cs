@@ -6,7 +6,6 @@ public class IdleState : PlayerStateBase
     public override void Enter()
     {
         Debug.Log("IdleState Entered");
-        _player.PlayerAnimator.ApplyMovementAnimation(Vector2.zero);
     }
 
     public override void Execute()
@@ -15,8 +14,11 @@ public class IdleState : PlayerStateBase
         {
             _player.ChangeState(PlayerStateType.Fall);
         }
-        _player.Jump();
-        _player.Move();
+        else 
+        {
+            if(!_player.IsIdle) _player.ChangeState(PlayerStateType.Move);
+            else if (_player.IsJumping) _player.ChangeState(PlayerStateType.Jump);
+        }
     }
 
     public override void Exit() { }

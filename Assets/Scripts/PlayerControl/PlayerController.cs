@@ -20,8 +20,10 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private PlayerStatData _playerStatData;
     [SerializeField] private Health _playerHealth;
 
-    public PlayerAnimator PlayerAnimator => _playerAnimator;
+    // State Check Properties
     public bool IsGrounded => _groundDetector.IsGrounded;
+    public bool IsIdle => _playerInput.GetMovementInput().magnitude < 0.01f;
+    public bool IsJumping => _playerInput.IsJumpPressed();
 
     private void Awake()
     {
@@ -68,27 +70,21 @@ public class PlayerController : MonoBehaviour
 
     public void Move()
     {
-        bool isIdle = _playerInput.GetMovementInput().magnitude < 0.01f;
-        if (IsGrounded && isIdle)
-        {
-            ChangeState(PlayerStateType.Idle);
-            _playerMover.Move(Vector2.zero, 0);
-        }
-        else
-        {
-            if (IsGrounded) ChangeState(PlayerStateType.Move);
-            _playerMover.Move(_playerInput.GetMovementInput(), _playerStateData.moveSpeed);
-            _playerAnimator.ApplyMovementAnimation(_playerInput.GetMovementInput());
-        }
+        Vector2 movementInput = _playerInput.GetMovementInput();
+        if(IsIdle) movementInput = Vector2.zero;
+
+        _playerMover.Move(movementInput, _playerStateData.moveSpeed);
+        _playerAnimator.ApplyMovementAnimation(movementInput);
     }
 
     public void Jump()
     {
-        if (!_playerInput.IsJumpPressed()) return;
-        if (!IsGrounded) return;
-        ChangeState(PlayerStateType.Jump);
         _playerMover.Jump(_playerInput.GetMovementInput(), _playerStateData.jumpForce);
-        _playerAnimator.ApplyJumpingAnimation(true, false);
+        _playerAnimator.ApplyJumpingAnimation();  
+    }
+    public void Falling(bool isFalling)
+    {
+        _playerAnimator.ApplyFallingAnimation(isFalling);
     }
 
     private void Die()

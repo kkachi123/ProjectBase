@@ -9,6 +9,7 @@ public class JumpState : PlayerStateBase
     {
         _jumpTimer = 0f;
         Debug.Log("JumpState Entered");
+        _player.Jump();
     }
 
     public override void Execute()
@@ -29,8 +30,5 @@ public class JumpState : PlayerStateBase
         }
     }
 
-    public override void Exit() 
-    {
-        _player.PlayerAnimator.ApplyJumpingAnimation(_player.IsGrounded, false);
-    }
+    public override void Exit() {}
 }

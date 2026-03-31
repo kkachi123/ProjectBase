@@ -52,10 +52,9 @@ public class PlayerAnimator : MonoBehaviour
         }
     }
 
-    public void ApplyJumpingAnimation(bool isJumping , bool isGrounded)
+    public void ApplyJumpingAnimation()
     {
-        _anim.SetBool(IsJumpingHash, isJumping);
-        _anim.SetBool(IsGroundedHash, isGrounded);
+        _anim.SetTrigger(IsJumpingHash);
     }
 
     public void ApplyFallingAnimation(bool isFalling)

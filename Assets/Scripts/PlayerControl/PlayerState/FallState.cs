@@ -6,18 +6,22 @@ public class FallState : PlayerStateBase
 
     public override void Enter()
     {
-        _player.PlayerAnimator.ApplyFallingAnimation(true);
         Debug.Log("FallState Entered");
+        _player.Falling(true);
     }
 
     public override void Execute()
     {
         _player.Move();
+        if (_player.IsGrounded)
+        {
+            _player.ChangeState(PlayerStateType.Idle);
+        }
     }
 
     public override void Exit()
     {
-        _player.PlayerAnimator.ApplyFallingAnimation(false);
+        _player.Falling(false);
     }
 
 }
