@@ -20,9 +20,14 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private PlayerStatData _playerStatData;
     [SerializeField] private Health _playerHealth;
 
+    [Header("Controller Handler")]
+    private PlayerInputHandler _playerInputHandler;
+
     // State Check Properties
     public bool IsGrounded => _groundDetector.IsGrounded;
     public bool IsIdle => _playerInput.GetMovementInput().magnitude < 0.01f;
+
+    public bool CanJump => _stateMachine.CurrentState.CanJump;
 
     private void Awake()
     {
@@ -36,6 +41,8 @@ public class PlayerController : MonoBehaviour
 
         _playerHealth.Initialize(_playerStatData.maxHealth);
         _playerAnimator.Initialize(_playerHealth);
+
+        _playerInputHandler = new PlayerInputHandler(_playerInput, this);
     }
     private void Start()
     {
@@ -46,12 +53,6 @@ public class PlayerController : MonoBehaviour
             {
                 Die();
             })
-            .AddTo(this);
-
-        _playerInput.JumpPressed
-            .Where(jumpPressed => jumpPressed) // 점프 버튼이 눌렸을 때만 반응
-            .Where(_ => _stateMachine.CurrentState != null && _stateMachine.CurrentState.CanJump) // 현재 상태에서 점프가 가능한지 확인
-            .Subscribe(_ => ChangeState(PlayerStateType.Jump))
             .AddTo(this);
 
         ChangeState(PlayerStateType.Idle);
