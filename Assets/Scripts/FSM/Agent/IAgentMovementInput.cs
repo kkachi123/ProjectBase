@@ -1,6 +1,7 @@
+using UniRx;
 using UnityEngine;
 public interface IAgentMovementInput
 {
     Vector2 GetMovementInput();
-    bool IsJumpPressed();
+    IReadOnlyReactiveProperty<bool> JumpPressed { get; }
 } 

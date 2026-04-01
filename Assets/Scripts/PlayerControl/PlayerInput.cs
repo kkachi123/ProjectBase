@@ -1,12 +1,14 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UniRx;
 
 public class PlayerInput : MonoBehaviour , IAgentMovementInput
 {
     public PlayerInputCommands inputActions;
     
     public Vector2 Horizontal { get; private set; }
-    public bool JumpPressed { get; private set; }
+    private readonly ReactiveProperty<bool> _jumpPressed = new ReactiveProperty<bool>(false);
+    public IReadOnlyReactiveProperty<bool> JumpPressed => _jumpPressed;
 
     private void Awake()
     {
@@ -22,10 +24,6 @@ public class PlayerInput : MonoBehaviour , IAgentMovementInput
     public Vector2 GetMovementInput()
     {
         return Horizontal;
-    }
-    public bool IsJumpPressed()
-    {
-        return JumpPressed;
     }
 
     public void MoveInput(InputAction.CallbackContext context)
@@ -43,11 +41,11 @@ public class PlayerInput : MonoBehaviour , IAgentMovementInput
     {
         if (context.performed)
         {
-            JumpPressed = true;
+            _jumpPressed.Value = true;
         }
         else if (context.canceled)
         {
-            JumpPressed = false;
+            _jumpPressed.Value = false;
         }
     }
 

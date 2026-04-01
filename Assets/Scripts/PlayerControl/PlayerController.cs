@@ -12,9 +12,9 @@ public class PlayerController : MonoBehaviour
     private GroundDetector _groundDetector;
 
     [Header("State Controller")]
-    private StateMachine _stateMachine;
+    private StateMachine<PlayerStateBase> _stateMachine;
     private PlayerStateFactory _playerStateFactory;
-    Dictionary<PlayerStateType, IState> _playerStates;
+    Dictionary<PlayerStateType, PlayerStateBase> _playerStates;
 
     [Header("Player Stats")]
     [SerializeField] private PlayerStatData _playerStatData;
@@ -23,7 +23,6 @@ public class PlayerController : MonoBehaviour
     // State Check Properties
     public bool IsGrounded => _groundDetector.IsGrounded;
     public bool IsIdle => _playerInput.GetMovementInput().magnitude < 0.01f;
-    public bool IsJumping => _playerInput.IsJumpPressed();
 
     private void Awake()
     {
@@ -31,7 +30,7 @@ public class PlayerController : MonoBehaviour
         _playerInput = GetComponent<IAgentMovementInput>();
         _groundDetector = GetComponent<GroundDetector>();
 
-        _stateMachine = new StateMachine();
+        _stateMachine = new StateMachine<PlayerStateBase>();
         _playerStateFactory = new PlayerStateFactory();
         _playerStates = _playerStateFactory.CreateStates(this);
 
@@ -49,6 +48,12 @@ public class PlayerController : MonoBehaviour
             })
             .AddTo(this);
 
+        _playerInput.JumpPressed
+            .Where(jumpPressed => jumpPressed) // 점프 버튼이 눌렸을 때만 반응
+            .Where(_ => _stateMachine.CurrentState != null && _stateMachine.CurrentState.CanJump) // 현재 상태에서 점프가 가능한지 확인
+            .Subscribe(_ => ChangeState(PlayerStateType.Jump))
+            .AddTo(this);
+
         ChangeState(PlayerStateType.Idle);
     }
     private void Update()
@@ -64,7 +69,7 @@ public class PlayerController : MonoBehaviour
             Debug.LogError("Invalid state type: " + type);
             return;
         }
-        IState newState = _playerStates[type];
+        PlayerStateBase newState = _playerStates[type];
         _stateMachine.ChangeState(newState);
     }
 

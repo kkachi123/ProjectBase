@@ -14,8 +14,10 @@ public class PlayerAnimator : MonoBehaviour
     private SpriteRenderer _spriteRenderer;
 
     private static readonly int MoveDirHash = Animator.StringToHash("MoveSpeed");
-    private static readonly int IsJumpingHash = Animator.StringToHash("IsJumping");
+    private static readonly int IsJumpingHash = Animator.StringToHash("JumpTrigger");
     private static readonly int IsGroundedHash = Animator.StringToHash("IsGround");
+
+    private static readonly int DieHash = Animator.StringToHash("DieTrigger");
 
     Health _playerHealth;
 
@@ -64,7 +66,7 @@ public class PlayerAnimator : MonoBehaviour
 
     public void ApplyDieAnimation()
     {
-        _anim.SetTrigger("Die");
+        _anim.SetTrigger(DieHash);
     }
     #endregion
 

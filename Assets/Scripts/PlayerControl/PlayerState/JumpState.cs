@@ -19,14 +19,8 @@ public class JumpState : PlayerStateBase
         _jumpTimer += Time.deltaTime;
         if(_jumpTimer >= MIN_JUMP_TIME)
         {
-            if (_player.IsGrounded)
-            {
-                _player.ChangeState(PlayerStateType.Idle);
-            }
-            else 
-            {
-                _player.ChangeState(PlayerStateType.Fall);
-            }
+            if (_player.IsGrounded) _player.ChangeState(PlayerStateType.Idle);
+            else _player.ChangeState(PlayerStateType.Fall);
         }
     }
 

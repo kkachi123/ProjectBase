@@ -11,9 +11,9 @@ public enum PlayerStateType
 
 public class PlayerStateFactory 
 {
-    public Dictionary<PlayerStateType, IState> CreateStates(PlayerController playerController)
+    public Dictionary<PlayerStateType, PlayerStateBase> CreateStates(PlayerController playerController)
     {
-        return new Dictionary<PlayerStateType, IState>
+        return new Dictionary<PlayerStateType, PlayerStateBase>
         {
             { PlayerStateType.Idle, new IdleState(playerController) },
             { PlayerStateType.Move, new MoveState(playerController) },

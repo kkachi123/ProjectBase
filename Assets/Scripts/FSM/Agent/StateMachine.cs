@@ -1,9 +1,9 @@
-public class StateMachine
+public class StateMachine<T> where T : class , IState
 {
-    private IState _currentState;
-    public IState CurrentState => _currentState;
+    private T _currentState;
+    public T CurrentState => _currentState;
 
-    public void ChangeState(IState newState)
+    public void ChangeState(T newState)
     {
         if(_currentState == newState) return;
         _currentState?.Exit();   
