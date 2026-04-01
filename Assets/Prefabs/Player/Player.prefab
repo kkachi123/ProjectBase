@@ -52,10 +52,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b555bc994db8f194fba2a9c5d0b2f364, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _playerAnimator: {fileID: 3521758970269948959}
-  _playerStateData: {fileID: 11400000, guid: b052bdbf92f96df4ca1699d02055e658, type: 2}
-  _playerStatData: {fileID: 11400000, guid: bbd7a6feca900de40b6381f1e29bff55, type: 2}
-  _playerHealth: {fileID: 4506167850545434978}
+  _stateData: {fileID: 11400000, guid: b052bdbf92f96df4ca1699d02055e658, type: 2}
+  _statData: {fileID: 11400000, guid: bbd7a6feca900de40b6381f1e29bff55, type: 2}
+  _animator: {fileID: 4862446387975837390}
+  _health: {fileID: 4506167850545434978}
+  _animationHandler:
+    _spriteRenderer: {fileID: 1273930479780660056}
 --- !u!114 &6786316900135613947
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -197,7 +199,7 @@ GameObject:
   - component: {fileID: 8068988675647806908}
   - component: {fileID: 1273930479780660056}
   - component: {fileID: 3093487027749187603}
-  - component: {fileID: 3521758970269948959}
+  - component: {fileID: 4862446387975837390}
   m_Layer: 0
   m_Name: Hero
   m_TagString: Untagged
@@ -297,7 +299,7 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
---- !u!114 &3521758970269948959
+--- !u!114 &4862446387975837390
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -306,6 +308,8 @@ MonoBehaviour:
   m_GameObject: {fileID: 8998790350646415857}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1df180dd79042304db455932fd35d0c2, type: 3}
+  m_Script: {fileID: 11500000, guid: 743791b4643b6f841a1644203c22bc95, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _anim: {fileID: 3093487027749187603}
+  _animationData: {fileID: 11400000, guid: 134d8c06edf397e4c9cbac210ddf32b7, type: 2}
