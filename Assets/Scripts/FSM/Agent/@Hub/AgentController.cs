@@ -56,9 +56,9 @@ public abstract class AgentController<T , U> : MonoBehaviour where T : class, IS
     public abstract void ChangeState(U type);
 
     #region Action Methods - State Operations
-    public virtual void Move()
+    public virtual void Move(bool isMove)
     {
-        Vector2 moveVec = IsIdle ? Vector2.zero : _moveInput.GetMovementInput();
+        Vector2 moveVec = isMove ? _moveInput.GetMovementInput() : Vector2.zero;
         _movementHandler.HandleMove(moveVec);
         _animationHandler.ApplyMovementAnimation(moveVec);
     }

@@ -11,7 +11,7 @@ public class IdleState : PlayerStateBase
 
     public override void Execute()
     {
-        if(!_player.IsGrounded) _player.ChangeState(PlayerStateType.Fall);
+        if (!_player.IsGrounded) _player.ChangeState(PlayerStateType.Fall);
         else if(!_player.IsIdle) _player.ChangeState(PlayerStateType.Move);
     }
 

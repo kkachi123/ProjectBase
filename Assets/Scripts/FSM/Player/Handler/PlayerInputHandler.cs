@@ -34,6 +34,7 @@ public class PlayerInputHandler
     {
         _combatInput.AttackPressed
             .Where(attackType => attackType != 0)
+            .Where(_ => _controller.IsGrounded)
             .Subscribe(attackType =>
             {
                 _combatHandler.SetAttackType(attackType);

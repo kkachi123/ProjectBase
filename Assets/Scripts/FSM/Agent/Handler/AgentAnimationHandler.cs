@@ -27,14 +27,7 @@ public class AgentAnimationHandler
     #region Animation Control
     public void ApplyMovementAnimation(Vector2 horizontalInput)
     {
-        float velocity = horizontalInput.x;
-        _animationController.SetFloat(AnimationFloatType.MoveSpeed, Math.Abs(velocity));
-
-        if (Math.Abs(velocity) > 0.01f)
-        {
-            if (velocity > 0) _spriteRenderer.flipX = false;
-            else if (velocity < 0) _spriteRenderer.flipX = true;
-        }
+        _animationController.SetFloat(AnimationFloatType.MoveSpeed, Math.Abs(horizontalInput.x));
     }
 
     public void ApplyJumpingAnimation()

@@ -117,42 +117,18 @@ public partial class @PlayerInputCommands: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""Attack2"",
+                    ""type"": ""Button"",
+                    ""id"": ""fd1212a8-2059-4011-ae17-70a392db7b47"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
-                {
-                    ""name"": ""WASD"",
-                    ""id"": ""0b5a407e-5365-4d8d-ac7b-e8eae5192afe"",
-                    ""path"": ""2DVector"",
-                    ""interactions"": """",
-                    ""processors"": """",
-                    ""groups"": """",
-                    ""action"": ""Move"",
-                    ""isComposite"": true,
-                    ""isPartOfComposite"": false
-                },
-                {
-                    ""name"": ""left"",
-                    ""id"": ""fffed220-448f-40cc-ab3e-6f572228f8ed"",
-                    ""path"": ""<Keyboard>/a"",
-                    ""interactions"": """",
-                    ""processors"": """",
-                    ""groups"": "";PC"",
-                    ""action"": ""Move"",
-                    ""isComposite"": false,
-                    ""isPartOfComposite"": true
-                },
-                {
-                    ""name"": ""right"",
-                    ""id"": ""8676e648-9fb2-4318-90f3-4b842647018a"",
-                    ""path"": ""<Keyboard>/d"",
-                    ""interactions"": """",
-                    ""processors"": """",
-                    ""groups"": "";PC"",
-                    ""action"": ""Move"",
-                    ""isComposite"": false,
-                    ""isPartOfComposite"": true
-                },
                 {
                     ""name"": ""Arrow"",
                     ""id"": ""3484ff42-a657-4032-8345-9ce76457f8d8"",
@@ -200,11 +176,22 @@ public partial class @PlayerInputCommands: IInputActionCollection2, IDisposable
                 {
                     ""name"": """",
                     ""id"": ""db7b0daf-cc73-4a30-8848-fb249ecaa59f"",
-                    ""path"": ""<Keyboard>/c"",
+                    ""path"": ""<Keyboard>/a"",
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": "";PC"",
                     ""action"": ""Attack1"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""1fa6edc0-e0dc-451e-92f7-29867687aaa8"",
+                    ""path"": ""<Keyboard>/s"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": "";PC"",
+                    ""action"": ""Attack2"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 }
@@ -224,6 +211,7 @@ public partial class @PlayerInputCommands: IInputActionCollection2, IDisposable
         m_gamePlay_Move = m_gamePlay.FindAction("Move", throwIfNotFound: true);
         m_gamePlay_Jump = m_gamePlay.FindAction("Jump", throwIfNotFound: true);
         m_gamePlay_Attack1 = m_gamePlay.FindAction("Attack1", throwIfNotFound: true);
+        m_gamePlay_Attack2 = m_gamePlay.FindAction("Attack2", throwIfNotFound: true);
     }
 
     ~@PlayerInputCommands()
@@ -307,6 +295,7 @@ public partial class @PlayerInputCommands: IInputActionCollection2, IDisposable
     private readonly InputAction m_gamePlay_Move;
     private readonly InputAction m_gamePlay_Jump;
     private readonly InputAction m_gamePlay_Attack1;
+    private readonly InputAction m_gamePlay_Attack2;
     /// <summary>
     /// Provides access to input actions defined in input action map "gamePlay".
     /// </summary>
@@ -330,6 +319,10 @@ public partial class @PlayerInputCommands: IInputActionCollection2, IDisposable
         /// Provides access to the underlying input action "gamePlay/Attack1".
         /// </summary>
         public InputAction @Attack1 => m_Wrapper.m_gamePlay_Attack1;
+        /// <summary>
+        /// Provides access to the underlying input action "gamePlay/Attack2".
+        /// </summary>
+        public InputAction @Attack2 => m_Wrapper.m_gamePlay_Attack2;
         /// <summary>
         /// Provides access to the underlying input action map instance.
         /// </summary>
@@ -365,6 +358,9 @@ public partial class @PlayerInputCommands: IInputActionCollection2, IDisposable
             @Attack1.started += instance.OnAttack1;
             @Attack1.performed += instance.OnAttack1;
             @Attack1.canceled += instance.OnAttack1;
+            @Attack2.started += instance.OnAttack2;
+            @Attack2.performed += instance.OnAttack2;
+            @Attack2.canceled += instance.OnAttack2;
         }
 
         /// <summary>
@@ -385,6 +381,9 @@ public partial class @PlayerInputCommands: IInputActionCollection2, IDisposable
             @Attack1.started -= instance.OnAttack1;
             @Attack1.performed -= instance.OnAttack1;
             @Attack1.canceled -= instance.OnAttack1;
+            @Attack2.started -= instance.OnAttack2;
+            @Attack2.performed -= instance.OnAttack2;
+            @Attack2.canceled -= instance.OnAttack2;
         }
 
         /// <summary>
@@ -459,5 +458,12 @@ public partial class @PlayerInputCommands: IInputActionCollection2, IDisposable
         /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
         void OnAttack1(InputAction.CallbackContext context);
+        /// <summary>
+        /// Method invoked when associated input action "Attack2" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnAttack2(InputAction.CallbackContext context);
     }
 }

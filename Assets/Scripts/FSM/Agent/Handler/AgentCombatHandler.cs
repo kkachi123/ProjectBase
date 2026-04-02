@@ -4,7 +4,7 @@ using System;
 [Serializable]
 public class AgentCombatHandler : MonoBehaviour
 {
-    [SerializeField] private BoxCollider2D _attackArea; 
+    [SerializeField] private BoxCollider2D[] _attackAreas; 
     [SerializeField] private LayerMask _targetLayer;
     private float _attackDamage = 0f;
     public int CurrentAttackType { get; private set; }
@@ -21,6 +21,7 @@ public class AgentCombatHandler : MonoBehaviour
 
     public void PerformAttack()
     {
+        BoxCollider2D _attackArea = _attackAreas[CurrentAttackType - 1];
         Collider2D[] hitTargets = Physics2D.OverlapBoxAll(_attackArea.bounds.center, _attackArea.bounds.size, 0f, _targetLayer);
         foreach (Collider2D target in hitTargets)
         {

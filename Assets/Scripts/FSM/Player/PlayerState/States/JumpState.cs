@@ -14,8 +14,6 @@ public class JumpState : PlayerStateBase
 
     public override void Execute()
     {
-        _player.Move();
-
         _jumpTimer += Time.deltaTime;
         if(_jumpTimer >= MIN_JUMP_TIME)
         {

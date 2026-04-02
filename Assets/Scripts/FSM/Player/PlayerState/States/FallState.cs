@@ -12,13 +12,14 @@ public class FallState : PlayerStateBase
 
     public override void Execute()
     {
-        _player.Move();
+        _player.Move(true);
         if (_player.IsGrounded) _player.ChangeState(PlayerStateType.Idle);
     }
 
     public override void Exit()
     {
         _player.Falling(false);
+        _player.Move(false);
     }
 
 }

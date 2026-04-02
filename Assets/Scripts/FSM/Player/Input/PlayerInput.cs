@@ -23,7 +23,10 @@ public class PlayerInput : MonoBehaviour , IAgentMovementInput , IAgentCombatInp
         inputActions.gamePlay.Jump.canceled += JumpInput;
 
         inputActions.gamePlay.Attack1.performed += Attack1Input;
-        inputActions.gamePlay.Attack1.canceled += Attack1Input;
+        inputActions.gamePlay.Attack1.canceled += AttackEnd;
+
+        inputActions.gamePlay.Attack2.performed += Attack2Input;
+        inputActions.gamePlay.Attack2.canceled += AttackEnd;
     }
 
     public Vector2 GetMovementInput()
@@ -53,16 +56,26 @@ public class PlayerInput : MonoBehaviour , IAgentMovementInput , IAgentCombatInp
             _jumpPressed.Value = false;
         }
     }
-
+    public void AttackEnd(InputAction.CallbackContext context)
+    {
+        if (context.canceled)
+        {
+            _attackPressed.Value = 0;
+        }
+    }
     public void Attack1Input(InputAction.CallbackContext context)
     {
         if (context.performed)
         {
             _attackPressed.Value = 1;
         }
-        else if (context.canceled)
+    }
+
+    public void Attack2Input(InputAction.CallbackContext context)
+    {
+        if (context.performed)
         {
-            _attackPressed.Value = 0;
+            _attackPressed.Value = 2;
         }
     }
 

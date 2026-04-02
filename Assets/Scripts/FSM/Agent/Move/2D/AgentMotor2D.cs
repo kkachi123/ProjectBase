@@ -14,7 +14,14 @@ public class AgentMotor2D : MonoBehaviour
 
     public void Move(Vector2 horizontalInput, float moveSpeed)
     {
+        Turn(horizontalInput);
         _rb.linearVelocity = new Vector2(horizontalInput.x * moveSpeed, _rb.linearVelocity.y);
+    }
+
+    private void Turn(Vector2 horizontalInput)
+    {
+        if (horizontalInput.x > 0) transform.localScale = new Vector3(1, 1, 1);
+        else if (horizontalInput.x < 0) transform.localScale = new Vector3(-1, 1, 1);
     }
 
     public void Jump(Vector2 horizontalInput, float jumpForce)
