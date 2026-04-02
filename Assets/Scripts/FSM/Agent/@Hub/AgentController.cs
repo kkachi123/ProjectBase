@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using UnityEngine;
 
 [RequireComponent(typeof(AgentMover2D))]
-[RequireComponent(typeof(IAgentMovementInput))]
 [RequireComponent(typeof(GroundDetector))]
 [RequireComponent(typeof(Health))]
 public abstract class AgentController<T , U> : MonoBehaviour where T : class, IState where U : Enum
@@ -13,7 +12,8 @@ public abstract class AgentController<T , U> : MonoBehaviour where T : class, IS
     [SerializeField] protected AgentStatData _statData;
 
     [Header("Core Components")]
-    protected IAgentMovementInput _agentInput;
+    protected IAgentMovementInput _moveInput;
+    protected IAgentCombatInput _combatInput;
     protected AgentMover2D _mover;
     protected GroundDetector _groundDetector;
 
@@ -24,6 +24,7 @@ public abstract class AgentController<T , U> : MonoBehaviour where T : class, IS
     [SerializeField] protected AgentAnimator _animator;
     [SerializeField] protected AgentAnimationHandler _animationHandler;
     [SerializeField] protected AgentMovementHandler _movementHandler;
+    [SerializeField] protected AgentCombatHandler _combatHandler;
 
     [Header("State Machine")]
     protected StateMachine<T> _stateMachine;
@@ -31,22 +32,25 @@ public abstract class AgentController<T , U> : MonoBehaviour where T : class, IS
 
     // State Check Properties
     public bool IsGrounded => _groundDetector != null && _groundDetector.IsGrounded;
-    public bool IsIdle => _agentInput.GetMovementInput().sqrMagnitude < 0.0001f;
+    public bool IsIdle => _moveInput.GetMovementInput().sqrMagnitude < 0.0001f;
+    
 
     protected virtual void Awake()
     {
         // Core Component Initialization
         _mover = GetComponent<AgentMover2D>();
-        _agentInput = GetComponent<IAgentMovementInput>();
+        _moveInput = GetComponent<IAgentMovementInput>();
+        _combatInput = GetComponent<IAgentCombatInput>();
         _groundDetector = GetComponent<GroundDetector>();
 
         _health = GetComponent<Health>();
         _health.Initialize(_statData.maxHealth);
 
         // Handler Initialization
-        _animator.Initialize();
-        _animationHandler.Initialize(_animator);
-        _movementHandler.Initialize(_mover , _stateData);
+        _animator?.Initialize();
+        _animationHandler?.Initialize(_animator);
+        _movementHandler?.Initialize(_mover , _stateData);
+        _combatHandler?.Initialize(_statData.attackDamage);
     }
 
     public abstract void ChangeState(U type);
@@ -54,12 +58,17 @@ public abstract class AgentController<T , U> : MonoBehaviour where T : class, IS
     #region Action Methods - State Operations
     public virtual void Move()
     {
-        Vector2 moveVec = IsIdle ? Vector2.zero : _agentInput.GetMovementInput();
+        Vector2 moveVec = IsIdle ? Vector2.zero : _moveInput.GetMovementInput();
         _movementHandler.HandleMove(moveVec);
         _animationHandler.ApplyMovementAnimation(moveVec);
     }
 
     public virtual void Jump() {}
     public virtual void Falling(bool isFalling) {}
+
+    public virtual void Attack()
+    {
+        _animationHandler.ApplyAttackAnimation(_combatHandler.CurrentAttackType);
+    }
     #endregion
 }

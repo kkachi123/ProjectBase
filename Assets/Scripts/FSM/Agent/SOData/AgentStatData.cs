@@ -4,5 +4,5 @@ using UnityEngine;
 public class AgentStatData : ScriptableObject
 {
     public float maxHealth = 10f;
-    //public float attackDamage = 10f;
+    public float attackDamage = 1f;
 }

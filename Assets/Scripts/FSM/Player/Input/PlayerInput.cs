@@ -2,13 +2,15 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using UniRx;
 
-public class PlayerInput : MonoBehaviour , IAgentMovementInput
+public class PlayerInput : MonoBehaviour , IAgentMovementInput , IAgentCombatInput
 {
     public PlayerInputCommands inputActions;
     
     public Vector2 Horizontal { get; private set; }
     private readonly ReactiveProperty<bool> _jumpPressed = new ReactiveProperty<bool>(false);
+    private readonly ReactiveProperty<int> _attackPressed = new ReactiveProperty<int>(0);
     public IReadOnlyReactiveProperty<bool> JumpPressed => _jumpPressed;
+    public IReadOnlyReactiveProperty<int> AttackPressed => _attackPressed;
 
     private void Awake()
     {
@@ -19,6 +21,9 @@ public class PlayerInput : MonoBehaviour , IAgentMovementInput
 
         inputActions.gamePlay.Jump.performed += JumpInput;
         inputActions.gamePlay.Jump.canceled += JumpInput;
+
+        inputActions.gamePlay.Attack1.performed += Attack1Input;
+        inputActions.gamePlay.Attack1.canceled += Attack1Input;
     }
 
     public Vector2 GetMovementInput()
@@ -46,6 +51,18 @@ public class PlayerInput : MonoBehaviour , IAgentMovementInput
         else if (context.canceled)
         {
             _jumpPressed.Value = false;
+        }
+    }
+
+    public void Attack1Input(InputAction.CallbackContext context)
+    {
+        if (context.performed)
+        {
+            _attackPressed.Value = 1;
+        }
+        else if (context.canceled)
+        {
+            _attackPressed.Value = 0;
         }
     }
 

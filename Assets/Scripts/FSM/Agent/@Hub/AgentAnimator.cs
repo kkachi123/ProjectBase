@@ -1,6 +1,10 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+public enum AnimationIntType
+{
+    AttackType,
+}
 public enum AnimationFloatType
 {
     MoveSpeed,
@@ -10,6 +14,7 @@ public enum AnimationTriggerType
 {
     JumpTrigger,
     DieTrigger,
+    AttackTrigger
 }
 public enum AnimationBoolType
 {
@@ -22,6 +27,7 @@ public class AgentAnimator : MonoBehaviour
 {
     [SerializeField] Animator _anim;
     [SerializeField] AnimationDataSO _animationData;
+    private Dictionary<AnimationIntType, int> _intParameters;
 
     private Dictionary<AnimationFloatType, int> _floatParameters;
     private Dictionary<AnimationTriggerType, int> _triggerParameters;
@@ -29,6 +35,11 @@ public class AgentAnimator : MonoBehaviour
 
     public void Initialize()
     {
+        _intParameters = new Dictionary<AnimationIntType, int>()
+        {
+            { AnimationIntType.AttackType, Animator.StringToHash(_animationData.AttackTypeInt) },
+        };
+
         _floatParameters = new Dictionary<AnimationFloatType, int>()
         {
             { AnimationFloatType.MoveSpeed, Animator.StringToHash(_animationData.MoveSpeedFloat) },
@@ -37,11 +48,19 @@ public class AgentAnimator : MonoBehaviour
         {
             { AnimationTriggerType.JumpTrigger, Animator.StringToHash(_animationData.JumpTrigger) },
             { AnimationTriggerType.DieTrigger, Animator.StringToHash(_animationData.DieTrigger) },
+            { AnimationTriggerType.AttackTrigger, Animator.StringToHash(_animationData.AttackTrigger) },
         };
         _boolParameters = new Dictionary<AnimationBoolType, int>()
         {
             { AnimationBoolType.IsGround, Animator.StringToHash(_animationData.IsGroundBool) },
         };
+    }
+    public void SetInteger(AnimationIntType type, int value)
+    {
+        if (_intParameters.TryGetValue(type, out int hash))
+        {
+            _anim.SetInteger(hash, value);
+        }
     }
 
     public void SetFloat(AnimationFloatType type , float value)

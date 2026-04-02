@@ -6,6 +6,7 @@ public enum PlayerStateType
     Move,
     Jump,
     Fall,
+    Attack,
     Die,
 }
 
@@ -19,6 +20,7 @@ public class PlayerStateFactory
             { PlayerStateType.Move, new MoveState(playerController) },
             { PlayerStateType.Jump, new JumpState(playerController) },
             { PlayerStateType.Fall, new FallState(playerController) },
+            { PlayerStateType.Attack, new AttackState(playerController) },
             { PlayerStateType.Die, new DieState(playerController) },
         };
     }

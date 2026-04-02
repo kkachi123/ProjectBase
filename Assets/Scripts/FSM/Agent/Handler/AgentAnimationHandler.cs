@@ -46,6 +46,11 @@ public class AgentAnimationHandler
     {
         _animationController.SetBool(AnimationBoolType.IsGround, !isFalling);
     }
+    public void ApplyAttackAnimation(int attackType)
+    {
+        _animationController.SetInteger(AnimationIntType.AttackType, attackType);
+        _animationController.SetTrigger(AnimationTriggerType.AttackTrigger);
+    }
 
     public void ApplyDieAnimation()
     {
