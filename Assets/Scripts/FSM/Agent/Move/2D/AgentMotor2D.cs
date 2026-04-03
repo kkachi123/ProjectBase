@@ -30,10 +30,4 @@ public class AgentMotor2D : MonoBehaviour
         _rb.linearVelocity = new Vector2(horizontalInput.x, 0);
         _rb.AddForce(Vector2.up * jumpForce, ForceMode2D.Impulse);
     }
-
-    public void StopMovement()
-    {
-        _rb.linearVelocity = Vector2.zero;
-    }
-
 }

@@ -15,7 +15,14 @@ public class PlayerController : AgentController<PlayerStateBase>
     private void Update()
     {
         _stateMachine.Operate();
+    }
+    private void FixedUpdate()
+    {
+        // 2. 물리 연산 주기와 맞춰서 지면 상태 업데이트
         _groundDetector.UpdateGroundedStatus();
+
+        // (선택 사항) 만약 물리적인 이동 처리를 State에서 하고 있다면 
+        // 물리 관련 로직만 따로 FixedOperate() 같은 메서드를 만들어 호출하기도 합니다.
     }
 
     public override void ChangeState(StateType type)
