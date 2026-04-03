@@ -63,8 +63,15 @@ public abstract class AgentController<T , U> : MonoBehaviour where T : class, IS
         _animationHandler.ApplyMovementAnimation(moveVec);
     }
 
-    public virtual void Jump() {}
-    public virtual void Falling(bool isFalling) {}
+    public virtual void Jump() 
+    {
+        _movementHandler.HandleJump(_moveInput.GetMovementInput());
+        _animationHandler.ApplyJumpingAnimation();
+    }
+    public virtual void Falling(bool isFalling) 
+    {
+        _animationHandler.ApplyFallingAnimation(isFalling);
+    }
 
     public virtual void Attack()
     {

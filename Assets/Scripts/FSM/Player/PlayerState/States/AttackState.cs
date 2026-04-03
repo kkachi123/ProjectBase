@@ -12,10 +12,7 @@ public class AttackState : PlayerStateBase
     }
     public override void Execute()
     {
-        if(_isAttackFinished)
-        {
-            _player.ChangeState(PlayerStateType.Idle);
-        }
+        if(_isAttackFinished) _player.ChangeState(PlayerStateType.Idle);
     }
     public override void Exit() { }
 

@@ -10,7 +10,10 @@ public class AnimationDataSO : ScriptableObject
     [Header("Animation Trigger")]
     public string JumpTrigger = "JumpTrigger";
     public string AttackTrigger = "AttackTrigger";
+    public string HitTrigger = "HitTrigger";
     public string DieTrigger = "DieTrigger";
     [Header("Animation Bool")]
     public string IsGroundBool = "IsGround";
+    public string IsHitBool = "IsHit";
+    public string IsDeadBool = "IsDead";
 }

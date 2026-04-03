@@ -1,4 +1,3 @@
-using DG.Tweening;
 using UnityEngine;
 using System;
 
@@ -7,21 +6,10 @@ public class AgentAnimationHandler
 {
     private AgentAnimator _animationController;
     [SerializeField] private SpriteRenderer _spriteRenderer;
-    Sequence _hurtSequence;
 
     public void Initialize(AgentAnimator animationController)
     {
         _animationController = animationController;
-    }
-
-    public void PlayHurtSequence()
-    {
-        if(_hurtSequence != null && _hurtSequence.IsActive()) _hurtSequence.Kill();
-        _hurtSequence = DOTween.Sequence();
-        _hurtSequence.Append(_spriteRenderer.DOColor(Color.red, 0.1f))
-                    .Append(_spriteRenderer.DOColor(Color.white, 0.1f))
-                    .SetLoops(3, LoopType.Yoyo)
-                    .SetEase(Ease.InOutQuad);
     }
 
     #region Animation Control
@@ -44,10 +32,15 @@ public class AgentAnimationHandler
         _animationController.SetInteger(AnimationIntType.AttackType, attackType);
         _animationController.SetTrigger(AnimationTriggerType.AttackTrigger);
     }
-
+    public void ApplyHitAnimation(bool isHit)
+    {
+        if(isHit) _animationController.SetTrigger(AnimationTriggerType.HitTrigger);
+        _animationController.SetBool(AnimationBoolType.IsHit, isHit);
+    }
     public void ApplyDieAnimation()
     {
         _animationController.SetTrigger(AnimationTriggerType.DieTrigger);
+        _animationController.SetBool(AnimationBoolType.IsDead, true);
     }
     #endregion
 }

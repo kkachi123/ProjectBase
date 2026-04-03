@@ -40,16 +40,6 @@ public class PlayerController : AgentController<PlayerStateBase, PlayerStateType
     }
 
     #region Action Methods - State Operations
-    public override void Jump()
-    {
-        _movementHandler.HandleJump(_moveInput.GetMovementInput());
-        _animationHandler.ApplyJumpingAnimation();
-    }
-    public override void Falling(bool isFalling)
-    {
-        _animationHandler.ApplyFallingAnimation(isFalling);
-    }
-
     public void OnAttackHitFrame()
     {
         _combatHandler.PerformAttack();
@@ -60,6 +50,15 @@ public class PlayerController : AgentController<PlayerStateBase, PlayerStateType
         {
             attackState.NotifyAttackEnd();
             _animationHandler.ApplyAttackAnimation(0); // Reset to default attack animation
+        }
+    }
+
+    public void OnHitAnimationEnd()
+    {
+        if(_stateMachine.CurrentState is HitState hitState)
+        {
+            hitState.NotifyHitEnd();
+            _animationHandler.ApplyHitAnimation(false); // Reset to default state animation
         }
     }
     #endregion

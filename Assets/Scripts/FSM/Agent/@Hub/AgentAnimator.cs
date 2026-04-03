@@ -13,12 +13,15 @@ public enum AnimationFloatType
 public enum AnimationTriggerType
 {
     JumpTrigger,
+    AttackTrigger,
+    HitTrigger,
     DieTrigger,
-    AttackTrigger
 }
 public enum AnimationBoolType
 {
     IsGround,
+    IsHit,
+    IsDead,
 }
 
 [RequireComponent(typeof(Animator))]
@@ -47,12 +50,15 @@ public class AgentAnimator : MonoBehaviour
         _triggerParameters = new Dictionary<AnimationTriggerType, int>()
         {
             { AnimationTriggerType.JumpTrigger, Animator.StringToHash(_animationData.JumpTrigger) },
-            { AnimationTriggerType.DieTrigger, Animator.StringToHash(_animationData.DieTrigger) },
             { AnimationTriggerType.AttackTrigger, Animator.StringToHash(_animationData.AttackTrigger) },
+            { AnimationTriggerType.HitTrigger, Animator.StringToHash(_animationData.HitTrigger) },
+            { AnimationTriggerType.DieTrigger, Animator.StringToHash(_animationData.DieTrigger) },
         };
         _boolParameters = new Dictionary<AnimationBoolType, int>()
         {
             { AnimationBoolType.IsGround, Animator.StringToHash(_animationData.IsGroundBool) },
+            { AnimationBoolType.IsHit, Animator.StringToHash(_animationData.IsHitBool) },
+            { AnimationBoolType.IsDead, Animator.StringToHash(_animationData.IsDeadBool) },
         };
     }
     public void SetInteger(AnimationIntType type, int value)

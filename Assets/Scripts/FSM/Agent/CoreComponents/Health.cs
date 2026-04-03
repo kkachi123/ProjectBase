@@ -4,6 +4,7 @@ using UniRx;
 
 public class Health : MonoBehaviour , IDamageable
 {
+    [SerializeField]
     private FloatReactiveProperty _currentHealth = new FloatReactiveProperty();
     public IReadOnlyReactiveProperty<float> CurrentHealth => _currentHealth;
     public float MaxHealth { get; private set; }

@@ -1,4 +1,3 @@
-using System;
 using UniRx;
 [System.Serializable]
 public class PlayerHealthHandler
@@ -20,14 +19,19 @@ public class PlayerHealthHandler
         _health.CurrentHealth
             .Pairwise()
             .Where(pair => pair.Current < pair.Previous)
-            .Subscribe(_ => _animationHandler.PlayHurtSequence())
+            .Subscribe(_ => Hit())
             .AddTo(_controller);
 
         _health.IsDead
-            .Pairwise() // IsDead 상태의 이전 값과 현재 값을 쌍으로 만들어서 전달
-            .Where(pair => pair.Current != pair.Previous) // 상태가 변경되었을 때만 반응
+            .Pairwise() 
+            .Where(pair => pair.Current != pair.Previous)
             .Subscribe(_ => Die())
             .AddTo(_controller);
+    }
+    private void Hit()
+    {
+        _animationHandler.ApplyHitAnimation(true);
+        _controller.ChangeState(PlayerStateType.Hit);
     }
 
     private void Die()
