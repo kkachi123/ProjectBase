@@ -1,14 +1,5 @@
-using UnityEngine;
-[RequireComponent(typeof(PlayerInput))]
-public class PlayerController : AgentController<PlayerStateBase, PlayerStateType>
+public class PlayerController : AgentController<PlayerStateBase>
 {
-    [Header("Player Specific Handlers")]
-    [SerializeField] private PlayerInputHandler _playerInputHandler;
-    [SerializeField] private PlayerHealthHandler _playerHealthHandler;
-
-    // State Check Properties
-    public bool CanJump => _stateMachine != null && _stateMachine.CurrentState.CanJump;
-
     protected override void Awake()
     {
         base.Awake();
@@ -16,14 +7,10 @@ public class PlayerController : AgentController<PlayerStateBase, PlayerStateType
         _stateMachine = new StateMachine<PlayerStateBase>();
         _states = new PlayerStateFactory().CreateStates(this);
 
-        _playerInputHandler?
-        .SetController(_moveInput, this)
-        .SetCombat(_combatInput, _combatHandler);
-        _playerHealthHandler?.Initialize(_health, _animationHandler , this);
     }
     private void Start()
     {
-        ChangeState(PlayerStateType.Idle);
+        ChangeState(StateType.Idle);
     }
     private void Update()
     {
@@ -31,7 +18,7 @@ public class PlayerController : AgentController<PlayerStateBase, PlayerStateType
         _groundDetector.UpdateGroundedStatus();
     }
 
-    public override void ChangeState(PlayerStateType type)
+    public override void ChangeState(StateType type)
     {
         if(_states.TryGetValue(type, out PlayerStateBase newState))
         {
@@ -39,27 +26,33 @@ public class PlayerController : AgentController<PlayerStateBase, PlayerStateType
         }
     }
 
-    #region Action Methods - State Operations
+    #region State Animation Event 
     public void OnAttackHitFrame()
     {
         _combatHandler.PerformAttack();
     }
     public void OnAttackAnimationEnd()
     {
-        if(_stateMachine.CurrentState is AttackState attackState)
-        {
-            attackState.NotifyAttackEnd();
-            _animationHandler.ApplyAttackAnimation(0); // Reset to default attack animation
-        }
+        _stateMachine.CurrentState.OnAnimationEvent(AnimEventType.End);
+        _animationHandler.ApplyAttackAnimation(0); // Reset to default state animation
     }
-
     public void OnHitAnimationEnd()
     {
-        if(_stateMachine.CurrentState is HitState hitState)
-        {
-            hitState.NotifyHitEnd();
-            _animationHandler.ApplyHitAnimation(false); // Reset to default state animation
-        }
+        _stateMachine.CurrentState.OnAnimationEvent(AnimEventType.End);
+        _animationHandler.ApplyHitAnimation(false); // Reset to default state animation
     }
+    #endregion
+
+    #region State Input Methods - Called by Input Handler
+    public override void OnJumpAction()
+    {
+        _stateMachine.CurrentState?.OnInputEvent(InputKeyType.Jump);
+    }
+    public override void OnAttackAction(int attackType)
+    {
+        _combatHandler.SetAttackType(attackType);
+        _stateMachine.CurrentState?.OnInputEvent(InputKeyType.Attack);
+    }
+
     #endregion
 }

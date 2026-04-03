@@ -12,12 +12,15 @@ public class AttackState : PlayerStateBase
     }
     public override void Execute()
     {
-        if(_isAttackFinished) _player.ChangeState(PlayerStateType.Idle);
+        if(_isAttackFinished) _player.ChangeState(StateType.Idle);
     }
     public override void Exit() { }
 
-    public void NotifyAttackEnd()
+    public override void OnAnimationEvent(AnimEventType type)
     {
-        _isAttackFinished = true;
+        if(type == AnimEventType.End)
+        {
+            _isAttackFinished = true;
+        }
     }
 }

@@ -13,7 +13,7 @@ public class FallState : PlayerStateBase
     public override void Execute()
     {
         _player.Move(true);
-        if (_player.IsGrounded) _player.ChangeState(PlayerStateType.Idle);
+        if (_player.IsGrounded) _player.ChangeState(StateType.Idle);
     }
 
     public override void Exit()

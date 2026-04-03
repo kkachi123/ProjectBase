@@ -15,7 +15,7 @@ public enum AnimationTriggerType
     JumpTrigger,
     AttackTrigger,
     HitTrigger,
-    DieTrigger,
+    DeathTrigger,
 }
 public enum AnimationBoolType
 {
@@ -52,7 +52,7 @@ public class AgentAnimator : MonoBehaviour
             { AnimationTriggerType.JumpTrigger, Animator.StringToHash(_animationData.JumpTrigger) },
             { AnimationTriggerType.AttackTrigger, Animator.StringToHash(_animationData.AttackTrigger) },
             { AnimationTriggerType.HitTrigger, Animator.StringToHash(_animationData.HitTrigger) },
-            { AnimationTriggerType.DieTrigger, Animator.StringToHash(_animationData.DieTrigger) },
+            { AnimationTriggerType.DeathTrigger, Animator.StringToHash(_animationData.DeathTrigger) },
         };
         _boolParameters = new Dictionary<AnimationBoolType, int>()
         {

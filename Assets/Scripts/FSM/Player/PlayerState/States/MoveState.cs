@@ -1,24 +1,37 @@
 using UnityEngine;
 public class MoveState : PlayerStateBase
 {
-    public override bool CanJump => true;
     public MoveState(PlayerController player) : base(player) { _player = player; }
 
     public override void Enter()
     {
         Debug.Log("MoveState Entered");
+        _input = InputKeyType.None;
     }
 
     public override void Execute()
     {
         _player.Move(true);
-        if (!_player.IsGrounded) _player.ChangeState(PlayerStateType.Fall);
-        else if (_player.IsIdle) _player.ChangeState(PlayerStateType.Idle);
+        if (!_player.IsGrounded) _player.ChangeState(StateType.Fall);
+        else if (_player.IsIdle) _player.ChangeState(StateType.Idle);
     }
 
     public override void Exit() 
     {
         _player.Move(false);
     }
+    public override void OnInputEvent(InputKeyType type)
+    {
+        if (!_player.IsGrounded) return;
 
+        switch (type)
+        {
+            case InputKeyType.Jump:
+                _player.ChangeState(StateType.Jump);
+                break;
+            case InputKeyType.Attack:
+                _player.ChangeState(StateType.Attack);
+                break;
+        }
+    }
 }

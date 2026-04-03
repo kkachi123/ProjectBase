@@ -11,7 +11,7 @@ public class AnimationDataSO : ScriptableObject
     public string JumpTrigger = "JumpTrigger";
     public string AttackTrigger = "AttackTrigger";
     public string HitTrigger = "HitTrigger";
-    public string DieTrigger = "DieTrigger";
+    public string DeathTrigger = "DeathTrigger";
     [Header("Animation Bool")]
     public string IsGroundBool = "IsGround";
     public string IsHitBool = "IsHit";

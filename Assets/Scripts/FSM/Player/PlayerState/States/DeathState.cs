@@ -1,10 +1,10 @@
 using UnityEngine;
-public class DieState : PlayerStateBase
+public class DeathState : PlayerStateBase
 {
-    public DieState(PlayerController player) : base(player) { _player = player; }
+    public DeathState(PlayerController player) : base(player) { _player = player; }
     public override void Enter()
     {
-        Debug.Log("DieState Entered");
+        Debug.Log("DeathState Entered");
     }
     public override void Execute()
     {

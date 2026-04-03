@@ -11,12 +11,16 @@ public class HitState : PlayerStateBase
     }
     public override void Execute()
     {
-        if(_isHitFinished) _player.ChangeState(PlayerStateType.Idle);
+        if(_isHitFinished) _player.ChangeState(StateType.Idle);
     }
     public override void Exit() { }
 
-    public void NotifyHitEnd()
+    public override void OnAnimationEvent(AnimEventType type)
     {
-        _isHitFinished = true;
+        if(type == AnimEventType.End)
+        {
+            _isHitFinished = true;
+        }
     }
+    
 }

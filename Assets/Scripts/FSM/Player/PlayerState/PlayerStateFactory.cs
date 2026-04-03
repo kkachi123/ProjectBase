@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-public enum PlayerStateType
+public enum StateType
 {
     Idle,
     Move,
@@ -8,22 +8,22 @@ public enum PlayerStateType
     Fall,
     Attack,
     Hit,
-    Die,
+    Death,
 }
 
 public class PlayerStateFactory 
 {
-    public Dictionary<PlayerStateType, PlayerStateBase> CreateStates(PlayerController playerController)
+    public Dictionary<StateType, PlayerStateBase> CreateStates(PlayerController playerController)
     {
-        return new Dictionary<PlayerStateType, PlayerStateBase>
+        return new Dictionary<StateType, PlayerStateBase>
         {
-            { PlayerStateType.Idle, new IdleState(playerController) },
-            { PlayerStateType.Move, new MoveState(playerController) },
-            { PlayerStateType.Jump, new JumpState(playerController) },
-            { PlayerStateType.Fall, new FallState(playerController) },
-            { PlayerStateType.Attack, new AttackState(playerController) },
-            { PlayerStateType.Hit, new HitState(playerController) },
-            { PlayerStateType.Die, new DieState(playerController) },
+            { StateType.Idle, new IdleState(playerController) },
+            { StateType.Move, new MoveState(playerController) },
+            { StateType.Jump, new JumpState(playerController) },
+            { StateType.Fall, new FallState(playerController) },
+            { StateType.Attack, new AttackState(playerController) },
+            { StateType.Hit, new HitState(playerController) },
+            { StateType.Death, new DeathState(playerController) },
         };
     }
 }

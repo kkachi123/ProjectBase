@@ -37,9 +37,9 @@ public class AgentAnimationHandler
         if(isHit) _animationController.SetTrigger(AnimationTriggerType.HitTrigger);
         _animationController.SetBool(AnimationBoolType.IsHit, isHit);
     }
-    public void ApplyDieAnimation()
+    public void ApplyDeathAnimation()
     {
-        _animationController.SetTrigger(AnimationTriggerType.DieTrigger);
+        _animationController.SetTrigger(AnimationTriggerType.DeathTrigger);
         _animationController.SetBool(AnimationBoolType.IsDead, true);
     }
     #endregion

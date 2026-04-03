@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class AnimationEventProxy : MonoBehaviour
+public class PlayerAnimationEventProxy : MonoBehaviour
 {
     [SerializeField] private PlayerController _controller;
 
