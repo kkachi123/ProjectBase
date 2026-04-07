@@ -13,9 +13,10 @@ public class AgentAnimationHandler
     }
 
     #region Animation Control
-    public void ApplyMovementAnimation(Vector2 horizontalInput)
+    public void ApplyMovementAnimation(bool isMove)
     {
-        _animationController.SetFloat(AnimationFloatType.MoveSpeed, Math.Abs(horizontalInput.x));
+        if (isMove) _animationController.SetTrigger(AnimationTriggerType.MoveTrigger);
+        _animationController.SetBool(AnimationBoolType.IsMove, isMove);
     }
 
     public void ApplyJumpingAnimation()
@@ -25,12 +26,15 @@ public class AgentAnimationHandler
 
     public void ApplyFallingAnimation(bool isFalling)
     {
-        _animationController.SetBool(AnimationBoolType.IsGround, !isFalling);
+        if(isFalling) _animationController.SetTrigger(AnimationTriggerType.FallTrigger);
+        _animationController.SetBool(AnimationBoolType.IsFall, isFalling);
     }
     public void ApplyAttackAnimation(int attackType)
     {
+        bool isAttack = attackType > 0; 
+        if(isAttack) _animationController.SetTrigger(AnimationTriggerType.AttackTrigger);
+        _animationController.SetBool(AnimationBoolType.IsAttack, isAttack);
         _animationController.SetInteger(AnimationIntType.AttackType, attackType);
-        _animationController.SetTrigger(AnimationTriggerType.AttackTrigger);
     }
     public void ApplyHitAnimation(bool isHit)
     {
@@ -40,7 +44,7 @@ public class AgentAnimationHandler
     public void ApplyDeathAnimation()
     {
         _animationController.SetTrigger(AnimationTriggerType.DeathTrigger);
-        _animationController.SetBool(AnimationBoolType.IsDead, true);
+        _animationController.SetBool(AnimationBoolType.IsDeath, true);
     }
     #endregion
 }

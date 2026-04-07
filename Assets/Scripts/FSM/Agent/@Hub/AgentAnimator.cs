@@ -9,19 +9,22 @@ public enum AnimationFloatType
 {
     MoveSpeed,
 }
-
 public enum AnimationTriggerType
 {
+    MoveTrigger,
     JumpTrigger,
+    FallTrigger,
     AttackTrigger,
     HitTrigger,
     DeathTrigger,
 }
 public enum AnimationBoolType
 {
-    IsGround,
+    IsMove,
+    IsFall,
+    IsAttack,
     IsHit,
-    IsDead,
+    IsDeath,
 }
 
 [RequireComponent(typeof(Animator))]
@@ -31,7 +34,6 @@ public class AgentAnimator : MonoBehaviour
     [SerializeField] Animator _anim;
     [SerializeField] AnimationDataSO _animationData;
     private Dictionary<AnimationIntType, int> _intParameters;
-
     private Dictionary<AnimationFloatType, int> _floatParameters;
     private Dictionary<AnimationTriggerType, int> _triggerParameters;
     private Dictionary<AnimationBoolType, int> _boolParameters;
@@ -49,16 +51,20 @@ public class AgentAnimator : MonoBehaviour
         };
         _triggerParameters = new Dictionary<AnimationTriggerType, int>()
         {
+            { AnimationTriggerType.MoveTrigger, Animator.StringToHash(_animationData.MoveTrigger) },
             { AnimationTriggerType.JumpTrigger, Animator.StringToHash(_animationData.JumpTrigger) },
+            { AnimationTriggerType.FallTrigger, Animator.StringToHash(_animationData.FallTrigger) },
             { AnimationTriggerType.AttackTrigger, Animator.StringToHash(_animationData.AttackTrigger) },
             { AnimationTriggerType.HitTrigger, Animator.StringToHash(_animationData.HitTrigger) },
             { AnimationTriggerType.DeathTrigger, Animator.StringToHash(_animationData.DeathTrigger) },
         };
         _boolParameters = new Dictionary<AnimationBoolType, int>()
         {
-            { AnimationBoolType.IsGround, Animator.StringToHash(_animationData.IsGroundBool) },
+            {AnimationBoolType.IsMove, Animator.StringToHash(_animationData.IsMoveBool) },
+            { AnimationBoolType.IsFall, Animator.StringToHash(_animationData.IsFallBool) },
+            { AnimationBoolType.IsAttack, Animator.StringToHash(_animationData.IsAttackBool) },
             { AnimationBoolType.IsHit, Animator.StringToHash(_animationData.IsHitBool) },
-            { AnimationBoolType.IsDead, Animator.StringToHash(_animationData.IsDeadBool) },
+            { AnimationBoolType.IsDeath, Animator.StringToHash(_animationData.IsDeathBool) },
         };
     }
     public void SetInteger(AnimationIntType type, int value)

@@ -12,7 +12,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 31e57d5b4fc39e849a5d3fb71617d404, type: 3}
   m_Name: PlayerAnimationData
   m_EditorClassIdentifier: 
+  AttackTypeInt: AttackType
   MoveSpeedFloat: MoveSpeed
   JumpTrigger: JumpTrigger
-  DieTrigger: DieTrigger
-  IsGroundBool: IsGround
+  AttackTrigger: AttackTrigger
+  HitTrigger: HitTrigger
+  DeathTrigger: DeathTrigger
+  IsFallBool: IsFall
+  IsHitBool: IsHit
+  IsDeadBool: IsDead

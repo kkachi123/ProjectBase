@@ -10,7 +10,7 @@ public abstract class AgentController<T> :
     where T : class, IState
 {
     [Header("Data Assets")]
-    [SerializeField] protected AgentStateData _stateData;
+    [SerializeField] protected AgentMotorData _motorData;
     [SerializeField] protected AgentStatData _statData;
 
     [Header("Core Components")]
@@ -54,7 +54,7 @@ public abstract class AgentController<T> :
         // Handler Initialization
         _animator?.Initialize();
         _animationHandler?.Initialize(_animator);
-        _movementHandler?.Initialize(_mover, _stateData);
+        _movementHandler?.Initialize(_mover, _motorData);
         _combatHandler?.Initialize(_statData.attackDamage);
         _healthHandler?.Initialize(this);
         _inputHandler?.Initialize(this);
@@ -67,7 +67,7 @@ public abstract class AgentController<T> :
     {
         Vector2 moveVec = isMove ? _moveInput.GetMovementInput() : Vector2.zero;
         _movementHandler.HandleMove(moveVec);
-        _animationHandler.ApplyMovementAnimation(moveVec);
+        _animationHandler.ApplyMovementAnimation(isMove);
     }
 
     public virtual void Jump()

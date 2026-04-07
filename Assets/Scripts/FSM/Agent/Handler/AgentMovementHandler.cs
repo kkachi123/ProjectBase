@@ -3,9 +3,9 @@ using UnityEngine;
 public class AgentMovementHandler 
 {
     private AgentMover2D _mover;
-    private AgentStateData _data;
+    private AgentMotorData _data;
 
-    public void Initialize(AgentMover2D mover, AgentStateData data)
+    public void Initialize(AgentMover2D mover, AgentMotorData data)
     {
         _mover = mover;
         _data = data;
