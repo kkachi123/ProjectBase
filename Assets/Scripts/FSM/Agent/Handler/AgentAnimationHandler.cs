@@ -1,11 +1,9 @@
-using UnityEngine;
 using System;
 
 [Serializable]
 public class AgentAnimationHandler 
 {
     private AgentAnimator _animationController;
-    [SerializeField] private SpriteRenderer _spriteRenderer;
 
     public void Initialize(AgentAnimator animationController)
     {

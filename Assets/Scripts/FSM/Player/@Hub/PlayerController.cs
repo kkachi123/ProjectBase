@@ -1,5 +1,7 @@
-public class PlayerController : AgentController<PlayerStateBase>
+using UnityEngine;
+public class PlayerController : AgentController<PlayerStateBase> , IPlayerAnimationListener
 {
+    [SerializeField] private PlayerAnimationEventProxy _animationEventProxy;
     protected override void Awake()
     {
         base.Awake();
@@ -7,6 +9,7 @@ public class PlayerController : AgentController<PlayerStateBase>
         _stateMachine = new StateMachine<PlayerStateBase>();
         _states = new PlayerStateFactory().CreateStates(this);
 
+        _animationEventProxy?.Initialize(this);
     }
     private void Start()
     {

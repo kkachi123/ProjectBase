@@ -1,16 +1,5 @@
 using System.Collections.Generic;
 
-public enum StateType
-{
-    Idle,
-    Move,
-    Jump,
-    Fall,
-    Attack,
-    Hit,
-    Death,
-}
-
 public class PlayerStateFactory 
 {
     public Dictionary<StateType, PlayerStateBase> CreateStates(PlayerController playerController)
