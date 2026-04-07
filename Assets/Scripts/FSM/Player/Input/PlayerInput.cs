@@ -22,10 +22,11 @@ public class PlayerInput : MonoBehaviour , IAgentMovementInput , IAgentCombatInp
         inputActions.gamePlay.Jump.performed += JumpInput;
         inputActions.gamePlay.Jump.canceled += JumpInput;
 
-        inputActions.gamePlay.Attack1.performed += Attack1Input;
+        inputActions.gamePlay.Attack1.performed += context => AttackInput(context, 1);
+        
         inputActions.gamePlay.Attack1.canceled += AttackEnd;
 
-        inputActions.gamePlay.Attack2.performed += Attack2Input;
+        inputActions.gamePlay.Attack2.performed += context => AttackInput(context, 2);
         inputActions.gamePlay.Attack2.canceled += AttackEnd;
     }
 
@@ -56,26 +57,18 @@ public class PlayerInput : MonoBehaviour , IAgentMovementInput , IAgentCombatInp
             _jumpPressed.Value = false;
         }
     }
+    public void AttackInput(InputAction.CallbackContext context , int value)
+    {
+        if (context.performed)
+        {
+            _attackPressed.Value = value;
+        }
+    }
     public void AttackEnd(InputAction.CallbackContext context)
     {
         if (context.canceled)
         {
             _attackPressed.Value = 0;
-        }
-    }
-    public void Attack1Input(InputAction.CallbackContext context)
-    {
-        if (context.performed)
-        {
-            _attackPressed.Value = 1;
-        }
-    }
-
-    public void Attack2Input(InputAction.CallbackContext context)
-    {
-        if (context.performed)
-        {
-            _attackPressed.Value = 2;
         }
     }
 
