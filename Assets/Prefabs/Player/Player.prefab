@@ -90,9 +90,8 @@ MonoBehaviour:
   _motorData: {fileID: 11400000, guid: b052bdbf92f96df4ca1699d02055e658, type: 2}
   _statData: {fileID: 11400000, guid: bbd7a6feca900de40b6381f1e29bff55, type: 2}
   _animator: {fileID: 4862446387975837390}
-  _animationHandler:
-    _spriteRenderer: {fileID: 1273930479780660056}
   _combatHandler: {fileID: 6125933212912360794}
+  _animationEventProxy: {fileID: 8638326237852265103}
 --- !u!114 &6786316900135613947
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -537,4 +536,3 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b0342741f2a3f469b9f36640bb82afac, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _controller: {fileID: 7120852688989209731}
