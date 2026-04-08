@@ -6,11 +6,12 @@ public class MoveState : PlayerStateBase
     public override void Enter()
     {
         Debug.Log("MoveState Entered");
+        _player.Move(true);
     }
 
     public override void Execute()
     {
-        _player.Move(true);
+        _player.HandleMovement();
         if (!_player.IsGrounded) _player.ChangeState(StateType.Fall);
         else if (_player.IsIdle) _player.ChangeState(StateType.Idle);
     }

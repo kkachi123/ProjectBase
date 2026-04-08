@@ -12,38 +12,6 @@ public class AgentAnimationHandler
     }
 
     #region Animation Control
-    public void NotifyTransition(List<StateType> types)
-    {
-        foreach(var type in types)
-        {
-            switch (type)
-            {
-                case StateType.Idle:
-                    _animationController.SetBool(AnimationBoolType.IsIdle, true);
-                    break;
-                case StateType.Move:
-                    _animationController.SetBool(AnimationBoolType.IsMove, true);
-                    break;
-                case StateType.Jump:
-                    _animationController.SetBool(AnimationBoolType.IsJump, true);
-                    break;
-                case StateType.Fall:
-                    _animationController.SetBool(AnimationBoolType.IsFall, true);
-                    break;
-                case StateType.Attack:
-                    _animationController.SetBool(AnimationBoolType.IsAttack, true);
-                    break;
-                case StateType.Hit:
-                    _animationController.SetBool(AnimationBoolType.IsHit, true);
-                    break;
-                case StateType.Death:
-                    _animationController.SetBool(AnimationBoolType.IsDeath, true);
-                    break;
-                default:
-                    break;
-            }
-        }
-    }
 
     public void ApplyIdleAnimation(bool isIdle)
     {
