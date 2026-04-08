@@ -23,4 +23,14 @@ public class JumpState : PlayerStateBase
     }
 
     public override void Exit() {}
+
+    public override void OnInputEvent(InputKeyType type)
+    {
+        switch (type)
+        {
+            case InputKeyType.Attack:
+                _player.ChangeState(StateType.Attack);
+                break;
+        }
+    }
 }

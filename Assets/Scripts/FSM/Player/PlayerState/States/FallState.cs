@@ -22,4 +22,13 @@ public class FallState : PlayerStateBase
         _player.Move(false);
     }
 
+    public override void OnInputEvent(InputKeyType type)
+    {
+        switch (type)
+        {
+            case InputKeyType.Attack:
+                _player.ChangeState(StateType.Attack);
+                break;
+        }
+    }
 }
