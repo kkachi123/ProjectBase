@@ -1,27 +1,26 @@
 using UnityEngine;
 using System.Collections;
-
-public enum AIInputType
-{
-    None = 0,
-    Move,
-    Jump,
-    Attack
-}
-
+[RequireComponent (typeof(AIPlayerInput), typeof(JumpFloorDetector))]
 public class AIPlayerLogic : MonoBehaviour
 {
-    [SerializeField] private AIPlayerInput _input;
-    [SerializeField] private FieldOfView _fieldOfView;
+    private AIPlayerInput _input;
+    private JumpFloorDetector _fieldOfView;
+    private PlayerSearchDetector _fieldOfView2; 
 
     [Header("AI Settings")]
     [SerializeField] private float _attackRange = 1.0f;
     [SerializeField] private float _jumpThresholdY = 0.5f; // 대상이 이 높이보다 위에 있으면 점프
     [SerializeField] private float _decisionInterval = 0.1f; // 판단 주기
+    private void Awake()
+    {
+        _input = GetComponent<AIPlayerInput>();
+        _fieldOfView = GetComponent<JumpFloorDetector>();
+    }
 
     private void Start()
     {
-        StartCoroutine(AILogicRoutine());
+        //StartCoroutine(AILogicRoutine());
+        StartCoroutine(PatrolRoutine());
     }
 
     private IEnumerator AILogicRoutine()
@@ -31,7 +30,7 @@ public class AIPlayerLogic : MonoBehaviour
 
         while (true)
         {
-            if (_fieldOfView.IsTargetInView())
+            if (_fieldOfView2.IsTargetInView())
             {
                 // 1. 플레이어를 인식한 경우
                 yield return StartCoroutine(ChaseAndAttackRoutine());
@@ -107,7 +106,7 @@ public class AIPlayerLogic : MonoBehaviour
         float idleTime = Random.Range(1f, 2f);
         while (idleTime > 0)
         {
-            if (_fieldOfView.IsTargetInView()) yield break; // 도중 발견 시 즉시 탈출
+            //if (_fieldOfView.IsTargetInView()) yield break; // 도중 발견 시 즉시 탈출
             idleTime -= Time.deltaTime;
             yield return null;
         }
@@ -115,7 +114,7 @@ public class AIPlayerLogic : MonoBehaviour
         // 3-2. 방향 전환 후 이동 또는 가까운 지면 탐색 점프
         Transform nextGround = _fieldOfView.GetClosedGround();
 
-        if (nextGround != null && Vector2.Distance(transform.position, nextGround.position) > 2f)
+        if (nextGround != null)
         {
             // 가까운 땅이 있다면 그 방향으로 점프 탐색
             yield return StartCoroutine(JumpAction(nextGround));
@@ -128,7 +127,7 @@ public class AIPlayerLogic : MonoBehaviour
 
             while (walkTime > 0)
             {
-                if (_fieldOfView.IsTargetInView()) yield break;
+                //if (_fieldOfView.IsTargetInView()) yield break;
                 _input.Move(new Vector2(patrolDir, 0));
                 walkTime -= Time.deltaTime;
                 yield return null;
@@ -136,6 +135,7 @@ public class AIPlayerLogic : MonoBehaviour
         }
 
         _input.Move(Vector2.zero);
+        StartCoroutine(PatrolRoutine());
     }
 
     private IEnumerator JumpAction(Transform ground)
@@ -150,7 +150,7 @@ public class AIPlayerLogic : MonoBehaviour
         {
             _input.Move(new Vector2(dirToGround.x > 0 ? 1 : -1, 0));
 
-            if(Mathf.Abs(transform.position.x - ground.position.x) < 0.5f)
+            if(Mathf.Abs(transform.position.x - ground.position.x) < 0.2f)
             {
                 yield break; 
             }

@@ -1,16 +1,15 @@
 using UnityEngine;
 
-public class FieldOfView : MonoBehaviour
+public class PlayerSearchDetector : MonoBehaviour
 {
     [SerializeField] Transform eyePosition;
     [SerializeField] private LayerMask _targetMask;
     [SerializeField] private LayerMask obstacleMask;
-    [SerializeField] private LayerMask _groundMask;
-    [Range(0, 360)] 
+    [Range(0, 360)]
     [SerializeField] private float viewAngle = 90f;
     [Range(0, 20)]
     [SerializeField] private float viewRadius = 5f;
-    [SerializeField] private float canJumpWidth = 2.0f;
+    [SerializeField] private float canJumpWidth = 0.6f;
 
     public Transform currentTarget;
 
@@ -23,7 +22,7 @@ public class FieldOfView : MonoBehaviour
         {
             Transform target = targetCollider.transform;
             Vector2 dirToTarget = (target.position - eyePosition.position).normalized;
-            Vector2 lookDir = transform.localScale.x < 0 ? Vector2.left : Vector2.right; 
+            Vector2 lookDir = transform.localScale.x < 0 ? Vector2.left : Vector2.right;
 
             if (Vector2.Angle(lookDir, dirToTarget) < viewAngle / 2)
             {
@@ -42,36 +41,13 @@ public class FieldOfView : MonoBehaviour
         return false;
     }
 
-    public Transform GetClosedGround()
-    {
-        Collider2D[] groundsInRadius = Physics2D.OverlapCircleAll(eyePosition.position, viewRadius, _groundMask);
-        Transform closestGround = null;
-        float closestDistance = Mathf.Infinity;
-        foreach (Collider2D ground in groundsInRadius)
-        {
-            if(ground.transform.position.y <= transform.position.y) continue;
-            // x축 방향으로 일정 거리가 있어야 점프할 수 있는 위치로 간주
-            if(Mathf.Abs(ground.transform.position.x - transform.position.x) < canJumpWidth) continue;
-
-            float dist = Vector2.Distance(eyePosition.position, ground.transform.position);
-            if (dist < closestDistance)
-            {
-                closestDistance = dist;
-                closestGround = ground.transform;
-            }
-        }
-        return closestGround;
-    }
-
-    // 에디터에서 시야 범위를 시각적으로 확인하기 위한 기즈모
+    //에디터에서 시야 범위를 시각적으로 확인하기 위한 기즈모
     private void OnDrawGizmos()
     {
         Gizmos.color = Color.white;
         Gizmos.DrawWireSphere(eyePosition.position, viewRadius);
-
         Vector3 leftBoundary = DirFromAngle(-viewAngle / 2);
         Vector3 rightBoundary = DirFromAngle(viewAngle / 2);
-
         Gizmos.color = Color.yellow;
         Gizmos.DrawLine(eyePosition.position, eyePosition.position + leftBoundary * viewRadius);
         Gizmos.DrawLine(eyePosition.position, eyePosition.position + rightBoundary * viewRadius);

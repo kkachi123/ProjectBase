@@ -29,7 +29,7 @@ public class JumpState : PlayerStateBase
 
     public override void OnInputEvent(InputKeyType type)
     {
-        if(_jumpTimer < MIN_JUMP_TIME || _player.IsGrounded) return;
+        if( _player.IsGrounded) return;
         switch (type)
         {
             case InputKeyType.Attack:
