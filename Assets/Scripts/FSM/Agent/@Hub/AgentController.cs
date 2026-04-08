@@ -93,6 +93,7 @@ public abstract class AgentController<T> :
     }
     public virtual void Hit(bool isHit)
     {
+        if(!isHit) _movementHandler.HandleMove(Vector2.zero); 
         _animationHandler.ApplyHitAnimation(isHit);
     }
     #endregion
