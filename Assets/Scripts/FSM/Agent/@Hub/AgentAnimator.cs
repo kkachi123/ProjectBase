@@ -11,6 +11,7 @@ public enum AnimationFloatType
 }
 public enum AnimationTriggerType
 {
+    IdleTrigger,
     MoveTrigger,
     JumpTrigger,
     FallTrigger,
@@ -53,6 +54,7 @@ public class AgentAnimator : MonoBehaviour
         };
         _triggerParameters = new Dictionary<AnimationTriggerType, int>()
         {
+            { AnimationTriggerType.IdleTrigger, Animator.StringToHash(_animationData.IdleTrigger) },
             { AnimationTriggerType.MoveTrigger, Animator.StringToHash(_animationData.MoveTrigger) },
             { AnimationTriggerType.JumpTrigger, Animator.StringToHash(_animationData.JumpTrigger) },
             { AnimationTriggerType.FallTrigger, Animator.StringToHash(_animationData.FallTrigger) },

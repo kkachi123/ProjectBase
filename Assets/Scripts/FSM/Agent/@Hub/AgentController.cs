@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-[RequireComponent(typeof(AgentMover2D))]
 [RequireComponent(typeof(GroundDetector))]
 [RequireComponent(typeof(Health))]
 public abstract class AgentController<T> : 
@@ -18,7 +17,7 @@ public abstract class AgentController<T> :
     protected IAgentCombatInput _combatInput;
     public IAgentMovementInput MoveInput => _moveInput;
     public IAgentCombatInput CombatInput => _combatInput;
-    protected AgentMover2D _mover;
+    protected AgentMotor2D _motor;
     protected GroundDetector _groundDetector;
     protected Health _health;
     public Health Health => _health;
@@ -26,7 +25,7 @@ public abstract class AgentController<T> :
     [Header("Handlers & Visuals")]
     [SerializeField] protected AgentAnimator _animator;
     [SerializeField] protected AgentAnimationHandler _animationHandler;
-    [SerializeField] protected AgentMovementHandler _movementHandler;
+    [SerializeField] protected AgentMovementHandler2D _movementHandler;
     [SerializeField] protected AgentCombatHandler _combatHandler;
     [SerializeField] protected AgentHealthHandler _healthHandler;
     [SerializeField] protected AgentInputHandler _inputHandler;
@@ -43,7 +42,7 @@ public abstract class AgentController<T> :
     protected virtual void Awake()
     {
         // Core Component Initialization
-        _mover = GetComponent<AgentMover2D>();
+        _motor = GetComponent<AgentMotor2D>();
         _moveInput = GetComponent<IAgentMovementInput>();
         _combatInput = GetComponent<IAgentCombatInput>();
         _groundDetector = GetComponent<GroundDetector>();
@@ -54,7 +53,7 @@ public abstract class AgentController<T> :
         // Handler Initialization
         _animator?.Initialize();
         _animationHandler?.Initialize(_animator);
-        _movementHandler?.Initialize(_mover, _motorData);
+        _movementHandler?.Initialize(_motor, _motorData);
         _combatHandler?.Initialize(_statData.attackDamage);
         _healthHandler?.Initialize(this);
         _inputHandler?.Initialize(this);
@@ -92,11 +91,14 @@ public abstract class AgentController<T> :
     {
         _animationHandler.ApplyAttackAnimation(_combatHandler.CurrentAttackType);
     }
-
-    #endregion
-    public virtual void OnHit()
+    public virtual void Hit(bool isHit)
     {
-        _animationHandler.ApplyHitAnimation(true);
+        _animationHandler.ApplyHitAnimation(isHit);
+    }
+    #endregion
+    public virtual void OnHit(Vector2 dir)
+    {
+        _movementHandler.HandleKnockback(dir);
         ChangeState(StateType.Hit);
     }
 

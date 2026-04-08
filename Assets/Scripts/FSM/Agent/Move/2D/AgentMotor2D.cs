@@ -30,4 +30,11 @@ public class AgentMotor2D : MonoBehaviour
         _rb.linearVelocity = new Vector2(horizontalInput.x, 0);
         _rb.AddForce(Vector2.up * jumpForce, ForceMode2D.Impulse);
     }
+
+    public void Knockback(Vector2 horizontalInput, float knockForce)
+    {
+        // X축 속도를 초기화하고 넉백 힘을 적용
+        _rb.linearVelocity = Vector2.zero;
+        _rb.AddForce(horizontalInput * knockForce, ForceMode2D.Impulse);
+    }
 }

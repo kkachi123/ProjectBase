@@ -7,4 +7,5 @@ public class AgentMotorData : ScriptableObject
     public float moveSpeed = 5f;
     public float jumpSpeed = 3f;
     public float jumpForce = 8f;
+    public float knockbackForce = 3f;
 }

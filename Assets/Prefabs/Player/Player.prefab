@@ -123,13 +123,12 @@ GameObject:
   - component: {fileID: 8186350033515855826}
   - component: {fileID: 7120852688989209731}
   - component: {fileID: 6786316900135613947}
-  - component: {fileID: 1336395422084641467}
   - component: {fileID: 1530164503890448634}
   - component: {fileID: 3853302286112741967}
   - component: {fileID: 4506167850545434978}
+  - component: {fileID: 6125933212912360794}
   - component: {fileID: 7415742755830340724}
   - component: {fileID: 8565116985865354277}
-  - component: {fileID: 6125933212912360794}
   m_Layer: 8
   m_Name: Player
   m_TagString: Player
@@ -183,19 +182,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5f7ec31e6c3646542acea792effb7a3f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!114 &1336395422084641467
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6748850014222937685}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f1471e0e48b7e4186969516120abe167, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _motor: {fileID: 1530164503890448634}
 --- !u!114 &1530164503890448634
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -239,6 +225,25 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _currentHealth:
     value: 0
+--- !u!114 &6125933212912360794
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6748850014222937685}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b6d0292d1e39840768ff6070354a478e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _attackAreas:
+  - {fileID: 8585009378877103962}
+  - {fileID: 6799880764833448647}
+  - {fileID: 5743376470882950068}
+  _targetLayer:
+    serializedVersion: 2
+    m_Bits: 512
 --- !u!70 &7415742755830340724
 CapsuleCollider2D:
   m_ObjectHideFlags: 0
@@ -303,25 +308,6 @@ Rigidbody2D:
   m_SleepingMode: 1
   m_CollisionDetection: 0
   m_Constraints: 4
---- !u!114 &6125933212912360794
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6748850014222937685}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b6d0292d1e39840768ff6070354a478e, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _attackAreas:
-  - {fileID: 8585009378877103962}
-  - {fileID: 6799880764833448647}
-  - {fileID: 5743376470882950068}
-  _targetLayer:
-    serializedVersion: 2
-    m_Bits: 512
 --- !u!1 &7117462831889813507
 GameObject:
   m_ObjectHideFlags: 0

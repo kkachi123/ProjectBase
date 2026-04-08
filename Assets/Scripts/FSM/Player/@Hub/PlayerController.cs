@@ -49,7 +49,6 @@ public class PlayerController : AgentController<PlayerStateBase> , IPlayerAnimat
     public void OnHitAnimationEnd()
     {
         _stateMachine.CurrentState.OnAnimationEvent(AnimEventType.End);
-        _animationHandler.ApplyHitAnimation(false); // Reset to default state animation
     }
     #endregion
 

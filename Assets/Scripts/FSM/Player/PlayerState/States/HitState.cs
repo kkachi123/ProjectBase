@@ -8,12 +8,16 @@ public class HitState : PlayerStateBase
     {
         Debug.Log("HurtState Entered");
         _isHitFinished = false;
+        _player.Hit(true);
     }
     public override void Execute()
     {
         if(_isHitFinished) _player.ChangeState(StateType.Idle);
     }
-    public override void Exit() { }
+    public override void Exit() 
+    {
+        _player.Hit(false);
+    }
 
     public override void OnAnimationEvent(AnimEventType type)
     {

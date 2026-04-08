@@ -27,7 +27,7 @@ public class AgentCombatHandler : MonoBehaviour
         {
             if (target.TryGetComponent(out IDamageable damageable))
             {
-                damageable.TakeDamage(_attackDamage);
+                damageable.TakeDamage(_attackDamage , _attackArea.transform.position);
             }
         }
     }

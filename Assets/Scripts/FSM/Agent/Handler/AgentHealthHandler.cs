@@ -14,10 +14,8 @@ public class AgentHealthHandler
 
     private void BindEvents()
     {
-        _health.CurrentHealth
-            .Pairwise()
-            .Where(pair => pair.Current < pair.Previous)
-            .Subscribe(_ => _controller.OnHit())
+        _health.OnKnockback
+            .Subscribe(knockbackDir => _controller.OnHit(knockbackDir))
             .AddTo(_controller.gameObject);
 
         _health.IsDead

@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 
 [Serializable]
 public class AgentAnimationHandler 
@@ -15,6 +14,7 @@ public class AgentAnimationHandler
 
     public void ApplyIdleAnimation(bool isIdle)
     {
+        if (isIdle) _animationController.SetTrigger(AnimationTriggerType.IdleTrigger);
         _animationController.SetBool(AnimationBoolType.IsIdle, isIdle);
     }
     public void ApplyMovementAnimation(bool isMove)
