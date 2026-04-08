@@ -60,6 +60,7 @@ public class PlayerController : AgentController<PlayerStateBase> , IPlayerAnimat
     }
     public override void OnAttackAction(int attackType)
     {
+        if (!IsGrounded) attackType = 3;
         _combatHandler.SetAttackType(attackType);
         _stateMachine.CurrentState?.OnInputEvent(InputKeyType.Attack);
     }

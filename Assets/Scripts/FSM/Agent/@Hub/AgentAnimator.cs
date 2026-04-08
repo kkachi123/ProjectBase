@@ -20,7 +20,9 @@ public enum AnimationTriggerType
 }
 public enum AnimationBoolType
 {
+    IsIdle,
     IsMove,
+    IsJump,
     IsFall,
     IsAttack,
     IsHit,
@@ -60,7 +62,9 @@ public class AgentAnimator : MonoBehaviour
         };
         _boolParameters = new Dictionary<AnimationBoolType, int>()
         {
-            {AnimationBoolType.IsMove, Animator.StringToHash(_animationData.IsMoveBool) },
+            { AnimationBoolType.IsIdle, Animator.StringToHash(_animationData.IsIdleBool) },
+            { AnimationBoolType.IsMove, Animator.StringToHash(_animationData.IsMoveBool) },
+            { AnimationBoolType.IsJump, Animator.StringToHash(_animationData.IsJumpBool) },
             { AnimationBoolType.IsFall, Animator.StringToHash(_animationData.IsFallBool) },
             { AnimationBoolType.IsAttack, Animator.StringToHash(_animationData.IsAttackBool) },
             { AnimationBoolType.IsHit, Animator.StringToHash(_animationData.IsHitBool) },

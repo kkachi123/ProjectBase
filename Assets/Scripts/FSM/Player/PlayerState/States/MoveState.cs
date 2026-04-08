@@ -6,7 +6,6 @@ public class MoveState : PlayerStateBase
     public override void Enter()
     {
         Debug.Log("MoveState Entered");
-        _input = InputKeyType.None;
     }
 
     public override void Execute()

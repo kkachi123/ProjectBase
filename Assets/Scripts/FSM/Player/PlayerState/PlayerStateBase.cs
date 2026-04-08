@@ -12,11 +12,9 @@ public enum InputKeyType
 public abstract class PlayerStateBase : IState
 {
     protected PlayerController _player;
-    protected InputKeyType _input;
     public PlayerStateBase(PlayerController playerController)
     {
         _player = playerController;
-        _input = InputKeyType.None;
     }
     public abstract void Enter();
     public abstract void Execute();

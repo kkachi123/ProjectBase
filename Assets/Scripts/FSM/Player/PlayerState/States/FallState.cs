@@ -12,18 +12,23 @@ public class FallState : PlayerStateBase
 
     public override void Execute()
     {
-        _player.Move(true);
-        if (_player.IsGrounded) _player.ChangeState(StateType.Idle);
+        _player.HandleMovement();
+        if (_player.IsGrounded)
+        {
+            if(_player.IsIdle) _player.ChangeState(StateType.Idle);
+            else _player.ChangeState(StateType.Move);
+        }
+            
     }
 
     public override void Exit()
     {
         _player.Falling(false);
-        _player.Move(false);
     }
 
     public override void OnInputEvent(InputKeyType type)
     {
+        if(_player.IsGrounded) return;
         switch (type)
         {
             case InputKeyType.Attack:

@@ -63,17 +63,25 @@ public abstract class AgentController<T> :
     public abstract void ChangeState(StateType type);
 
     #region Action Methods - State Operations
+    public virtual void Idle(bool isIdle)
+    {
+        _animationHandler.ApplyIdleAnimation(isIdle);
+    }
     public virtual void Move(bool isMove)
     {
         Vector2 moveVec = isMove ? _moveInput.GetMovementInput() : Vector2.zero;
         _movementHandler.HandleMove(moveVec);
         _animationHandler.ApplyMovementAnimation(isMove);
     }
+    public virtual void HandleMovement()
+    {
+        _movementHandler.HandleMove(_moveInput.GetMovementInput());
+    }
 
-    public virtual void Jump()
+    public virtual void Jump(bool isJump)
     {
         _movementHandler.HandleJump(_moveInput.GetMovementInput());
-        _animationHandler.ApplyJumpingAnimation();
+        _animationHandler.ApplyJumpingAnimation(isJump);
     }
     public virtual void Falling(bool isFalling)
     {

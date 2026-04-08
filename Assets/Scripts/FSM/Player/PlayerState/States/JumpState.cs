@@ -9,7 +9,7 @@ public class JumpState : PlayerStateBase
     {
         _jumpTimer = 0f;
         Debug.Log("JumpState Entered");
-        _player.Jump();
+        _player.Jump(true);
     }
 
     public override void Execute()
@@ -22,10 +22,14 @@ public class JumpState : PlayerStateBase
         }
     }
 
-    public override void Exit() {}
+    public override void Exit() 
+    {
+        _player.Jump(false);
+    }
 
     public override void OnInputEvent(InputKeyType type)
     {
+        if(_jumpTimer < MIN_JUMP_TIME || _player.IsGrounded) return;
         switch (type)
         {
             case InputKeyType.Attack:

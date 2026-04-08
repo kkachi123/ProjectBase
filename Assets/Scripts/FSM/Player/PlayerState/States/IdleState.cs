@@ -6,7 +6,7 @@ public class IdleState : PlayerStateBase
     public override void Enter()
     {
         Debug.Log("IdleState Entered");
-        _input = InputKeyType.None; 
+        _player.Idle(true);
     }
 
     public override void Execute()
@@ -15,7 +15,10 @@ public class IdleState : PlayerStateBase
         else if (!_player.IsIdle) _player.ChangeState(StateType.Move);
     }
 
-    public override void Exit() { }
+    public override void Exit() 
+    {
+        _player.Idle(false);
+    }
 
     public override void OnInputEvent(InputKeyType type)
     {
