@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class PlayerSearchDetector : MonoBehaviour
+public class FieldOfView2D : MonoBehaviour
 {
     [SerializeField] Transform eyePosition;
     [SerializeField] private LayerMask _targetMask;
@@ -9,8 +9,6 @@ public class PlayerSearchDetector : MonoBehaviour
     [SerializeField] private float viewAngle = 90f;
     [Range(0, 20)]
     [SerializeField] private float viewRadius = 5f;
-    [SerializeField] private float canJumpWidth = 0.6f;
-
     public Transform currentTarget;
 
     public bool IsTargetInView()

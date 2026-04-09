@@ -860,7 +860,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 471708758}
-  m_Layer: 8
+  m_Layer: 9
   m_Name: EyePos
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1524,7 +1524,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 821084003}
-  m_Layer: 8
+  m_Layer: 9
   m_Name: legPos
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2384,7 +2384,7 @@ GameObject:
   m_Component:
   - component: {fileID: 222401526002060509}
   - component: {fileID: 7390139515306895355}
-  m_Layer: 8
+  m_Layer: 9
   m_Name: Area3
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2593,7 +2593,7 @@ GameObject:
   m_Component:
   - component: {fileID: 3168823351228379390}
   - component: {fileID: 6782291635909468949}
-  m_Layer: 8
+  m_Layer: 9
   m_Name: Area1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2642,7 +2642,7 @@ GameObject:
   m_Component:
   - component: {fileID: 6780623422983272205}
   - component: {fileID: 8603451177323576968}
-  m_Layer: 8
+  m_Layer: 9
   m_Name: Area2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2699,7 +2699,7 @@ GameObject:
   - component: {fileID: 276365321536113756}
   - component: {fileID: 7656541571521653377}
   - component: {fileID: 6835023008432625344}
-  m_Layer: 8
+  m_Layer: 9
   m_Name: Hero
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2894,7 +2894,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2685815841201570910}
-  m_Layer: 8
+  m_Layer: 9
   m_Name: AttackArea
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2918,9 +2918,10 @@ GameObject:
   - component: {fileID: 5751550253351362619}
   - component: {fileID: 6910481436039069802}
   - component: {fileID: 8950958172198789399}
+  - component: {fileID: 8950958172198789402}
   - component: {fileID: 8950958172198789401}
   - component: {fileID: 8950958172198789400}
-  m_Layer: 8
+  m_Layer: 9
   m_Name: Player AI
   m_TagString: Player
   m_Icon: {fileID: 0}
@@ -3024,7 +3025,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2b0d21668ed26ee449d82b9cefbd3562, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _attackRange: 1
+  _attackRange:
+  - 1.25
+  - 1.45
+  - 0.9
   _jumpThresholdY: 0.5
   _decisionInterval: 0.1
   _motorData: {fileID: 11400000, guid: b052bdbf92f96df4ca1699d02055e658, type: 2}
@@ -3040,6 +3044,25 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c85efe94d511d8e49af27333e5a65f39, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &8950958172198789402
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8400099033603150362}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ff9ece546e2d239489983dcdfc76f041, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  playerMask:
+    serializedVersion: 2
+    m_Bits: 256
+  obstacleMask:
+    serializedVersion: 2
+    m_Bits: 192
+  viewRadius: 6
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
