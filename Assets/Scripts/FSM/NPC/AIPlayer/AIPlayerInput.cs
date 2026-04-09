@@ -17,13 +17,16 @@ public class AIPlayerInput : MonoBehaviour , IAgentMovementInput , IAgentCombatI
     {
         Horizontal = horizontal;
     }
+    // 순간 입력처리
     public void Jump(bool value)
     {
         _jumpPressed.Value = value;
+        if(value) _jumpPressed.Value = false; 
     }
 
     public void Attack(int value)
     {
         _attackPressed.Value = value;
+        if(value != 0) _attackPressed.Value = 0; 
     }
 }

@@ -2,21 +2,27 @@ using UnityEngine;
 
 public class JumpFloorDetector : MonoBehaviour
 {
-    [SerializeField] Transform eyePosition;
     [SerializeField] private LayerMask _groundMask;
     [SerializeField] private LayerMask obstacleMask;
     [Range(0, 20)]
     [SerializeField] private float viewRadius = 5f;
     [SerializeField] private float canJumpWidth = 0.6f;
 
-    public Transform currentTarget;
     private Vector2 closestGroundPos;
+    private float vX , vY , gravity;
+
+    public void SetJumpParameters(float vX, float vY, float gravityValue)
+    {
+        this.vX = vX;
+        this.vY = vY;
+        gravity = gravityValue;
+    }
 
     private bool IsJumpReachable(float diffX, float diffY, float vX, float vY, float gravity, out float timeToLand)
     {
         timeToLand = 0f;
 
-        // 1. 점프 최고 높이(Peak) 체크
+        // 1. 점프 최고 높이(maxHeight) 체크
         float maxHeight = (vY * vY) / (2f * gravity);
         if (diffY > maxHeight * 0.95f) return false; // 여유값 5%
 
@@ -40,14 +46,9 @@ public class JumpFloorDetector : MonoBehaviour
     }
     public Transform GetClosedGround()
     {
-        Collider2D[] groundsInRadius = Physics2D.OverlapCircleAll(eyePosition.position, viewRadius, _groundMask);
+        Collider2D[] groundsInRadius = Physics2D.OverlapCircleAll(transform.position, viewRadius, _groundMask);
         Transform closestGround = null;
         float closestDistance = Mathf.Infinity;
-
-        // 데이터 로드
-        float vY = 8f;
-        float vX = 5f;
-        float gravity = Mathf.Abs(Physics2D.gravity.y);
 
         foreach (Collider2D groundCollider in groundsInRadius)
         {
@@ -57,11 +58,12 @@ public class JumpFloorDetector : MonoBehaviour
             float diffY = targetPoint.y - startPos.y;
             float diffX = Mathf.Abs(targetPoint.x - startPos.x);
 
-            // 기본 필터링 (아래에 있거나 장애물에 막힌 경우)
-            if (diffY < -0.2f || diffX < canJumpWidth) continue; 
-            if (Physics2D.Linecast(eyePosition.position, targetPoint, obstacleMask)) continue;
-
-            // 분리한 함수 호출
+            // 기본 필터링 : 아래층이거나 x값이 너무 붙은 경우(천장에 부딪힘)
+            // 장애물 체크 (Linecast)
+            if (diffY < 0 || diffX < canJumpWidth) continue;
+            if (Physics2D.Linecast(transform.position, targetPoint, obstacleMask)) continue;
+            
+            // Jump Possibility Check 
             if (IsJumpReachable(diffX, diffY, vX, vY, gravity, out float t))
             {
                 // 거리 비교 후 최적의 지면 선택
@@ -70,42 +72,32 @@ public class JumpFloorDetector : MonoBehaviour
                 {
                     closestDistance = dist;
                     closestGround = groundCollider.transform;
-                    closestGroundPos = targetPoint; // 착지 예상 위치 저장 (필요 시 활용)
+                    closestGroundPos = targetPoint; // Gizmo visualization
                 }
             }
         }
-        currentTarget = closestGround;
         return closestGround;
     }
 
-    //에디터에서 시야 범위를 시각적으로 확인하기 위한 기즈모
     private void OnDrawGizmos()
     {
-        Gizmos.DrawWireSphere(eyePosition.position, viewRadius);
+        // Detection Radius
+        Gizmos.DrawWireSphere(transform.position, viewRadius);
 
+        // Preview of jumpable grounds 
         if (Application.isPlaying)
         {
-            Transform ground = GetClosedGround();
-            
-            if (ground != null)
+            if (GetClosedGround() != null)
             {
+                // Landing point Line
                 Gizmos.color = Color.cyan;
                 Gizmos.DrawLine(transform.position, closestGroundPos);
-                Gizmos.DrawWireCube(closestGroundPos, Vector3.one * 0.2f);
 
-                // 예상 궤적(간이)
+                // Landing point Box & Sphere
+                Gizmos.DrawWireCube(closestGroundPos, Vector3.one * 0.2f);
                 Gizmos.color = Color.red;
                 Gizmos.DrawWireSphere(closestGroundPos, 0.1f);
             }
         }
-
-        RaycastHit2D hit = Physics2D.Raycast(transform.position, Vector2.up, 2.0f, obstacleMask);
-        if (hit.collider != null)
-        {
-            Gizmos.color = Color.red;
-            Gizmos.DrawLine(transform.position, hit.point);
-            Gizmos.DrawWireSphere(hit.point, 0.2f);
-        }
     }
-
 }
