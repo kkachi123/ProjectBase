@@ -1,6 +1,5 @@
 using UniRx;
 using UnityEngine;
-
 public class AIPlayerInput : MonoBehaviour , IAgentMovementInput , IAgentCombatInput
 {
     public Vector2 Horizontal { get; private set; }
