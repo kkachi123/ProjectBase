@@ -16,9 +16,9 @@ public class AgentMovementHandler2D
         _motor.Move(moveVec, _data.moveSpeed);
     }
 
-    public void HandleJump(Vector2 input)
+    public void HandleJump()
     {
-        _motor.Jump(input, _data.jumpForce);
+        _motor.Jump(_data.jumpForce);
     }
 
     public void HandleKnockback(Vector2 direction)

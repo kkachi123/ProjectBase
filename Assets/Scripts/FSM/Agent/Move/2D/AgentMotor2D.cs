@@ -15,7 +15,7 @@ public class AgentMotor2D : MonoBehaviour
     public void Move(Vector2 horizontalInput, float moveSpeed)
     {
         Turn(horizontalInput);
-        _rb.linearVelocity = new Vector2(horizontalInput.x * moveSpeed, _rb.linearVelocity.y);
+        _rb.linearVelocityX = horizontalInput.x * moveSpeed;
     }
 
     private void Turn(Vector2 horizontalInput)
@@ -24,11 +24,9 @@ public class AgentMotor2D : MonoBehaviour
         else if (horizontalInput.x < 0) transform.localScale = new Vector3(-1, 1, 1);
     }
 
-    public void Jump(Vector2 horizontalInput, float jumpForce)
+    public void Jump(float jumpForce)
     {
-        // X축 속도를 초기화하고 점프 힘을 적용
-        _rb.linearVelocity = new Vector2(horizontalInput.x, 0);
-        _rb.AddForce(Vector2.up * jumpForce, ForceMode2D.Impulse);
+        _rb.AddForceY(jumpForce, ForceMode2D.Impulse);
     }
 
     public void Knockback(Vector2 horizontalInput, float knockForce)

@@ -33,5 +33,6 @@ public class AIBrain : MonoBehaviour
     private void Update()
     {
         _agent.SetVariableValue("IsGround", _groundDetector.IsGrounded);
+        _agent.SetVariableValue("JumpFloor", _jumpFloorDetector.GetClosedGround());
     }
 }

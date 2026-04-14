@@ -15,6 +15,7 @@ public partial class AIJumpAction : Action
 
     protected override Status OnStart()
     {
+        if(Target.Value == null || Self.Value == null || Input.Value == null) return Status.Failure;
         dirToGround = (Target.Value.position - Self.Value.position).normalized;
         Input.Value.Jump(true);
         return Status.Running;

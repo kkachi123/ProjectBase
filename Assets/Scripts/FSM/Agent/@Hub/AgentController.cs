@@ -79,8 +79,8 @@ public abstract class AgentController<T> :
 
     public virtual void Jump(bool isJump)
     {
-        _movementHandler.HandleJump(_moveInput.GetMovementInput());
         _animationHandler.ApplyJumpingAnimation(isJump);
+        if(isJump) _movementHandler.HandleJump();
     }
     public virtual void Falling(bool isFalling)
     {

@@ -8,5 +8,4 @@ public enum AIState
 	Move,
 	Jump,
 	Attack,
-	JumpAttack
 }
