@@ -54,7 +54,7 @@ public abstract class AgentController<T> :
         _animator?.Initialize();
         _animationHandler?.Initialize(_animator);
         _movementHandler?.Initialize(_motor, _motorData);
-        _combatHandler?.Initialize(_statData.attackDamage);
+        _combatHandler?.Initialize(_statData.attackDatas);
         _healthHandler?.Initialize(this);
         _inputHandler?.Initialize(this);
     }
@@ -68,9 +68,8 @@ public abstract class AgentController<T> :
     }
     public virtual void Move(bool isMove)
     {
-        Vector2 moveVec = isMove ? _moveInput.GetMovementInput() : Vector2.zero;
-        _movementHandler.HandleMove(moveVec);
         _animationHandler.ApplyMovementAnimation(isMove);
+        if(!isMove) _movementHandler.HandleMove(Vector2.zero); 
     }
     public virtual void HandleMovement()
     {
