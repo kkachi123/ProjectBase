@@ -7,6 +7,8 @@ public class PlayerDetector : MonoBehaviour
     [Range(0, 20)]
     [SerializeField] private float viewRadius = 5f;
 
+    public Transform Target { get; private set; }
+
     public bool IsTargetInView()
     {
         Collider2D[] targetsInRadius = Physics2D.OverlapCircleAll(transform.position, viewRadius, playerMask);
@@ -17,9 +19,11 @@ public class PlayerDetector : MonoBehaviour
             // Check Wall Obstacle (Linecast)
             if (!Physics2D.Linecast(transform.position, target.position, obstacleMask))
             {
+                Target = target;
                 return true;
             }
         }
+        Target = null;
         return false;
     }
 

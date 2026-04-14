@@ -8,4 +8,6 @@ public enum AIState
 	Move,
 	Jump,
 	Attack,
+	Chase,
+    Dodge
 }

@@ -1,38 +1,61 @@
 using UnityEngine;
-using System.Collections;
-using Cysharp.Threading.Tasks;
-using System.Threading;
 using Unity.Behavior;
-[RequireComponent (typeof(AIPlayerInput), typeof(JumpFloorDetector))]
+using System;
+[RequireComponent (typeof(AIPlayerInput))]
+[RequireComponent (typeof(JumpFloorDetector) ,typeof(PlayerDetector))]
+[RequireComponent (typeof(GroundDetector), typeof(WallDetector))]
+
+[Serializable]
+public class AgentBlackboardValue
+{
+    [Header("component")]
+    public string Input = "Input";
+
+    [Header("Transform")]
+    public string JumpFloorPos = "JumpFloorPos";
+    public string PlayerPos = "PlayerPos";
+
+    [Header("Boolean")]
+    public string IsPlayerInView = "IsPlayerInView";
+    public string IsGround = "IsGround";
+    public string IsWallInFront = "IsWallInFront";
+}
+
 public class AIBrain : MonoBehaviour
 {
+    [Header("Behavior Tree")]
     [SerializeField] private BehaviorGraphAgent _agent;
+    [SerializeField] private AgentBlackboardValue _blackboardValue;
 
     private AIPlayerInput _input;
     private GroundDetector _groundDetector;
     private JumpFloorDetector _jumpFloorDetector;
     private PlayerDetector _playerDetector;
+    private WallDetector _wallDetector;
 
-    [Header("AI Settings")]
-    [SerializeField] private float[] _attackRange = new float[3] { 1.25f, 1.45f, 0.9f };
-    [SerializeField] private float _jumpThresholdY = 0.5f; // 대상이 이 높이보다 위에 있으면 점프
-    [SerializeField] private float _decisionInterval = 0.1f; // 판단 주기
+    [Header("Detector Settings")]
     [SerializeField] private AgentMotorData _motorData;
+    [SerializeField] private AgentStatData _statData;
+    
     private void Awake()
     {
         _input = GetComponent<AIPlayerInput>();
         _groundDetector = GetComponent<GroundDetector>();
         _jumpFloorDetector = GetComponent<JumpFloorDetector>();
         _playerDetector = GetComponent<PlayerDetector>();
+        _wallDetector = GetComponent<WallDetector>();
+
         _jumpFloorDetector?.SetJumpParameters(_motorData.moveSpeed , _motorData.jumpForce , Mathf.Abs(Physics2D.gravity.y));
 
-        _agent.SetVariableValue("Input", _input);
-        _agent.SetVariableValue("Jump Floor Detector", _jumpFloorDetector);
+        _agent.SetVariableValue(_blackboardValue.Input, _input);
     }
 
     private void Update()
     {
-        _agent.SetVariableValue("IsGround", _groundDetector.IsGrounded);
-        _agent.SetVariableValue("JumpFloor", _jumpFloorDetector.GetClosedGround());
+        _agent.SetVariableValue(_blackboardValue.JumpFloorPos , _jumpFloorDetector.GetClosedGround());
+        _agent.SetVariableValue(_blackboardValue.PlayerPos , _playerDetector.Target);
+        _agent.SetVariableValue(_blackboardValue.IsPlayerInView , _playerDetector.IsTargetInView());
+        _agent.SetVariableValue(_blackboardValue.IsGround, _groundDetector.IsGrounded);
+        _agent.SetVariableValue(_blackboardValue.IsWallInFront , _wallDetector.IsWallInFront());    
     }
 }
