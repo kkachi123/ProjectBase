@@ -12,7 +12,7 @@ public partial class AIDodgeTargetAction : Action
     [SerializeReference] public BlackboardVariable<Transform> Self;
     [SerializeReference] public BlackboardVariable<Transform> Target;
     [SerializeReference] public BlackboardVariable<float> DodgeDistance;
-    [SerializeReference] public BlackboardVariable<bool> IsWallInfront;
+    [SerializeReference] public BlackboardVariable<WallDetector> WallDetector;
 
     private Vector2 _targetPos;
     private Vector2 inputDir;
@@ -29,7 +29,7 @@ public partial class AIDodgeTargetAction : Action
 
     protected override Status OnUpdate()
     {
-        if(IsWallInfront.Value || Mathf.Abs(Self.Value.position.x - _targetPos.x) < 0.1f) return Status.Success;
+        if(WallDetector.Value.IsWallInFront() || Mathf.Abs(Self.Value.position.x - _targetPos.x) < 0.1f) return Status.Success;
 
         Input.Value.Move(inputDir);
 
