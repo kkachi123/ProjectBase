@@ -5,31 +5,31 @@ using Action = Unity.Behavior.Action;
 using Unity.Properties;
 
 [Serializable, GeneratePropertyBag]
-[NodeDescription(name: "AIMoveTargetAction"
-    , story: "[Input] Move to [Target]", category: "Action", id: "ffce954764ae1e1e95cc1726070678d7")]
-public partial class AIMoveTargetAction : Action
+[NodeDescription(name: "AIDodgeTargetAction", story: "[Input] Dodge from [target] [DodgeDistance]", category: "Action", id: "ff069399fb0272e3600d1bf97b5629db")]
+public partial class AIDodgeTargetAction : Action
 {
     [SerializeReference] public BlackboardVariable<AIPlayerInput> Input;
     [SerializeReference] public BlackboardVariable<Transform> Self;
     [SerializeReference] public BlackboardVariable<Transform> Target;
+    [SerializeReference] public BlackboardVariable<float> DodgeDistance;
+    [SerializeReference] public BlackboardVariable<bool> IsWallInfront;
 
     private Vector2 _targetPos;
     private Vector2 inputDir;
     protected override Status OnStart()
     {
-        if(Target.Value == null || Self.Value == null) return Status.Failure;
+        if (Target.Value == null || Self.Value == null) return Status.Failure;
         Vector2 dirToTarget = (Target.Value.position - Self.Value.position).normalized;
-        inputDir = new Vector2(dirToTarget.x > 0 ? 1 : -1, 0); 
-        _targetPos = Target.Value.position;
+        inputDir = new Vector2(dirToTarget.x > 0 ? -1 : 1, 0); // 타겟의 반대 방향으로 회피
 
+        _targetPos = (Vector2)Self.Value.position + (inputDir * DodgeDistance.Value); // 회피 목표 위치 계산
 
-        if (dirToTarget.y > 0.5f) Input.Value.Jump(true); // 타겟이 위에 있으면 점프
         return Status.Running;
     }
 
     protected override Status OnUpdate()
     {
-        if (Mathf.Abs(Self.Value.position.x - _targetPos.x) < 0.1f) return Status.Success;
+        if(IsWallInfront.Value || Mathf.Abs(Self.Value.position.x - _targetPos.x) < 0.1f) return Status.Success;
 
         Input.Value.Move(inputDir);
 
