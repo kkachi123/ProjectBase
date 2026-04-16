@@ -29,7 +29,7 @@ public partial class AIDodgeTargetAction : Action
 
     protected override Status OnUpdate()
     {
-        if(WallDetector.Value.IsWallInFront() || Mathf.Abs(Self.Value.position.x - _targetPos.x) < 0.1f) return Status.Success;
+        if (WallDetector.Value.IsWallInFront() || Mathf.Abs(Self.Value.position.x - _targetPos.x) < 0.1f) return Status.Success;
 
         Input.Value.Move(inputDir);
 

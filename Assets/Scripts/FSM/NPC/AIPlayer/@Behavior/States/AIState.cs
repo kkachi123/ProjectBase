@@ -7,7 +7,7 @@ public enum AIState
 	Idle,
 	Move,
 	Jump,
-	Attack,
+    Attack,
 	Chase,
     Dodge
 }

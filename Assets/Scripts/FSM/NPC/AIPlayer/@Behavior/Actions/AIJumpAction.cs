@@ -5,19 +5,22 @@ using UnityEngine;
 using Action = Unity.Behavior.Action;
 
 [Serializable, GeneratePropertyBag]
-[NodeDescription(name: "AIJumpAction", story: "[Input] Jump [JumpFloor] [IsGround]", category: "Action", id: "b7b03e72f3028b868b5a3bd7e07b30e1")]
+[NodeDescription(name: "AIJumpAction", story: "[Input] Jump [JumpFloor] [IsGround] [JumpChance]%", category: "Action", id: "b7b03e72f3028b868b5a3bd7e07b30e1")]
 public partial class AIJumpAction : Action
 {
     [SerializeReference] public BlackboardVariable<Transform> Self;
     [SerializeReference] public BlackboardVariable<Transform> JumpFloor;
     [SerializeReference] public BlackboardVariable<AIPlayerInput> Input;
     [SerializeReference] public BlackboardVariable<bool> IsGround;
+    [SerializeReference] public BlackboardVariable<float> JumpChance = new BlackboardVariable<float>(45f);
     private Vector2 dirToGround;
     private Transform jumpfloor;
 
     protected override Status OnStart()
     {
         if(JumpFloor.Value == null || !IsGround.Value) return Status.Failure;
+        if (UnityEngine.Random.value > JumpChance.Value / 100f) return Status.Failure; 
+
         jumpfloor = JumpFloor.Value;
         dirToGround = (jumpfloor.position - Self.Value.position).normalized;
 
