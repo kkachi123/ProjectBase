@@ -10,26 +10,21 @@ using Action = Unity.Behavior.Action;
 public partial class AIAttackAction : Action
 {
     [SerializeReference] public BlackboardVariable<AIPlayerInput> Input;
-    [SerializeReference] public BlackboardVariable<float> TargetDistance;
     [SerializeReference] public BlackboardVariable<List<float>> AttackRanges;
     [SerializeReference] public BlackboardVariable<int> AttackType;
+    [SerializeReference] public BlackboardVariable<bool> CanAttack;
 
     protected override Status OnStart()
     {
-        if (Input == null) return Status.Success;
+        if (Input == null || !CanAttack.Value) return Status.Failure;
+        CanAttack.Value = false;
         int attackType = AttackType.Value;
-        // 범위 밖이면 견제 공격
-        if (AttackType == 0) attackType = UnityEngine.Random.Range(1, AttackRanges.Value.Count); 
+        // 범위 밖이면 가장 긴 공격을 사용하도록 설정
+        if (AttackType == 0) attackType = 2; 
 
         Input.Value.Attack(attackType);
 
         return Status.Success;
-    }
-
-    protected override void OnEnd()
-    {
-        //if(UnityEngine.Random.Range(0, 2) != 0) Input.Value.Attack(1);
-        Input.Value.Attack(1);
     }
 }
 

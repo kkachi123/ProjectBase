@@ -12,7 +12,8 @@ public partial class AICheckAttackTypeAction : Action
     [SerializeReference] public BlackboardVariable<float> TargetDistance;
     [SerializeReference] public BlackboardVariable<int> AttackType;
     [SerializeReference] public BlackboardVariable<List<float>> AttackRanges;
-    protected override Status OnUpdate()
+    
+    protected override Status OnStart()
     {
         if(TargetDistance == null || AttackType == null || AttackRanges == null) return Status.Failure;
         AttackType.Value = 0;
@@ -24,6 +25,7 @@ public partial class AICheckAttackTypeAction : Action
                 break;
             }
         }
+
         return Status.Success;
     }
 }
