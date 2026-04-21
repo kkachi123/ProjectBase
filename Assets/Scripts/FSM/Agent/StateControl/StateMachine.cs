@@ -1,6 +1,6 @@
 public class StateMachine<T> where T : class , IState
 {
-    private T _currentState;
+    protected T _currentState;
     public T CurrentState => _currentState;
 
     public void ChangeState(T newState)

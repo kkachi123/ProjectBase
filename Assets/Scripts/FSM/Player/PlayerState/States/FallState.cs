@@ -12,7 +12,6 @@ public class FallState : PlayerStateBase
 
     public override void Execute()
     {
-        _player.HandleMovement();
         if (_player.IsGrounded)
         {
             if(_player.IsIdle) _player.ChangeState(StateType.Idle);
@@ -21,6 +20,10 @@ public class FallState : PlayerStateBase
             
     }
 
+    public override void FixedExecute()
+    {
+        _player.HandleMovement();
+    }
     public override void Exit()
     {
         _player.Falling(false);

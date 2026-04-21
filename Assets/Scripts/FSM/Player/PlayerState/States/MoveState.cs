@@ -11,9 +11,13 @@ public class MoveState : PlayerStateBase
 
     public override void Execute()
     {
-        _player.HandleMovement();
         if (!_player.IsGrounded) _player.ChangeState(StateType.Fall);
         else if (_player.IsIdle) _player.ChangeState(StateType.Idle);
+    }
+
+    public override void FixedExecute()
+    {
+        _player.HandleMovement();
     }
 
     public override void Exit() 

@@ -5,6 +5,11 @@ public interface IState
     public void Exit();
 }
 
+public interface IAgentState : IState
+{
+    public void FixedExecute();
+}
+
 public enum StateType
 {
     Idle,

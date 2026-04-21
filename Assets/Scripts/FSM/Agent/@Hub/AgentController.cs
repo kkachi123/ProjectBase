@@ -6,7 +6,7 @@ using UnityEngine;
 [RequireComponent(typeof(Health))]
 public abstract class AgentController<T> : 
     MonoBehaviour , IAgentHealthListener , IAgentInputListener
-    where T : class, IState
+    where T : class, IAgentState
 {
     [Header("Data Assets")]
     [SerializeField] protected AgentMotorData _motorData;
@@ -31,7 +31,7 @@ public abstract class AgentController<T> :
     [SerializeField] protected AgentInputHandler _inputHandler;
 
     [Header("State Machine")]
-    protected StateMachine<T> _stateMachine;
+    protected AgentStateMachine<T> _stateMachine;
     protected Dictionary<StateType, T> _states;
 
     // State Check Properties

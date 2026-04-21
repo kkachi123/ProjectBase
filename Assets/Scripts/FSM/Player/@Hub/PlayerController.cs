@@ -6,7 +6,7 @@ public class PlayerController : AgentController<PlayerStateBase> , IPlayerAnimat
     {
         base.Awake();
 
-        _stateMachine = new StateMachine<PlayerStateBase>();
+        _stateMachine = new AgentStateMachine<PlayerStateBase>();
         _states = new PlayerStateFactory().CreateStates(this);
 
         _animationEventProxy?.Initialize(this);
@@ -21,11 +21,8 @@ public class PlayerController : AgentController<PlayerStateBase> , IPlayerAnimat
     }
     private void FixedUpdate()
     {
-        // 2. 물리 연산 주기와 맞춰서 지면 상태 업데이트
         _groundDetector.UpdateGroundedStatus();
-
-        // (선택 사항) 만약 물리적인 이동 처리를 State에서 하고 있다면 
-        // 물리 관련 로직만 따로 FixedOperate() 같은 메서드를 만들어 호출하기도 합니다.
+        _stateMachine.FixedOperate();
     }
 
     public override void ChangeState(StateType type)
