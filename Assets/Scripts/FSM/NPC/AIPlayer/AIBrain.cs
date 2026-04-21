@@ -74,7 +74,7 @@ public class AIBrain : MonoBehaviour
 
     private float CalcAttackRange(Vector2 offset, Vector2 size)
     {
-        // 공격 범위는 offset과 size의 대각선 길이의 합으로 계산 (적절한 조정 필요)
+        // 공격 범위는 offset과 size의 대각선 길이의 합으로 계산
         return Mathf.Sqrt(offset.x * offset.x + offset.y * offset.y) + Mathf.Sqrt(size.x * size.x + size.y * size.y) / 2f;
     }
 }
