@@ -6,13 +6,13 @@ public class PlayerStateFactory
     {
         return new Dictionary<StateType, PlayerStateBase>
         {
-            { StateType.Idle, new IdleState(playerController) },
-            { StateType.Move, new MoveState(playerController) },
-            { StateType.Jump, new JumpState(playerController) },
-            { StateType.Fall, new FallState(playerController) },
-            { StateType.Attack, new AttackState(playerController) },
-            { StateType.Hit, new HitState(playerController) },
-            { StateType.Death, new DeathState(playerController) },
+            { StateType.Idle, new P_IdleState(playerController) },
+            { StateType.Move, new P_MoveState(playerController) },
+            { StateType.Jump, new P_JumpState(playerController) },
+            { StateType.Fall, new P_FallState(playerController) },
+            { StateType.Attack, new P_AttackState(playerController) },
+            { StateType.Hit, new P_HitState(playerController) },
+            { StateType.Death, new P_DeathState(playerController) },
         };
     }
 }

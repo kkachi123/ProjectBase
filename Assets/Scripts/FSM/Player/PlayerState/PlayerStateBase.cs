@@ -1,14 +1,3 @@
-public enum AnimEventType
-{
-    OnFrame,
-    End,
-}
-public enum InputKeyType
-{
-    None,
-    Jump,
-    Attack,
-}
 public abstract class PlayerStateBase : IAgentState
 {
     protected PlayerController _player;

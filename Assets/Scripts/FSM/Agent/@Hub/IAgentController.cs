@@ -14,3 +14,9 @@ public interface IAgentInputListener
     void OnJumpAction();
     void OnAttackAction(int attackType);
 }
+
+public interface IAgentAnimationListener
+{
+    void OnAttackHitFrame();
+    void OnAnimationEnd(AnimEventType type);
+}

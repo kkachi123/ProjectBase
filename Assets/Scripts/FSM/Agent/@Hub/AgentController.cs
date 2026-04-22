@@ -5,7 +5,7 @@ using UnityEngine;
 [RequireComponent(typeof(GroundDetector))]
 [RequireComponent(typeof(Health))]
 public abstract class AgentController<T> : 
-    MonoBehaviour , IAgentHealthListener , IAgentInputListener
+    MonoBehaviour , IAgentHealthListener , IAgentInputListener , IAgentAnimationListener
     where T : class, IAgentState
 {
     [Header("Data Assets")]
@@ -25,6 +25,7 @@ public abstract class AgentController<T> :
     [Header("Handlers & Visuals")]
     [SerializeField] protected AgentAnimator _animator;
     [SerializeField] protected AgentAnimationHandler _animationHandler;
+    [SerializeField] protected AgentAnimationEventProxy _animationEventProxy;
     [SerializeField] protected AgentMovementHandler2D _movementHandler;
     [SerializeField] protected AgentCombatHandler _combatHandler;
     [SerializeField] protected AgentHealthHandler _healthHandler;
@@ -53,13 +54,34 @@ public abstract class AgentController<T> :
         // Handler Initialization
         _animator?.Initialize();
         _animationHandler?.Initialize(_animator);
+        _animationEventProxy?.Initialize(this);
         _movementHandler?.Initialize(_motor, _motorData);
         _combatHandler?.Initialize(_statData.attackDatas);
         _healthHandler?.Initialize(this);
         _inputHandler?.Initialize(this);
     }
 
-    public abstract void ChangeState(StateType type);
+    protected virtual void Start()
+    {
+        ChangeState(StateType.Idle);
+    }
+    protected virtual void Update()
+    {
+        _stateMachine.Operate();
+    }
+    protected virtual void FixedUpdate()
+    {
+        _groundDetector.UpdateGroundedStatus();
+        _stateMachine.FixedOperate();
+    }
+
+    public virtual void ChangeState(StateType type)
+    {
+        if (_states.TryGetValue(type, out T newState))
+        {
+            _stateMachine.ChangeState(newState);
+        }
+    }
 
     #region Action Methods - State Operations
     public virtual void Idle(bool isIdle)
@@ -86,10 +108,11 @@ public abstract class AgentController<T> :
         _animationHandler.ApplyFallingAnimation(isFalling);
     }
 
-    public virtual void Attack()
+    public virtual void Attack(bool isAttack)
     {
         if(IsGrounded) _movementHandler.HandleMove(Vector2.zero); 
-        _animationHandler.ApplyAttackAnimation(_combatHandler.CurrentAttackType);
+        if(isAttack) _animationHandler.ApplyAttackAnimation(_combatHandler.CurrentAttackType);
+        else _animationHandler.ApplyAttackAnimation(0); // Reset to default state animation
     }
     public virtual void Hit(bool isHit)
     {
@@ -107,8 +130,22 @@ public abstract class AgentController<T> :
         _animationHandler.ApplyDeathAnimation();
         ChangeState(StateType.Death);
     }
+    #region State Animation Event 
+    public virtual void OnAttackHitFrame()
+    {
+        _combatHandler.PerformAttack();
+    }
+    public virtual void OnAnimationEnd(AnimEventType type)
+    {
+        Debug.Log($"Animation Event: {type}");
+        _stateMachine.CurrentState.OnAnimationEvent(type);
+    }
+    #endregion
 
-    public virtual void OnJumpAction() { }
+    public virtual void OnJumpAction()
+    {
+        _stateMachine.CurrentState?.OnInputEvent(InputKeyType.Jump);
+    }
 
     public virtual void OnAttackAction(int attackType) { }
 }
