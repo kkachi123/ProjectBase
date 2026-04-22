@@ -9,16 +9,6 @@ public enum AnimationFloatType
 {
     MoveSpeed,
 }
-public enum AnimationTriggerType
-{
-    IdleTrigger,
-    MoveTrigger,
-    JumpTrigger,
-    FallTrigger,
-    AttackTrigger,
-    HitTrigger,
-    DeathTrigger,
-}
 public enum AnimationBoolType
 {
     IsIdle,
@@ -38,7 +28,6 @@ public class AgentAnimator : MonoBehaviour
     [SerializeField] AnimationDataSO _animationData;
     private Dictionary<AnimationIntType, int> _intParameters;
     private Dictionary<AnimationFloatType, int> _floatParameters;
-    private Dictionary<AnimationTriggerType, int> _triggerParameters;
     private Dictionary<AnimationBoolType, int> _boolParameters;
 
     public void Initialize()
@@ -51,16 +40,6 @@ public class AgentAnimator : MonoBehaviour
         _floatParameters = new Dictionary<AnimationFloatType, int>()
         {
             { AnimationFloatType.MoveSpeed, Animator.StringToHash(_animationData.MoveSpeedFloat) },
-        };
-        _triggerParameters = new Dictionary<AnimationTriggerType, int>()
-        {
-            { AnimationTriggerType.IdleTrigger, Animator.StringToHash(_animationData.IdleTrigger) },
-            { AnimationTriggerType.MoveTrigger, Animator.StringToHash(_animationData.MoveTrigger) },
-            { AnimationTriggerType.JumpTrigger, Animator.StringToHash(_animationData.JumpTrigger) },
-            { AnimationTriggerType.FallTrigger, Animator.StringToHash(_animationData.FallTrigger) },
-            { AnimationTriggerType.AttackTrigger, Animator.StringToHash(_animationData.AttackTrigger) },
-            { AnimationTriggerType.HitTrigger, Animator.StringToHash(_animationData.HitTrigger) },
-            { AnimationTriggerType.DeathTrigger, Animator.StringToHash(_animationData.DeathTrigger) },
         };
         _boolParameters = new Dictionary<AnimationBoolType, int>()
         {
@@ -86,14 +65,6 @@ public class AgentAnimator : MonoBehaviour
         if (_floatParameters.TryGetValue(type, out int hash))
         {
             _anim.SetFloat(hash, value);
-        }
-    }
-
-    public void SetTrigger(AnimationTriggerType type)
-    {
-        if (_triggerParameters.TryGetValue(type, out int hash))
-        {
-            _anim.SetTrigger(hash);
         }
     }
 

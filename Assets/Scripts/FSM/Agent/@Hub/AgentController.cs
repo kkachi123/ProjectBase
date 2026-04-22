@@ -65,11 +65,11 @@ public abstract class AgentController<T> :
     public virtual void Idle(bool isIdle)
     {
         _animationHandler.ApplyIdleAnimation(isIdle);
+        if(isIdle) _movementHandler.HandleMove(Vector2.zero);
     }
     public virtual void Move(bool isMove)
     {
         _animationHandler.ApplyMovementAnimation(isMove);
-        if(!isMove) _movementHandler.HandleMove(Vector2.zero); 
     }
     public virtual void HandleMovement()
     {
@@ -88,11 +88,11 @@ public abstract class AgentController<T> :
 
     public virtual void Attack()
     {
+        if(IsGrounded) _movementHandler.HandleMove(Vector2.zero); 
         _animationHandler.ApplyAttackAnimation(_combatHandler.CurrentAttackType);
     }
     public virtual void Hit(bool isHit)
     {
-        if(!isHit) _movementHandler.HandleMove(Vector2.zero); 
         _animationHandler.ApplyHitAnimation(isHit);
     }
     #endregion
