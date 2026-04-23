@@ -2,17 +2,17 @@ using System.Collections.Generic;
 
 public class PlayerStateFactory 
 {
-    public Dictionary<StateType, PlayerStateBase> CreateStates(PlayerController playerController)
+    public Dictionary<StateType, IAgentState> CreateStates(PlayerController playerController)
     {
-        return new Dictionary<StateType, PlayerStateBase>
+        return new Dictionary<StateType, IAgentState>
         {
-            { StateType.Idle, new P_IdleState(playerController) },
-            { StateType.Move, new P_MoveState(playerController) },
-            { StateType.Jump, new P_JumpState(playerController) },
-            { StateType.Fall, new P_FallState(playerController) },
-            { StateType.Attack, new P_AttackState(playerController) },
-            { StateType.Hit, new P_HitState(playerController) },
-            { StateType.Death, new P_DeathState(playerController) },
+            { StateType.Idle, new IdleState(playerController) },
+            { StateType.Move, new MoveState(playerController) },
+            { StateType.Jump, new JumpState(playerController) },
+            { StateType.Fall, new FallState(playerController) },
+            { StateType.Attack, new AttackState(playerController) },
+            { StateType.Hit, new HitState(playerController) },
+            { StateType.Death, new DeathState(playerController) },
         };
     }
 }

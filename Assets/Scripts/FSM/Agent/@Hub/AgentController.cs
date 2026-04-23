@@ -4,9 +4,7 @@ using UnityEngine;
 
 [RequireComponent(typeof(GroundDetector))]
 [RequireComponent(typeof(Health))]
-public abstract class AgentController<T> : 
-    MonoBehaviour , IAgentHealthListener , IAgentInputListener , IAgentAnimationListener
-    where T : class, IAgentState
+public abstract class AgentController : MonoBehaviour, IAgentHealthListener, IAgentInputListener, IAgentAnimationListener
 {
     [Header("Data Assets")]
     [SerializeField] protected AgentMotorData _motorData;
@@ -31,8 +29,8 @@ public abstract class AgentController<T> :
     [SerializeField] protected AgentInputHandler _inputHandler;
 
     [Header("State Machine")]
-    protected AgentStateMachine<T> _stateMachine;
-    protected Dictionary<StateType, T> _states;
+    protected AgentStateMachine<IAgentState> _stateMachine;
+    protected Dictionary<StateType, IAgentState> _states;
 
     // State Check Properties
     public bool IsGrounded => _groundDetector != null && _groundDetector.IsGrounded;
@@ -57,6 +55,8 @@ public abstract class AgentController<T> :
         _combatHandler?.Initialize(_statData.attackDatas);
         _healthHandler?.Initialize(this);
         _inputHandler?.Initialize(this);
+
+        _stateMachine = new AgentStateMachine<IAgentState>();
     }
 
     protected virtual void Start()
@@ -75,7 +75,7 @@ public abstract class AgentController<T> :
 
     public virtual void ChangeState(StateType type)
     {
-        if (_states.TryGetValue(type, out T newState))
+        if (_states.TryGetValue(type, out IAgentState newState))
         {
             _stateMachine.ChangeState(newState);
         }
@@ -85,21 +85,17 @@ public abstract class AgentController<T> :
     public virtual void Idle(bool isIdle)
     {
         _animator.SetBool(StateType.Idle, isIdle);
-        if(isIdle) _movementHandler.HandleMove(Vector2.zero);
+        if (isIdle) _movementHandler.HandleMove(Vector2.zero);
     }
     public virtual void Move(bool isMove)
     {
         _animator.SetBool(StateType.Move, isMove);
     }
-    public virtual void HandleMovement()
-    {
-        _movementHandler.HandleMove(_moveInput.GetMovementInput());
-    }
 
     public virtual void Jump(bool isJump)
     {
         _animator.SetBool(StateType.Jump, isJump);
-        if(isJump) _movementHandler.HandleJump();
+        if (isJump) _movementHandler.HandleJump();
     }
     public virtual void Falling(bool isFalling)
     {
@@ -108,9 +104,8 @@ public abstract class AgentController<T> :
 
     public virtual void Attack(bool isAttack)
     {
-        if(IsGrounded) _movementHandler.HandleMove(Vector2.zero); 
         _animator.SetBool(StateType.Attack, isAttack);
-        if(isAttack) _animator.SetInteger(AnimationIntType.AttackType, _combatHandler.CurrentAttackType);
+        if (isAttack) _animator.SetInteger(AnimationIntType.AttackType, _combatHandler.CurrentAttackType);
         else _animator.SetInteger(AnimationIntType.AttackType, 0); // Reset to default state animation
     }
     public virtual void Hit(bool isHit)
@@ -122,16 +117,17 @@ public abstract class AgentController<T> :
         _animator.SetBool(StateType.Death, isDeath);
     }
     #endregion
-    public virtual void OnHit(Vector2 dir)
+    
+    public virtual void HandleMovement()
     {
-        _movementHandler.HandleKnockback(dir);
-        ChangeState(StateType.Hit);
+        _movementHandler.HandleMove(_moveInput.GetMovementInput());
     }
+    #region IAgentHealthListener
+    public virtual void OnHit(Vector2 dir) => ChangeState(StateType.Hit);
 
-    public virtual void OnDeath()
-    {
-        ChangeState(StateType.Death);
-    }
+    public virtual void OnDeath() => ChangeState(StateType.Death);
+    #endregion
+    
     #region State Animation Event 
     public virtual void OnAttackHitFrame()
     {
@@ -143,10 +139,12 @@ public abstract class AgentController<T> :
     }
     #endregion
 
+    #region  State Input Event
     public virtual void OnJumpAction()
     {
         _stateMachine.CurrentState?.OnInputEvent(InputKeyType.Jump);
     }
 
     public virtual void OnAttackAction(int attackType) { }
+    #endregion
 }

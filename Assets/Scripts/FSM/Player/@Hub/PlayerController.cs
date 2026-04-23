@@ -1,14 +1,33 @@
-public class PlayerController : AgentController<PlayerStateBase>
+using UnityEngine;
+public class PlayerController : AgentController
 {
     protected override void Awake()
     {
         base.Awake();
 
-        _stateMachine = new AgentStateMachine<PlayerStateBase>();
         _states = new PlayerStateFactory().CreateStates(this);
     }
 
-    #region State Input Methods - Called by Input Handler
+    #region Action Methods - State Operations
+
+    public override void Attack(bool isAttack)
+    {
+        base.Attack(isAttack);
+        if(IsGrounded) _movementHandler.HandleMove(Vector2.zero); 
+    }
+
+    #endregion
+
+    #region IAgentHealthListener
+    public override void OnHit(Vector2 dir)
+    {
+        _movementHandler.HandleKnockback(dir);
+        base.OnHit(dir);
+    }
+    #endregion
+
+
+    #region State Input Event
     public override void OnAttackAction(int attackType)
     {
         if (!IsGrounded) attackType = 3;

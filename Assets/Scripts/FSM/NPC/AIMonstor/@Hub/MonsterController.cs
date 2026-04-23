@@ -1,10 +1,9 @@
-public class MonsterController : AgentController<MonsterStateBase>
+public class MonsterController : AgentController
 {
     protected override void Awake()
     {
         base.Awake();
 
-        _stateMachine = new AgentStateMachine<MonsterStateBase>();
         _states = new MonsterStateFactory().CreateStates(this);
     }
     public override void OnAttackAction(int attackType)

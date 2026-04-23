@@ -1,10 +1,10 @@
 using UnityEngine;
-public class P_DeathState : PlayerStateBase
+public class DeathState : AgentStateBase
 {
-    public P_DeathState(PlayerController player) : base(player) { }
+    public DeathState(AgentController agent) : base(agent) { }
     public override void Enter()
     {
-        _player.Death(true);
+        _agent.Death(true);
     }
     public override void Execute()
     {

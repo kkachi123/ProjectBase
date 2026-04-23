@@ -1,9 +1,9 @@
-public abstract class PlayerStateBase : IAgentState
+public abstract class AgentStateBase : IAgentState
 {
-    protected PlayerController _player;
-    public PlayerStateBase(PlayerController playerController)
+    protected AgentController _agent;
+    public AgentStateBase(AgentController agentController)
     {
-        _player = playerController;
+        _agent = agentController;
     }
     public abstract void Enter();
     public abstract void Execute();

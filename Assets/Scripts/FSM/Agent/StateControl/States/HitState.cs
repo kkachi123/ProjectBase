@@ -1,31 +1,31 @@
 using UnityEngine;
 
-public class M_HitState : MonsterStateBase
+public class HitState : AgentStateBase
 {
     private bool _isHitFinished;
-    public M_HitState(MonsterController monster) : base(monster) { }
-
+    public HitState(AgentController agent) : base(agent) { }
     public override void Enter()
     {
+        Debug.Log("P_HitState Entered");
         _isHitFinished = false;
-        _monster.Hit(true);
+        _agent.Hit(true);
     }
-
     public override void Execute()
     {
-        if (_isHitFinished) _monster.ChangeState(StateType.Idle);
+        if(_isHitFinished) _agent.ChangeState(StateType.Idle);
     }
-
     public override void Exit() 
     {
-        _monster.Hit(false);
+        _agent.Hit(false);
     }
 
     public override void OnAnimationEvent(AnimEventType type)
     {
-        if (type == AnimEventType.End)
+        if(type == AnimEventType.End)
         {
+            Debug.Log("Hit animation ended");
             _isHitFinished = true;
         }
     }
+    
 }

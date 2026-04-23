@@ -2,15 +2,15 @@ using System.Collections.Generic;
 
 public class MonsterStateFactory
 {
-    public Dictionary<StateType, MonsterStateBase> CreateStates(MonsterController monsterController)
+    public Dictionary<StateType, IAgentState> CreateStates(MonsterController monsterController)
     {
-        return new Dictionary<StateType, MonsterStateBase>
+        return new Dictionary<StateType, IAgentState>
         {
-            { StateType.Idle, new M_IdleState(monsterController) },
-            { StateType.Move, new M_MoveState(monsterController) },
-            { StateType.Attack, new M_AttackState(monsterController) },
-            { StateType.Hit, new M_HitState(monsterController) },
-            { StateType.Death, new M_DeathState(monsterController) }
+            { StateType.Idle, new IdleState(monsterController) },
+            { StateType.Move, new MoveState(monsterController) },
+            { StateType.Attack, new AttackState(monsterController) },
+            { StateType.Hit, new HitState(monsterController) },
+            { StateType.Death, new DeathState(monsterController) }
         };
     }
 }
