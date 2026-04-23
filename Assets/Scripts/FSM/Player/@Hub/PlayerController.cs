@@ -1,9 +1,13 @@
 using UnityEngine;
+[RequireComponent(typeof(AgentImpactHandler))]
 public class PlayerController : AgentController
 {
+    [SerializeField] private AgentImpactHandler _impactHandler;
     protected override void Awake()
     {
         base.Awake();
+        _impactHandler = GetComponent<AgentImpactHandler>();
+        _impactHandler.Initialize(_motor, _motorData);
 
         _states = new PlayerStateFactory().CreateStates(this);
     }
@@ -17,15 +21,6 @@ public class PlayerController : AgentController
     }
 
     #endregion
-
-    #region IAgentHealthListener
-    public override void OnHit(Vector2 dir)
-    {
-        _movementHandler.HandleKnockback(dir);
-        base.OnHit(dir);
-    }
-    #endregion
-
 
     #region State Input Event
     public override void OnAttackAction(int attackType)

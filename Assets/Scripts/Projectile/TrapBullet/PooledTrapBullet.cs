@@ -27,7 +27,7 @@ public class PooledTrapBullet : MonoBehaviour
         if (collision.CompareTag("Bullet")) return;
         if (collision.CompareTag("Floor")) return;
 
-        if(collision.TryGetComponent(out IDamageable target)) target.TakeDamage(damage , Vector2.zero);
+        if(collision.TryGetComponent(out IDamageable target)) target.TakeDamage(damage);
 
         OnReleaseToPool.Release(this);
     }

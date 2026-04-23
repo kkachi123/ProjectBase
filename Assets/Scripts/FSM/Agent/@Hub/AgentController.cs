@@ -123,7 +123,7 @@ public abstract class AgentController : MonoBehaviour, IAgentHealthListener, IAg
         _movementHandler.HandleMove(_moveInput.GetMovementInput());
     }
     #region IAgentHealthListener
-    public virtual void OnHit(Vector2 dir) => ChangeState(StateType.Hit);
+    public virtual void OnHit() => ChangeState(StateType.Hit);
 
     public virtual void OnDeath() => ChangeState(StateType.Death);
     #endregion

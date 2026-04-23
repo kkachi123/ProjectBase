@@ -3,7 +3,7 @@ public interface IAgentHealthListener
 {
     Health Health { get; }
     GameObject gameObject { get; }
-    void OnHit(Vector2 dir);
+    void OnHit();
     void OnDeath();
 }
 public interface IAgentInputListener

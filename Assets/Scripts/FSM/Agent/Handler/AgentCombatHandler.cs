@@ -35,7 +35,12 @@ public class AgentCombatHandler : MonoBehaviour
         {
             if (target.TryGetComponent(out IDamageable damageable))
             {
-                damageable.TakeDamage(currentData.damage, transform.position);
+                damageable.TakeDamage(currentData.damage);
+            }
+            if(target.TryGetComponent(out IKnockbackListener knockbackListener))
+            {
+                Vector2 knockbackDir = (target.transform.position - transform.position).normalized;
+                knockbackListener.HandleKnockback(knockbackDir);
             }
         }
     }
