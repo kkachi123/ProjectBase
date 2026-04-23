@@ -8,7 +8,6 @@ public class P_JumpState : PlayerStateBase
     public override void Enter() 
     {
         _jumpTimer = 0f;
-        Debug.Log("P_JumpState Entered");
         _player.Jump(true);
     }
 

@@ -17,6 +17,5 @@ public interface IAgentInputListener
 
 public interface IAgentAnimationListener
 {
-    void OnAttackHitFrame();
-    void OnAnimationEnd(AnimEventType type);
+    void OnAnimationEvent(AnimEventType type);
 }

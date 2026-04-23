@@ -5,7 +5,6 @@ public class P_MoveState : PlayerStateBase
 
     public override void Enter()
     {
-        Debug.Log("P_MoveState Entered");
         _player.Move(true);
     }
 

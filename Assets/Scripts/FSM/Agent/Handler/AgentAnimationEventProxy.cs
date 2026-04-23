@@ -9,6 +9,6 @@ public class AgentAnimationEventProxy : MonoBehaviour
         _controller = controller;
     }
     // Called by Animation Events
-    public virtual void OnAttackHitFrame() => _controller?.OnAttackHitFrame();
-    public virtual void OnAnimationEnd() => _controller?.OnAnimationEnd(AnimEventType.End);
+    public virtual void OnAnimationOnFrame() => _controller?.OnAnimationEvent(AnimEventType.OnFrame);
+    public virtual void OnAnimationEnd() => _controller?.OnAnimationEvent(AnimEventType.End);
 }

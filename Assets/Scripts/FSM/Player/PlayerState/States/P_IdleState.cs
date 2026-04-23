@@ -5,7 +5,6 @@ public class P_IdleState : PlayerStateBase
 
     public override void Enter()
     {
-        Debug.Log("P_IdleState Entered");
         _player.Idle(true);
     }
 

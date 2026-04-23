@@ -135,9 +135,8 @@ public abstract class AgentController<T> :
     {
         _combatHandler.PerformAttack();
     }
-    public virtual void OnAnimationEnd(AnimEventType type)
+    public virtual void OnAnimationEvent(AnimEventType type)
     {
-        Debug.Log($"Animation Event: {type}");
         _stateMachine.CurrentState.OnAnimationEvent(type);
     }
     #endregion

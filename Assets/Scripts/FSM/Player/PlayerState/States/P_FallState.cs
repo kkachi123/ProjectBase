@@ -6,7 +6,6 @@ public class P_FallState : PlayerStateBase
 
     public override void Enter()
     {
-        Debug.Log("P_FallState Entered");
         _player.Falling(true);
     }
 

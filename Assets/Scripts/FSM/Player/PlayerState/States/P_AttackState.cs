@@ -6,7 +6,6 @@ public class P_AttackState : PlayerStateBase
     public P_AttackState(PlayerController player) : base(player) { }
     public override void Enter()
     {
-        Debug.Log("P_AttackState Entered");
         _isAttackFinished = false;
         _player.Attack(true);
     }
@@ -21,6 +20,10 @@ public class P_AttackState : PlayerStateBase
 
     public override void OnAnimationEvent(AnimEventType type)
     {
+        if(type == AnimEventType.OnFrame)
+        {
+            _player.OnAttackHitFrame();
+        }
         if(type == AnimEventType.End)
         {
             _isAttackFinished = true;

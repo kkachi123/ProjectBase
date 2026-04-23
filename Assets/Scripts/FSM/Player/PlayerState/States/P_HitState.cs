@@ -23,6 +23,7 @@ public class P_HitState : PlayerStateBase
     {
         if(type == AnimEventType.End)
         {
+            Debug.Log("Hit animation ended");
             _isHitFinished = true;
         }
     }
