@@ -24,7 +24,6 @@ public abstract class AgentController<T> :
 
     [Header("Handlers & Visuals")]
     [SerializeField] protected AgentAnimator _animator;
-    [SerializeField] protected AgentAnimationHandler _animationHandler;
     [SerializeField] protected AgentAnimationEventProxy _animationEventProxy;
     [SerializeField] protected AgentMovementHandler2D _movementHandler;
     [SerializeField] protected AgentCombatHandler _combatHandler;
@@ -53,7 +52,6 @@ public abstract class AgentController<T> :
 
         // Handler Initialization
         _animator?.Initialize();
-        _animationHandler?.Initialize(_animator);
         _animationEventProxy?.Initialize(this);
         _movementHandler?.Initialize(_motor, _motorData);
         _combatHandler?.Initialize(_statData.attackDatas);
@@ -86,12 +84,12 @@ public abstract class AgentController<T> :
     #region Action Methods - State Operations
     public virtual void Idle(bool isIdle)
     {
-        _animationHandler.ApplyIdleAnimation(isIdle);
+        _animator.SetBool(StateType.Idle, isIdle);
         if(isIdle) _movementHandler.HandleMove(Vector2.zero);
     }
     public virtual void Move(bool isMove)
     {
-        _animationHandler.ApplyMovementAnimation(isMove);
+        _animator.SetBool(StateType.Move, isMove);
     }
     public virtual void HandleMovement()
     {
@@ -100,23 +98,28 @@ public abstract class AgentController<T> :
 
     public virtual void Jump(bool isJump)
     {
-        _animationHandler.ApplyJumpingAnimation(isJump);
+        _animator.SetBool(StateType.Jump, isJump);
         if(isJump) _movementHandler.HandleJump();
     }
     public virtual void Falling(bool isFalling)
     {
-        _animationHandler.ApplyFallingAnimation(isFalling);
+        _animator.SetBool(StateType.Fall, isFalling);
     }
 
     public virtual void Attack(bool isAttack)
     {
         if(IsGrounded) _movementHandler.HandleMove(Vector2.zero); 
-        if(isAttack) _animationHandler.ApplyAttackAnimation(_combatHandler.CurrentAttackType);
-        else _animationHandler.ApplyAttackAnimation(0); // Reset to default state animation
+        _animator.SetBool(StateType.Attack, isAttack);
+        if(isAttack) _animator.SetInteger(AnimationIntType.AttackType, _combatHandler.CurrentAttackType);
+        else _animator.SetInteger(AnimationIntType.AttackType, 0); // Reset to default state animation
     }
     public virtual void Hit(bool isHit)
     {
-        _animationHandler.ApplyHitAnimation(isHit);
+        _animator.SetBool(StateType.Hit, isHit);
+    }
+    public virtual void Death(bool isDeath)
+    {
+        _animator.SetBool(StateType.Death, isDeath);
     }
     #endregion
     public virtual void OnHit(Vector2 dir)
@@ -127,7 +130,6 @@ public abstract class AgentController<T> :
 
     public virtual void OnDeath()
     {
-        _animationHandler.ApplyDeathAnimation();
         ChangeState(StateType.Death);
     }
     #region State Animation Event 

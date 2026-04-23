@@ -4,7 +4,7 @@ public class P_DeathState : PlayerStateBase
     public P_DeathState(PlayerController player) : base(player) { }
     public override void Enter()
     {
-        Debug.Log("P_DeathState Entered");
+        _player.Death(true);
     }
     public override void Execute()
     {
