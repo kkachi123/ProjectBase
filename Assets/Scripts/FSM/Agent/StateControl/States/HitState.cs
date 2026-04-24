@@ -6,7 +6,6 @@ public class HitState : AgentStateBase
     public HitState(AgentController agent) : base(agent) { }
     public override void Enter()
     {
-        Debug.Log("P_HitState Entered");
         _isHitFinished = false;
         _agent.Hit(true);
     }
@@ -23,7 +22,6 @@ public class HitState : AgentStateBase
     {
         if(type == AnimEventType.End)
         {
-            Debug.Log("Hit animation ended");
             _isHitFinished = true;
         }
     }

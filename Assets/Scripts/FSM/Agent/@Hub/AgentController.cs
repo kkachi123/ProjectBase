@@ -100,6 +100,7 @@ public abstract class AgentController : MonoBehaviour, IAgentHealthListener, IAg
     public virtual void Death(bool isDeath)
     {
         _animator.SetBool(StateType.Death, isDeath);
+        if (isDeath) _movementHandler.HandleMove(Vector2.zero);
     }
     #endregion
     
