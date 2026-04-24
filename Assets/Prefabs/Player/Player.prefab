@@ -17,6 +17,7 @@ GameObject:
   - component: {fileID: 6125933212912360794}
   - component: {fileID: 7415742755830340724}
   - component: {fileID: 8565116985865354277}
+  - component: {fileID: 6264426419169757140}
   m_Layer: 8
   m_Name: Player
   m_TagString: Player
@@ -54,9 +55,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _motorData: {fileID: 11400000, guid: b052bdbf92f96df4ca1699d02055e658, type: 2}
   _statData: {fileID: 11400000, guid: bbd7a6feca900de40b6381f1e29bff55, type: 2}
-  _animator: {fileID: 4862446387975837390}
-  _combatHandler: {fileID: 6125933212912360794}
   _animationEventProxy: {fileID: 8638326237852265103}
+  _combatHandler: {fileID: 6125933212912360794}
+  _animator: {fileID: 4862446387975837390}
+  _impactHandler: {fileID: 6264426419169757140}
 --- !u!114 &6786316900135613947
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -195,6 +197,18 @@ Rigidbody2D:
   m_SleepingMode: 1
   m_CollisionDetection: 0
   m_Constraints: 4
+--- !u!114 &6264426419169757140
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6748850014222937685}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1c22869fcae3bf34b8ce71f04385bd67, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &8998790350646415857
 GameObject:
   m_ObjectHideFlags: 0
