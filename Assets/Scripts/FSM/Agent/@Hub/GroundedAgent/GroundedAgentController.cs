@@ -1,11 +1,12 @@
 using UnityEngine;
 
 [RequireComponent(typeof(GroundDetector))]
-public abstract class GroundedAgentController : AgentController
+public abstract class GroundedAgentController : AgentController , IGroundedAgentInputListener
 {
     protected GroundDetector _groundDetector;
     protected IAgentJumpInput _jumpInput;
-    protected GroundedAgentInputHandler _inputHandler;
+    public IAgentJumpInput JumpInput => _jumpInput;
+    [SerializeField] protected GroundedAgentInputHandler _groundedInputHandler;
 
     // State Check Properties
     public bool IsGrounded => _groundDetector != null && _groundDetector.IsGrounded;
@@ -17,9 +18,7 @@ public abstract class GroundedAgentController : AgentController
 
         _jumpInput = GetComponent<IAgentJumpInput>();
 
-        _inputHandler = new GroundedAgentInputHandler();
-        _inputHandler.Initialize(this);
-        _inputHandler.BindJumpInput(_jumpInput);
+        _groundedInputHandler?.Initialize(this);
     }
 
     protected override void FixedUpdate()
@@ -42,7 +41,7 @@ public abstract class GroundedAgentController : AgentController
     #endregion
 
     #region State Input Event
-    public override void OnJumpAction()
+    public virtual void OnJumpAction()
     {
         _stateMachine.CurrentState?.OnInputEvent(InputKeyType.Jump);
     }

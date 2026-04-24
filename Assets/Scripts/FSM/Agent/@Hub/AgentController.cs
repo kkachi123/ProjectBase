@@ -24,6 +24,7 @@ public abstract class AgentController : MonoBehaviour, IAgentHealthListener, IAg
     [SerializeField] protected AgentMovementHandler2D _movementHandler;
     [SerializeField] protected AgentCombatHandler _combatHandler;
     [SerializeField] protected AgentHealthHandler _healthHandler;
+    [SerializeField] protected AgentInputHandler _inputHandler;
 
     [Header("State Machine")]
     protected AgentStateMachine<IAgentState> _stateMachine;
@@ -48,7 +49,8 @@ public abstract class AgentController : MonoBehaviour, IAgentHealthListener, IAg
         _animationEventProxy?.Initialize(this);
         _movementHandler?.Initialize(_motor, _motorData);
         _combatHandler?.Initialize(_statData.attackDatas);
-        _healthHandler?.Initialize(this);
+        _healthHandler?.Initialize(this);   
+        _inputHandler?.Initialize(this);
 
         _stateMachine = new AgentStateMachine<IAgentState>();
     }
@@ -101,16 +103,6 @@ public abstract class AgentController : MonoBehaviour, IAgentHealthListener, IAg
     }
     #endregion
     
-    public virtual void HandleMovement()
-    {
-        _movementHandler.HandleMove(_moveInput.GetMovementInput());
-    }
-    #region IAgentHealthListener
-    public virtual void OnHit() => ChangeState(StateType.Hit);
-
-    public virtual void OnDeath() => ChangeState(StateType.Death);
-    #endregion
-    
     #region State Animation Event 
     public virtual void OnAttackHitFrame()
     {
@@ -121,10 +113,18 @@ public abstract class AgentController : MonoBehaviour, IAgentHealthListener, IAg
         _stateMachine.CurrentState.OnAnimationEvent(type);
     }
     #endregion
+    
+    #region IAgentHealthListener
+    public virtual void OnHit() => ChangeState(StateType.Hit);
+
+    public virtual void OnDeath() => ChangeState(StateType.Death);
+    #endregion
 
     #region  State Input Event
-    public virtual void OnJumpAction() { }
-
+    public virtual void HandleMovement()
+    {
+        _movementHandler.HandleMove(_moveInput.GetMovementInput());
+    }
     public virtual void OnAttackAction(int attackType) { }
     #endregion
 }

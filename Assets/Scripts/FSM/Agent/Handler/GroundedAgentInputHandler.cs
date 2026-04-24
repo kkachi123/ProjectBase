@@ -1,17 +1,20 @@
 using UniRx;
-public class GroundedAgentInputHandler : AgentInputHandler
+[System.Serializable]
+public class GroundedAgentInputHandler
 {
-    private IAgentJumpInput _jumpInput;
+    private IGroundedAgentInputListener _controller;
 
-    public void BindJumpInput(IAgentJumpInput jumpInput)
+    public virtual void Initialize(IGroundedAgentInputListener controller)
     {
-        _jumpInput = jumpInput;
-        if (_jumpInput != null)
-        {
-            _jumpInput.JumpPressed
-                .Where(jumpPressed => jumpPressed)
-                .Subscribe(_ => _controller.OnJumpAction())
-                .AddTo(_controller.gameObject);
-        }
+        _controller = controller;
+        BindEvents();
+    }
+
+    private void BindEvents()
+    {
+        _controller.JumpInput.JumpPressed
+               .Where(jumpPressed => jumpPressed)
+               .Subscribe(_ => _controller.OnJumpAction())
+               .AddTo(_controller.gameObject);
     }
 }

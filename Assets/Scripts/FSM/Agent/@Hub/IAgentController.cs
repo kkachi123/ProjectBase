@@ -8,11 +8,16 @@ public interface IAgentHealthListener
 }
 public interface IAgentInputListener
 {
-    IAgentMovementInput MoveInput { get; }
-    IAgentCombatInput CombatInput { get; }
     GameObject gameObject { get; }
-    void OnJumpAction();
+    IAgentCombatInput CombatInput { get; }
     void OnAttackAction(int attackType);
+}
+
+public interface IGroundedAgentInputListener
+{
+    GameObject gameObject { get; }
+    IAgentJumpInput JumpInput { get; }
+    void OnJumpAction();
 }
 
 public interface IAgentAnimationListener
