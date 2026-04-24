@@ -1340,7 +1340,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!50 &741353673
 Rigidbody2D:
   serializedVersion: 5
@@ -1435,9 +1435,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _motorData: {fileID: 11400000, guid: 1dbc92e490441e1499b8b366dcb79ef1, type: 2}
   _statData: {fileID: 11400000, guid: db3f0133c32043a4688541e731704222, type: 2}
-  _animator: {fileID: 0}
-  _animationEventProxy: {fileID: 0}
-  _combatHandler: {fileID: 0}
+  _animator: {fileID: 1504615144}
+  _animationEventProxy: {fileID: 1504615143}
+  _combatHandler: {fileID: 741353680}
 --- !u!114 &741353677
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1499,7 +1499,7 @@ MonoBehaviour:
     size: {x: 0, y: 0}
   _targetLayer:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 256
 --- !u!1 &763558812
 GameObject:
   m_ObjectHideFlags: 0
@@ -2150,6 +2150,8 @@ GameObject:
   - component: {fileID: 1504615142}
   - component: {fileID: 1504615141}
   - component: {fileID: 1504615140}
+  - component: {fileID: 1504615144}
+  - component: {fileID: 1504615143}
   m_Layer: 9
   m_Name: Orc
   m_TagString: Untagged
@@ -2249,6 +2251,32 @@ Transform:
   m_Children: []
   m_Father: {fileID: 741353675}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1504615143
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1504615139}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b0342741f2a3f469b9f36640bb82afac, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &1504615144
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1504615139}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 743791b4643b6f841a1644203c22bc95, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _anim: {fileID: 1504615140}
+  _animationData: {fileID: 11400000, guid: 1f5152704bd4c4b43b07a5355ff6b752, type: 2}
 --- !u!1 &1507316952
 GameObject:
   m_ObjectHideFlags: 0

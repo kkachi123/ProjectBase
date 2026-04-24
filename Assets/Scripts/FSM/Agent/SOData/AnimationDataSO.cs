@@ -5,8 +5,6 @@ public class AnimationDataSO : ScriptableObject
 {
     [Header("Animation Int")]
     public string AttackTypeInt = "AttackType";
-    [Header("Animation Float")]
-    public string MoveSpeedFloat = "MoveSpeed";
     [Header("Animation Bool")]
     public string IsIdleBool = "IsIdle";
     public string IsMoveBool = "IsMove";

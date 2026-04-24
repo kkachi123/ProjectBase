@@ -1,6 +1,6 @@
 using UnityEngine;
 [RequireComponent(typeof(AgentImpactHandler))]
-public class PlayerController : AgentController
+public class PlayerController : GroundedAgentController
 {
     [SerializeField] private AgentImpactHandler _impactHandler;
     protected override void Awake()

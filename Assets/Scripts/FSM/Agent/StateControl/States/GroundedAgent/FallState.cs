@@ -1,8 +1,8 @@
 using UnityEngine;
 
-public class FallState : AgentStateBase
+public class FallState : GroundedAgentStateBase
 {
-    public FallState(AgentController agent) : base(agent) { }
+    public FallState(GroundedAgentController agent) : base(agent) { }
 
     public override void Enter()
     {

@@ -6,8 +6,8 @@ public class PlayerStateFactory
     {
         return new Dictionary<StateType, IAgentState>
         {
-            { StateType.Idle, new IdleState(playerController) },
-            { StateType.Move, new MoveState(playerController) },
+            { StateType.Idle, new GroundedIdleState(playerController) },
+            { StateType.Move, new GroundedMoveState(playerController) },
             { StateType.Jump, new JumpState(playerController) },
             { StateType.Fall, new FallState(playerController) },
             { StateType.Attack, new AttackState(playerController) },

@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-[RequireComponent(typeof(GroundDetector))]
 [RequireComponent(typeof(Health))]
 public abstract class AgentController : MonoBehaviour, IAgentHealthListener, IAgentInputListener, IAgentAnimationListener
 {
@@ -16,7 +15,6 @@ public abstract class AgentController : MonoBehaviour, IAgentHealthListener, IAg
     public IAgentMovementInput MoveInput => _moveInput;
     public IAgentCombatInput CombatInput => _combatInput;
     protected AgentMotor2D _motor;
-    protected GroundDetector _groundDetector;
     protected Health _health;
     public Health Health => _health;
 
@@ -33,8 +31,7 @@ public abstract class AgentController : MonoBehaviour, IAgentHealthListener, IAg
     protected Dictionary<StateType, IAgentState> _states;
 
     // State Check Properties
-    public bool IsGrounded => _groundDetector != null && _groundDetector.IsGrounded;
-    public bool IsIdle => _moveInput.GetMovementInput().sqrMagnitude < 0.0001f;
+    public virtual bool IsIdle => _moveInput.GetMovementInput().sqrMagnitude < 0.0001f;
 
 
     protected virtual void Awake()
@@ -43,7 +40,6 @@ public abstract class AgentController : MonoBehaviour, IAgentHealthListener, IAg
         _motor = GetComponent<AgentMotor2D>();
         _moveInput = GetComponent<IAgentMovementInput>();
         _combatInput = GetComponent<IAgentCombatInput>();
-        _groundDetector = GetComponent<GroundDetector>();
 
         _health = GetComponent<Health>();
         _health.Initialize(_statData.maxHealth);
@@ -69,7 +65,6 @@ public abstract class AgentController : MonoBehaviour, IAgentHealthListener, IAg
     }
     protected virtual void FixedUpdate()
     {
-        _groundDetector.UpdateGroundedStatus();
         _stateMachine.FixedOperate();
     }
 
@@ -90,16 +85,6 @@ public abstract class AgentController : MonoBehaviour, IAgentHealthListener, IAg
     public virtual void Move(bool isMove)
     {
         _animator.SetBool(StateType.Move, isMove);
-    }
-
-    public virtual void Jump(bool isJump)
-    {
-        _animator.SetBool(StateType.Jump, isJump);
-        if (isJump) _movementHandler.HandleJump();
-    }
-    public virtual void Falling(bool isFalling)
-    {
-        _animator.SetBool(StateType.Fall, isFalling);
     }
 
     public virtual void Attack(bool isAttack)
@@ -140,10 +125,7 @@ public abstract class AgentController : MonoBehaviour, IAgentHealthListener, IAg
     #endregion
 
     #region  State Input Event
-    public virtual void OnJumpAction()
-    {
-        _stateMachine.CurrentState?.OnInputEvent(InputKeyType.Jump);
-    }
+    public virtual void OnJumpAction() { }
 
     public virtual void OnAttackAction(int attackType) { }
     #endregion

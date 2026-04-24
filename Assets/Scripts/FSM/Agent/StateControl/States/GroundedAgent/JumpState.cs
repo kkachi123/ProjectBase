@@ -1,10 +1,10 @@
 using UnityEngine;
-public class JumpState : AgentStateBase
+public class JumpState : GroundedAgentStateBase
 {
     private float _jumpTimer;
     private bool _isJumpFinished;
     private const float MIN_JUMP_TIME = 0.1f;
-    public JumpState(AgentController agent) : base(agent) { }
+    public JumpState(GroundedAgentController agent) : base(agent) { }
 
     public override void Enter() 
     {

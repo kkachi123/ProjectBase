@@ -10,11 +10,41 @@ public class IdleState : AgentStateBase
 
     public override void Execute()
     {
+        if (!_agent.IsIdle) _agent.ChangeState(StateType.Move);
+    }
+
+    public override void Exit() 
+    {
+        _agent.Idle(false);
+    }
+
+    public override void OnInputEvent(InputKeyType type)
+    {
+        switch (type)
+        {
+            case InputKeyType.Attack:
+                _agent.ChangeState(StateType.Attack);
+                break;
+        }
+    }
+}
+
+public class GroundedIdleState : GroundedAgentStateBase
+{
+    public GroundedIdleState(GroundedAgentController agent) : base(agent) { }
+
+    public override void Enter()
+    {
+        _agent.Idle(true);
+    }
+
+    public override void Execute()
+    {
         if (!_agent.IsGrounded) _agent.ChangeState(StateType.Fall);
         else if (!_agent.IsIdle) _agent.ChangeState(StateType.Move);
     }
 
-    public override void Exit() 
+    public override void Exit()
     {
         _agent.Idle(false);
     }
