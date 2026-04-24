@@ -13,13 +13,6 @@ public interface IAgentInputListener
     void OnAttackAction(int attackType);
 }
 
-public interface IGroundedAgentInputListener
-{
-    GameObject gameObject { get; }
-    IAgentJumpInput JumpInput { get; }
-    void OnJumpAction();
-}
-
 public interface IAgentAnimationListener
 {
     void OnAnimationEvent(AnimEventType type);
