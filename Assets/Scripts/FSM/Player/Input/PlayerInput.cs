@@ -2,7 +2,7 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using UniRx;
 
-public class PlayerInput : MonoBehaviour , IAgentMovementInput , IAgentCombatInput
+public class PlayerInput : MonoBehaviour , IAgentMovementInput , IAgentJumpInput , IAgentCombatInput
 {
     public PlayerInputCommands inputActions;
     

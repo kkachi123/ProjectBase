@@ -13,11 +13,10 @@ MonoBehaviour:
   m_Name: OrcAnimationData
   m_EditorClassIdentifier: 
   AttackTypeInt: AttackType
-  MoveSpeedFloat: MoveSpeed
-  JumpTrigger: JumpTrigger
-  AttackTrigger: AttackTrigger
-  HitTrigger: HitTrigger
-  DeathTrigger: DeathTrigger
-  IsFallBool: IsFall
+  IsIdleBool: IsIdle
+  IsMoveBool: IsMove
+  IsJumpBool: 
+  IsFallBool: 
+  IsAttackBool: IsAttack
   IsHitBool: IsHit
-  IsDeadBool: IsDead
+  IsDeathBool: IsDeath

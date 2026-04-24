@@ -1,7 +1,7 @@
-public abstract class AgentStateBase : IAgentState
+public abstract class AgentStateBase<T> : IAgentState where T : AgentController
 {
-    protected AgentController _agent;
-    public AgentStateBase(AgentController agentController)
+    protected T _agent;
+    public AgentStateBase(T agentController)
     {
         _agent = agentController;
     }
@@ -12,4 +12,9 @@ public abstract class AgentStateBase : IAgentState
 
     public virtual void OnAnimationEvent(AnimEventType type) { }
     public virtual void OnInputEvent(InputKeyType type) { }
+}
+
+public abstract class AgentStateBase : AgentStateBase<AgentController>
+{
+    public AgentStateBase(AgentController agentController) : base(agentController) { }
 }

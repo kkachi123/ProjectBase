@@ -4,6 +4,8 @@ using UnityEngine;
 public abstract class GroundedAgentController : AgentController
 {
     protected GroundDetector _groundDetector;
+    protected IAgentJumpInput _jumpInput;
+    protected GroundedAgentInputHandler _inputHandler;
 
     // State Check Properties
     public bool IsGrounded => _groundDetector != null && _groundDetector.IsGrounded;
@@ -12,6 +14,12 @@ public abstract class GroundedAgentController : AgentController
     {
         base.Awake();
         _groundDetector = GetComponent<GroundDetector>();
+
+        _jumpInput = GetComponent<IAgentJumpInput>();
+
+        _inputHandler = new GroundedAgentInputHandler();
+        _inputHandler.Initialize(this);
+        _inputHandler.BindJumpInput(_jumpInput);
     }
 
     protected override void FixedUpdate()

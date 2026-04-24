@@ -1,6 +1,6 @@
 using UniRx;
 using UnityEngine;
-public class AIPlayerInput : MonoBehaviour , IAgentMovementInput , IAgentCombatInput
+public class AIPlayerInput : MonoBehaviour , IAgentMovementInput , IAgentJumpInput , IAgentCombatInput
 {
     public Vector2 Horizontal { get; private set; }
     private readonly ReactiveProperty<bool> _jumpPressed = new ReactiveProperty<bool>(false);
@@ -16,7 +16,6 @@ public class AIPlayerInput : MonoBehaviour , IAgentMovementInput , IAgentCombatI
     {
         Horizontal = horizontal;
     }
-    // 순간 입력처리
     public void Jump(bool value)
     {
         _jumpPressed.Value = value;

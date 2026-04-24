@@ -24,7 +24,6 @@ public abstract class AgentController : MonoBehaviour, IAgentHealthListener, IAg
     [SerializeField] protected AgentMovementHandler2D _movementHandler;
     [SerializeField] protected AgentCombatHandler _combatHandler;
     [SerializeField] protected AgentHealthHandler _healthHandler;
-    [SerializeField] protected AgentInputHandler _inputHandler;
 
     [Header("State Machine")]
     protected AgentStateMachine<IAgentState> _stateMachine;
@@ -50,7 +49,6 @@ public abstract class AgentController : MonoBehaviour, IAgentHealthListener, IAg
         _movementHandler?.Initialize(_motor, _motorData);
         _combatHandler?.Initialize(_statData.attackDatas);
         _healthHandler?.Initialize(this);
-        _inputHandler?.Initialize(this);
 
         _stateMachine = new AgentStateMachine<IAgentState>();
     }

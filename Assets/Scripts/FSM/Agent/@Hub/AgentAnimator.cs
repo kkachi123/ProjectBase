@@ -17,22 +17,39 @@ public class AgentAnimator : MonoBehaviour
 
     public void Initialize()
     {
-        _intParameters = new Dictionary<AnimationIntType, int>()
-        {
-            { AnimationIntType.AttackType, Animator.StringToHash(_animationData.AttackTypeInt) },
-        };
+        _intParameters = new Dictionary<AnimationIntType, int>();
+        _boolParameters = new Dictionary<StateType, int>();
 
-        _boolParameters = new Dictionary<StateType, int>()
-        {
-            { StateType.Idle, Animator.StringToHash(_animationData.IsIdleBool) },
-            { StateType.Move, Animator.StringToHash(_animationData.IsMoveBool) },
-            { StateType.Jump, Animator.StringToHash(_animationData.IsJumpBool) },
-            { StateType.Fall, Animator.StringToHash(_animationData.IsFallBool) },
-            { StateType.Attack, Animator.StringToHash(_animationData.IsAttackBool) },
-            { StateType.Hit, Animator.StringToHash(_animationData.IsHitBool) },
-            { StateType.Death, Animator.StringToHash(_animationData.IsDeathBool) },
-        };
+        // Register Integer Parameters
+        RegisterIntParam(AnimationIntType.AttackType, _animationData.AttackTypeInt);
+
+        // Register Boolean (State) Parameters
+        RegisterBoolParam(StateType.Idle, _animationData.IsIdleBool);
+        RegisterBoolParam(StateType.Move, _animationData.IsMoveBool);
+        RegisterBoolParam(StateType.Jump, _animationData.IsJumpBool);
+        RegisterBoolParam(StateType.Fall, _animationData.IsFallBool);
+        RegisterBoolParam(StateType.Attack, _animationData.IsAttackBool);
+        RegisterBoolParam(StateType.Hit, _animationData.IsHitBool);
+        RegisterBoolParam(StateType.Death, _animationData.IsDeathBool);
     }
+
+    private void RegisterIntParam(AnimationIntType type, string paramName)
+    {
+        // Only register if the parameter name is valid (not null or empty)
+        if (!string.IsNullOrWhiteSpace(paramName))
+        {
+            _intParameters[type] = Animator.StringToHash(paramName);
+        }
+    }
+
+    private void RegisterBoolParam(StateType type, string paramName)
+    {
+        if (!string.IsNullOrWhiteSpace(paramName))
+        {
+            _boolParameters[type] = Animator.StringToHash(paramName);
+        }
+    }
+
     public void SetInteger(AnimationIntType type, int value)
     {
         if (_intParameters.TryGetValue(type, out int hash))

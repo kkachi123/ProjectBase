@@ -14,13 +14,15 @@ public interface IAgentState : IState
 
 public enum StateType
 {
+    // Common States
     Idle,
     Move,
-    Jump,
-    Fall,
     Attack,
     Hit,
     Death,
+    // Grounded States
+    Jump,
+    Fall,
 }
 
 public enum AnimEventType

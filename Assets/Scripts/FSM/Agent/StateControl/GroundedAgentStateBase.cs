@@ -1,15 +1,9 @@
-public abstract class GroundedAgentStateBase : IAgentState
+public abstract class GroundedAgentStateBase<T> : AgentStateBase<T> where T : GroundedAgentController
 {
-    protected GroundedAgentController _agent;
-    public GroundedAgentStateBase(GroundedAgentController agentController)
-    {
-        _agent = agentController;
-    }
-    public abstract void Enter();
-    public abstract void Execute();
-    public virtual void FixedExecute() { }
-    public abstract void Exit();
+    public GroundedAgentStateBase(T agentController) : base(agentController) { }
+}
 
-    public virtual void OnAnimationEvent(AnimEventType type) { }
-    public virtual void OnInputEvent(InputKeyType type) { }
+public abstract class GroundedAgentStateBase : GroundedAgentStateBase<GroundedAgentController>
+{
+    public GroundedAgentStateBase(GroundedAgentController agentController) : base(agentController) { }
 }

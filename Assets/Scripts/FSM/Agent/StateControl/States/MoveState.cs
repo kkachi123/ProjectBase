@@ -1,7 +1,8 @@
 using UnityEngine;
-public class MoveState : AgentStateBase
+
+public class MoveState<T> : AgentStateBase<T> where T : AgentController
 {
-    public MoveState(AgentController agent) : base(agent) { }
+    public MoveState(T agent) : base(agent) { }
 
     public override void Enter()
     {
@@ -33,30 +34,21 @@ public class MoveState : AgentStateBase
     }
 }
 
-public class GroundedMoveState : GroundedAgentStateBase
+public class MoveState : MoveState<AgentController>
+{
+    public MoveState(AgentController agent) : base(agent) { }
+}
+
+public class GroundedMoveState : MoveState<GroundedAgentController>
 {
     public GroundedMoveState(GroundedAgentController agent) : base(agent) { }
-
-    public override void Enter()
-    {
-        _agent.Move(true);
-    }
 
     public override void Execute()
     {
         if (!_agent.IsGrounded) _agent.ChangeState(StateType.Fall);
-        else if (_agent.IsIdle) _agent.ChangeState(StateType.Idle);
+        else base.Execute();
     }
 
-    public override void FixedExecute()
-    {
-        _agent.HandleMovement();
-    }
-
-    public override void Exit()
-    {
-        _agent.Move(false);
-    }
     public override void OnInputEvent(InputKeyType type)
     {
         if (!_agent.IsGrounded) return;
@@ -66,8 +58,8 @@ public class GroundedMoveState : GroundedAgentStateBase
             case InputKeyType.Jump:
                 _agent.ChangeState(StateType.Jump);
                 break;
-            case InputKeyType.Attack:
-                _agent.ChangeState(StateType.Attack);
+            default:
+                base.OnInputEvent(type);
                 break;
         }
     }
