@@ -1,11 +1,10 @@
 using UnityEngine;
-[System.Serializable]
 public class AgentMovementHandler2D 
 {
     private AgentMotor2D _motor;
     private AgentMotorData _data;
 
-    public void Initialize(AgentMotor2D motor, AgentMotorData data)
+    public AgentMovementHandler2D(AgentMotor2D motor, AgentMotorData data)
     {
         _motor = motor;
         _data = data;

@@ -3,10 +3,10 @@ using UnityEngine;
 [RequireComponent(typeof(GroundDetector))]
 public abstract class GroundedAgentController : AgentController , IGroundedAgentInputListener
 {
-    protected GroundDetector _groundDetector;
+    [SerializeField] protected GroundDetector _groundDetector;
     protected IAgentJumpInput _jumpInput;
     public IAgentJumpInput JumpInput => _jumpInput;
-    [SerializeField] protected GroundedAgentInputHandler _groundedInputHandler;
+    protected GroundedAgentInputHandler _groundedInputHandler;
 
     // State Check Properties
     public bool IsGrounded => _groundDetector != null && _groundDetector.IsGrounded;
@@ -18,7 +18,7 @@ public abstract class GroundedAgentController : AgentController , IGroundedAgent
 
         _jumpInput = GetComponent<IAgentJumpInput>();
 
-        _groundedInputHandler?.Initialize(this);
+        _groundedInputHandler = new GroundedAgentInputHandler(this);
     }
 
     protected override void FixedUpdate()

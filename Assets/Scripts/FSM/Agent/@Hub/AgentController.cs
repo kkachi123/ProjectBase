@@ -2,29 +2,27 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-[RequireComponent(typeof(Health))]
+[RequireComponent(typeof(AgentMotor2D), typeof(Health), typeof(AgentCombatHandler))]
+
 public abstract class AgentController : MonoBehaviour, IAgentHealthListener, IAgentInputListener, IAgentAnimationListener
 {
     [Header("Data Assets")]
-    [SerializeField] protected AgentMotorData _motorData;
     [SerializeField] protected AgentStatData _statData;
+    [SerializeField] protected AgentMotorData _motorData;
 
     [Header("Core Components")]
-    protected IAgentMovementInput _moveInput;
-    protected IAgentCombatInput _combatInput;
-    public IAgentMovementInput MoveInput => _moveInput;
-    public IAgentCombatInput CombatInput => _combatInput;
     protected AgentMotor2D _motor;
-    protected Health _health;
-    public Health Health => _health;
+    protected IAgentMovementInput _moveInput;
+    public IAgentCombatInput CombatInput { get; private set; }
+    public Health Health { get; private set; }
 
     [Header("Handlers & Visuals")]
     [SerializeField] protected AgentAnimator _animator;
     [SerializeField] protected AgentAnimationEventProxy _animationEventProxy;
-    [SerializeField] protected AgentMovementHandler2D _movementHandler;
     [SerializeField] protected AgentCombatHandler _combatHandler;
-    [SerializeField] protected AgentHealthHandler _healthHandler;
-    [SerializeField] protected AgentInputHandler _inputHandler;
+    protected AgentMovementHandler2D _movementHandler;
+    protected AgentHealthHandler _healthHandler;
+    protected AgentInputHandler _inputHandler;
 
     [Header("State Machine")]
     protected AgentStateMachine<IAgentState> _stateMachine;
@@ -39,18 +37,20 @@ public abstract class AgentController : MonoBehaviour, IAgentHealthListener, IAg
         // Core Component Initialization
         _motor = GetComponent<AgentMotor2D>();
         _moveInput = GetComponent<IAgentMovementInput>();
-        _combatInput = GetComponent<IAgentCombatInput>();
+        CombatInput = GetComponent<IAgentCombatInput>();
 
-        _health = GetComponent<Health>();
-        _health.Initialize(_statData.maxHealth);
+        Health = GetComponent<Health>();
+        Health.Initialize(_statData.maxHealth);
 
         // Handler Initialization
         _animator?.Initialize();
         _animationEventProxy?.Initialize(this);
-        _movementHandler?.Initialize(_motor, _motorData);
+        _combatHandler = GetComponent<AgentCombatHandler>();
         _combatHandler?.Initialize(_statData.attackDatas);
-        _healthHandler?.Initialize(this);   
-        _inputHandler?.Initialize(this);
+
+        _movementHandler =  new AgentMovementHandler2D(_motor, _motorData);
+        _healthHandler = new AgentHealthHandler(this);
+        _inputHandler = new AgentInputHandler(this);
 
         _stateMachine = new AgentStateMachine<IAgentState>();
     }

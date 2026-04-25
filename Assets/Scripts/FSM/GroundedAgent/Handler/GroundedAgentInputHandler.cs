@@ -1,10 +1,9 @@
 using UniRx;
-[System.Serializable]
 public class GroundedAgentInputHandler
 {
     private IGroundedAgentInputListener _controller;
 
-    public virtual void Initialize(IGroundedAgentInputListener controller)
+    public GroundedAgentInputHandler(IGroundedAgentInputListener controller)
     {
         _controller = controller;
         BindEvents();

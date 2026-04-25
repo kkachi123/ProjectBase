@@ -4,8 +4,6 @@ using UnityEngine;
 public class AgentMotor2D : MonoBehaviour
 {
     Rigidbody2D _rb;
-    public Vector2 Velocity => _rb.linearVelocity;
-
 
     private void Awake()
     {
@@ -29,7 +27,7 @@ public class AgentMotor2D : MonoBehaviour
         _rb.AddForceY(jumpForce, ForceMode2D.Impulse);
     }
 
-    public void Knockback(Vector2 horizontalInput, float knockForce)
+    public void Knockback(Vector3 horizontalInput, float knockForce)
     {
         // X축 속도를 초기화하고 넉백 힘을 적용
         _rb.linearVelocity = Vector2.zero;

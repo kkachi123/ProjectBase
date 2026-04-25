@@ -1,8 +1,6 @@
 using UnityEngine;
-using System;
 using System.Collections.Generic;
 
-[Serializable]
 public class AgentCombatHandler : MonoBehaviour
 {
     [SerializeField] private AttackData _testAttackData; // Editor Data Setting
