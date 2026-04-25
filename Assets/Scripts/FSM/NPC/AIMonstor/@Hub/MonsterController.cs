@@ -1,3 +1,4 @@
+using UnityEngine;
 public class MonsterController : AgentController
 {
     protected override void Awake()
