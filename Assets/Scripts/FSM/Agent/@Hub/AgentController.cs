@@ -8,7 +8,9 @@ public abstract class AgentController : MonoBehaviour, IAgentHealthListener, IAg
 {
     [Header("Data Assets")]
     [SerializeField] protected AgentStatData _statData;
+    public AgentStatData StatData => _statData;
     [SerializeField] protected AgentMotorData _motorData;
+    public AgentMotorData MotorData => _motorData;
 
     [Header("Core Components")]
     protected AgentMotor2D _motor;

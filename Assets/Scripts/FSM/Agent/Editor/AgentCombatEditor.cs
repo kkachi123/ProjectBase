@@ -2,7 +2,7 @@ using UnityEngine;
 using UnityEditor;
 using System.Collections.Generic;
 
-public class AttackRangeEditorWindow : EditorWindow
+public class AgentCombatEditor : EditorWindow
 {
     private AgentCombatHandler _targetHandler;
     private Animator _animator;
@@ -16,10 +16,19 @@ public class AttackRangeEditorWindow : EditorWindow
     // Local storage for editing
     private AttackData _tempData;
 
-    [MenuItem("Window/Custom/Attack Range Editor")]
+    [MenuItem("Window/Custom/Agent Combat Editor")]
     public static void ShowWindow()
     {
-        GetWindow<AttackRangeEditorWindow>("Attack Range Editor");
+        GetWindow<AgentCombatEditor>("Agent Combat Editor");
+    }
+
+    public static void OpenWithTarget(AgentCombatHandler handler)
+    {
+        AgentCombatEditor window = GetWindow<AgentCombatEditor>("Agent Combat Editor");
+        window._targetHandler = handler;
+        window._animator = handler.GetComponentInChildren<Animator>();
+        window.AutoFindStatData();
+        window.Show();
     }
 
     private void OnEnable()
@@ -45,61 +54,77 @@ public class AttackRangeEditorWindow : EditorWindow
             _animator = _targetHandler.GetComponentInChildren<Animator>();
             AutoFindStatData();
         }
-
         if (_targetHandler == null)
         {
-            EditorGUILayout.HelpBox("Select an AgentCombatHandler in the scene.", MessageType.Info);
+            EditorGUILayout.HelpBox("Assign an AgentCombatHandler to edit its attack ranges.", MessageType.Info);
             return;
         }
 
         EditorGUILayout.Space();
         EditorGUILayout.LabelField("Data Management", EditorStyles.boldLabel);
-        
-        _statData = (AgentStatData)EditorGUILayout.ObjectField("Stat Data Asset", _statData, typeof(AgentStatData), false);
 
+        EditorGUI.BeginChangeCheck();
+        _statData = (AgentStatData)EditorGUILayout.ObjectField("Stat Data Asset", _statData, typeof(AgentStatData), false);
+        if(EditorGUI.EndChangeCheck() && _statData == null)
+        {
+            EditorGUILayout.HelpBox("Assign an AgentStatData asset to edit attack ranges.", MessageType.Warning);
+            return;
+        }
         if (_statData != null)
         {
             string[] options = new string[_statData.attackDatas.Count];
             for (int i = 0; i < _statData.attackDatas.Count; i++)
-            {
-                options[i] = $"Attack Index {i}";
-            }
+                options[i] = $"Attack {i + 1}";
             _selectedIndex = EditorGUILayout.Popup("Select Index", _selectedIndex, options);
 
             EditorGUILayout.BeginHorizontal();
             if (GUILayout.Button("Load from SO")) LoadFromSO();
             if (GUILayout.Button("Save to SO")) SaveToSO();
             EditorGUILayout.EndHorizontal();
-        }
 
-        EditorGUILayout.Space();
-        EditorGUILayout.LabelField("Current Editing Values", EditorStyles.boldLabel);
-        _tempData.damage = EditorGUILayout.FloatField("Damage", _tempData.damage);
-        _tempData.offset = EditorGUILayout.Vector2Field("Offset", _tempData.offset);
-        _tempData.size = EditorGUILayout.Vector2Field("Size", _tempData.size);
+            EditorGUILayout.Space();
+            EditorGUILayout.LabelField("Editing Values", EditorStyles.boldLabel);
+            _tempData.damage = EditorGUILayout.FloatField("Damage", _tempData.damage);
+            _tempData.offset = EditorGUILayout.Vector2Field("Offset", _tempData.offset);
+            _tempData.size = EditorGUILayout.Vector2Field("Size", _tempData.size);
+
+            _isSceneHandleEnabled = EditorGUILayout.Toggle("Show Scene Handles", _isSceneHandleEnabled);
+        }
 
         EditorGUILayout.Space();
         EditorGUILayout.LabelField("Animation Preview", EditorStyles.boldLabel);
-        _currentClip = (AnimationClip)EditorGUILayout.ObjectField("Clip", _currentClip, typeof(AnimationClip), false);
-        
+
+        if (_animator != null && _animator.runtimeAnimatorController != null)
+        {
+            AnimationClip[] clips = _animator.runtimeAnimatorController.animationClips;
+            if (clips.Length > 0)
+            {
+                string[] clipNames = new string[clips.Length];
+                int currentClipIndex = -1;
+
+                for (int i = 0; i < clips.Length; i++)
+                {
+                    clipNames[i] = clips[i].name;
+                    if (clips[i] == _currentClip) currentClipIndex = i;
+                }
+
+                EditorGUI.BeginChangeCheck();
+                int newIndex = EditorGUILayout.Popup("Select Clip", currentClipIndex, clipNames);
+                if (EditorGUI.EndChangeCheck() && newIndex >= 0)
+                {
+                    _currentClip = clips[newIndex];
+                    _animationTime = 0f;
+                }
+            }
+        }
+
+        _currentClip = (AnimationClip)EditorGUILayout.ObjectField("Clip Asset", _currentClip, typeof(AnimationClip), false);
+
         EditorGUI.BeginChangeCheck();
         _animationTime = EditorGUILayout.Slider("Timeline", _animationTime, 0f, 1f);
-        if (EditorGUI.EndChangeCheck())
-        {
-            SampleAnimation();
-        }
-
-        if (GUILayout.Button("Reset Pose / Stop Mode"))
-        {
-            StopAnimationMode();
-        }
-
-        _isSceneHandleEnabled = EditorGUILayout.Toggle("Show Scene Handles", _isSceneHandleEnabled);
-        
-        if (GUI.changed)
-        {
-            SceneView.RepaintAll();
-        }
+        if (EditorGUI.EndChangeCheck()) SampleAnimation();
+        if (GUILayout.Button("Reset Pose / Stop Mode")) StopAnimationMode();
+        if (GUI.changed) SceneView.RepaintAll();
     }
 
     private void AutoFindStatData()
@@ -107,9 +132,8 @@ public class AttackRangeEditorWindow : EditorWindow
         var controller = _targetHandler.GetComponent<AgentController>();
         if (controller != null)
         {
-            SerializedObject so = new SerializedObject(controller);
-            var prop = so.FindProperty("_statData");
-            if (prop != null) _statData = prop.objectReferenceValue as AgentStatData;
+            _statData = controller.StatData;
+            if (_statData == null) Debug.LogWarning("AgentController does not have a reference to AgentStatData.");
         }
     }
 
@@ -140,7 +164,7 @@ public class AttackRangeEditorWindow : EditorWindow
         AnimationMode.BeginSampling();
         AnimationMode.SampleAnimationClip(_animator.gameObject, _currentClip, _animationTime * _currentClip.length);
         AnimationMode.EndSampling();
-        
+
         EditorApplication.QueuePlayerLoopUpdate();
         SceneView.RepaintAll();
     }
@@ -166,7 +190,7 @@ public class AttackRangeEditorWindow : EditorWindow
 
         // Center Handle
         EditorGUI.BeginChangeCheck();
-        var fmh_169_64_639129025623624580 = Quaternion.identity; Vector3 newCenter = Handles.FreeMoveHandle(areaCenter, 0.1f, Vector3.zero, Handles.RectangleHandleCap);
+        Vector3 newCenter = Handles.FreeMoveHandle(areaCenter, 0.1f, Vector3.zero, Handles.RectangleHandleCap);
         if (EditorGUI.EndChangeCheck())
         {
             Vector3 delta = newCenter - pos;
