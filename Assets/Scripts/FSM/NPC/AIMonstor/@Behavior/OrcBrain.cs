@@ -16,14 +16,18 @@ public class OrcBrain : MonoBehaviour
     void Start()
     {
         _input = GetComponent<AIMonsterInput>();
-        _leftGroundDetector = GetComponent<GroundDetector>();
-        _rightGroundDetector = GetComponent<GroundDetector>();
         // -1 : left, 1 : right
         _direction = Random.value < 0.5f ? -1 : 1;
         _moveDir = new Vector2(_direction, 0);
         StartCoroutine(WalkRoutine());
     }
-    
+
+    void Update()
+    {
+        _leftGroundDetector.UpdateGroundedStatus();
+        _rightGroundDetector.UpdateGroundedStatus();
+    }
+
     IEnumerator WalkRoutine()
     {
         while (true)
