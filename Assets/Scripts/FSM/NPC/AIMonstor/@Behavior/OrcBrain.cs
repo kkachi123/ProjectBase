@@ -1,4 +1,6 @@
 using System.Collections;
+using System.Threading;
+using Cysharp.Threading.Tasks;
 using UnityEngine;
 
 [RequireComponent(typeof(AIMonsterInput))]
@@ -12,35 +14,33 @@ public class OrcBrain : MonoBehaviour
     || _rightGroundDetector != null && _direction == 1 && _rightGroundDetector.IsGrounded;
     private Vector2 _moveDir;
     [SerializeField] private int _direction;
-    [SerializeField] private bool isfrontGrounded;
-    void Start()
+    private void Start()
     {
         _input = GetComponent<AIMonsterInput>();
         // -1 : left, 1 : right
         _direction = Random.value < 0.5f ? -1 : 1;
         _moveDir = new Vector2(_direction, 0);
-        StartCoroutine(WalkRoutine());
+        
+        WalkRoutine(this.GetCancellationTokenOnDestroy()).Forget();
     }
 
-    void Update()
+    private void Update()
     {
         _leftGroundDetector.UpdateGroundedStatus();
         _rightGroundDetector.UpdateGroundedStatus();
     }
 
-    IEnumerator WalkRoutine()
+    private async UniTaskVoid WalkRoutine(CancellationToken cancellationToken)
     {
         while (true)
         {
             _input.Move(_moveDir);
-            isfrontGrounded = IsFrontGrounded;
             if(!IsFrontGrounded)
             {
                 _moveDir = new Vector2(-_moveDir.x, 0);
                 _direction *= -1;
             }
-            yield return null;
+            await UniTask.Yield(PlayerLoopTiming.Update, cancellationToken);
         }
     }
-    
 }
