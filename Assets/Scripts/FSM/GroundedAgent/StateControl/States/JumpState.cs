@@ -23,6 +23,11 @@ public class JumpState : GroundedAgentStateBase
         }
     }
 
+    public override void FixedExecute()
+    {
+        _agent.HandleMovement();
+    }
+
     public override void Exit() 
     {
         _agent.Jump(false);

@@ -1511,10 +1511,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b6d0292d1e39840768ff6070354a478e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _testAttackData:
-    damage: 1
-    offset: {x: 0.72, y: 0.15}
-    size: {x: 1, y: 1.3}
   _targetLayer:
     serializedVersion: 2
     m_Bits: 256
@@ -3016,9 +3012,33 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 6125933212912360794, guid: 4f34bba3e5999f94798c5894e520cf4b, type: 3}
+      propertyPath: _testAttackData.damage
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 6125933212912360794, guid: 4f34bba3e5999f94798c5894e520cf4b, type: 3}
+      propertyPath: _testAttackData.size.x
+      value: 2.063949
+      objectReference: {fileID: 0}
+    - target: {fileID: 6125933212912360794, guid: 4f34bba3e5999f94798c5894e520cf4b, type: 3}
+      propertyPath: _testAttackData.size.y
+      value: 1.0987453
+      objectReference: {fileID: 0}
+    - target: {fileID: 6125933212912360794, guid: 4f34bba3e5999f94798c5894e520cf4b, type: 3}
+      propertyPath: _testAttackData.offset.x
+      value: 0.63479495
+      objectReference: {fileID: 0}
+    - target: {fileID: 6125933212912360794, guid: 4f34bba3e5999f94798c5894e520cf4b, type: 3}
+      propertyPath: _testAttackData.offset.y
+      value: -0.03354287
+      objectReference: {fileID: 0}
     - target: {fileID: 6748850014222937685, guid: 4f34bba3e5999f94798c5894e520cf4b, type: 3}
       propertyPath: m_Name
       value: Player
+      objectReference: {fileID: 0}
+    - target: {fileID: 6748850014222937685, guid: 4f34bba3e5999f94798c5894e520cf4b, type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 8186350033515855826, guid: 4f34bba3e5999f94798c5894e520cf4b, type: 3}
       propertyPath: m_LocalPosition.x

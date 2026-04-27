@@ -3,7 +3,6 @@ using System.Collections.Generic;
 
 public class AgentCombatHandler : MonoBehaviour
 {
-    [SerializeField] private AttackData _testAttackData; // Editor Data Setting
     [SerializeField] private LayerMask _targetLayer;
     private List<AttackData> _datas;
     public int CurrentAttackType { get; private set; }
@@ -51,13 +50,6 @@ public class AgentCombatHandler : MonoBehaviour
             Vector2 areaPos = CalcAreaPos(currentData.offset);
             Gizmos.color = Color.red;
             Gizmos.DrawWireCube(areaPos, currentData.size);
-        }
-        // Editor Data Setting Visualization (Yellow Box)
-        else if (!Application.isPlaying)
-        {
-            Gizmos.color = Color.yellow;
-            Vector2 areaPos = CalcAreaPos(_testAttackData.offset);
-            Gizmos.DrawWireCube(areaPos, _testAttackData.size);
         }
     }
 }
