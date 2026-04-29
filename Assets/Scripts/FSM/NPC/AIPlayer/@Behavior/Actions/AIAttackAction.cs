@@ -16,14 +16,9 @@ public partial class AIAttackAction : Action
 
     protected override Status OnStart()
     {
-        if (Input == null || !CanAttack.Value) return Status.Failure;
+        if (Input == null || !CanAttack.Value || AttackType == 0) return Status.Failure;
         CanAttack.Value = false;
-        int attackType = AttackType.Value;
-        // 범위 밖이면 가장 긴 공격을 사용하도록 설정
-        if (AttackType == 0) attackType = 2; 
-
-        Input.Value.Attack(attackType);
-
+        Input.Value.Attack(AttackType.Value);
         return Status.Success;
     }
 }

@@ -1368,6 +1368,7 @@ GameObject:
   - component: {fileID: 741353682}
   - component: {fileID: 741353674}
   - component: {fileID: 741353673}
+  - component: {fileID: 741353684}
   m_Layer: 9
   m_Name: OrcAI
   m_TagString: Untagged
@@ -1542,6 +1543,25 @@ MonoBehaviour:
   _leftGroundDetector: {fileID: 1216224376}
   _rightGroundDetector: {fileID: 2106578122}
   _direction: 0
+--- !u!114 &741353684
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 741353672}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ff9ece546e2d239489983dcdfc76f041, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  playerMask:
+    serializedVersion: 2
+    m_Bits: 256
+  obstacleMask:
+    serializedVersion: 2
+    m_Bits: 64
+  viewRadius: 2
 --- !u!1 &763558812
 GameObject:
   m_ObjectHideFlags: 0
@@ -3042,7 +3062,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8186350033515855826, guid: 4f34bba3e5999f94798c5894e520cf4b, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -4.29
+      value: -3.39
       objectReference: {fileID: 0}
     - target: {fileID: 8186350033515855826, guid: 4f34bba3e5999f94798c5894e520cf4b, type: 3}
       propertyPath: m_LocalPosition.y

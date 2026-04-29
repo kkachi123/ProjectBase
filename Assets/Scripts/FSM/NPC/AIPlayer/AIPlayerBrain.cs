@@ -7,7 +7,7 @@ using System.Collections.Generic;
 [RequireComponent(typeof(GroundDetector), typeof(WallDetector))]
 
 [Serializable]
-public class AgentBlackboardValue
+public class AIPlayerBlackboardValue
 {
     [Header("component")]
     public string Input = "Input";
@@ -31,7 +31,7 @@ public class AIPlayerBrain : MonoBehaviour
 {
     [Header("Behavior Tree")]
     [SerializeField] private BehaviorGraphAgent _agent;
-    [SerializeField] private AgentBlackboardValue _blackboardValue;
+    [SerializeField] private AIPlayerBlackboardValue _blackboardValue;
 
     private AIPlayerInput _input;
     private GroundDetector _groundDetector;
@@ -57,7 +57,7 @@ public class AIPlayerBrain : MonoBehaviour
         List<float> attackRanges = new List<float>();
         for (int i = 0; i < _statData.attackDatas.Count; i++)
         {
-            float range = CalcAttackRange(_statData.attackDatas[i].offset, _statData.attackDatas[i].size);
+            float range = Calculators.CalcAttackRange(_statData.attackDatas[i].offset, _statData.attackDatas[i].size);
             attackRanges.Add(range);
         }
         _agent.SetVariableValue(_blackboardValue.AttackRanges, attackRanges);
@@ -70,11 +70,5 @@ public class AIPlayerBrain : MonoBehaviour
         _agent.SetVariableValue(_blackboardValue.PlayerPos, _playerDetector.Target);
         _agent.SetVariableValue(_blackboardValue.IsPlayerInView, _playerDetector.IsTargetInView());
         _agent.SetVariableValue(_blackboardValue.IsGround, _groundDetector.IsGrounded);
-    }
-
-    private float CalcAttackRange(Vector2 offset, Vector2 size)
-    {
-        // 공격 범위는 공격의 중심점에서 가장 먼 지점까지의 거리를 계산하여 반환 
-        return Mathf.Sqrt(offset.x * offset.x + offset.y * offset.y) + Mathf.Sqrt(size.x * size.x + size.y * size.y) / 2f;
     }
 }
