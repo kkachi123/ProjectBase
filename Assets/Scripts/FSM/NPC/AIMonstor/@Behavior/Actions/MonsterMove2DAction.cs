@@ -11,15 +11,17 @@ public partial class MonsterMove2DAction : Action
     [SerializeReference] public BlackboardVariable<AIMonsterInput> Input;
     [SerializeReference] public BlackboardVariable<float> Min = new BlackboardVariable<float>(1);
     [SerializeReference] public BlackboardVariable<float> Max = new BlackboardVariable<float>(3);
-    [SerializeReference] public BlackboardVariable<bool> IsFrontGrounded;
-    [SerializeReference] public BlackboardVariable<int> Direction;
+    [SerializeReference] public BlackboardVariable<bool> IsLeftGrounded;
+    [SerializeReference] public BlackboardVariable<bool> IsRightGrounded;
     Vector2 dir;
     float duration;
     float elapsedTime = 0f;
+    int direction;
+    bool IsFrontGrounded => IsLeftGrounded.Value && direction == -1 || IsRightGrounded.Value && direction == 1;
     protected override Status OnStart()
     {
-        Direction.Value = UnityEngine.Random.value > 0.5f ? 1 : -1;
-        dir = Direction.Value == 1 ? Vector2.right : Vector2.left;
+        direction = UnityEngine.Random.value > 0.5f ? 1 : -1;
+        dir = new Vector2(direction, 0); 
 
         duration = UnityEngine.Random.Range(Min.Value, Max.Value);
         elapsedTime = 0f;
@@ -33,10 +35,10 @@ public partial class MonsterMove2DAction : Action
 
         elapsedTime += Time.deltaTime;
 
-        if(!IsFrontGrounded.Value)
+        if(!IsFrontGrounded)
         {
-            Direction.Value *= -1;
-            dir *= -1;
+            direction *= -1;
+            dir = new Vector2(direction, 0);
         }
 
         Input.Value.Move(dir);

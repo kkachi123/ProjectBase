@@ -10,12 +10,13 @@ using System.Collections.Generic;
 public partial class MonsterAttackAction : Action
 {
     [SerializeReference] public BlackboardVariable<AIMonsterInput> Input;
-    [SerializeReference] public BlackboardVariable<List<float>> AttackRanges;
     [SerializeReference] public BlackboardVariable<int> AttackType;
+    [SerializeReference] public BlackboardVariable<bool> CanAttack;
 
     protected override Status OnStart()
     {
-        if (Input == null || AttackType == 0) return Status.Failure;
+        if (Input == null || AttackType == 0 || !CanAttack.Value) return Status.Failure;
+        CanAttack.Value = false;
         Input.Value.Attack(AttackType.Value);
         return Status.Success;
     }

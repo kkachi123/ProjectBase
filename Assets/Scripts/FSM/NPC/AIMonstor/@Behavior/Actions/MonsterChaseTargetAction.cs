@@ -12,16 +12,21 @@ public partial class MonsterChaseTargetAction : Action
     [SerializeReference] public BlackboardVariable<Transform> Self;
     [SerializeReference] public BlackboardVariable<Transform> Target;
     [SerializeReference] public BlackboardVariable<float> LimitDistance;
-    [SerializeReference] public BlackboardVariable<bool> IsFrontGrounded;
 
+    [SerializeReference] public BlackboardVariable<bool> IsLeftGrounded;
+    [SerializeReference] public BlackboardVariable<bool> IsRightGrounded;
+
+    int direction;
     Vector2 inputDir;
+
+    bool IsFrontGrounded => IsLeftGrounded.Value && direction == -1 || IsRightGrounded.Value && direction == 1;
     protected override Status OnStart()
     {
         if (Target.Value == null || Self.Value == null) return Status.Failure;
 
-
         Vector2 dirToTarget = (Target.Value.position - Self.Value.position).normalized;
-        inputDir = new Vector2(dirToTarget.x > 0 ? 1 : -1, 0);
+        direction = dirToTarget.x > 0 ? 1 : -1;
+        inputDir = new Vector2(direction, 0);
 
         return Status.Running;
     }
@@ -31,7 +36,7 @@ public partial class MonsterChaseTargetAction : Action
         if (Target.Value == null || Self.Value == null) return Status.Failure;
         else if (TargetDistanceX(Target.Value.position) < LimitDistance.Value) return Status.Success;
 
-        if(!IsFrontGrounded.Value) Input.Value.Move(Vector2.zero);
+        if(IsFrontGrounded) Input.Value.Move(Vector2.zero);
         else
         {
             inputDir = CalcInputDir(Target.Value.position);
@@ -51,7 +56,8 @@ public partial class MonsterChaseTargetAction : Action
     private Vector2 CalcInputDir(Vector2 target)
     {
         Vector2 dirToTarget = (target - (Vector2)Self.Value.position).normalized;
-        return new Vector2(dirToTarget.x > 0 ? 1 : -1, 0);
+        direction = dirToTarget.x > 0 ? 1 : -1;
+        return new Vector2(direction, 0);
     }
 }
 

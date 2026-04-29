@@ -19,9 +19,6 @@ public class AIMonsterBlackboardValue
     [Header("List")]
     public string AttackRanges = "AttackRanges";
 
-    [Header("Integer")]
-    public string Direction = "Direction";
-
     [Header("Float")]
     public string maxAttackRange = "MaxAttackRange";
 }
@@ -39,19 +36,13 @@ public class OrcBrain : MonoBehaviour
     [SerializeField] private GroundDetector _leftGroundDetector;
     [SerializeField] private GroundDetector _rightGroundDetector;
     [SerializeField] private PlayerDetector _playerDetector;
-    public bool IsFrontGrounded =>
-    _leftGroundDetector != null && _direction == -1 && _leftGroundDetector.IsGrounded
-    || _rightGroundDetector != null && _direction == 1 && _rightGroundDetector.IsGrounded;
-
     [SerializeField] private AgentStatData _statData;
-    [SerializeField] private int _direction;
-    private List<float> _attackRanges;
     private void Start()
     {
         _input = GetComponent<AIMonsterInput>();
         _playerDetector = GetComponent<PlayerDetector>();
         _agent.SetVariableValue(_blackboardValue.Input, _input);
-        _attackRanges = new List<float>(_statData.attackDatas.Count);
+       
         UpdateAttackRange();
     }
 
@@ -61,18 +52,22 @@ public class OrcBrain : MonoBehaviour
         _leftGroundDetector.UpdateGroundedStatus();
         _rightGroundDetector.UpdateGroundedStatus();
 
+        _agent.SetVariableValue(_blackboardValue.IsLeftGrounded, _leftGroundDetector.IsGrounded);
+        _agent.SetVariableValue(_blackboardValue.IsRightGrounded, _rightGroundDetector.IsGrounded);
+
         _agent.SetVariableValue(_blackboardValue.PlayerPos, _playerDetector.Target);
         _agent.SetVariableValue(_blackboardValue.IsPlayerInView, _playerDetector.IsTargetInView());
-        _agent.SetVariableValue(_blackboardValue.Direction, _direction);
     }
 
     private void UpdateAttackRange()
     {
+        List<float> _attackRanges = new List<float>();
+
         float maxRange = 0f;
-        for (int i = 0; i < _attackRanges.Count; i++)
+        for (int i = 0; i < _statData.attackDatas.Count; i++)
         {
             float range = Calculators.CalcAttackRange(_statData.attackDatas[i].offset, _statData.attackDatas[i].size);
-            _attackRanges[i] = range;
+            _attackRanges.Add(range);
             maxRange = Mathf.Max(maxRange, range);
         }
         _agent.SetVariableValue(_blackboardValue.AttackRanges, _attackRanges);

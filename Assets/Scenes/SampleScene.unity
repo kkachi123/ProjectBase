@@ -1548,13 +1548,11 @@ MonoBehaviour:
     IsRightGrounded: IsRightGrounded
     IsPlayerInView: IsPlayerInView
     AttackRanges: AttackRanges
-    Direction: Direction
     maxAttackRange: MaxAttackRange
   _leftGroundDetector: {fileID: 1216224376}
   _rightGroundDetector: {fileID: 2106578122}
   _playerDetector: {fileID: 741353684}
   _statData: {fileID: 11400000, guid: db3f0133c32043a4688541e731704222, type: 2}
-  _direction: 0
 --- !u!114 &741353684
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3079,7 +3077,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6748850014222937685, guid: 4f34bba3e5999f94798c5894e520cf4b, type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 8186350033515855826, guid: 4f34bba3e5999f94798c5894e520cf4b, type: 3}
       propertyPath: m_LocalPosition.x
