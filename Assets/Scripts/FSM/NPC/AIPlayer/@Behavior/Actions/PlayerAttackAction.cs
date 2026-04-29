@@ -10,7 +10,6 @@ using Action = Unity.Behavior.Action;
 public partial class PlayerAttackAction : Action
 {
     [SerializeReference] public BlackboardVariable<AIPlayerInput> Input;
-    [SerializeReference] public BlackboardVariable<List<float>> AttackRanges;
     [SerializeReference] public BlackboardVariable<int> AttackType;
     [SerializeReference] public BlackboardVariable<bool> CanAttack;
 

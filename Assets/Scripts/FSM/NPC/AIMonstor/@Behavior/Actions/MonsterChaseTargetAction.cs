@@ -36,7 +36,7 @@ public partial class MonsterChaseTargetAction : Action
         if (Target.Value == null || Self.Value == null) return Status.Failure;
         else if (TargetDistanceX(Target.Value.position) < LimitDistance.Value) return Status.Success;
 
-        if(IsFrontGrounded) Input.Value.Move(Vector2.zero);
+        if(!IsFrontGrounded) Input.Value.Move(Vector2.zero);
         else
         {
             inputDir = CalcInputDir(Target.Value.position);
