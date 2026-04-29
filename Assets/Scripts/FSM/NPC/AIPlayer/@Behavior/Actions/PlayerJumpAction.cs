@@ -5,8 +5,8 @@ using UnityEngine;
 using Action = Unity.Behavior.Action;
 
 [Serializable, GeneratePropertyBag]
-[NodeDescription(name: "AIJumpAction", story: "[Input] Jump [JumpFloor] [JumpChance]%", category: "Action", id: "b7b03e72f3028b868b5a3bd7e07b30e1")]
-public partial class AIJumpAction : Action
+[NodeDescription(name: "PlayerJumpAction", story: "[Input] Jump [JumpFloor] [JumpChance]%", category: "Action", id: "b7b03e72f3028b868b5a3bd7e07b30e1")]
+public partial class PlayerJumpAction : Action
 {
     [SerializeReference] public BlackboardVariable<Transform> Self;
     [SerializeReference] public BlackboardVariable<Transform> JumpFloor;
@@ -41,4 +41,5 @@ public partial class AIJumpAction : Action
         Input.Value.Move(Vector2.zero);
     }
 }
+
 

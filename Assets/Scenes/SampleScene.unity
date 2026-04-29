@@ -1369,6 +1369,7 @@ GameObject:
   - component: {fileID: 741353674}
   - component: {fileID: 741353673}
   - component: {fileID: 741353684}
+  - component: {fileID: 741353685}
   m_Layer: 9
   m_Name: OrcAI
   m_TagString: Untagged
@@ -1539,9 +1540,20 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7e12de4c5103ef14b852d9a52df4af4e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _input: {fileID: 741353682}
+  _agent: {fileID: 741353685}
+  _blackboardValue:
+    Input: Input
+    PlayerPos: PlayerPos
+    IsLeftGrounded: IsLeftGrounded
+    IsRightGrounded: IsRightGrounded
+    IsPlayerInView: IsPlayerInView
+    AttackRanges: AttackRanges
+    Direction: Direction
+    maxAttackRange: MaxAttackRange
   _leftGroundDetector: {fileID: 1216224376}
   _rightGroundDetector: {fileID: 2106578122}
+  _playerDetector: {fileID: 741353684}
+  _statData: {fileID: 11400000, guid: db3f0133c32043a4688541e731704222, type: 2}
   _direction: 0
 --- !u!114 &741353684
 MonoBehaviour:
@@ -1562,6 +1574,35 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 64
   viewRadius: 2
+--- !u!114 &741353685
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 741353672}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f0038c16c34866b4f9e25c9c0dc0f7e6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Graph: {fileID: -2008767281213494841, guid: 61c5772b2d1a2034a8578fdb88d3a7f7, type: 2}
+  m_BlackboardVariableOverridesList:
+  - rid: 1276375336854749380
+  m_OriginalGraph: {fileID: -2008767281213494841, guid: 61c5772b2d1a2034a8578fdb88d3a7f7, type: 2}
+  m_IsInitialised: 0
+  m_IsStarted: 0
+  references:
+    version: 2
+    RefIds:
+    - rid: 1276375336854749380
+      type: {class: 'BlackboardVariable`1[[UnityEngine.GameObject, UnityEngine.CoreModule]]', ns: Unity.Behavior, asm: Unity.Behavior}
+      data:
+        GUID:
+          m_Value0: 1
+          m_Value1: 0
+        Name: Self
+        m_Value: {fileID: 741353672}
 --- !u!1 &763558812
 GameObject:
   m_ObjectHideFlags: 0
@@ -1906,10 +1947,6 @@ PrefabInstance:
       propertyPath: m_Name
       value: Player AI2
       objectReference: {fileID: 0}
-    - target: {fileID: 977787327339771244, guid: 690d8cb949022a74ab708d340effddbc, type: 3}
-      propertyPath: m_IsActive
-      value: 0
-      objectReference: {fileID: 0}
     - target: {fileID: 2264714571487737822, guid: 690d8cb949022a74ab708d340effddbc, type: 3}
       propertyPath: m_LocalPosition.x
       value: 3.08
@@ -1949,22 +1986,6 @@ PrefabInstance:
     - target: {fileID: 2264714571487737822, guid: 690d8cb949022a74ab708d340effddbc, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 3576275967200910481, guid: 690d8cb949022a74ab708d340effddbc, type: 3}
-      propertyPath: m_Enabled
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 6671057825615997707, guid: 690d8cb949022a74ab708d340effddbc, type: 3}
-      propertyPath: m_Color.b
-      value: 0.5849056
-      objectReference: {fileID: 0}
-    - target: {fileID: 6671057825615997707, guid: 690d8cb949022a74ab708d340effddbc, type: 3}
-      propertyPath: m_Color.g
-      value: 0.30982378
-      objectReference: {fileID: 0}
-    - target: {fileID: 6671057825615997707, guid: 690d8cb949022a74ab708d340effddbc, type: 3}
-      propertyPath: m_Color.r
-      value: 0.2896938
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -3058,7 +3079,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6748850014222937685, guid: 4f34bba3e5999f94798c5894e520cf4b, type: 3}
       propertyPath: m_IsActive
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8186350033515855826, guid: 4f34bba3e5999f94798c5894e520cf4b, type: 3}
       propertyPath: m_LocalPosition.x

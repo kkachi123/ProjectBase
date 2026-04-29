@@ -5,10 +5,10 @@ using Action = Unity.Behavior.Action;
 using Unity.Properties;
 
 [Serializable, GeneratePropertyBag]
-[NodeDescription(name: "AIMove2DAction"
+[NodeDescription(name: "PlayerMove2DAction"
     , description: "AIMoveAction use [Input] to move RandomDir for a random duration between [Min] and [Max] seconds. If [WallDetector] detects a wall in front, it will reverse the horizontal direction."
     , story: "[Input] RandomMove between [Min] ~ [Max].", category: "Action", id: "882cdd58bb7f90ddbfb2fbfb44fc63a6")]
-public partial class AIMove2DAction : Action
+public partial class PlayerMove2DAction : Action
 {
     [SerializeReference] public BlackboardVariable<AIPlayerInput> Input;
     [SerializeReference] public BlackboardVariable<float> Min = new BlackboardVariable<float>(1);
@@ -45,4 +45,5 @@ public partial class AIMove2DAction : Action
         Input.Value.Move(Vector2.zero);
     }
 }
+
 

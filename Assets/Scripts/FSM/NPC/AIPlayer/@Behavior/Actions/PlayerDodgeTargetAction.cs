@@ -5,8 +5,8 @@ using Action = Unity.Behavior.Action;
 using Unity.Properties;
 
 [Serializable, GeneratePropertyBag]
-[NodeDescription(name: "AIDodgeTargetAction", story: "[Input] Dodge from [target] [DodgeDistance]", category: "Action", id: "ff069399fb0272e3600d1bf97b5629db")]
-public partial class AIDodgeTargetAction : Action
+[NodeDescription(name: "PlayerDodgeTargetAction", story: "[Input] Dodge from [target] [DodgeDistance]", category: "Action", id: "ff069399fb0272e3600d1bf97b5629db")]
+public partial class PlayerDodgeTargetAction : Action
 {
     [SerializeReference] public BlackboardVariable<AIPlayerInput> Input;
     [SerializeReference] public BlackboardVariable<Transform> Self;
@@ -41,4 +41,5 @@ public partial class AIDodgeTargetAction : Action
         Input.Value.Move(Vector2.zero);
     }
 }
+
 

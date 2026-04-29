@@ -12,7 +12,8 @@ public class AIMonsterBlackboardValue
     public string PlayerPos = "PlayerPos";
 
     [Header("Boolean")]
-    public string IsFrontGrounded = "IsFrontGrounded";
+    public string IsLeftGrounded = "IsLeftGrounded";
+    public string IsRightGrounded = "IsRightGrounded";
     public string IsPlayerInView = "IsPlayerInView";
 
     [Header("List")]
@@ -62,7 +63,6 @@ public class OrcBrain : MonoBehaviour
 
         _agent.SetVariableValue(_blackboardValue.PlayerPos, _playerDetector.Target);
         _agent.SetVariableValue(_blackboardValue.IsPlayerInView, _playerDetector.IsTargetInView());
-        _agent.SetVariableValue(_blackboardValue.IsFrontGrounded, IsFrontGrounded);
         _agent.SetVariableValue(_blackboardValue.Direction, _direction);
     }
 

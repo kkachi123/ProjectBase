@@ -6,10 +6,10 @@ using static UnityEngine.GraphicsBuffer;
 using Action = Unity.Behavior.Action;
 
 [Serializable, GeneratePropertyBag]
-[NodeDescription(name: "AIChaseTargetAction"
-    , description: "AIChaseTargetAction uses [Input] to move towards [Target] for a random duration between [Min] and [Max] seconds. If the target is above, it will jump."
+[NodeDescription(name: "PlayerChaseTargetAction"
+    , description: "PlayerChaseTargetAction uses [Input] to move towards [Target] for a random duration between [Min] and [Max] seconds. If the target is above, it will jump."
     , story: "[Input] Move [Target] between [Min] ~ [Max].", category: "Action", id: "ffce954764ae1e1e95cc1726070678d7")]
-public partial class AIChaseTargetAction : Action
+public partial class PlayerChaseTargetAction : Action
 {
     [SerializeReference] public BlackboardVariable<AIPlayerInput> Input;
     [SerializeReference] public BlackboardVariable<Transform> Self;
@@ -60,4 +60,6 @@ public partial class AIChaseTargetAction : Action
         return new Vector2(dirToTarget.x > 0 ? 1 : -1, 0);
     }
 }
+
+
 

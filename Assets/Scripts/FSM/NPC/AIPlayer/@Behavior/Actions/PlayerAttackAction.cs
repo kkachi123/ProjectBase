@@ -6,8 +6,8 @@ using UnityEngine;
 using Action = Unity.Behavior.Action;
 
 [Serializable, GeneratePropertyBag]
-[NodeDescription(name: "AIAttackAction", story: "[Input] Attack", category: "Action", id: "cd66dc1e3204e7e18256738d55600b2a")]
-public partial class AIAttackAction : Action
+[NodeDescription(name: "PlayerAttackAction", story: "[Input] Attack", category: "Action", id: "cd66dc1e3204e7e18256738d55600b2a")]
+public partial class PlayerAttackAction : Action
 {
     [SerializeReference] public BlackboardVariable<AIPlayerInput> Input;
     [SerializeReference] public BlackboardVariable<List<float>> AttackRanges;
@@ -22,4 +22,5 @@ public partial class AIAttackAction : Action
         return Status.Success;
     }
 }
+
 
