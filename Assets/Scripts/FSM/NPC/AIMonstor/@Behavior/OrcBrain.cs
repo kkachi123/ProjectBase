@@ -16,11 +16,10 @@ public class AIMonsterBlackboardValue
     public string IsRightGrounded = "IsRightGrounded";
     public string IsPlayerInView = "IsPlayerInView";
 
-    [Header("List")]
-    public string AttackRanges = "AttackRanges";
-
+    [Header("Integer")]
+    public string AttackTypeCount = "AttackTypeCount";
     [Header("Float")]
-    public string maxAttackRange = "MaxAttackRange";
+    public string MaxAttackRange = "MaxAttackRange";
 }
 
 [RequireComponent(typeof(AIMonsterInput))]
@@ -29,7 +28,6 @@ public class OrcBrain : MonoBehaviour
     [Header("Behavior Tree")]
     [SerializeField] private BehaviorGraphAgent _agent;
     [SerializeField] private AIMonsterBlackboardValue _blackboardValue;
-
 
     [Header("Detector Settings")]
     AIMonsterInput _input;
@@ -42,8 +40,15 @@ public class OrcBrain : MonoBehaviour
         _input = GetComponent<AIMonsterInput>();
         _playerDetector = GetComponent<PlayerDetector>();
         _agent.SetVariableValue(_blackboardValue.Input, _input);
-       
-        UpdateAttackRange();
+        _agent.SetVariableValue(_blackboardValue.AttackTypeCount, _statData.attackDatas.Count);
+        
+        float maxAttackRange = 0f;
+        foreach (var attackData in _statData.attackDatas)
+        {
+            float attackRange = Calculators.CalcAttackRange(attackData.offset, attackData.size);
+            if (attackRange > maxAttackRange) maxAttackRange = attackRange;
+        }
+        _agent.SetVariableValue(_blackboardValue.MaxAttackRange, maxAttackRange);
     }
 
 
@@ -57,20 +62,5 @@ public class OrcBrain : MonoBehaviour
 
         _agent.SetVariableValue(_blackboardValue.PlayerPos, _playerDetector.Target);
         _agent.SetVariableValue(_blackboardValue.IsPlayerInView, _playerDetector.IsTargetInView());
-    }
-
-    private void UpdateAttackRange()
-    {
-        List<float> _attackRanges = new List<float>();
-
-        float maxRange = 0f;
-        for (int i = 0; i < _statData.attackDatas.Count; i++)
-        {
-            float range = Calculators.CalcAttackRange(_statData.attackDatas[i].offset, _statData.attackDatas[i].size);
-            _attackRanges.Add(range);
-            maxRange = Mathf.Max(maxRange, range);
-        }
-        _agent.SetVariableValue(_blackboardValue.AttackRanges, _attackRanges);
-        _agent.SetVariableValue(_blackboardValue.maxAttackRange, maxRange);
     }
 }

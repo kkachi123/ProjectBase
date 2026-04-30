@@ -10,14 +10,14 @@ using System.Collections.Generic;
 public partial class MonsterAttackAction : Action
 {
     [SerializeReference] public BlackboardVariable<AIMonsterInput> Input;
-    [SerializeReference] public BlackboardVariable<int> AttackType;
+    [SerializeReference] public BlackboardVariable<int> AttackTypeCount;
     [SerializeReference] public BlackboardVariable<bool> CanAttack;
 
     protected override Status OnStart()
     {
-        if (Input == null || AttackType == 0 || !CanAttack.Value) return Status.Failure;
+        if (Input == null || AttackTypeCount == 0 || !CanAttack.Value) return Status.Failure;
         CanAttack.Value = false;
-        Input.Value.Attack(AttackType.Value);
+        Input.Value.Attack(UnityEngine.Random.Range(1, AttackTypeCount.Value + 1));
         return Status.Success;
     }
 }

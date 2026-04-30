@@ -17,7 +17,6 @@ public partial class PlayerJumpAction : Action
 
     protected override Status OnStart()
     {
-        // JumpChance% 확률로 점프 시도
         if (JumpFloor.Value == null || UnityEngine.Random.value > JumpChance.Value / 100f) return Status.Failure; 
 
         jumpfloor = JumpFloor.Value;
