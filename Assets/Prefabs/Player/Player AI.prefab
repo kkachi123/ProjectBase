@@ -302,12 +302,17 @@ MonoBehaviour:
   _agent: {fileID: 3576275967200910481}
   _blackboardValue:
     Input: Input
+    WallDetector: WallDetector
     JumpFloorPos: JumpFloorPos
     PlayerPos: PlayerPos
     IsPlayerInView: IsPlayerInView
     IsGround: IsGround
-    AttackRanges: AttackRanges
-    WallDetector: WallDetector
+    AttackTypeCount: AttackTypeCount
+  _input: {fileID: 618724395176287133}
+  _groundDetector: {fileID: 6466604966190703418}
+  _jumpFloorDetector: {fileID: 6379634346539123043}
+  _playerDetector: {fileID: 1467017937865125655}
+  _wallDetector: {fileID: 2996925227762382933}
   _motorData: {fileID: 11400000, guid: b052bdbf92f96df4ca1699d02055e658, type: 2}
   _statData: {fileID: 11400000, guid: bbd7a6feca900de40b6381f1e29bff55, type: 2}
 --- !u!114 &3576275967200910481

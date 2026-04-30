@@ -18,6 +18,8 @@ public partial class PlayerChaseTargetAction : Action
     [SerializeReference] public BlackboardVariable<float> Min = new BlackboardVariable<float>(1);
     [SerializeReference] public BlackboardVariable<float> Max = new BlackboardVariable<float>(3);
 
+    [SerializeReference] public BlackboardVariable<bool> IsGrounded;
+
     Vector2 inputDir;
     float duration;
     float elapsedTime = 0f;
@@ -28,11 +30,6 @@ public partial class PlayerChaseTargetAction : Action
 
         duration = UnityEngine.Random.Range(Min.Value, Max.Value);
         elapsedTime = 0f;
-
-        Vector2 dirToTarget = (Target.Value.position - Self.Value.position).normalized;
-        inputDir = new Vector2(dirToTarget.x > 0 ? 1 : -1, 0);
-
-        if (dirToTarget.y > 0.5f) Input.Value.Jump(true);
         return Status.Running;
     }
 
@@ -43,7 +40,9 @@ public partial class PlayerChaseTargetAction : Action
 
         elapsedTime += Time.deltaTime;
 
-        inputDir = CalcInputDir(Target.Value.position);
+        Vector2 dirToTarget = ((Vector2)Target.Value.position - (Vector2)Self.Value.position).normalized;
+        inputDir = new Vector2(dirToTarget.x > 0 ? 1 : -1, 0);
+        if(dirToTarget.y > 0.5f && IsGrounded.Value) Input.Value.Jump(true);
         Input.Value.Move(inputDir);
 
         return Status.Running;
@@ -55,12 +54,6 @@ public partial class PlayerChaseTargetAction : Action
     }
 
     private float TargetDistanceX(Vector2 target) => Mathf.Abs(Self.Value.position.x - target.x);
-
-    private Vector2 CalcInputDir(Vector2 target)
-    {
-        Vector2 dirToTarget = (target - (Vector2)Self.Value.position).normalized;
-        return new Vector2(dirToTarget.x > 0 ? 1 : -1, 0);
-    }
 }
 
 

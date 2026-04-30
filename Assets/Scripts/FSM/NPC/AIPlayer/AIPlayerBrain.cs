@@ -9,8 +9,9 @@ using System.Collections.Generic;
 [Serializable]
 public class AIPlayerBlackboardValue
 {
-    [Header("component")]
+    [Header("Component")]
     public string Input = "Input";
+    public string WallDetector = "WallDetector";
 
     [Header("Transform")]
     public string JumpFloorPos = "JumpFloorPos";
@@ -20,11 +21,8 @@ public class AIPlayerBlackboardValue
     public string IsPlayerInView = "IsPlayerInView";
     public string IsGround = "IsGround";
 
-    [Header("List")]
-    public string AttackRanges = "AttackRanges";
-
-    [Header("Component")]
-    public string WallDetector = "WallDetector";
+    [Header("Integer")]
+    public string AttackTypeCount = "AttackTypeCount";
 }
 
 public class AIPlayerBrain : MonoBehaviour
@@ -33,13 +31,13 @@ public class AIPlayerBrain : MonoBehaviour
     [SerializeField] private BehaviorGraphAgent _agent;
     [SerializeField] private AIPlayerBlackboardValue _blackboardValue;
 
-    private AIPlayerInput _input;
-    private GroundDetector _groundDetector;
-    private JumpFloorDetector _jumpFloorDetector;
-    private PlayerDetector _playerDetector;
-    private WallDetector _wallDetector;
-
     [Header("Detector Settings")]
+    [SerializeField] private AIPlayerInput _input;
+    [SerializeField] private GroundDetector _groundDetector;
+    [SerializeField] private JumpFloorDetector _jumpFloorDetector;
+    [SerializeField] private PlayerDetector _playerDetector;
+    [SerializeField] private WallDetector _wallDetector;
+    [Header("Datas")]
     [SerializeField] private AgentMotorData _motorData;
     [SerializeField] private AgentStatData _statData;
 
@@ -54,14 +52,8 @@ public class AIPlayerBrain : MonoBehaviour
         _jumpFloorDetector?.SetJumpParameters(_motorData.moveSpeed, _motorData.jumpForce, Mathf.Abs(Physics2D.gravity.y));
 
         _agent.SetVariableValue(_blackboardValue.Input, _input);
-        List<float> attackRanges = new List<float>();
-        for (int i = 0; i < _statData.attackDatas.Count; i++)
-        {
-            float range = Calculators.CalcAttackRange(_statData.attackDatas[i].offset, _statData.attackDatas[i].size);
-            attackRanges.Add(range);
-        }
-        _agent.SetVariableValue(_blackboardValue.AttackRanges, attackRanges);
         _agent.SetVariableValue(_blackboardValue.WallDetector, _wallDetector);
+        _agent.SetVariableValue(_blackboardValue.AttackTypeCount, _statData.attackDatas.Count - 1);
     }
 
     private void Update()

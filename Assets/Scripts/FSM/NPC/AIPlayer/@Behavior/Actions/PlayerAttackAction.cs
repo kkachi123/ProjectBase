@@ -10,14 +10,14 @@ using Action = Unity.Behavior.Action;
 public partial class PlayerAttackAction : Action
 {
     [SerializeReference] public BlackboardVariable<AIPlayerInput> Input;
-    [SerializeReference] public BlackboardVariable<int> AttackType;
+    [SerializeReference] public BlackboardVariable<int> AttackTypeCount;
     [SerializeReference] public BlackboardVariable<bool> CanAttack;
 
     protected override Status OnStart()
     {
-        if (Input == null || !CanAttack.Value || AttackType == 0) return Status.Failure;
+        if (Input == null || !CanAttack.Value || AttackTypeCount == 0) return Status.Failure;
         CanAttack.Value = false;
-        Input.Value.Attack(AttackType.Value);
+        Input.Value.Attack(UnityEngine.Random.Range(1, AttackTypeCount.Value + 1));
         return Status.Success;
     }
 }
