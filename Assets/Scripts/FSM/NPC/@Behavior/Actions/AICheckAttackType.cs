@@ -7,7 +7,7 @@ using Action = Unity.Behavior.Action;
 
 [Serializable, GeneratePropertyBag]
 [NodeDescription(name: "AICheckAttackType", story: "Update [AttackType] to Check [TargetDistance]", category: "Action", id: "be17d0558cd47f6d4a67332e444fca35")]
-public partial class AICheckAttackTypeAction : Action
+public partial class AICheckAttackType : Action
 {
     [SerializeReference] public BlackboardVariable<float> TargetDistance;
     [SerializeReference] public BlackboardVariable<int> AttackType;

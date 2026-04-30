@@ -12,6 +12,7 @@ using Action = Unity.Behavior.Action;
 public partial class PlayerChaseTargetAction : Action
 {
     [SerializeReference] public BlackboardVariable<AIPlayerInput> Input;
+    [SerializeReference] public BlackboardVariable<bool> CanChase;
     [SerializeReference] public BlackboardVariable<Transform> Self;
     [SerializeReference] public BlackboardVariable<Transform> Target;
     [SerializeReference] public BlackboardVariable<float> Min = new BlackboardVariable<float>(1);
@@ -22,7 +23,8 @@ public partial class PlayerChaseTargetAction : Action
     float elapsedTime = 0f;
     protected override Status OnStart()
     {
-        if(Target.Value == null || Self.Value == null) return Status.Failure;
+        if(Target.Value == null || Self.Value == null || !CanChase.Value) return Status.Failure;
+        CanChase.Value = false;
 
         duration = UnityEngine.Random.Range(Min.Value, Max.Value);
         elapsedTime = 0f;

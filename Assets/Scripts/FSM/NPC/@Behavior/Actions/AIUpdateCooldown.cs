@@ -6,7 +6,7 @@ using Unity.Properties;
 
 [Serializable, GeneratePropertyBag]
 [NodeDescription(name: "AIUpdateCooldown", story: "Update [CanValue] [Delay] delay", category: "Action", id: "72757c75e1ed74cd127feaead103ecba")]
-public partial class AIUpdateCooldownAction : Action
+public partial class AIUpdateCooldown : Action
 {
     [SerializeReference] public BlackboardVariable<bool> CanValue;
     [SerializeReference] public BlackboardVariable<float> Delay;
