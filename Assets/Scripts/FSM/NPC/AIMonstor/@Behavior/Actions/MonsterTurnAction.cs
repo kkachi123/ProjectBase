@@ -5,12 +5,13 @@ using Action = Unity.Behavior.Action;
 using Unity.Properties;
 
 [Serializable, GeneratePropertyBag]
-[NodeDescription(name: "PlayerTurnAction", story: "Check [Self] [Target] Direction And Turn", category: "Action", id: "dc7ccefa1c25b74b04cb4b6bdd34ebcf")]
-public partial class PlayerTurnAction : Action
+[NodeDescription(name: "MonsterTurnAction", story: "Check [Self] [Target] Direction And Turn", category: "Action", id: "3ee5fd9bbbdf80873e5c976e7160c4b3")]
+public partial class MonsterTurnAction : Action
 {
-    [SerializeReference] public BlackboardVariable<AIPlayerInput> Input;
+    [SerializeReference] public BlackboardVariable<AIMonsterInput> Input;
     [SerializeReference] public BlackboardVariable<Transform> Self;
     [SerializeReference] public BlackboardVariable<Transform> Target;
+
     float elapsedTime = 0f;
     protected override Status OnStart()
     {
