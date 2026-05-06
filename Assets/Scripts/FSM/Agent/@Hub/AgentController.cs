@@ -12,15 +12,17 @@ public abstract class AgentController : MonoBehaviour, IAgentHealthListener, IAg
     [SerializeField] protected AgentMotorData _motorData;
     public AgentMotorData MotorData => _motorData;
 
-    [Header("Core Components")]
-    protected AgentMotor2D _motor;
+    [Header("Input Components")]
     protected IAgentMovementInput _moveInput;
     public IAgentCombatInput CombatInput { get; private set; }
-    public Health Health { get; private set; }
 
-    [Header("Handlers & Visuals")]
+    [Header("Core Components")]
+    protected AgentMotor2D _motor;
     [SerializeField] protected AgentAnimator _animator;
     [SerializeField] protected AgentAnimationEventProxy _animationEventProxy;
+    public Health Health { get; private set; }
+
+    [Header("Handlers")]
     [SerializeField] protected AgentCombatHandler _combatHandler;
     protected AgentMovementHandler2D _movementHandler;
     protected AgentHealthHandler _healthHandler;
