@@ -8,8 +8,8 @@ public class HealthViewModel
     public HealthViewModel(Health model)
     {
         HpRatio = model.CurrentHealth
-            .Select(hp => hp / model.MaxHealth) // µ¥ÀÌÅÍ¸¦ ºñÀ²(0~1)·Î °¡°ø
-            .DistinctUntilChanged()               // °ªÀÌ ½ÇÁ¦·Î º¯ÇßÀ» ¶§¸¸ ½ÇÇà (ÃÖÀûÈ­)
+            .Select(hp => hp / model.MaxHealth) 
+            .DistinctUntilChanged()             // ê¸°ëŠ¥ : ì´ì „ ê°’ê³¼ ë‹¤ë¥¸ ê²½ìš°ì—ë§Œ ì—…ë°ì´íŠ¸í•˜ë„ë¡ í•¨
             .ToReactiveProperty();                
     }
 }
