@@ -60,13 +60,13 @@
         "*.asset": "yaml",
         "*.meta": "yaml",
         "*.prefab": "yaml",
-        "*.unity": "yaml",
+        "*.unity": "yaml"
     },
     "explorer.fileNesting.enabled": true,
     "explorer.fileNesting.patterns": {
-        "*.sln": "*.csproj",
+        "*.sln": "*.csproj"
     },
-    "dotnet.defaultSolution": "ProjectBase.sln",
+    "dotnet.defaultSolution": "ProjectBase.slnx",
     "editor.inlineSuggest.enabled": true,
     "editor.suggestOnTriggerCharacters": true,
     "editor.quickSuggestions": {
@@ -88,5 +88,6 @@
             "comments": false,
             "strings": true
         }
-    }
+    },
+    "dotnet.preferCSharpExtension": true
 }
