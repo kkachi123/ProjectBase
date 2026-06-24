@@ -4,8 +4,8 @@ using UnityEngine.UI;
 
 public class MenuTabController : MonoBehaviour
 {
-    static readonly Color TabActive   = new Color(0.80f, 0.60f, 0.15f, 1f);
-    static readonly Color TabInactive = new Color(0.25f, 0.20f, 0.12f, 1f);
+    [SerializeField] Sprite TabActive;
+    [SerializeField] Sprite TabInactive;
 
     [SerializeField] List<UIScreen> _screens;
     [SerializeField] List<Button>   _tabs;
@@ -35,7 +35,7 @@ public class MenuTabController : MonoBehaviour
         for (int i = 0; i < _tabs.Count; i++)
         {
             var img = _tabs[i].GetComponent<Image>();
-            if (img) img.color = i == _activeIndex ? TabActive : TabInactive;
+            if (img) img.sprite = i == _activeIndex ? TabActive : TabInactive;
         }
     }
 }
