@@ -1,0 +1,1 @@
+public class SettingsScreen : UIScreen { }
