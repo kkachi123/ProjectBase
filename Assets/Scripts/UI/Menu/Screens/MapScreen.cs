@@ -1,1 +1,1 @@
-public class MapScreen : UIScreen { }
+public class MapScreen : UITab { }

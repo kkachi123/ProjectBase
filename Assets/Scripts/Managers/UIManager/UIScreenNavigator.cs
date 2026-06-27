@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 public class UIScreenNavigator
 {
+    
     private readonly Stack<UIScreen> _screenStack = new ();
     private readonly Dictionary<Type , UIScreen> _screenMap  = new ();
 

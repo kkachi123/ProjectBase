@@ -1,1 +1,1 @@
-public class SettingsScreen : UIScreen { }
+public class SettingsScreen : UITab { }

@@ -99,7 +99,7 @@ public static class MenuCanvas_REBuilder
             screens[i].gameObject.SetActive(i == 0);
 
         // ── Tab controller ────────────────────────────────────────────────────
-        var controller = root.AddComponent<MenuTabController>();
+        var controller = root.AddComponent<UIMenuTabController>();
         var so = new SerializedObject(controller);
 
         var propScreens = so.FindProperty("_screens");
