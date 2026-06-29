@@ -6,9 +6,11 @@ public class Managers : MonoBehaviour
 
     [SerializeField] private UIManager _ui;
     [SerializeField] private GameManager _game;
+    [SerializeField] private GameFlowManager _flow;
 
     public UIManager UI => _ui;
     public GameManager Game => _game;
+    public GameFlowManager Flow => _flow;
     public InventorySystem Inventory { get; private set; }
     public PlayerEquipment Equipment { get; private set; }
 

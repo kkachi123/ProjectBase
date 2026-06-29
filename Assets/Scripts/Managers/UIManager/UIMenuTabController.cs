@@ -7,11 +7,38 @@ public class UIMenuTabController : MonoBehaviour
     [SerializeField] Sprite TabActive;
     [SerializeField] Sprite TabInactive;
 
+    [SerializeField] private GameObject _content;
     [SerializeField] List<UITab> _screens;
     [SerializeField] List<Button> _tabs;
 
     int _activeIndex = -1;
     Image[] _tabImages;
+
+    public bool IsOpen { get; private set; }
+
+    void Awake() => Managers.Instance.UI.Register(this);
+    void OnDestroy() { if (Managers.Instance != null) Managers.Instance.UI.Unregister(this); }
+    void Start() => Initialize();
+
+    public void OpenMenu()
+    {
+        _content.SetActive(true);
+        IsOpen = true;
+        Managers.Instance.UI.HUD?.gameObject.SetActive(false);
+    }
+
+    public void CloseMenu()
+    {
+        _content.SetActive(false);
+        IsOpen = false;
+        Managers.Instance.UI.HUD?.gameObject.SetActive(true);
+    }
+
+    public void ToggleMenu()
+    {
+        if (IsOpen) CloseMenu();
+        else OpenMenu();
+    }
 
     public void Initialize()
     {

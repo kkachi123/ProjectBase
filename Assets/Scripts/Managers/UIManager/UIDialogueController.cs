@@ -3,6 +3,9 @@ using TMPro;
 
 public class UIDialogueController : MonoBehaviour
 {
+    void Awake() => Managers.Instance.UI.Register(this);
+    void OnDestroy() { if (Managers.Instance != null) Managers.Instance.UI.Unregister(this); }
+
     [SerializeField] private GameObject _panel;
     [SerializeField] private TextMeshProUGUI _speakerText;
     [SerializeField] private TextMeshProUGUI _contentText;
