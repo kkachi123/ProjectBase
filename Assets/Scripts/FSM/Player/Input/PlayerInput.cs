@@ -5,12 +5,25 @@ using UniRx;
 public class PlayerInput : MonoBehaviour , IAgentMovementInput , IAgentJumpInput , IAgentCombatInput
 {
     public PlayerInputCommands inputActions;
-    
+
     public Vector2 Horizontal { get; private set; }
     private readonly ReactiveProperty<bool> _jumpPressed = new ReactiveProperty<bool>(false);
     private readonly ReactiveProperty<int> _attackPressed = new ReactiveProperty<int>(0);
     public IReadOnlyReactiveProperty<bool> JumpPressed => _jumpPressed;
     public IReadOnlyReactiveProperty<int> AttackPressed => _attackPressed;
+
+    public bool IsInputBlocked { get; private set; }
+
+    public void SetInputBlocked(bool blocked)
+    {
+        IsInputBlocked = blocked;
+        if (blocked)
+        {
+            Horizontal = Vector2.zero;
+            _jumpPressed.Value = false;
+            _attackPressed.Value = 0;
+        }
+    }
 
     private void Awake()
     {
@@ -32,12 +45,12 @@ public class PlayerInput : MonoBehaviour , IAgentMovementInput , IAgentJumpInput
 
     public Vector2 GetMovementInput()
     {
-        return Horizontal;
+        return IsInputBlocked ? Vector2.zero : Horizontal;
     }
 
     public void MoveInput(InputAction.CallbackContext context)
     {
-        if(context.canceled)
+        if (context.canceled)
         {
             Horizontal = Vector2.zero;
             return;
@@ -48,28 +61,24 @@ public class PlayerInput : MonoBehaviour , IAgentMovementInput , IAgentJumpInput
 
     public void JumpInput(InputAction.CallbackContext context)
     {
+        if (IsInputBlocked) return;
         if (context.performed)
-        {
             _jumpPressed.Value = true;
-        }
         else if (context.canceled)
-        {
             _jumpPressed.Value = false;
-        }
     }
-    public void AttackInput(InputAction.CallbackContext context , int value)
+
+    public void AttackInput(InputAction.CallbackContext context, int value)
     {
+        if (IsInputBlocked) return;
         if (context.performed)
-        {
             _attackPressed.Value = value;
-        }
     }
+
     public void AttackEnd(InputAction.CallbackContext context)
     {
         if (context.canceled)
-        {
             _attackPressed.Value = 0;
-        }
     }
 
     private void OnEnable()

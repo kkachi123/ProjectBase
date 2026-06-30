@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 public class UIManager : MonoBehaviour
@@ -17,13 +18,15 @@ public class UIManager : MonoBehaviour
     public UINotificationController Notification => _notification;
     public UIMenuTabController MenuTabController => _menuTabController;
 
+    public event Action<UIDialogueController> OnDialogueChanged;
+
     public void Register(UIHUD hud)                         => _hud = hud;
-    public void Register(UIDialogueController dialogue)     => _dialogue = dialogue;
+    public void Register(UIDialogueController dialogue)     { _dialogue = dialogue; OnDialogueChanged?.Invoke(dialogue); }
     public void Register(UINotificationController notification) => _notification = notification;
     public void Register(UIMenuTabController menu)          => _menuTabController = menu;
 
     public void Unregister(UIHUD _)                         => _hud = null;
-    public void Unregister(UIDialogueController _)          => _dialogue = null;
+    public void Unregister(UIDialogueController _)          { _dialogue = null; OnDialogueChanged?.Invoke(null); }
     public void Unregister(UINotificationController _)      => _notification = null;
     public void Unregister(UIMenuTabController _)           => _menuTabController = null;
 }
