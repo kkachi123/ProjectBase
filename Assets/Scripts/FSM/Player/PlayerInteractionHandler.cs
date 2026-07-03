@@ -71,4 +71,10 @@ public class PlayerInteractionHandler : MonoBehaviour
     private void OnDisable() => _interactAction.Disable();
 
     private void OnDestroy() => _interactAction.performed -= OnInteract;
+
+    private void OnDrawGizmosSelected()
+    {
+        Gizmos.color = Color.yellow;
+        Gizmos.DrawWireSphere(transform.position, _interactRadius);
+    }
 }

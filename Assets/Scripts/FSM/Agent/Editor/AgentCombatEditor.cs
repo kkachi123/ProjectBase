@@ -85,6 +85,7 @@ public class AgentCombatEditor : EditorWindow
             EditorGUILayout.Space();
             EditorGUILayout.LabelField("Editing Values", EditorStyles.boldLabel);
             _tempData.damage = EditorGUILayout.FloatField("Damage", _tempData.damage);
+            _tempData.usedStamina = EditorGUILayout.FloatField("Used Stamina", _tempData.usedStamina);
             _tempData.offset = EditorGUILayout.Vector2Field("Offset", _tempData.offset);
             _tempData.size = EditorGUILayout.Vector2Field("Size", _tempData.size);
 

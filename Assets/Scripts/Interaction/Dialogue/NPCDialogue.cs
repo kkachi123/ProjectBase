@@ -16,7 +16,7 @@ public class NPCDialogue : MonoBehaviour, IInteractable
 
     private void OnDestroy()
     {
-        Managers.Instance?.UI.OnDialogueChanged -= OnDialogueChanged;
+        Managers.Instance.UI.OnDialogueChanged -= OnDialogueChanged;
         _dialogue = null;
     }
 

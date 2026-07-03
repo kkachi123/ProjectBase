@@ -18,6 +18,7 @@ public class UIDialogueController : MonoBehaviour
         _contentText.text = content;
         _panel.SetActive(true);
         IsOpen = true;
+        Managers.Instance.UI.SetHUDActive(false);
     }
 
     public void UpdateContent(string content)
@@ -29,5 +30,6 @@ public class UIDialogueController : MonoBehaviour
     {
         _panel.SetActive(false);
         IsOpen = false;
+        Managers.Instance.UI.SetHUDActive(true);
     }
 }

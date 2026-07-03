@@ -25,6 +25,8 @@ public class UIManager : MonoBehaviour
     public void Register(UINotificationController notification) => _notification = notification;
     public void Register(UIMenuTabController menu)          => _menuTabController = menu;
 
+    public void SetHUDActive(bool active) => _hud?.gameObject.SetActive(active);
+
     public void Unregister(UIHUD _)                         => _hud = null;
     public void Unregister(UIDialogueController _)          { _dialogue = null; OnDialogueChanged?.Invoke(null); }
     public void Unregister(UINotificationController _)      => _notification = null;

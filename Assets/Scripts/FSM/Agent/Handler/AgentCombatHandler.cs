@@ -12,10 +12,14 @@ public class AgentCombatHandler : MonoBehaviour
         _datas = data;
     }
 
-    public void SetAttackType(int attackType)
+    public bool SetAttackType(int attackType)
     {
+        if (CurrentAttackType != 0) return false;
         CurrentAttackType = attackType;
+        return true;
     }
+
+    public void ResetAttackType() => CurrentAttackType = 0;
 
     private Vector2 CalcAreaPos(Vector2 offset) => (Vector2)transform.position + new Vector2(offset.x * (transform.localScale.x > 0 ? 1 : -1), offset.y);
 

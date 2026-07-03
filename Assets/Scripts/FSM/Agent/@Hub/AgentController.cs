@@ -21,6 +21,7 @@ public abstract class AgentController : MonoBehaviour, IAgentHealthListener, IAg
     [SerializeField] protected AgentAnimator _animator;
     [SerializeField] protected AgentAnimationEventProxy _animationEventProxy;
     public Health Health { get; private set; }
+    public Stamina Stamina { get; private set; }
 
     [Header("Handlers")]
     [SerializeField] protected AgentCombatHandler _combatHandler;
@@ -44,7 +45,9 @@ public abstract class AgentController : MonoBehaviour, IAgentHealthListener, IAg
         CombatInput = GetComponent<IAgentCombatInput>();
 
         Health = GetComponent<Health>();
-        Health.Initialize(_statData.maxHealth);
+        Health?.Initialize(_statData.maxHealth);
+        Stamina = GetComponent<Stamina>();
+        Stamina?.Initialize(_statData.maxStamina, _statData.staminaRegenRate);
 
         // Handler Initialization
         _animator?.Initialize();
@@ -95,20 +98,29 @@ public abstract class AgentController : MonoBehaviour, IAgentHealthListener, IAg
     {
         _animator.SetBool(StateType.Attack, isAttack);
         if (isAttack) _animator.SetInteger(AnimationIntType.AttackType, _combatHandler.CurrentAttackType);
-        else _animator.SetInteger(AnimationIntType.AttackType, 0); // Reset to default state animation
+        else
+        {
+            _combatHandler.ResetAttackType();
+            _animator.SetInteger(AnimationIntType.AttackType, 0);
+        }
     }
     public virtual void Hit(bool isHit)
     {
+        _combatHandler.ResetAttackType();
         _animator.SetBool(StateType.Hit, isHit);
     }
     public virtual void Death(bool isDeath)
     {
         _animator.SetBool(StateType.Death, isDeath);
-        if (isDeath) _movementHandler.HandleMove(Vector2.zero);
+        if (isDeath)
+        {
+            _combatHandler.ResetAttackType();
+            _movementHandler.HandleMove(Vector2.zero);
+        }
     }
     #endregion
     
-    #region State Animation Event 
+    #region State Animation Event
     public virtual void OnAttackHitFrame()
     {
         _combatHandler.PerformAttack();
@@ -117,8 +129,9 @@ public abstract class AgentController : MonoBehaviour, IAgentHealthListener, IAg
     {
         _stateMachine.CurrentState.OnAnimationEvent(type);
     }
+    public virtual void OnDeathFinished() { }
     #endregion
-    
+
     #region IAgentHealthListener
     public virtual void OnHit() => ChangeState(StateType.Hit);
 

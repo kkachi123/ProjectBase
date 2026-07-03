@@ -26,5 +26,6 @@ public class GameManager : MonoBehaviour
     {
         State = GameState.GameOver;
         Time.timeScale = 0f;
+        Managers.Instance.Flow.GoToTitle();
     }
 }
