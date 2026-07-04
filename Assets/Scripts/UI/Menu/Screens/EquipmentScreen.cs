@@ -7,7 +7,7 @@ public class EquipmentScreen : UITab
     public override void OnShow()
     {
         base.OnShow();
-        _equipment = Managers.Instance.Equipment;
+        _equipment = Managers.Instance.Player.Equipment;
         _equipment.OnChanged += Render;
         Render(_equipment.GetSlots());
     }

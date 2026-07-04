@@ -7,7 +7,7 @@ public class InventoryScreen : UITab
     public override void OnShow()
     {
         base.OnShow();
-        _inventory = Managers.Instance.Inventory;
+        _inventory = Managers.Instance.Player.Inventory;
         _inventory.OnChanged += Render;
         Render(_inventory.GetItems());
     }

@@ -11,8 +11,7 @@ public class Managers : MonoBehaviour
     public UIManager UI => _ui;
     public GameManager Game => _game;
     public GameFlowManager Flow => _flow;
-    public InventorySystem Inventory { get; private set; }
-    public PlayerEquipment Equipment { get; private set; }
+    public PlayerManager Player { get; private set; }
 
     void Awake()
     {
@@ -20,7 +19,6 @@ public class Managers : MonoBehaviour
         Instance = this;
         DontDestroyOnLoad(gameObject);
 
-        Inventory = new InventorySystem();
-        Equipment = new PlayerEquipment();
+        Player = new PlayerManager();
     }
 }
