@@ -3,11 +3,18 @@ using UnityEngine;
 public class PlayerController : GroundedAgentController
 {
     [SerializeField] private AgentImpactHandler _impactHandler;
+
+    public Stamina Stamina { get; private set; }
+
     private PlayerInput _playerInput;
 
     protected override void Awake()
     {
         base.Awake();
+        Stamina = GetComponent<Stamina>();
+        Stamina?.Initialize(_statData.maxStamina, _statData.staminaRegenRate);
+
+
         _playerInput = GetComponent<PlayerInput>();
         _impactHandler = GetComponent<AgentImpactHandler>();
         _impactHandler.Initialize(_motor, _motorData);

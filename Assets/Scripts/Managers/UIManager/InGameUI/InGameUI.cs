@@ -12,8 +12,21 @@ public class InGameUI : MonoBehaviour
     public UINotificationController Notification => _notification;
     public UIMenuTabController MenuTabController => _menuTabController;
 
-    void Awake() => Managers.Instance.UI.Register(this);
+    private GameManager _game;
+
+    void Awake()
+    {
+        _game = Managers.Instance.Game;
+        Managers.Instance.UI.Register(this);
+    }
+
     void OnDestroy() { if (Managers.Instance) Managers.Instance.UI.Unregister(this); }
 
-    public void SetHUDActive(bool active) => _hud?.gameObject.SetActive(active);
+    public void SetHUDActive(bool active)
+    {
+        if (active) _game.Resume();
+        else _game.Pause();
+        _hud?.gameObject.SetActive(active);
+    }
+     
 }

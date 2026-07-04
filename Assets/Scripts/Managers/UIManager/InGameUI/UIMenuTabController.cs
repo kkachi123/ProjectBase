@@ -22,14 +22,14 @@ public class UIMenuTabController : MonoBehaviour
     {
         _content.SetActive(true);
         IsOpen = true;
-        Managers.Instance.UI.SetHUDActive(false);
+        Managers.Instance.UI.InGameUI?.SetHUDActive(false);
     }
 
     public void CloseMenu()
     {
         _content.SetActive(false);
         IsOpen = false;
-        Managers.Instance.UI.SetHUDActive(true);
+        Managers.Instance.UI.InGameUI?.SetHUDActive(true);
     }
 
     public void ToggleMenu()

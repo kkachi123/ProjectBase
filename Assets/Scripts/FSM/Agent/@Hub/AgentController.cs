@@ -21,7 +21,6 @@ public abstract class AgentController : MonoBehaviour, IAgentHealthListener, IAg
     [SerializeField] protected AgentAnimator _animator;
     [SerializeField] protected AgentAnimationEventProxy _animationEventProxy;
     public Health Health { get; private set; }
-    public Stamina Stamina { get; private set; }
 
     [Header("Handlers")]
     [SerializeField] protected AgentCombatHandler _combatHandler;
@@ -46,8 +45,6 @@ public abstract class AgentController : MonoBehaviour, IAgentHealthListener, IAg
 
         Health = GetComponent<Health>();
         Health?.Initialize(_statData.maxHealth);
-        Stamina = GetComponent<Stamina>();
-        Stamina?.Initialize(_statData.maxStamina, _statData.staminaRegenRate);
 
         // Handler Initialization
         _animator?.Initialize();
