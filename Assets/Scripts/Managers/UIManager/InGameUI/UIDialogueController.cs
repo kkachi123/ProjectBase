@@ -1,4 +1,6 @@
+using System;
 using UnityEngine;
+using UnityEngine.InputSystem;
 using TMPro;
 
 public class UIDialogueController : MonoBehaviour
@@ -9,8 +11,20 @@ public class UIDialogueController : MonoBehaviour
 
     public bool IsOpen { get; private set; }
 
-    public void Open(string speaker, string content)
+    private Action _onAdvance;
+    private InputAction _advanceAction;
+
+    private void Awake()
     {
+        _advanceAction = new InputAction("DialogueAdvance", InputActionType.Button);
+        _advanceAction.AddBinding("<Keyboard>/space");
+        _advanceAction.AddBinding("<Keyboard>/enter");
+        _advanceAction.performed += _ => { if (IsOpen) _onAdvance?.Invoke(); };
+    }
+
+    public void Open(string speaker, string content, Action onAdvance)
+    {
+        _onAdvance = onAdvance;
         _speakerText.text = speaker;
         _contentText.text = content;
         _panel.SetActive(true);
@@ -25,8 +39,12 @@ public class UIDialogueController : MonoBehaviour
 
     public void Close()
     {
+        _onAdvance = null;
         _panel.SetActive(false);
         IsOpen = false;
         Managers.Instance.UI.InGameUI?.SetHUDActive(true);
     }
+
+    private void OnEnable() => _advanceAction.Enable();
+    private void OnDisable() => _advanceAction.Disable();
 }

@@ -19,14 +19,14 @@ public class NPCDialogue : MonoBehaviour, IInteractable
     public void Interact()
     {
         if (_dialogue == null || _data == null || _data.Lines.Length == 0) return;
+        if (_dialogue.IsOpen) return;
 
-        if (!_dialogue.IsOpen)
-        {
-            _lineIndex = 0;
-            _dialogue.Open(_data.SpeakerName, _data.Lines[0]);
-            return;
-        }
+        _lineIndex = 0;
+        _dialogue.Open(_data.SpeakerName, _data.Lines[0], Advance);
+    }
 
+    private void Advance()
+    {
         _lineIndex++;
         if (_lineIndex >= _data.Lines.Length)
             _dialogue.Close();

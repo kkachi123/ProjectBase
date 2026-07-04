@@ -11,9 +11,6 @@ public class PlayerInteractionHandler : MonoBehaviour
     private readonly Collider2D[] _hitBuffer = new Collider2D[8];
     private ContactFilter2D _contactFilter;
     private IInteractable _nearbyTarget;
-    private IInteractable _activeNPC;
-
-    private UIDialogueController _dialogue;
 
     private void Awake()
     {
@@ -25,26 +22,11 @@ public class PlayerInteractionHandler : MonoBehaviour
 
         _playerInput.InteractPressed
             .Where(v => v)
-            .Subscribe(_ => OnInteract())
+            .Subscribe(_ => TryInteract())
             .AddTo(this);
     }
 
-    private void Start()
-    {
-        InGameUI inGameUI = Managers.Instance.UI.InGameUI;
-        if (inGameUI) _dialogue = inGameUI.Dialogue;
-    }
-
-    private void OnDestroy()
-    {
-        _dialogue = null;
-    }
-
-    private void Update()
-    {
-        if (_dialogue && _dialogue.IsOpen) return;
-        DetectNearbyTarget();
-    }
+    private void Update() => DetectNearbyTarget();
 
     private void DetectNearbyTarget()
     {
@@ -62,27 +44,10 @@ public class PlayerInteractionHandler : MonoBehaviour
         }
     }
 
-    private void OnInteract()
+    private void TryInteract()
     {
-        if (_dialogue == null) return;
-
-        if (_dialogue.IsOpen) ContinueDialogue();
-        else TryStartInteraction();
-    }
-
-    private void ContinueDialogue()
-    {
-        _activeNPC?.Interact();
-        if (_dialogue.IsOpen) return;
-        _playerInput.SetInputBlocked(false);
-        _activeNPC = null;
-    }
-
-    private void TryStartInteraction()
-    {
+        if (Managers.Instance.Game.State != GameManager.GameState.Playing) return;
         if (_nearbyTarget == null) return;
-        _activeNPC = _nearbyTarget;
-        _playerInput.SetInputBlocked(true);
         _nearbyTarget.Interact();
     }
 
