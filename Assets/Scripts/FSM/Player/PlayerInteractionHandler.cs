@@ -1,5 +1,5 @@
 using UnityEngine;
-using UnityEngine.InputSystem;
+using UniRx;
 
 public class PlayerInteractionHandler : MonoBehaviour
 {
@@ -7,7 +7,6 @@ public class PlayerInteractionHandler : MonoBehaviour
     [SerializeField] private LayerMask _interactLayer;
 
     private PlayerInput _playerInput;
-    private InputAction _interactAction;
 
     private readonly Collider2D[] _hitBuffer = new Collider2D[8];
     private ContactFilter2D _contactFilter;
@@ -24,9 +23,10 @@ public class PlayerInteractionHandler : MonoBehaviour
         _contactFilter.SetLayerMask(_interactLayer);
         _contactFilter.useTriggers = true;
 
-        _interactAction = new InputAction("Interact", InputActionType.Button);
-        _interactAction.AddBinding("<Keyboard>/e");
-        _interactAction.performed += OnInteract;
+        _playerInput.InteractPressed
+            .Where(v => v)
+            .Subscribe(_ => OnInteract())
+            .AddTo(this);
     }
 
     private void Start()
@@ -37,7 +37,6 @@ public class PlayerInteractionHandler : MonoBehaviour
 
     private void OnDestroy()
     {
-        _interactAction.performed -= OnInteract;
         _dialogue = null;
     }
 
@@ -63,31 +62,29 @@ public class PlayerInteractionHandler : MonoBehaviour
         }
     }
 
-    private void OnInteract(InputAction.CallbackContext context)
+    private void OnInteract()
     {
         if (_dialogue == null) return;
 
-        if (_dialogue.IsOpen)
-        {
-            _activeNPC?.Interact();
-            if (!_dialogue.IsOpen)
-            {
-                _playerInput.SetInputBlocked(false);
-                _activeNPC = null;
-            }
-            return;
-        }
-
-        if (_nearbyTarget != null)
-        {
-            _activeNPC = _nearbyTarget;
-            _playerInput.SetInputBlocked(true);
-            _nearbyTarget.Interact();
-        }
+        if (_dialogue.IsOpen) ContinueDialogue();
+        else TryStartInteraction();
     }
 
-    private void OnEnable() => _interactAction.Enable();
-    private void OnDisable() => _interactAction.Disable();
+    private void ContinueDialogue()
+    {
+        _activeNPC?.Interact();
+        if (_dialogue.IsOpen) return;
+        _playerInput.SetInputBlocked(false);
+        _activeNPC = null;
+    }
+
+    private void TryStartInteraction()
+    {
+        if (_nearbyTarget == null) return;
+        _activeNPC = _nearbyTarget;
+        _playerInput.SetInputBlocked(true);
+        _nearbyTarget.Interact();
+    }
 
     private void OnDrawGizmosSelected()
     {

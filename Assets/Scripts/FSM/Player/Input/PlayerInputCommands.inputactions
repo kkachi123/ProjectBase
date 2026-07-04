@@ -1,4 +1,5 @@
 {
+    "version": 1,
     "name": "PlayerInputCommands",
     "maps": [
         {
@@ -36,6 +37,15 @@
                     "name": "Attack2",
                     "type": "Button",
                     "id": "fd1212a8-2059-4011-ae17-70a392db7b47",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "Interact",
+                    "type": "Button",
+                    "id": "99096e00-e5fc-471b-8f17-d6e71caf625f",
                     "expectedControlType": "",
                     "processors": "",
                     "interactions": "",
@@ -128,6 +138,17 @@
                     "processors": "",
                     "groups": ";PC",
                     "action": "Attack2",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "80e67219-ce24-49f1-a5f9-9f5d10f01697",
+                    "path": "<Keyboard>/e",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": ";PC",
+                    "action": "Interact",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }

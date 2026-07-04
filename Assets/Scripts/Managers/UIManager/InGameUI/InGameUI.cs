@@ -18,9 +18,17 @@ public class InGameUI : MonoBehaviour
     {
         _game = Managers.Instance.Game;
         Managers.Instance.UI.Register(this);
+        Managers.Instance.Inventory.OnItemAdded += OnItemAdded;
     }
 
-    void OnDestroy() { if (Managers.Instance) Managers.Instance.UI.Unregister(this); }
+    void OnDestroy()
+    {
+        if (!Managers.Instance) return;
+        Managers.Instance.UI.Unregister(this);
+        Managers.Instance.Inventory.OnItemAdded -= OnItemAdded;
+    }
+
+    private void OnItemAdded(ItemData item) => _notification.Show($"{item.Name} 획득");
 
     public void SetHUDActive(bool active)
     {

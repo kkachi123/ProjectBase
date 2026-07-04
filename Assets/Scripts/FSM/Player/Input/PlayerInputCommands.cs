@@ -127,6 +127,15 @@ public partial class @PlayerInputCommands: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""Interact"",
+                    ""type"": ""Button"",
+                    ""id"": ""99096e00-e5fc-471b-8f17-d6e71caf625f"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -217,6 +226,17 @@ public partial class @PlayerInputCommands: IInputActionCollection2, IDisposable
                     ""action"": ""Attack2"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""80e67219-ce24-49f1-a5f9-9f5d10f01697"",
+                    ""path"": ""<Keyboard>/e"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": "";PC"",
+                    ""action"": ""Interact"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         }
@@ -235,6 +255,7 @@ public partial class @PlayerInputCommands: IInputActionCollection2, IDisposable
         m_gamePlay_Jump = m_gamePlay.FindAction("Jump", throwIfNotFound: true);
         m_gamePlay_Attack1 = m_gamePlay.FindAction("Attack1", throwIfNotFound: true);
         m_gamePlay_Attack2 = m_gamePlay.FindAction("Attack2", throwIfNotFound: true);
+        m_gamePlay_Interact = m_gamePlay.FindAction("Interact", throwIfNotFound: true);
     }
 
     ~@PlayerInputCommands()
@@ -319,6 +340,7 @@ public partial class @PlayerInputCommands: IInputActionCollection2, IDisposable
     private readonly InputAction m_gamePlay_Jump;
     private readonly InputAction m_gamePlay_Attack1;
     private readonly InputAction m_gamePlay_Attack2;
+    private readonly InputAction m_gamePlay_Interact;
     /// <summary>
     /// Provides access to input actions defined in input action map "gamePlay".
     /// </summary>
@@ -346,6 +368,10 @@ public partial class @PlayerInputCommands: IInputActionCollection2, IDisposable
         /// Provides access to the underlying input action "gamePlay/Attack2".
         /// </summary>
         public InputAction @Attack2 => m_Wrapper.m_gamePlay_Attack2;
+        /// <summary>
+        /// Provides access to the underlying input action "gamePlay/Interact".
+        /// </summary>
+        public InputAction @Interact => m_Wrapper.m_gamePlay_Interact;
         /// <summary>
         /// Provides access to the underlying input action map instance.
         /// </summary>
@@ -384,6 +410,9 @@ public partial class @PlayerInputCommands: IInputActionCollection2, IDisposable
             @Attack2.started += instance.OnAttack2;
             @Attack2.performed += instance.OnAttack2;
             @Attack2.canceled += instance.OnAttack2;
+            @Interact.started += instance.OnInteract;
+            @Interact.performed += instance.OnInteract;
+            @Interact.canceled += instance.OnInteract;
         }
 
         /// <summary>
@@ -407,6 +436,9 @@ public partial class @PlayerInputCommands: IInputActionCollection2, IDisposable
             @Attack2.started -= instance.OnAttack2;
             @Attack2.performed -= instance.OnAttack2;
             @Attack2.canceled -= instance.OnAttack2;
+            @Interact.started -= instance.OnInteract;
+            @Interact.performed -= instance.OnInteract;
+            @Interact.canceled -= instance.OnInteract;
         }
 
         /// <summary>
@@ -488,5 +520,12 @@ public partial class @PlayerInputCommands: IInputActionCollection2, IDisposable
         /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
         void OnAttack2(InputAction.CallbackContext context);
+        /// <summary>
+        /// Method invoked when associated input action "Interact" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnInteract(InputAction.CallbackContext context);
     }
 }

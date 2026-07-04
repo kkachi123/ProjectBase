@@ -6,12 +6,14 @@ public class InventorySystem
     private readonly List<ItemData> _items = new();
 
     public event Action<IReadOnlyList<ItemData>> OnChanged;
+    public event Action<ItemData> OnItemAdded;
 
     public IReadOnlyList<ItemData> GetItems() => _items;
 
     public void Add(ItemData item)
     {
         _items.Add(item);
+        OnItemAdded?.Invoke(item);
         OnChanged?.Invoke(_items);
     }
 

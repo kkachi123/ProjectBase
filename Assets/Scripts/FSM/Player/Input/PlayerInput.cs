@@ -2,15 +2,17 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using UniRx;
 
-public class PlayerInput : MonoBehaviour , IAgentMovementInput , IAgentJumpInput , IAgentCombatInput
+public class PlayerInput : MonoBehaviour , IAgentMovementInput , IAgentJumpInput , IAgentCombatInput , IAgentInteractionInput
 {
     public PlayerInputCommands inputActions;
 
     public Vector2 Horizontal { get; private set; }
     private readonly ReactiveProperty<bool> _jumpPressed = new ReactiveProperty<bool>(false);
     private readonly ReactiveProperty<int> _attackPressed = new ReactiveProperty<int>(0);
+    private readonly ReactiveProperty<bool> _interactPressed = new(false);
     public IReadOnlyReactiveProperty<bool> JumpPressed => _jumpPressed;
     public IReadOnlyReactiveProperty<int> AttackPressed => _attackPressed;
+    public IReadOnlyReactiveProperty<bool> InteractPressed => _interactPressed;
 
     public bool IsInputBlocked { get; private set; }
 
@@ -22,6 +24,7 @@ public class PlayerInput : MonoBehaviour , IAgentMovementInput , IAgentJumpInput
             Horizontal = Vector2.zero;
             _jumpPressed.Value = false;
             _attackPressed.Value = 0;
+            _interactPressed.Value = false;
         }
     }
 
@@ -36,11 +39,12 @@ public class PlayerInput : MonoBehaviour , IAgentMovementInput , IAgentJumpInput
         inputActions.gamePlay.Jump.canceled += JumpInput;
 
         inputActions.gamePlay.Attack1.performed += context => AttackInput(context, 1);
-        
         inputActions.gamePlay.Attack1.canceled += AttackEnd;
 
         inputActions.gamePlay.Attack2.performed += context => AttackInput(context, 2);
         inputActions.gamePlay.Attack2.canceled += AttackEnd;
+
+        inputActions.gamePlay.Interact.performed += _ => { _interactPressed.Value = true; _interactPressed.Value = false; };
     }
 
     public Vector2 GetMovementInput()
@@ -81,13 +85,7 @@ public class PlayerInput : MonoBehaviour , IAgentMovementInput , IAgentJumpInput
             _attackPressed.Value = 0;
     }
 
-    private void OnEnable()
-    {
-        inputActions.Enable();
-    }
+    private void OnEnable() => inputActions.Enable();
 
-    private void OnDisable()
-    {
-        inputActions.Disable();
-    }
+    private void OnDisable() => inputActions.Disable();
 }
