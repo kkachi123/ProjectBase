@@ -8,19 +8,13 @@ public class NPCDialogue : MonoBehaviour, IInteractable
     private UIDialogueController _dialogue;
     private int _lineIndex;
 
-    private void Awake()
+    void Start()
     {
-        Managers.Instance.UI.OnDialogueChanged += OnDialogueChanged;
-        _dialogue = Managers.Instance.UI.Dialogue;
+        InGameUI inGameUI = Managers.Instance.UI.InGameUI;
+        if (inGameUI) _dialogue = inGameUI.Dialogue;
     }
 
-    private void OnDestroy()
-    {
-        Managers.Instance.UI.OnDialogueChanged -= OnDialogueChanged;
-        _dialogue = null;
-    }
-
-    private void OnDialogueChanged(UIDialogueController dialogue) => _dialogue = dialogue;
+    void OnDestroy() => _dialogue = null;
 
     public void Interact()
     {

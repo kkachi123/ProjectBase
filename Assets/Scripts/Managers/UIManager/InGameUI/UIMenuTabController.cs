@@ -16,8 +16,6 @@ public class UIMenuTabController : MonoBehaviour
 
     public bool IsOpen { get; private set; }
 
-    void Awake() => Managers.Instance.UI.Register(this);
-    void OnDestroy() { if (Managers.Instance != null) Managers.Instance.UI.Unregister(this); }
     void Start() => Initialize();
 
     public void OpenMenu()

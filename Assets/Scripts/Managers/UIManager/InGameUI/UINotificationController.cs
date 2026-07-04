@@ -5,9 +5,6 @@ using Cysharp.Threading.Tasks;
 
 public class UINotificationController : MonoBehaviour
 {
-    void Awake() => Managers.Instance.UI.Register(this);
-    void OnDestroy() { if (Managers.Instance != null) Managers.Instance.UI.Unregister(this); }
-
     [SerializeField] private GameObject _panel;
     [SerializeField] private TextMeshProUGUI _messageText;
     [SerializeField] private float _displayDuration = 2f;
