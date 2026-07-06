@@ -7,5 +7,5 @@ public class ItemData : ScriptableObject
     public string Name;
     [TextArea] public string Description;
     public Sprite Icon;
-    public EquipSlot? EquipSlot;
+    public EquipSlot EquipSlot;
 }

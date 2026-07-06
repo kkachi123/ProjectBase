@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 
-public enum EquipSlot { Weapon, Armor, Accessory }
+public enum EquipSlot { None, Weapon, Armor, Accessory }
 
 public class PlayerEquipment
 {
