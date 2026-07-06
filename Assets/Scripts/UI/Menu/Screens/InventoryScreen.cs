@@ -1,8 +1,22 @@
 using System.Collections.Generic;
+using UnityEngine;
+using UnityEngine.UI;
 
 public class InventoryScreen : UITab
 {
+    [SerializeField] private Transform _slotsContent;
+
     private InventorySystem _inventory;
+    private Image[] _slotImages;
+
+    private static readonly Color _emptySlotColor = new(0f, 0f, 0f, 0.47f);
+
+    private void Awake()
+    {
+        _slotImages = new Image[_slotsContent.childCount];
+        for (int i = 0; i < _slotsContent.childCount; i++)
+            _slotImages[i] = _slotsContent.GetChild(i).GetComponent<Image>();
+    }
 
     public override void OnShow()
     {
@@ -21,6 +35,11 @@ public class InventoryScreen : UITab
 
     private void Render(IReadOnlyList<ItemData> items)
     {
-        // TODO: 아이템 목록 UI 갱신
+        for (int i = 0; i < _slotImages.Length; i++)
+        {
+            bool hasItem = i < items.Count;
+            _slotImages[i].sprite = hasItem ? items[i].Icon : null;
+            _slotImages[i].color = hasItem ? Color.white : _emptySlotColor;
+        }
     }
 }
