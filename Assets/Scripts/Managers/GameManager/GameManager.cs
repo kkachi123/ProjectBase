@@ -11,7 +11,6 @@ public class GameManager : MonoBehaviour
         if (State != GameState.Playing) return;
         State = GameState.Paused;
         Time.timeScale = 0f;
-        Managers.Instance.UI.Overlay.ShowPauseDim(true);
     }
 
     public void Resume()
@@ -19,7 +18,6 @@ public class GameManager : MonoBehaviour
         if (State != GameState.Paused) return;
         State = GameState.Playing;
         Time.timeScale = 1f;
-        Managers.Instance.UI.Overlay.ShowPauseDim(false);
     }
 
     public void TriggerGameOver()

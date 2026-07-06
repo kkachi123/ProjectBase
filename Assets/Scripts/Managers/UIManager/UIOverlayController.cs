@@ -14,6 +14,15 @@ public class UIOverlayController : MonoBehaviour
     public void ShowPauseDim(bool show) => _pauseDim.SetActive(show);
     public void ShowLoading(bool show) => _loading.SetActive(show);
 
+    // 씬 전환 시 오버레이 잔존 상태를 방지하기 위한 일괄 리셋
+    public void ResetAll()
+    {
+        ShowPauseDim(false);
+        ShowLoading(false);
+        if (_screenFade != null) _screenFade.alpha = 0f;
+        if (_damageFlash != null) _damageFlash.alpha = 0f;
+    }
+
     private IEnumerator FadeRoutine(CanvasGroup group, float from, float to, float duration)
     {
         float elapsed = 0f;

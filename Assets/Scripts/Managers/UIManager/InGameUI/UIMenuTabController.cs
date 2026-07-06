@@ -16,7 +16,7 @@ public class UIMenuTabController : MonoBehaviour
 
     public bool IsOpen { get; private set; }
 
-    void Start() => Initialize();
+    private void Start() => Initialize();
 
     public void OpenMenu()
     {
@@ -46,6 +46,7 @@ public class UIMenuTabController : MonoBehaviour
             _tabImages[i] = _tabs[i].GetComponent<Image>();
             int idx = i;
             _tabs[i].onClick.AddListener(() => SwitchTo(idx));
+            _tabs[i].onClick.AddListener(() => Debug.Log($"Tab {idx} clicked"));
         }
         SwitchTo(0);
     }
