@@ -27,6 +27,7 @@ public class UIMenuTabController : MonoBehaviour
 
     public void CloseMenu()
     {
+        _screens[_activeIndex].OnHide();
         _content.SetActive(false);
         IsOpen = false;
         Managers.Instance.UI.InGameUI?.SetHUDActive(true);

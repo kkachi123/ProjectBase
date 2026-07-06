@@ -8,33 +8,32 @@ public class EquipmentScreen : UITab
     [SerializeField] private UIEquipArea _equipArea;
 
     private PlayerEquipment _equipment;
-    private InventorySystem _inventory;
     private EquipSlot _selectedSlot;
+    private bool _initialized;
 
-    private void Awake()
+    private void EnsureInit()
     {
-        foreach (var btn in _slotButtons)
-            btn.OnSelected += SelectSlot;
-
+        if (_initialized) return;
+        _initialized = true;
+        foreach (var btn in _slotButtons) btn.OnSelected += SelectSlot;
         _equipArea.OnItemSelected += OnEquipItem;
     }
 
     public override void OnShow()
     {
         base.OnShow();
+        EnsureInit();
         _equipment = Managers.Instance.Player.Equipment;
-        _inventory = Managers.Instance.Player.Inventory;
         _equipment.OnChanged += RenderEquipped;
-        RenderEquipped(_equipment.GetSlots());
-        SelectSlot(_slotButtons[0].Slot);
+        RenderEquipped(_equipment.GetEquipped());
     }
 
     public override void OnHide()
     {
         base.OnHide();
+        _equipArea.Hide();
         _equipment.OnChanged -= RenderEquipped;
         _equipment = null;
-        _inventory = null;
     }
 
     private void SelectSlot(EquipSlot slot)
@@ -43,21 +42,20 @@ public class EquipmentScreen : UITab
         foreach (var btn in _slotButtons)
             btn.SetSelected(btn.Slot == slot);
 
-        var filtered = _inventory.GetItems()
+        var filtered = _equipment.GetGear()
             .Where(item => item.EquipSlot == slot)
             .ToList();
         _equipArea.Render(filtered);
     }
 
-    private void RenderEquipped(IReadOnlyDictionary<EquipSlot, ItemData> slots)
+    private void RenderEquipped(IReadOnlyDictionary<EquipSlot, ItemData> equipped)
     {
         foreach (var btn in _slotButtons)
-            btn.SetEquipped(slots.GetValueOrDefault(btn.Slot));
+            btn.SetEquipped(equipped.GetValueOrDefault(btn.Slot));
     }
 
     private void OnEquipItem(ItemData item)
     {
         _equipment.Equip(_selectedSlot, item);
-        SelectSlot(_selectedSlot);
     }
 }

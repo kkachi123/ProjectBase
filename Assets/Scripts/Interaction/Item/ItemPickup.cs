@@ -8,7 +8,12 @@ public class ItemPickup : MonoBehaviour, IInteractable
     public void Interact()
     {
         if (_item == null) return;
-        Managers.Instance.Player.Inventory.Add(_item);
+        // item
+        if(_item.EquipSlot == EquipSlot.None) 
+            Managers.Instance.Player.Inventory.Add(_item);
+        // equipment
+        else
+            Managers.Instance.Player.Equipment.Add(_item);
         Destroy(gameObject);
     }
 }

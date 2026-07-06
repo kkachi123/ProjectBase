@@ -9,8 +9,9 @@ public class InventoryScreen : UITab
     private InventorySystem _inventory;
     private InventorySlot[] _slots;
 
-    private void Awake()
+    private void EnsureInit()
     {
+        if (_slots != null) return;
         _slots = new InventorySlot[_slotsContent.childCount];
         for (int i = 0; i < _slotsContent.childCount; i++)
         {
@@ -22,6 +23,7 @@ public class InventoryScreen : UITab
     public override void OnShow()
     {
         base.OnShow();
+        EnsureInit();
         _inventory = Managers.Instance.Player.Inventory;
         _inventory.OnChanged += Render;
         Render(_inventory.GetItems());
