@@ -11,14 +11,12 @@ public class UIDialogueController : MonoBehaviour
 
     public bool IsOpen { get; private set; }
 
+    [SerializeField] private InputAction _advanceAction;
+
     private Action _onAdvance;
-    private InputAction _advanceAction;
 
     private void Awake()
     {
-        _advanceAction = new InputAction("DialogueAdvance", InputActionType.Button);
-        _advanceAction.AddBinding("<Keyboard>/space");
-        _advanceAction.AddBinding("<Keyboard>/enter");
         _advanceAction.performed += _ => { if (IsOpen) _onAdvance?.Invoke(); };
     }
 
@@ -29,6 +27,7 @@ public class UIDialogueController : MonoBehaviour
         _contentText.text = content;
         _panel.SetActive(true);
         IsOpen = true;
+        Managers.Instance.Player.Input?.SetInputBlocked(true);
         Managers.Instance.UI.InGameUI?.SetHUDActive(false);
     }
 
@@ -42,6 +41,7 @@ public class UIDialogueController : MonoBehaviour
         _onAdvance = null;
         _panel.SetActive(false);
         IsOpen = false;
+        Managers.Instance.Player.Input?.SetInputBlocked(false);
         Managers.Instance.UI.InGameUI?.SetHUDActive(true);
     }
 

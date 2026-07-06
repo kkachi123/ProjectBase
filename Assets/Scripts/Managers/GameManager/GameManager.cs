@@ -20,6 +20,11 @@ public class GameManager : MonoBehaviour
         Time.timeScale = 1f;
     }
 
+    public void Reset()
+    {
+        State = GameState.Playing;
+    }
+
     public void TriggerGameOver()
     {
         State = GameState.GameOver;

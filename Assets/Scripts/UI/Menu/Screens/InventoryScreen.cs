@@ -1,21 +1,22 @@
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.UI;
 
 public class InventoryScreen : UITab
 {
     [SerializeField] private Transform _slotsContent;
+    [SerializeField] private UIItemDetailPanel _detailPanel;
 
     private InventorySystem _inventory;
-    private Image[] _slotImages;
-
-    private static readonly Color _emptySlotColor = new(0f, 0f, 0f, 0.47f);
+    private InventorySlot[] _slots;
 
     private void Awake()
     {
-        _slotImages = new Image[_slotsContent.childCount];
+        _slots = new InventorySlot[_slotsContent.childCount];
         for (int i = 0; i < _slotsContent.childCount; i++)
-            _slotImages[i] = _slotsContent.GetChild(i).GetComponent<Image>();
+        {
+            _slots[i] = _slotsContent.GetChild(i).GetComponent<InventorySlot>();
+            _slots[i].OnClicked += _detailPanel.Show;
+        }
     }
 
     public override void OnShow()
@@ -29,17 +30,14 @@ public class InventoryScreen : UITab
     public override void OnHide()
     {
         base.OnHide();
+        _detailPanel.Hide();
         _inventory.OnChanged -= Render;
         _inventory = null;
     }
 
     private void Render(IReadOnlyList<ItemData> items)
     {
-        for (int i = 0; i < _slotImages.Length; i++)
-        {
-            bool hasItem = i < items.Count;
-            _slotImages[i].sprite = hasItem ? items[i].Icon : null;
-            _slotImages[i].color = hasItem ? Color.white : _emptySlotColor;
-        }
+        for (int i = 0; i < _slots.Length; i++)
+            _slots[i].Set(i < items.Count ? items[i] : null);
     }
 }

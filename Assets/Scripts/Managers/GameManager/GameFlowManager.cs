@@ -30,6 +30,8 @@ public class GameFlowManager : MonoBehaviour
         yield return op;
 
         Time.timeScale = 1f;
+        if (nextState == FlowState.InGame)
+            Managers.Instance.Game.Reset();
         State = nextState;
         overlay.ShowLoading(false);
         overlay.FadeOut(_fadeTime);

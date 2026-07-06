@@ -30,6 +30,7 @@ public class PlayerInput : MonoBehaviour , IAgentMovementInput , IAgentJumpInput
 
     private void Awake()
     {
+        Managers.Instance.Player.Register(this);
         inputActions = new PlayerInputCommands();
 
         inputActions.gamePlay.Move.performed += MoveInput;
@@ -83,6 +84,11 @@ public class PlayerInput : MonoBehaviour , IAgentMovementInput , IAgentJumpInput
     {
         if (context.canceled)
             _attackPressed.Value = 0;
+    }
+
+    private void OnDestroy()
+    {
+        if (Managers.Instance) Managers.Instance.Player.Unregister(this);
     }
 
     private void OnEnable() => inputActions.Enable();
