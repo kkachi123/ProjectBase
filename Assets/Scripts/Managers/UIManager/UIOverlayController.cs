@@ -6,13 +6,15 @@ public class UIOverlayController : MonoBehaviour
     [SerializeField] private CanvasGroup _screenFade;
     [SerializeField] private CanvasGroup _damageFlash;
     [SerializeField] private GameObject _pauseDim;
-    [SerializeField] private GameObject _loading;
+    [SerializeField] private LoadingUI _loading;
+
+    public LoadingUI Loading => _loading;
 
     public void FadeIn(float duration) => StartCoroutine(FadeRoutine(_screenFade, 0f, 1f, duration));
     public void FadeOut(float duration) => StartCoroutine(FadeRoutine(_screenFade, 1f, 0f, duration));
     public void PlayDamageFlash() => StartCoroutine(FlashRoutine());
     public void ShowPauseDim(bool show) => _pauseDim.SetActive(show);
-    public void ShowLoading(bool show) => _loading.SetActive(show);
+    public void ShowLoading(bool show) { if (show) _loading.Show(); else _loading.Hide(); }
 
     // 씬 전환 시 오버레이 잔존 상태를 방지하기 위한 일괄 리셋
     public void ResetAll()

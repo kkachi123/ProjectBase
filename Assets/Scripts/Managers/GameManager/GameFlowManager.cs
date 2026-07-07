@@ -27,8 +27,13 @@ public class GameFlowManager : MonoBehaviour
         yield return new WaitForSecondsRealtime(_fadeTime);
 
         AsyncOperation op = SceneManager.LoadSceneAsync(sceneName);
-        yield return op;
+        while (!op.isDone)
+        {
+            overlay.Loading.SetProgress(Mathf.Clamp01(op.progress / 0.9f));
+            yield return null;
+        }
 
+        overlay.Loading.SetProgress(1f);
         Time.timeScale = 1f;
         if (nextState == FlowState.InGame)
             Managers.Instance.Game.Reset();

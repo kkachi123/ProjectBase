@@ -6,6 +6,7 @@ public class EquipmentScreen : UITab
 {
     [SerializeField] private EquipSlotButton[] _slotButtons;
     [SerializeField] private UIEquipArea _equipArea;
+    [SerializeField] private EquipDetail _equipDetail;
 
     private PlayerEquipment _equipment;
     private EquipSlot _selectedSlot;
@@ -32,6 +33,7 @@ public class EquipmentScreen : UITab
     {
         base.OnHide();
         _equipArea.Hide();
+        _equipDetail.Hide();
         _equipment.OnChanged -= RenderEquipped;
         _equipment = null;
     }
@@ -41,6 +43,10 @@ public class EquipmentScreen : UITab
         _selectedSlot = slot;
         foreach (var btn in _slotButtons)
             btn.SetSelected(btn.Slot == slot);
+
+        var equipped = _equipment.GetEquipped(slot);
+        if (equipped != null) _equipDetail.Show(equipped);
+        else _equipDetail.Hide();
 
         var filtered = _equipment.GetGear()
             .Where(item => item.EquipSlot == slot)
@@ -52,6 +58,9 @@ public class EquipmentScreen : UITab
     {
         foreach (var btn in _slotButtons)
             btn.SetEquipped(equipped.GetValueOrDefault(btn.Slot));
+
+        var current = equipped.GetValueOrDefault(_selectedSlot);
+        if (current != null) _equipDetail.Show(current);
     }
 
     private void OnEquipItem(ItemData item)

@@ -16,12 +16,18 @@ public class UIMenuTabController : MonoBehaviour
 
     public bool IsOpen { get; private set; }
 
-    private void Start() => Initialize();
+    private void EnsureInit()
+    {
+        if (_tabImages != null) return;
+        Initialize();
+    }
 
     public void OpenMenu()
     {
+        EnsureInit();
         _content.SetActive(true);
         IsOpen = true;
+        _screens[_activeIndex].OnShow();
         Managers.Instance.UI.InGameUI?.SetHUDActive(false);
     }
 
