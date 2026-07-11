@@ -133,20 +133,36 @@ MonoBehaviour:
     entrance2: {x: 10, y: 3}
     width: 10
     height: 10
-  - prefab: {fileID: 5515949758358363527, guid: 965fe8770d4da9740aa298dcb502ce8f, type: 3}
-    prefabName: 6_TransitionMap_LeftAerialLeft_UpOrDown
+  - prefab: {fileID: 4714132243365792670, guid: 6e3f6449110bad44aaabe0c17a3a1ed5, type: 3}
+    prefabName: 6_TransitionMap_GoUp
     type: 0
     difficulty: 0
-    entrance1: {x: 0, y: 9}
-    entrance2: {x: 0, y: 2}
+    entrance1: {x: 0, y: 7}
+    entrance2: {x: 1, y: 0}
     width: 10
     height: 10
-  - prefab: {fileID: 5515949758358363527, guid: 7e0d63e4d1b04c843b5e102f79dfbdc4, type: 3}
-    prefabName: 7_TransitionMap_RightAerialRight_UpOrDown
+  - prefab: {fileID: 2555507268527057286, guid: 3f971a46e8396a441900b35695cf2792, type: 3}
+    prefabName: 7_TransitionMap_Connect6_Left
     type: 0
     difficulty: 0
-    entrance1: {x: 10, y: 9}
-    entrance2: {x: 10, y: 2}
+    entrance1: {x: 1, y: 10}
+    entrance2: {x: 0, y: 3}
+    width: 10
+    height: 10
+  - prefab: {fileID: 5515949758358363527, guid: 7e7f5023b7ae00c4b88ac46795527857, type: 3}
+    prefabName: 8_TransitionMap_GoDown
+    type: 0
+    difficulty: 0
+    entrance1: {x: 10, y: 7}
+    entrance2: {x: 9, y: 0}
+    width: 10
+    height: 10
+  - prefab: {fileID: 5515949758358363527, guid: edbbd6b1d96bf6a4da07020555206758, type: 3}
+    prefabName: 9_TransitionMap_Connect8_Right
+    type: 0
+    difficulty: 0
+    entrance1: {x: 9, y: 10}
+    entrance2: {x: 10, y: 3}
     width: 10
     height: 10
   - prefab: {fileID: 2152955194347054507, guid: 0ebe7cbb040adb6449b78b0eb9edcf78, type: 3}

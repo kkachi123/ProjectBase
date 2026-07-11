@@ -6,14 +6,14 @@ namespace MapSystem.Editor
 {
     /// <summary>
     /// ChunkDatabase를 이용해 청크를 순서대로 이어붙여 랜덤 맵을 생성한다.
-    /// 매 스텝마다 (1) 소켓 호환성(진입 높이 일치) 필터링 -> (2) 겹침 검사 -> (3) 배치
-    /// 순서로 진행한다. Transition/Content 타입을 번갈아 배치하며, 이름이 "6_" 또는 "7_"로
-    /// 시작하는 통로를 통과하면 진행 방향(Right/Left) 플래그가 뒤집힌다.
+    ///
+    /// entrance1/entrance2는 "입구/출구"라는 고정된 역할이 아니라 그냥 "연결 가능한 두 지점"이다.
+    /// 매 스텝마다 두 지점 중 어느 쪽이든 현재 커서에 연결해보고, 겹치지 않는 배치가 나오는
+    /// 쪽을 채택한다. 방향 플래그나 진입 높이 필터는 없다 — 필요한 조건은 오직
+    /// (1) 타일이 겹치지 않을 것, (2) 실제로 연결점이 이어질 것, 이 두 가지뿐이다.
     /// </summary>
     public class ChunkMapGeneratorWindow : EditorWindow
     {
-        private enum Direction { Right, Left }
-
         private const string RootName = "GeneratedMap";
 
         private ChunkDatabase database;
@@ -54,6 +54,35 @@ namespace MapSystem.Editor
             }
         }
 
+        // 후보 하나를 커서에 연결하는 두 가지 방법(entrance1로 접합 / entrance2로 접합) 중
+        // 겹치지 않는 쪽을 찾는다. 성공 시 true와 함께 원점·다음 커서를 반환한다.
+        private static bool TryConnect(ChunkDatabaseEntry entry, Vector2 cursor, List<Rect> placedBoxes,
+            System.Random rng, out Vector2 origin, out Vector2 nextCursor)
+        {
+            bool tryEntrance1First = rng.Next(2) == 0; // 두 방식 중 어느 쪽을 먼저 시도할지 무작위
+
+            for (int attempt = 0; attempt < 2; attempt++)
+            {
+                bool useEntrance1 = (attempt == 0) ? tryEntrance1First : !tryEntrance1First;
+                Vector2Int inSocket = useEntrance1 ? entry.entrance1 : entry.entrance2;
+                Vector2Int outSocket = useEntrance1 ? entry.entrance2 : entry.entrance1;
+
+                Vector2 candidateOrigin = cursor - new Vector2(inSocket.x, inSocket.y);
+                Rect box = new Rect(candidateOrigin.x, candidateOrigin.y, entry.width, entry.height);
+
+                if (!Overlaps(box, placedBoxes))
+                {
+                    origin = candidateOrigin;
+                    nextCursor = candidateOrigin + new Vector2(outSocket.x, outSocket.y);
+                    return true;
+                }
+            }
+
+            origin = Vector2.zero;
+            nextCursor = Vector2.zero;
+            return false;
+        }
+
         private static void Generate(ChunkDatabase db, int steps, int seed)
         {
             if (db == null) { Debug.LogError("[ChunkMapGenerator] ChunkDatabase가 없습니다."); return; }
@@ -65,8 +94,7 @@ namespace MapSystem.Editor
             System.Random rng = new System.Random(seed);
             List<Rect> placedBoxes = new List<Rect>();
 
-            Vector2 cursor = new Vector2(0f, 3f); // 기본 진입 높이(y=3, ChunkData entrance1 기본값과 동일)
-            Direction dir = Direction.Right;
+            Vector2 cursor = new Vector2(0f, 3f); // 시작 연결점
             int placedCount = 0;
             int failCount = 0;
 
@@ -78,36 +106,20 @@ namespace MapSystem.Editor
                 List<ChunkDatabaseEntry> candidates = new List<ChunkDatabaseEntry>(db.GetByTypeAndDifficulty(
                     desiredType, desiredType == ChunkType.Transition ? ChunkDifficulty.None : ChunkDifficulty.Easy));
 
-                // 소켓 호환성 필터: 이 스텝에서 "진입 소켓"으로 쓸 쪽(direction에 따라 entrance1 또는 entrance2)의
-                // 높이가 현재 요구 높이(cursor.y)와 같아야 한다.
-                candidates.RemoveAll(e =>
-                {
-                    Vector2Int inSocket = (dir == Direction.Right) ? e.entrance1 : e.entrance2;
-                    return inSocket.y != Mathf.RoundToInt(cursor.y);
-                });
-
                 Shuffle(candidates, rng);
 
                 bool placed = false;
                 foreach (ChunkDatabaseEntry entry in candidates)
                 {
-                    Vector2Int inSocket = (dir == Direction.Right) ? entry.entrance1 : entry.entrance2;
-                    Vector2Int outSocket = (dir == Direction.Right) ? entry.entrance2 : entry.entrance1;
-
-                    Vector2 chunkOrigin = cursor - new Vector2(inSocket.x, inSocket.y);
-                    Rect newBox = new Rect(chunkOrigin.x, chunkOrigin.y, entry.width, entry.height);
-
-                    if (Overlaps(newBox, placedBoxes)) continue;
+                    if (!TryConnect(entry, cursor, placedBoxes, rng, out Vector2 origin, out Vector2 nextCursor))
+                        continue;
 
                     GameObject inst = (GameObject)PrefabUtility.InstantiatePrefab(entry.prefab, root.transform);
-                    inst.transform.position = new Vector3(chunkOrigin.x, chunkOrigin.y, 0f);
+                    inst.transform.position = new Vector3(origin.x, origin.y, 0f);
                     inst.name = entry.prefabName + "_" + step;
 
-                    placedBoxes.Add(newBox);
-                    cursor = chunkOrigin + new Vector2(outSocket.x, outSocket.y);
-
-                    if (entry.prefabName.StartsWith("6_") || entry.prefabName.StartsWith("7_"))
-                        dir = (dir == Direction.Right) ? Direction.Left : Direction.Right;
+                    placedBoxes.Add(new Rect(origin.x, origin.y, entry.width, entry.height));
+                    cursor = nextCursor;
 
                     placed = true;
                     placedCount++;
@@ -117,7 +129,7 @@ namespace MapSystem.Editor
                 if (!placed)
                 {
                     failCount++;
-                    Debug.LogWarning($"[ChunkMapGenerator] step {step}: 배치 가능한 후보 없음 (요구 타입={desiredType}, 요구 높이={cursor.y}, 방향={dir}). 스킵.");
+                    Debug.LogWarning($"[ChunkMapGenerator] step {step}: 배치 가능한 후보 없음 (요구 타입={desiredType}, 커서={cursor}). 스킵.");
                 }
             }
 
