@@ -1,0 +1,175 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f7b5abc1c31b0834486ac78cfda17a70, type: 3}
+  m_Name: ChunkDatabase
+  m_EditorClassIdentifier: 
+  entries:
+  - prefab: {fileID: 565926324478851296, guid: 07990bb40b71c0b47b174d5a732ca373, type: 3}
+    prefabName: Combat_Easy_A_Basic
+    type: 1
+    difficulty: 1
+    entrance1: {x: 0, y: 3}
+    entrance2: {x: 20, y: 3}
+    width: 20
+    height: 10
+  - prefab: {fileID: 9024553962824336200, guid: 478c18eaddb5a4e479452ed53b29480d, type: 3}
+    prefabName: Combat_Easy_B_Bump
+    type: 1
+    difficulty: 1
+    entrance1: {x: 0, y: 3}
+    entrance2: {x: 20, y: 3}
+    width: 20
+    height: 10
+  - prefab: {fileID: 914782992143755131, guid: cb1174e23c9c2b44d8aa37ef14b39e37, type: 3}
+    prefabName: Combat_Easy_C_Elevation
+    type: 1
+    difficulty: 1
+    entrance1: {x: 0, y: 3}
+    entrance2: {x: 20, y: 7}
+    width: 20
+    height: 10
+  - prefab: {fileID: 1884753945597036584, guid: 228c9d17f57ee6b448e24f607300d496, type: 3}
+    prefabName: Combat_Easy_D_AerialBypass
+    type: 1
+    difficulty: 1
+    entrance1: {x: 0, y: 3}
+    entrance2: {x: 20, y: 3}
+    width: 20
+    height: 10
+  - prefab: {fileID: 1006632289620067546, guid: 796b01e4547b28d4dbf09bbf79af8255, type: 3}
+    prefabName: Combat_Easy_E_AerialBonus
+    type: 1
+    difficulty: 1
+    entrance1: {x: 0, y: 3}
+    entrance2: {x: 20, y: 3}
+    width: 20
+    height: 10
+  - prefab: {fileID: 2547137522966040057, guid: 6c92feace1db8594c840db7477a32cf3, type: 3}
+    prefabName: Combat_Easy_F_ArrowTrap
+    type: 1
+    difficulty: 1
+    entrance1: {x: 0, y: 3}
+    entrance2: {x: 20, y: 3}
+    width: 20
+    height: 10
+  - prefab: {fileID: 5317187679108202924, guid: fd6431e217443214e924e7409cfbefbe, type: 3}
+    prefabName: Puzzle_Easy_A_Basic
+    type: 2
+    difficulty: 1
+    entrance1: {x: 0, y: 3}
+    entrance2: {x: 20, y: 3}
+    width: 20
+    height: 10
+  - prefab: {fileID: 7489728383692153079, guid: 1043846fe0205534dafef092a25d9610, type: 3}
+    prefabName: Puzzle_Easy_B_Elevation
+    type: 2
+    difficulty: 1
+    entrance1: {x: 0, y: 3}
+    entrance2: {x: 20, y: 5}
+    width: 20
+    height: 10
+  - prefab: {fileID: 694451392745491125, guid: 668837ddef41b1643a4bcbc7e9a8cee5, type: 3}
+    prefabName: Puzzle_Easy_C_SteppingStone
+    type: 2
+    difficulty: 1
+    entrance1: {x: 0, y: 3}
+    entrance2: {x: 20, y: 3}
+    width: 20
+    height: 10
+  - prefab: {fileID: 1284084678678450010, guid: 4e352c00161b4ef4db51db8d97ddece6, type: 3}
+    prefabName: Puzzle_Easy_D_SpikeTrap
+    type: 2
+    difficulty: 1
+    entrance1: {x: 0, y: 3}
+    entrance2: {x: 20, y: 3}
+    width: 20
+    height: 10
+  - prefab: {fileID: 3954179141993485795, guid: d120513dae75933419f1692e98796bef, type: 3}
+    prefabName: 1_TransitionMap_Flat
+    type: 0
+    difficulty: 0
+    entrance1: {x: 0, y: 3}
+    entrance2: {x: 10, y: 3}
+    width: 10
+    height: 10
+  - prefab: {fileID: 6723685205293776876, guid: 3d749922d99615444a28b348a91e1810, type: 3}
+    prefabName: 2_TransitionMap_LeftUpRight
+    type: 0
+    difficulty: 0
+    entrance1: {x: 0, y: 2}
+    entrance2: {x: 10, y: 6}
+    width: 10
+    height: 10
+  - prefab: {fileID: 6858004643134343820, guid: 02feffab94b3ebb4da273d4bc1eb158f, type: 3}
+    prefabName: 3_TransitionMap_LeftDownRight
+    type: 0
+    difficulty: 0
+    entrance1: {x: 0, y: 6}
+    entrance2: {x: 10, y: 2}
+    width: 10
+    height: 10
+  - prefab: {fileID: 5458151512594592865, guid: f7fd9c57623bf96448b43a1dd5f51ff5, type: 3}
+    prefabName: 4_TransitionMap_LeftAerialUpRight
+    type: 0
+    difficulty: 0
+    entrance1: {x: 0, y: 3}
+    entrance2: {x: 10, y: 7}
+    width: 10
+    height: 10
+  - prefab: {fileID: 2967518283305337978, guid: 23bb4f68bc010f34c9d656b7c821c095, type: 3}
+    prefabName: 5_TransitionMap_LeftAerialDownRight
+    type: 0
+    difficulty: 0
+    entrance1: {x: 0, y: 7}
+    entrance2: {x: 10, y: 3}
+    width: 10
+    height: 10
+  - prefab: {fileID: 5515949758358363527, guid: 965fe8770d4da9740aa298dcb502ce8f, type: 3}
+    prefabName: 6_TransitionMap_LeftAerialLeft_UpOrDown
+    type: 0
+    difficulty: 0
+    entrance1: {x: 0, y: 9}
+    entrance2: {x: 0, y: 2}
+    width: 10
+    height: 10
+  - prefab: {fileID: 5515949758358363527, guid: 7e0d63e4d1b04c843b5e102f79dfbdc4, type: 3}
+    prefabName: 7_TransitionMap_RightAerialRight_UpOrDown
+    type: 0
+    difficulty: 0
+    entrance1: {x: 10, y: 9}
+    entrance2: {x: 10, y: 2}
+    width: 10
+    height: 10
+  - prefab: {fileID: 2152955194347054507, guid: 0ebe7cbb040adb6449b78b0eb9edcf78, type: 3}
+    prefabName: Treasure_Easy_A_Basic
+    type: 3
+    difficulty: 1
+    entrance1: {x: 0, y: 3}
+    entrance2: {x: 20, y: 3}
+    width: 20
+    height: 10
+  - prefab: {fileID: 2274446904694715841, guid: 1576bdb0bf3d9fb4db746794189313ce, type: 3}
+    prefabName: Treasure_Easy_B_Stairs
+    type: 3
+    difficulty: 1
+    entrance1: {x: 0, y: 3}
+    entrance2: {x: 20, y: 7}
+    width: 20
+    height: 10
+  - prefab: {fileID: 5511053255886043270, guid: 98a3458cf0fbad04b8750ff680ba5b8b, type: 3}
+    prefabName: Treasure_Easy_C_HiddenNiche
+    type: 3
+    difficulty: 1
+    entrance1: {x: 0, y: 3}
+    entrance2: {x: 20, y: 3}
+    width: 20
+    height: 10
