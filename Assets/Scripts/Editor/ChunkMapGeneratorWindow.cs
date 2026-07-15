@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
+using UnityEngine.Tilemaps;
 
 namespace MapSystem.Editor
 {
@@ -16,10 +17,29 @@ namespace MapSystem.Editor
     {
         private const string RootName = "GeneratedMap";
 
+        private enum Mode { AssembleMap, GenerateChunk }
+        private Mode mode = Mode.AssembleMap;
+
         private ChunkDatabase database;
         private int stepCount = 10;
         private int seed = 0;
         private bool useRandomSeed = true;
+
+        // Generate Chunk 모드 상태
+        private ChunkType genChunkType = ChunkType.Combat;
+        private ChunkDifficulty genDifficulty = ChunkDifficulty.Easy;
+        private Vector2Int genEntrance1 = new Vector2Int(0, 3);
+        private Vector2Int genEntrance2 = new Vector2Int(20, 3);
+        private int genMaxJumpX = 6;
+        private int genMaxRiseY = 3;
+        private int genPlayerWidth = 1;
+        private int genPlayerHeight = 2;
+        private TileBase genGroundTile;
+        private int genSeed = 0;
+        private bool genUseRandomSeed = true;
+        private string genChunkName = "NewChunk";
+        private GameObject genPreviewRoot;
+        private ChunkType lastGenChunkType;
 
         [MenuItem("Map/Generate Random Map")]
         public static void Open()
@@ -31,9 +51,23 @@ namespace MapSystem.Editor
         {
             if (database == null)
                 database = AssetDatabase.LoadAssetAtPath<ChunkDatabase>("Assets/Data/ChunkDatabase.asset");
+            if (genGroundTile == null)
+                genGroundTile = AssetDatabase.LoadAssetAtPath<TileBase>("Assets/Prefabs/Map/ChunkMap/TileGround.asset");
+            lastGenChunkType = genChunkType;
         }
 
         private void OnGUI()
+        {
+            mode = (Mode)GUILayout.Toolbar((int)mode, new[] { "Assemble Map", "Generate Chunk" });
+            EditorGUILayout.Space();
+
+            if (mode == Mode.AssembleMap)
+                DrawAssembleMapGUI();
+            else
+                DrawGenerateChunkGUI();
+        }
+
+        private void DrawAssembleMapGUI()
         {
             database = (ChunkDatabase)EditorGUILayout.ObjectField("Chunk Database", database, typeof(ChunkDatabase), false);
             stepCount = EditorGUILayout.IntField("Step Count (Transition+Content 합)", stepCount);
@@ -51,6 +85,73 @@ namespace MapSystem.Editor
             {
                 GameObject existingRoot = GameObject.Find(RootName);
                 if (existingRoot != null) Object.DestroyImmediate(existingRoot);
+            }
+        }
+
+        private void DrawGenerateChunkGUI()
+        {
+            GUILayout.Label("청크 자동 생성 (내부 지형 + 콘텐츠)", EditorStyles.boldLabel);
+
+            genChunkType = (ChunkType)EditorGUILayout.EnumPopup("Chunk Type", genChunkType);
+            if (genChunkType != lastGenChunkType)
+            {
+                int width = genChunkType == ChunkType.Transition ? 10 : 20;
+                genEntrance2 = new Vector2Int(width, genEntrance2.y);
+                lastGenChunkType = genChunkType;
+            }
+            if (genChunkType != ChunkType.Transition)
+                genDifficulty = (ChunkDifficulty)EditorGUILayout.EnumPopup("Difficulty", genDifficulty);
+            else
+                genDifficulty = ChunkDifficulty.None;
+
+            EditorGUILayout.Space();
+            GUILayout.Label("Entrance (연결 가능 지점)", EditorStyles.boldLabel);
+            genEntrance1 = EditorGUILayout.Vector2IntField("Entrance 1", genEntrance1);
+            genEntrance2 = EditorGUILayout.Vector2IntField("Entrance 2", genEntrance2);
+
+            EditorGUILayout.Space();
+            GUILayout.Label("Player Limit", EditorStyles.boldLabel);
+            genMaxJumpX = EditorGUILayout.IntField("Max Jump X (이동)", genMaxJumpX);
+            genMaxRiseY = EditorGUILayout.IntField("Max Rise Y (상승)", genMaxRiseY);
+            genPlayerWidth = EditorGUILayout.IntField("Player Width", genPlayerWidth);
+            genPlayerHeight = EditorGUILayout.IntField("Player Height", genPlayerHeight);
+
+            EditorGUILayout.Space();
+            genGroundTile = (TileBase)EditorGUILayout.ObjectField("Ground Tile", genGroundTile, typeof(TileBase), false);
+            genUseRandomSeed = EditorGUILayout.Toggle("Random Seed", genUseRandomSeed);
+            if (!genUseRandomSeed)
+                genSeed = EditorGUILayout.IntField("Seed", genSeed);
+
+            EditorGUILayout.Space();
+            if (GUILayout.Button("Generate"))
+            {
+                int actualSeed = genUseRandomSeed ? System.Environment.TickCount : genSeed;
+                var settings = new ChunkAutoGenerator.Settings
+                {
+                    chunkType = genChunkType,
+                    difficulty = genDifficulty,
+                    width = genChunkType == ChunkType.Transition ? 10 : 20,
+                    entrance1 = genEntrance1,
+                    entrance2 = genEntrance2,
+                    maxJumpX = genMaxJumpX,
+                    maxRiseY = genMaxRiseY,
+                    playerWidth = genPlayerWidth,
+                    playerHeight = genPlayerHeight,
+                    groundTile = genGroundTile,
+                    seed = actualSeed,
+                };
+                genPreviewRoot = ChunkAutoGenerator.GeneratePreview(settings);
+            }
+
+            EditorGUILayout.Space();
+            using (new EditorGUI.DisabledScope(genPreviewRoot == null))
+            {
+                genChunkName = EditorGUILayout.TextField("Chunk Name", genChunkName);
+                if (GUILayout.Button("Save As Prefab"))
+                {
+                    ChunkAutoGenerator.SaveAsPrefab(genPreviewRoot, genChunkType, genDifficulty, genChunkName);
+                    genPreviewRoot = null;
+                }
             }
         }
 
