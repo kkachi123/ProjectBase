@@ -30,7 +30,8 @@ public class PlayerInput : MonoBehaviour , IAgentMovementInput , IAgentJumpInput
 
     private void Awake()
     {
-        Managers.Instance.Player.Register(this);
+        // Test
+        Managers.Instance?.Player.Register(this);
         inputActions = new PlayerInputCommands();
 
         inputActions.gamePlay.Move.performed += MoveInput;

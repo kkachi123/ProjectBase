@@ -14,6 +14,10 @@ public class AgentMovementHandler2D
     {
         _motor.Move(moveVec, _data.moveSpeed);
     }
+    public void HandleAirMove(Vector2 moveVec)
+    {
+        _motor.Move(moveVec, _data.airMoveSpeed);
+    }
 
     public void HandleJump()
     {

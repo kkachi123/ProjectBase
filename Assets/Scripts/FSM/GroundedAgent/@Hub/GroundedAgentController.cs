@@ -41,6 +41,12 @@ public abstract class GroundedAgentController : AgentController , IGroundedAgent
     #endregion
 
     #region State Input Event
+    public override void HandleMovement()
+    {
+        if(!IsGrounded) _movementHandler.HandleAirMove(_moveInput.GetMovementInput());
+        else base.HandleMovement();
+    }
+
     public virtual void OnJumpAction()
     {
         _stateMachine.CurrentState?.OnInputEvent(InputKeyType.Jump);
