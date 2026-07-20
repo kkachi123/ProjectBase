@@ -28,8 +28,8 @@ namespace MapSystem.Editor
         // Generate Chunk 모드 상태
         private ChunkType genChunkType = ChunkType.Combat;
         private ChunkDifficulty genDifficulty = ChunkDifficulty.Easy;
-        private Vector2Int genEntrance1 = new Vector2Int(0, 3);
-        private Vector2Int genEntrance2 = new Vector2Int(20, 3);
+        private ChunkEntrancePoint genEntrance1Point = ChunkEntrancePoint.West1;
+        private ChunkEntrancePoint genEntrance2Point = ChunkEntrancePoint.East1;
         private int genMaxJumpX = 6;
         private int genMaxRiseY = 3;
         private int genPlayerWidth = 1;
@@ -39,7 +39,6 @@ namespace MapSystem.Editor
         private bool genUseRandomSeed = true;
         private string genChunkName = "NewChunk";
         private GameObject genPreviewRoot;
-        private ChunkType lastGenChunkType;
 
         [MenuItem("Map/Generate Random Map")]
         public static void Open()
@@ -53,7 +52,6 @@ namespace MapSystem.Editor
                 database = AssetDatabase.LoadAssetAtPath<ChunkDatabase>("Assets/Data/ChunkDatabase.asset");
             if (genGroundTile == null)
                 genGroundTile = AssetDatabase.LoadAssetAtPath<TileBase>("Assets/Prefabs/Map/ChunkMap/TileGround.asset");
-            lastGenChunkType = genChunkType;
         }
 
         private void OnGUI()
@@ -93,21 +91,22 @@ namespace MapSystem.Editor
             GUILayout.Label("청크 자동 생성 (내부 지형 + 콘텐츠)", EditorStyles.boldLabel);
 
             genChunkType = (ChunkType)EditorGUILayout.EnumPopup("Chunk Type", genChunkType);
-            if (genChunkType != lastGenChunkType)
-            {
-                int width = genChunkType == ChunkType.Transition ? 10 : 20;
-                genEntrance2 = new Vector2Int(width, genEntrance2.y);
-                lastGenChunkType = genChunkType;
-            }
             if (genChunkType != ChunkType.Transition)
                 genDifficulty = (ChunkDifficulty)EditorGUILayout.EnumPopup("Difficulty", genDifficulty);
             else
                 genDifficulty = ChunkDifficulty.None;
 
+            int genWidth = genChunkType == ChunkType.Transition ? 10 : 20;
+
             EditorGUILayout.Space();
-            GUILayout.Label("Entrance (연결 가능 지점)", EditorStyles.boldLabel);
-            genEntrance1 = EditorGUILayout.Vector2IntField("Entrance 1", genEntrance1);
-            genEntrance2 = EditorGUILayout.Vector2IntField("Entrance 2", genEntrance2);
+            GUILayout.Label("Entrance (연결 가능 지점 — 청크 4변 x 2지점)", EditorStyles.boldLabel);
+            genEntrance1Point = (ChunkEntrancePoint)EditorGUILayout.EnumPopup("Entrance 1", genEntrance1Point);
+            genEntrance2Point = (ChunkEntrancePoint)EditorGUILayout.EnumPopup("Entrance 2", genEntrance2Point);
+            if (genEntrance1Point == genEntrance2Point)
+                EditorGUILayout.HelpBox("두 entrance가 같은 지점입니다 — 문이 하나뿐인 '구석진 방'으로 생성됩니다.", MessageType.Info);
+            Vector2Int genEntrance1 = ChunkAutoGenerator.ResolveEntrancePoint(genEntrance1Point, genWidth, 10);
+            Vector2Int genEntrance2 = ChunkAutoGenerator.ResolveEntrancePoint(genEntrance2Point, genWidth, 10);
+            EditorGUILayout.LabelField("실제 좌표", $"{genEntrance1}  ↔  {genEntrance2}");
 
             EditorGUILayout.Space();
             GUILayout.Label("Player Limit", EditorStyles.boldLabel);
@@ -130,7 +129,7 @@ namespace MapSystem.Editor
                 {
                     chunkType = genChunkType,
                     difficulty = genDifficulty,
-                    width = genChunkType == ChunkType.Transition ? 10 : 20,
+                    width = genWidth,
                     entrance1 = genEntrance1,
                     entrance2 = genEntrance2,
                     maxJumpX = genMaxJumpX,

@@ -13,6 +13,12 @@ namespace MapSystem.Editor
         public int xEnd; // inclusive
         public int height;
 
+        /// <summary>
+        /// South(낙하 통과) entrance처럼 실제 타일 없이 도달가능성 계산에만 쓰이는 가상 세그먼트인지.
+        /// ExtractSegments가 실제 타일에서 뽑아낸 세그먼트는 항상 false.
+        /// </summary>
+        public bool isVirtual;
+
         public int Width => xEnd - xStart + 1;
     }
 
@@ -119,8 +125,20 @@ namespace MapSystem.Editor
             return -1;
         }
 
-        /// <summary>startIdx에서 CanJump 간선만 따라 BFS로 도달 가능한 모든 세그먼트 인덱스 집합.</summary>
-        public static HashSet<int> ReachableFrom(List<ChunkSegment> segments, int startIdx, int maxJumpX, int maxRiseY)
+        /// <summary>
+        /// a와 b가 x범위를 공유(위아래로 겹침)할 때, 낮은 쪽 발판 위에 플레이어(세로 playerHeight칸)가
+        /// 설 머리 공간이 실제로 있는지. x가 겹치지 않으면 애초에 서로의 천장이 될 수 없으므로 항상 true.
+        /// CanJump가 "가로/상승 거리"만 보고 "천장까지의 여유"는 보지 않기 때문에 별도로 필요하다.
+        /// </summary>
+        public static bool HasClearance(ChunkSegment a, ChunkSegment b, int playerHeight)
+        {
+            bool xOverlap = a.xStart <= b.xEnd && b.xStart <= a.xEnd;
+            if (!xOverlap) return true;
+            return Mathf.Abs(a.height - b.height) >= playerHeight;
+        }
+
+        /// <summary>startIdx에서 CanJump(가로/상승) + HasClearance(머리 공간) 간선만 따라 BFS로 도달 가능한 세그먼트 인덱스 집합.</summary>
+        public static HashSet<int> ReachableFrom(List<ChunkSegment> segments, int startIdx, int maxJumpX, int maxRiseY, int playerHeight)
         {
             var visited = new HashSet<int> { startIdx };
             var queue = new Queue<int>();
@@ -132,7 +150,8 @@ namespace MapSystem.Editor
                 for (int i = 0; i < segments.Count; i++)
                 {
                     if (visited.Contains(i)) continue;
-                    if (CanJump(segments[cur], segments[i], maxJumpX, maxRiseY))
+                    if (CanJump(segments[cur], segments[i], maxJumpX, maxRiseY) &&
+                        HasClearance(segments[cur], segments[i], playerHeight))
                     {
                         visited.Add(i);
                         queue.Enqueue(i);
