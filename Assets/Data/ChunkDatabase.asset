@@ -61,6 +61,38 @@ MonoBehaviour:
     entrance2: {x: 20, y: 3}
     width: 20
     height: 10
+  - prefab: {fileID: 5140475730122304345, guid: d23f5a45f7606a54db9e14f8e1e6d7fb, type: 3}
+    prefabName: Combat_Hard_A_Basic
+    type: 1
+    difficulty: 3
+    entrance1: {x: 0, y: 3}
+    entrance2: {x: 20, y: 8}
+    width: 20
+    height: 10
+  - prefab: {fileID: 167312188415742760, guid: 04df4e29cd4755542ba6a7e29850879c, type: 3}
+    prefabName: Combat_Hard_B_Elevation
+    type: 1
+    difficulty: 3
+    entrance1: {x: 0, y: 3}
+    entrance2: {x: 20, y: 9}
+    width: 20
+    height: 10
+  - prefab: {fileID: 762714210142627515, guid: ea6059f2e561b0b4cbeb4272ffc53dd9, type: 3}
+    prefabName: Combat_Hard_C_Aerial
+    type: 1
+    difficulty: 3
+    entrance1: {x: 0, y: 3}
+    entrance2: {x: 20, y: 3}
+    width: 20
+    height: 10
+  - prefab: {fileID: 3696672032363897017, guid: da159771e1bb277409f08ed0151afafb, type: 3}
+    prefabName: Combat_Hard_D_Trap
+    type: 1
+    difficulty: 3
+    entrance1: {x: 0, y: 3}
+    entrance2: {x: 20, y: 3}
+    width: 20
+    height: 10
   - prefab: {fileID: 8598644896221835121, guid: 8e5578dd51ec0c94b90e300acad9c0fd, type: 3}
     prefabName: Combat_Medium_A_Basic
     type: 1
@@ -121,6 +153,38 @@ MonoBehaviour:
     prefabName: Puzzle_Easy_D_SpikeTrap
     type: 2
     difficulty: 1
+    entrance1: {x: 0, y: 3}
+    entrance2: {x: 20, y: 3}
+    width: 20
+    height: 10
+  - prefab: {fileID: 5493525658767992658, guid: 5178c525e6e29ed43abdbb2c98518ab9, type: 3}
+    prefabName: Puzzle_Hard_A_Basic
+    type: 2
+    difficulty: 3
+    entrance1: {x: 0, y: 3}
+    entrance2: {x: 20, y: 9}
+    width: 20
+    height: 10
+  - prefab: {fileID: 2919038514800340081, guid: fcf0f56449aa92948a93fa53ce6d1be4, type: 3}
+    prefabName: Puzzle_Hard_B_Rhythm
+    type: 2
+    difficulty: 3
+    entrance1: {x: 0, y: 3}
+    entrance2: {x: 20, y: 3}
+    width: 20
+    height: 10
+  - prefab: {fileID: 7578430343698527140, guid: bc662f712360f8f4eb5fb822d07b3ab6, type: 3}
+    prefabName: Puzzle_Hard_C_Descend
+    type: 2
+    difficulty: 3
+    entrance1: {x: 0, y: 9}
+    entrance2: {x: 20, y: 5}
+    width: 20
+    height: 10
+  - prefab: {fileID: 4176338083541316816, guid: 99938f5572e1bcc4599c00f07662b349, type: 3}
+    prefabName: Puzzle_Hard_D_Triple
+    type: 2
+    difficulty: 3
     entrance1: {x: 0, y: 3}
     entrance2: {x: 20, y: 3}
     width: 20
@@ -249,6 +313,30 @@ MonoBehaviour:
     prefabName: Treasure_Easy_C_HiddenNiche
     type: 3
     difficulty: 1
+    entrance1: {x: 0, y: 3}
+    entrance2: {x: 20, y: 3}
+    width: 20
+    height: 10
+  - prefab: {fileID: 1022877035900351313, guid: a5c5b570639ceb84baa815af9b4d1d6d, type: 3}
+    prefabName: Treasure_Hard_A_Basic
+    type: 3
+    difficulty: 3
+    entrance1: {x: 0, y: 3}
+    entrance2: {x: 20, y: 3}
+    width: 20
+    height: 10
+  - prefab: {fileID: 7840702811368342510, guid: 4d0c67e1a9f4f3547b6806ef6fc6a58c, type: 3}
+    prefabName: Treasure_Hard_B_Stairs
+    type: 3
+    difficulty: 3
+    entrance1: {x: 0, y: 3}
+    entrance2: {x: 20, y: 9}
+    width: 20
+    height: 10
+  - prefab: {fileID: 8629735996003530818, guid: f71f9d2c0b099884581424de74d0a83c, type: 3}
+    prefabName: Treasure_Hard_C_HiddenRiskExt
+    type: 3
+    difficulty: 3
     entrance1: {x: 0, y: 3}
     entrance2: {x: 20, y: 3}
     width: 20

@@ -183,6 +183,19 @@ namespace MapSystem.Editor
             return false;
         }
 
+        // 한 스텝의 배치 시도 기록 -- 백트래킹 시 이 프레임 단위로 되돌린다.
+        private class PlacementFrame
+        {
+            public ChunkType desiredType;
+            public Vector2 cursorBefore;
+            public HashSet<ChunkDatabaseEntry> excluded = new HashSet<ChunkDatabaseEntry>();
+            public ChunkDatabaseEntry placedEntry;
+            public GameObject instance;
+            public Vector2 cursorAfter;
+        }
+
+        // 막히면 그냥 스킵하는 대신, 이전 스텝으로 돌아가 다른 청크를 다시 골라본다(백트래킹).
+        // 이전 스텝도 더 이상 대안이 없으면 그보다 더 앞으로 계속 되돌아간다.
         private static void Generate(ChunkDatabase db, int steps, int seed)
         {
             if (db == null) { Debug.LogError("[ChunkMapGenerator] ChunkDatabase가 없습니다."); return; }
@@ -193,25 +206,31 @@ namespace MapSystem.Editor
 
             System.Random rng = new System.Random(seed);
             List<Rect> placedBoxes = new List<Rect>();
+            List<PlacementFrame> stack = new List<PlacementFrame>();
 
-            Vector2 cursor = new Vector2(0f, 3f); // 시작 연결점
-            int placedCount = 0;
-            int failCount = 0;
+            const int MAX_BACKTRACKS = 3000;
+            int totalBacktracks = 0;
+            int step = 0;
 
-            for (int step = 0; step < steps; step++)
+            while (step < steps)
             {
-                bool wantTransition = (step % 2 == 0);
-                ChunkType desiredType = wantTransition ? ChunkType.Transition : RandomContentType(rng);
+                if (step == stack.Count)
+                {
+                    bool wantTransition = (step % 2 == 0);
+                    ChunkType desiredType = wantTransition ? ChunkType.Transition : RandomContentType(rng);
+                    Vector2 cursorBefore = (step == 0) ? new Vector2(0f, 3f) : stack[step - 1].cursorAfter;
+                    stack.Add(new PlacementFrame { desiredType = desiredType, cursorBefore = cursorBefore });
+                }
 
-                List<ChunkDatabaseEntry> candidates = new List<ChunkDatabaseEntry>(db.GetByTypeAndDifficulty(
-                    desiredType, desiredType == ChunkType.Transition ? ChunkDifficulty.None : ChunkDifficulty.Easy));
-
+                PlacementFrame frame = stack[step];
+                List<ChunkDatabaseEntry> candidates = new List<ChunkDatabaseEntry>(db.GetByType(frame.desiredType));
+                candidates.RemoveAll(e => frame.excluded.Contains(e));
                 Shuffle(candidates, rng);
 
                 bool placed = false;
                 foreach (ChunkDatabaseEntry entry in candidates)
                 {
-                    if (!TryConnect(entry, cursor, placedBoxes, rng, out Vector2 origin, out Vector2 nextCursor))
+                    if (!TryConnect(entry, frame.cursorBefore, placedBoxes, rng, out Vector2 origin, out Vector2 nextCursor))
                         continue;
 
                     GameObject inst = (GameObject)PrefabUtility.InstantiatePrefab(entry.prefab, root.transform);
@@ -219,21 +238,44 @@ namespace MapSystem.Editor
                     inst.name = entry.prefabName + "_" + step;
 
                     placedBoxes.Add(new Rect(origin.x, origin.y, entry.width, entry.height));
-                    cursor = nextCursor;
 
+                    frame.placedEntry = entry;
+                    frame.instance = inst;
+                    frame.cursorAfter = nextCursor;
+
+                    step++;
                     placed = true;
-                    placedCount++;
                     break;
                 }
 
                 if (!placed)
                 {
-                    failCount++;
-                    Debug.LogWarning($"[ChunkMapGenerator] step {step}: 배치 가능한 후보 없음 (요구 타입={desiredType}, 커서={cursor}). 스킵.");
+                    if (step == 0)
+                    {
+                        Debug.LogError("[ChunkMapGenerator] 첫 스텝부터 배치 가능한 청크가 없습니다 — 생성 중단.");
+                        break;
+                    }
+
+                    totalBacktracks++;
+                    if (totalBacktracks > MAX_BACKTRACKS)
+                    {
+                        Debug.LogWarning($"[ChunkMapGenerator] 백트래킹 한도({MAX_BACKTRACKS}회) 초과 — {step}개까지만 배치하고 중단합니다.");
+                        break;
+                    }
+
+                    // 이전 스텝으로 되돌아가서 그 자리는 다른 청크로 다시 시도한다.
+                    step--;
+                    PlacementFrame prevFrame = stack[step];
+                    if (prevFrame.instance != null) Object.DestroyImmediate(prevFrame.instance);
+                    placedBoxes.RemoveAt(placedBoxes.Count - 1);
+                    prevFrame.excluded.Add(prevFrame.placedEntry);
+                    prevFrame.placedEntry = null;
+                    prevFrame.instance = null;
+                    if (stack.Count > step + 1) stack.RemoveRange(step + 1, stack.Count - step - 1);
                 }
             }
 
-            Debug.Log($"[ChunkMapGenerator] 생성 완료: {placedCount}개 배치, {failCount}개 실패(스킵). seed={seed}");
+            Debug.Log($"[ChunkMapGenerator] 생성 완료: {step}개 배치 (요청 {steps}개), 백트래킹 {totalBacktracks}회. seed={seed}");
         }
 
         private static ChunkType RandomContentType(System.Random rng)
