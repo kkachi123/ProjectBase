@@ -17,9 +17,9 @@ MonoBehaviour:
     prefabName: Combat_Easy_A_Basic
     type: 1
     difficulty: 1
-    entrance1: {x: 0, y: 3}
-    entrance2: {x: 20, y: 3}
-    extraEntrances: []
+    entrances:
+    - {x: 20, y: 3}
+    - {x: 0, y: 3}
     endLineRole: 0
     width: 20
     height: 10
@@ -27,9 +27,9 @@ MonoBehaviour:
     prefabName: Combat_Easy_B_Bump
     type: 1
     difficulty: 1
-    entrance1: {x: 0, y: 3}
-    entrance2: {x: 20, y: 3}
-    extraEntrances: []
+    entrances:
+    - {x: 20, y: 3}
+    - {x: 0, y: 3}
     endLineRole: 0
     width: 20
     height: 10
@@ -37,9 +37,9 @@ MonoBehaviour:
     prefabName: Combat_Easy_C_Elevation
     type: 1
     difficulty: 1
-    entrance1: {x: 0, y: 3}
-    entrance2: {x: 20, y: 7}
-    extraEntrances: []
+    entrances:
+    - {x: 20, y: 7}
+    - {x: 0, y: 3}
     endLineRole: 0
     width: 20
     height: 10
@@ -47,9 +47,9 @@ MonoBehaviour:
     prefabName: Combat_Easy_D_AerialBypass
     type: 1
     difficulty: 1
-    entrance1: {x: 0, y: 3}
-    entrance2: {x: 20, y: 3}
-    extraEntrances: []
+    entrances:
+    - {x: 20, y: 3}
+    - {x: 0, y: 3}
     endLineRole: 0
     width: 20
     height: 10
@@ -57,9 +57,9 @@ MonoBehaviour:
     prefabName: Combat_Easy_E_AerialBonus
     type: 1
     difficulty: 1
-    entrance1: {x: 0, y: 3}
-    entrance2: {x: 20, y: 3}
-    extraEntrances: []
+    entrances:
+    - {x: 20, y: 3}
+    - {x: 0, y: 3}
     endLineRole: 0
     width: 20
     height: 10
@@ -67,9 +67,9 @@ MonoBehaviour:
     prefabName: Combat_Easy_F_ArrowTrap
     type: 1
     difficulty: 1
-    entrance1: {x: 0, y: 3}
-    entrance2: {x: 20, y: 3}
-    extraEntrances: []
+    entrances:
+    - {x: 20, y: 3}
+    - {x: 0, y: 3}
     endLineRole: 0
     width: 20
     height: 10
@@ -77,9 +77,9 @@ MonoBehaviour:
     prefabName: Combat_Hard_A_Basic
     type: 1
     difficulty: 3
-    entrance1: {x: 0, y: 3}
-    entrance2: {x: 20, y: 8}
-    extraEntrances: []
+    entrances:
+    - {x: 20, y: 7}
+    - {x: 0, y: 3}
     endLineRole: 0
     width: 20
     height: 10
@@ -87,9 +87,9 @@ MonoBehaviour:
     prefabName: Combat_Hard_B_Elevation
     type: 1
     difficulty: 3
-    entrance1: {x: 0, y: 3}
-    entrance2: {x: 20, y: 9}
-    extraEntrances: []
+    entrances:
+    - {x: 20, y: 7}
+    - {x: 0, y: 3}
     endLineRole: 0
     width: 20
     height: 10
@@ -97,9 +97,9 @@ MonoBehaviour:
     prefabName: Combat_Hard_C_Aerial
     type: 1
     difficulty: 3
-    entrance1: {x: 0, y: 3}
-    entrance2: {x: 20, y: 3}
-    extraEntrances: []
+    entrances:
+    - {x: 20, y: 3}
+    - {x: 0, y: 3}
     endLineRole: 0
     width: 20
     height: 10
@@ -107,9 +107,9 @@ MonoBehaviour:
     prefabName: Combat_Hard_D_Trap
     type: 1
     difficulty: 3
-    entrance1: {x: 0, y: 3}
-    entrance2: {x: 20, y: 3}
-    extraEntrances: []
+    entrances:
+    - {x: 20, y: 3}
+    - {x: 0, y: 3}
     endLineRole: 0
     width: 20
     height: 10
@@ -117,9 +117,9 @@ MonoBehaviour:
     prefabName: Combat_Medium_A_Basic
     type: 1
     difficulty: 2
-    entrance1: {x: 0, y: 3}
-    entrance2: {x: 20, y: 5}
-    extraEntrances: []
+    entrances:
+    - {x: 20, y: 7}
+    - {x: 0, y: 3}
     endLineRole: 0
     width: 20
     height: 10
@@ -127,9 +127,9 @@ MonoBehaviour:
     prefabName: Combat_Medium_B_Elevation
     type: 1
     difficulty: 2
-    entrance1: {x: 0, y: 3}
-    entrance2: {x: 20, y: 9}
-    extraEntrances: []
+    entrances:
+    - {x: 20, y: 7}
+    - {x: 0, y: 3}
     endLineRole: 0
     width: 20
     height: 10
@@ -137,9 +137,9 @@ MonoBehaviour:
     prefabName: Combat_Medium_C_Aerial
     type: 1
     difficulty: 2
-    entrance1: {x: 0, y: 3}
-    entrance2: {x: 20, y: 3}
-    extraEntrances: []
+    entrances:
+    - {x: 20, y: 3}
+    - {x: 0, y: 3}
     endLineRole: 0
     width: 20
     height: 10
@@ -147,9 +147,9 @@ MonoBehaviour:
     prefabName: Combat_Medium_D_Trap
     type: 1
     difficulty: 2
-    entrance1: {x: 0, y: 3}
-    entrance2: {x: 20, y: 7}
-    extraEntrances: []
+    entrances:
+    - {x: 20, y: 7}
+    - {x: 0, y: 3}
     endLineRole: 0
     width: 20
     height: 10
@@ -157,9 +157,8 @@ MonoBehaviour:
     prefabName: '@End'
     type: 4
     difficulty: 0
-    entrance1: {x: 0, y: 3}
-    entrance2: {x: 0, y: 3}
-    extraEntrances: []
+    entrances:
+    - {x: 0, y: 3}
     endLineRole: 2
     width: 10
     height: 10
@@ -167,9 +166,8 @@ MonoBehaviour:
     prefabName: '@Start'
     type: 4
     difficulty: 0
-    entrance1: {x: 10, y: 3}
-    entrance2: {x: 10, y: 3}
-    extraEntrances: []
+    entrances:
+    - {x: 10, y: 3}
     endLineRole: 1
     width: 10
     height: 10
@@ -177,9 +175,8 @@ MonoBehaviour:
     prefabName: EndLine1
     type: 4
     difficulty: 0
-    entrance1: {x: 0, y: 3}
-    entrance2: {x: 0, y: 3}
-    extraEntrances: []
+    entrances:
+    - {x: 0, y: 3}
     endLineRole: 0
     width: 10
     height: 10
@@ -187,29 +184,8 @@ MonoBehaviour:
     prefabName: EndLine2
     type: 4
     difficulty: 0
-    entrance1: {x: 0, y: 3}
-    entrance2: {x: 0, y: 3}
-    extraEntrances: []
-    endLineRole: 0
-    width: 10
-    height: 10
-  - prefab: {fileID: 4482324677120334007, guid: 26a431745adf2da4cb3f9da3eb004448, type: 3}
-    prefabName: EndLine3
-    type: 4
-    difficulty: 0
-    entrance1: {x: 0, y: 3}
-    entrance2: {x: 0, y: 3}
-    extraEntrances: []
-    endLineRole: 0
-    width: 10
-    height: 10
-  - prefab: {fileID: 917386421537548920, guid: f71ea482aba3f0b4ebf5d6adfd53a364, type: 3}
-    prefabName: EndLine4
-    type: 4
-    difficulty: 0
-    entrance1: {x: 0, y: 3}
-    entrance2: {x: 0, y: 3}
-    extraEntrances: []
+    entrances:
+    - {x: 0, y: 3}
     endLineRole: 0
     width: 10
     height: 10
@@ -217,49 +193,8 @@ MonoBehaviour:
     prefabName: EndLine5
     type: 4
     difficulty: 0
-    entrance1: {x: 0, y: 3}
-    entrance2: {x: 0, y: 3}
-    extraEntrances: []
-    endLineRole: 0
-    width: 10
-    height: 10
-  - prefab: {fileID: 4149656610432871685, guid: e9bbd2acabc477d459f5649902b0dda2, type: 3}
-    prefabName: EndLine6
-    type: 4
-    difficulty: 0
-    entrance1: {x: 0, y: 3}
-    entrance2: {x: 0, y: 3}
-    extraEntrances: []
-    endLineRole: 0
-    width: 10
-    height: 10
-  - prefab: {fileID: 5988474068544832065, guid: e4968be95f3eeb447bc9153f4cf3f623, type: 3}
-    prefabName: EndLine7
-    type: 4
-    difficulty: 0
-    entrance1: {x: 0, y: 3}
-    entrance2: {x: 0, y: 3}
-    extraEntrances: []
-    endLineRole: 0
-    width: 10
-    height: 10
-  - prefab: {fileID: 2618431861240737988, guid: 8062f23558529e64eaf82e136bdad946, type: 3}
-    prefabName: EndLine8
-    type: 4
-    difficulty: 0
-    entrance1: {x: 0, y: 3}
-    entrance2: {x: 0, y: 3}
-    extraEntrances: []
-    endLineRole: 0
-    width: 10
-    height: 10
-  - prefab: {fileID: 39820619594691925, guid: a43aef9c5d87f2548ba7728600fbb827, type: 3}
-    prefabName: EndLine9
-    type: 4
-    difficulty: 0
-    entrance1: {x: 0, y: 3}
-    entrance2: {x: 0, y: 3}
-    extraEntrances: []
+    entrances:
+    - {x: 0, y: 3}
     endLineRole: 0
     width: 10
     height: 10
@@ -267,9 +202,8 @@ MonoBehaviour:
     prefabName: EndLine_WallBottomEntranceTop
     type: 4
     difficulty: 0
-    entrance1: {x: 4, y: 10}
-    entrance2: {x: 4, y: 10}
-    extraEntrances: []
+    entrances:
+    - {x: 2, y: 10}
     endLineRole: 0
     width: 10
     height: 10
@@ -277,9 +211,8 @@ MonoBehaviour:
     prefabName: EndLine_WallLeft
     type: 4
     difficulty: 0
-    entrance1: {x: 10, y: 3}
-    entrance2: {x: 10, y: 3}
-    extraEntrances: []
+    entrances:
+    - {x: 10, y: 3}
     endLineRole: 0
     width: 10
     height: 10
@@ -287,9 +220,8 @@ MonoBehaviour:
     prefabName: EndLine_WallTopEntranceBottom
     type: 4
     difficulty: 0
-    entrance1: {x: 4, y: 0}
-    entrance2: {x: 4, y: 0}
-    extraEntrances: []
+    entrances:
+    - {x: 2, y: 0}
     endLineRole: 0
     width: 10
     height: 10
@@ -297,9 +229,9 @@ MonoBehaviour:
     prefabName: Puzzle_Easy_A_Basic
     type: 2
     difficulty: 1
-    entrance1: {x: 0, y: 3}
-    entrance2: {x: 20, y: 3}
-    extraEntrances: []
+    entrances:
+    - {x: 20, y: 3}
+    - {x: 0, y: 3}
     endLineRole: 0
     width: 20
     height: 10
@@ -307,9 +239,9 @@ MonoBehaviour:
     prefabName: Puzzle_Easy_B_Elevation
     type: 2
     difficulty: 1
-    entrance1: {x: 0, y: 3}
-    entrance2: {x: 20, y: 5}
-    extraEntrances: []
+    entrances:
+    - {x: 20, y: 7}
+    - {x: 0, y: 3}
     endLineRole: 0
     width: 20
     height: 10
@@ -317,9 +249,9 @@ MonoBehaviour:
     prefabName: Puzzle_Easy_C_SteppingStone
     type: 2
     difficulty: 1
-    entrance1: {x: 0, y: 3}
-    entrance2: {x: 20, y: 3}
-    extraEntrances: []
+    entrances:
+    - {x: 20, y: 3}
+    - {x: 0, y: 3}
     endLineRole: 0
     width: 20
     height: 10
@@ -327,9 +259,9 @@ MonoBehaviour:
     prefabName: Puzzle_Easy_D_SpikeTrap
     type: 2
     difficulty: 1
-    entrance1: {x: 0, y: 3}
-    entrance2: {x: 20, y: 3}
-    extraEntrances: []
+    entrances:
+    - {x: 20, y: 3}
+    - {x: 0, y: 3}
     endLineRole: 0
     width: 20
     height: 10
@@ -337,9 +269,9 @@ MonoBehaviour:
     prefabName: Puzzle_Hard_A_Basic
     type: 2
     difficulty: 3
-    entrance1: {x: 0, y: 3}
-    entrance2: {x: 20, y: 9}
-    extraEntrances: []
+    entrances:
+    - {x: 20, y: 7}
+    - {x: 0, y: 3}
     endLineRole: 0
     width: 20
     height: 10
@@ -347,9 +279,9 @@ MonoBehaviour:
     prefabName: Puzzle_Hard_B_Rhythm
     type: 2
     difficulty: 3
-    entrance1: {x: 0, y: 3}
-    entrance2: {x: 20, y: 3}
-    extraEntrances: []
+    entrances:
+    - {x: 20, y: 3}
+    - {x: 0, y: 3}
     endLineRole: 0
     width: 20
     height: 10
@@ -357,9 +289,9 @@ MonoBehaviour:
     prefabName: Puzzle_Hard_C_Descend
     type: 2
     difficulty: 3
-    entrance1: {x: 0, y: 9}
-    entrance2: {x: 20, y: 5}
-    extraEntrances: []
+    entrances:
+    - {x: 20, y: 7}
+    - {x: 0, y: 7}
     endLineRole: 0
     width: 20
     height: 10
@@ -367,9 +299,9 @@ MonoBehaviour:
     prefabName: Puzzle_Hard_D_Triple
     type: 2
     difficulty: 3
-    entrance1: {x: 0, y: 3}
-    entrance2: {x: 20, y: 3}
-    extraEntrances: []
+    entrances:
+    - {x: 20, y: 3}
+    - {x: 0, y: 3}
     endLineRole: 0
     width: 20
     height: 10
@@ -377,9 +309,9 @@ MonoBehaviour:
     prefabName: Puzzle_Medium_A_Basic
     type: 2
     difficulty: 2
-    entrance1: {x: 0, y: 3}
-    entrance2: {x: 20, y: 8}
-    extraEntrances: []
+    entrances:
+    - {x: 20, y: 7}
+    - {x: 0, y: 3}
     endLineRole: 0
     width: 20
     height: 10
@@ -387,9 +319,9 @@ MonoBehaviour:
     prefabName: Puzzle_Medium_B_Elevation
     type: 2
     difficulty: 2
-    entrance1: {x: 0, y: 3}
-    entrance2: {x: 20, y: 9}
-    extraEntrances: []
+    entrances:
+    - {x: 20, y: 7}
+    - {x: 0, y: 3}
     endLineRole: 0
     width: 20
     height: 10
@@ -397,9 +329,9 @@ MonoBehaviour:
     prefabName: Puzzle_Medium_C_Rhythm
     type: 2
     difficulty: 2
-    entrance1: {x: 0, y: 3}
-    entrance2: {x: 20, y: 3}
-    extraEntrances: []
+    entrances:
+    - {x: 20, y: 3}
+    - {x: 0, y: 3}
     endLineRole: 0
     width: 20
     height: 10
@@ -407,9 +339,9 @@ MonoBehaviour:
     prefabName: Puzzle_Medium_D_Trap
     type: 2
     difficulty: 2
-    entrance1: {x: 0, y: 3}
-    entrance2: {x: 20, y: 3}
-    extraEntrances: []
+    entrances:
+    - {x: 20, y: 3}
+    - {x: 0, y: 3}
     endLineRole: 0
     width: 20
     height: 10
@@ -417,9 +349,9 @@ MonoBehaviour:
     prefabName: 1_TransitionMap_Flat
     type: 0
     difficulty: 0
-    entrance1: {x: 0, y: 3}
-    entrance2: {x: 10, y: 3}
-    extraEntrances: []
+    entrances:
+    - {x: 10, y: 3}
+    - {x: 0, y: 3}
     endLineRole: 0
     width: 10
     height: 10
@@ -427,9 +359,9 @@ MonoBehaviour:
     prefabName: 2_TransitionMap_LeftUpRight
     type: 0
     difficulty: 0
-    entrance1: {x: 0, y: 2}
-    entrance2: {x: 10, y: 6}
-    extraEntrances: []
+    entrances:
+    - {x: 10, y: 7}
+    - {x: 0, y: 3}
     endLineRole: 0
     width: 10
     height: 10
@@ -437,9 +369,9 @@ MonoBehaviour:
     prefabName: 3_TransitionMap_LeftDownRight
     type: 0
     difficulty: 0
-    entrance1: {x: 0, y: 6}
-    entrance2: {x: 10, y: 2}
-    extraEntrances: []
+    entrances:
+    - {x: 10, y: 3}
+    - {x: 0, y: 7}
     endLineRole: 0
     width: 10
     height: 10
@@ -447,9 +379,9 @@ MonoBehaviour:
     prefabName: 4_TransitionMap_LeftAerialUpRight
     type: 0
     difficulty: 0
-    entrance1: {x: 0, y: 3}
-    entrance2: {x: 10, y: 7}
-    extraEntrances: []
+    entrances:
+    - {x: 10, y: 7}
+    - {x: 0, y: 3}
     endLineRole: 0
     width: 10
     height: 10
@@ -457,9 +389,9 @@ MonoBehaviour:
     prefabName: 5_TransitionMap_LeftAerialDownRight
     type: 0
     difficulty: 0
-    entrance1: {x: 0, y: 7}
-    entrance2: {x: 10, y: 3}
-    extraEntrances: []
+    entrances:
+    - {x: 10, y: 3}
+    - {x: 0, y: 7}
     endLineRole: 0
     width: 10
     height: 10
@@ -467,9 +399,9 @@ MonoBehaviour:
     prefabName: 6_TransitionMap_GoUp
     type: 0
     difficulty: 0
-    entrance1: {x: 0, y: 7}
-    entrance2: {x: 1, y: 0}
-    extraEntrances: []
+    entrances:
+    - {x: 2, y: 0}
+    - {x: 0, y: 7}
     endLineRole: 0
     width: 10
     height: 10
@@ -477,9 +409,9 @@ MonoBehaviour:
     prefabName: 7_TransitionMap_Connect6_Left
     type: 0
     difficulty: 0
-    entrance1: {x: 1, y: 10}
-    entrance2: {x: 0, y: 3}
-    extraEntrances: []
+    entrances:
+    - {x: 2, y: 10}
+    - {x: 0, y: 3}
     endLineRole: 0
     width: 10
     height: 10
@@ -487,9 +419,9 @@ MonoBehaviour:
     prefabName: 8_TransitionMap_GoDown
     type: 0
     difficulty: 0
-    entrance1: {x: 10, y: 7}
-    entrance2: {x: 9, y: 0}
-    extraEntrances: []
+    entrances:
+    - {x: 7, y: 0}
+    - {x: 10, y: 7}
     endLineRole: 0
     width: 10
     height: 10
@@ -497,9 +429,9 @@ MonoBehaviour:
     prefabName: 9_TransitionMap_Connect8_Right
     type: 0
     difficulty: 0
-    entrance1: {x: 9, y: 10}
-    entrance2: {x: 10, y: 3}
-    extraEntrances: []
+    entrances:
+    - {x: 7, y: 10}
+    - {x: 10, y: 3}
     endLineRole: 0
     width: 10
     height: 10
@@ -507,13 +439,11 @@ MonoBehaviour:
     prefabName: 10_TransitionMap_4Way
     type: 0
     difficulty: 0
-    entrance1: {x: 0, y: 3}
-    entrance2: {x: 10, y: 7}
-    extraEntrances:
-    - {x: 0, y: 3}
-    - {x: 10, y: 7}
-    - {x: 5, y: 0}
+    entrances:
     - {x: 7, y: 10}
+    - {x: 7, y: 0}
+    - {x: 10, y: 7}
+    - {x: 0, y: 3}
     endLineRole: 0
     width: 10
     height: 10
@@ -521,9 +451,9 @@ MonoBehaviour:
     prefabName: Treasure_Easy_A_Basic
     type: 3
     difficulty: 1
-    entrance1: {x: 0, y: 3}
-    entrance2: {x: 20, y: 3}
-    extraEntrances: []
+    entrances:
+    - {x: 20, y: 3}
+    - {x: 0, y: 3}
     endLineRole: 0
     width: 20
     height: 10
@@ -531,9 +461,9 @@ MonoBehaviour:
     prefabName: Treasure_Easy_B_Stairs
     type: 3
     difficulty: 1
-    entrance1: {x: 0, y: 3}
-    entrance2: {x: 20, y: 7}
-    extraEntrances: []
+    entrances:
+    - {x: 20, y: 7}
+    - {x: 0, y: 3}
     endLineRole: 0
     width: 20
     height: 10
@@ -541,9 +471,9 @@ MonoBehaviour:
     prefabName: Treasure_Easy_C_HiddenNiche
     type: 3
     difficulty: 1
-    entrance1: {x: 0, y: 3}
-    entrance2: {x: 20, y: 3}
-    extraEntrances: []
+    entrances:
+    - {x: 20, y: 3}
+    - {x: 0, y: 3}
     endLineRole: 0
     width: 20
     height: 10
@@ -551,9 +481,9 @@ MonoBehaviour:
     prefabName: Treasure_Hard_A_Basic
     type: 3
     difficulty: 3
-    entrance1: {x: 0, y: 3}
-    entrance2: {x: 20, y: 3}
-    extraEntrances: []
+    entrances:
+    - {x: 20, y: 3}
+    - {x: 0, y: 3}
     endLineRole: 0
     width: 20
     height: 10
@@ -561,9 +491,9 @@ MonoBehaviour:
     prefabName: Treasure_Hard_B_Stairs
     type: 3
     difficulty: 3
-    entrance1: {x: 0, y: 3}
-    entrance2: {x: 20, y: 9}
-    extraEntrances: []
+    entrances:
+    - {x: 20, y: 7}
+    - {x: 0, y: 3}
     endLineRole: 0
     width: 20
     height: 10
@@ -571,9 +501,9 @@ MonoBehaviour:
     prefabName: Treasure_Hard_C_HiddenRiskExt
     type: 3
     difficulty: 3
-    entrance1: {x: 0, y: 3}
-    entrance2: {x: 20, y: 3}
-    extraEntrances: []
+    entrances:
+    - {x: 20, y: 3}
+    - {x: 0, y: 3}
     endLineRole: 0
     width: 20
     height: 10
@@ -581,9 +511,9 @@ MonoBehaviour:
     prefabName: Treasure_Medium_A_Basic
     type: 3
     difficulty: 2
-    entrance1: {x: 0, y: 3}
-    entrance2: {x: 20, y: 3}
-    extraEntrances: []
+    entrances:
+    - {x: 20, y: 3}
+    - {x: 0, y: 3}
     endLineRole: 0
     width: 20
     height: 10
@@ -591,9 +521,9 @@ MonoBehaviour:
     prefabName: Treasure_Medium_B_Stairs
     type: 3
     difficulty: 2
-    entrance1: {x: 0, y: 3}
-    entrance2: {x: 20, y: 9}
-    extraEntrances: []
+    entrances:
+    - {x: 20, y: 7}
+    - {x: 0, y: 3}
     endLineRole: 0
     width: 20
     height: 10
@@ -601,9 +531,9 @@ MonoBehaviour:
     prefabName: Treasure_Medium_C_HiddenRisk
     type: 3
     difficulty: 2
-    entrance1: {x: 0, y: 3}
-    entrance2: {x: 20, y: 3}
-    extraEntrances: []
+    entrances:
+    - {x: 20, y: 3}
+    - {x: 0, y: 3}
     endLineRole: 0
     width: 20
     height: 10

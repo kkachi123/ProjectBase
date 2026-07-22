@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using System.Reflection;
 using UnityEditor;
 using UnityEngine;
 
@@ -8,52 +7,51 @@ namespace MapSystem.Editor
     /// <summary>
     /// Assets/Prefabs/Map/ChunkMap/ 아래 프리팹을 전부 스캔해서 ChunkDatabase를 자동으로
     /// 재생성한다. 난이도는 ChunkData에 필드를 추가하는 대신, 프리팹 경로의 폴더명
-    /// (Easy/Medium/Hard)에서 추론한다. entrances는 ChunkData의 private
-    /// 필드를 리플렉션으로 읽어와 캐싱한다.
+    /// (Easy/Medium/Hard)에서 추론한다. entrances 등은 ChunkData의 공개 프로퍼티를
+    /// 통해 그대로 읽어와 캐싱한다.
     /// </summary>
     public static class ChunkDatabaseBuilder
     {
         private const string ScanRoot = "Assets/Prefabs/Map/ChunkMap";
-        private const string DatabasePath = "Assets/Data/ChunkDatabase.asset";
+        private const string DatabasePath = "Assets/Prefabs/@Data/Map/ChunkDatabase.asset";
 
         [MenuItem("Map/Rebuild Chunk Database")]
+        // Chunk Prefab을 전부 스캔해서 ChunkDatabase를 재생성한다. (ChunkData가 없는 프리팹은 스킵)
         public static void Rebuild()
         {
             ChunkDatabase db = AssetDatabase.LoadAssetAtPath<ChunkDatabase>(DatabasePath);
             if (db == null)
             {
-                string dir = "Assets/Data";
+                string dir = "Assets/Prefabs/@Data/Map";
                 if (!AssetDatabase.IsValidFolder(dir))
-                    AssetDatabase.CreateFolder("Assets", "Data");
+                    AssetDatabase.CreateFolder("Assets/Prefabs/@Data/Map", "ChunkDatabase.asset");
                 db = ScriptableObject.CreateInstance<ChunkDatabase>();
                 AssetDatabase.CreateAsset(db, DatabasePath);
             }
 
             db.entries.Clear();
-
+            // 지정된 경로 아래의 모든 프리팹을 스캔해서 ChunkData를 가진 것만 등록한다.
+            // 1. Guid 검색
             string[] guids = AssetDatabase.FindAssets("t:Prefab", new[] { ScanRoot });
-            System.Type cdType = typeof(ChunkData);
-            BindingFlags flags = BindingFlags.NonPublic | BindingFlags.Instance;
-            FieldInfo f_type = cdType.GetField("chunkType", flags);
-            FieldInfo f_entrances = cdType.GetField("entrances", flags);
-            FieldInfo f_role = cdType.GetField("endLineRole", flags);
 
-            int found = 0;
-            int skipped = 0;
+            int found = 0; // ChunkData가 있는 프리팹 수
+            int skipped = 0; // ChunkData가 없는 프리팹 수
 
             for (int i = 0; i < guids.Length; i++)
             {
+                // 2. Guid -> 파일 경로 -> 프리팹 로드
                 string path = AssetDatabase.GUIDToAssetPath(guids[i]);
                 GameObject prefab = AssetDatabase.LoadAssetAtPath<GameObject>(path);
                 if (prefab == null) { skipped++; continue; }
-
+                // 3. ChunkData 컴포넌트 확인
                 ChunkData cd = prefab.GetComponent<ChunkData>();
                 if (cd == null) { skipped++; continue; }
 
-                ChunkType type = (ChunkType)f_type.GetValue(cd);
-                List<Vector2Int> entrances = (List<Vector2Int>)f_entrances.GetValue(cd) ?? new List<Vector2Int>();
-                EndLineRole role = (EndLineRole)f_role.GetValue(cd);
-
+                ChunkType type = cd.ChunkType;
+                List<Vector2Int> entrances = cd.GetAllEntrances();
+                EndLineRole role = cd.EndLineRole;
+                
+                // 난이도 추론: 경로에 Easy/Medium/Hard가 포함되어 있으면 해당 난이도로 설정, 없으면 None
                 ChunkDifficulty diff = ChunkDifficulty.None;
                 if (path.Contains("/Easy/")) diff = ChunkDifficulty.Easy;
                 else if (path.Contains("/Medium/")) diff = ChunkDifficulty.Medium;
@@ -68,7 +66,7 @@ namespace MapSystem.Editor
                     prefabName = prefab.name,
                     type = type,
                     difficulty = diff,
-                    entrances = new List<Vector2Int>(entrances),
+                    entrances = entrances,
                     endLineRole = role,
                     width = width,
                     height = height,

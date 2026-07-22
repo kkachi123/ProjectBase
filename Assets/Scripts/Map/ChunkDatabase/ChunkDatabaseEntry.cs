@@ -29,7 +29,7 @@ namespace MapSystem
         {
             return entrances != null ? new System.Collections.Generic.List<Vector2Int>(entrances) : new System.Collections.Generic.List<Vector2Int>();
         }
-        public int width;   // Combat/Puzzle/Treasure=20, Transition=10
+        public int width;   // Combat/Puzzle/Treasure=20, Transition/EndLine=10
         public int height;  // 10
     }
 }
