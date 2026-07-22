@@ -59,14 +59,15 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   chunkType: 3
-  entrance1: {x: 0, y: 3}
-  entrance2: {x: 20, y: 3}
+  entrances:
+  - {x: 0, y: 3}
+  - {x: 20, y: 3}
   coins:
-  - {x: 15, y: 2}
+  - {x: 15, y: 3}
   monsters:
   - {x: 5, y: 3}
   items:
-  - {x: 12, y: 10}
+  - {x: 12, y: 9}
   arrowTraps: []
   spikeTraps: []
 --- !u!1 &2244970788789824700
@@ -564,7 +565,7 @@ Tilemap:
       m_TileObjectToInstantiateIndex: 65535
       dummyAlignment: 0
       m_AllTileFlags: 2147483650
-  - first: {x: 11, y: 7, z: 0}
+  - first: {x: 11, y: 6, z: 0}
     second:
       serializedVersion: 2
       m_TileIndex: 0
@@ -574,7 +575,7 @@ Tilemap:
       m_TileObjectToInstantiateIndex: 65535
       dummyAlignment: 0
       m_AllTileFlags: 2147483650
-  - first: {x: 12, y: 7, z: 0}
+  - first: {x: 12, y: 6, z: 0}
     second:
       serializedVersion: 2
       m_TileIndex: 0
@@ -584,7 +585,7 @@ Tilemap:
       m_TileObjectToInstantiateIndex: 65535
       dummyAlignment: 0
       m_AllTileFlags: 2147483650
-  - first: {x: 11, y: 8, z: 0}
+  - first: {x: 11, y: 7, z: 0}
     second:
       serializedVersion: 2
       m_TileIndex: 0
@@ -594,7 +595,7 @@ Tilemap:
       m_TileObjectToInstantiateIndex: 65535
       dummyAlignment: 0
       m_AllTileFlags: 2147483650
-  - first: {x: 12, y: 8, z: 0}
+  - first: {x: 12, y: 7, z: 0}
     second:
       serializedVersion: 2
       m_TileIndex: 0
@@ -623,6 +624,10 @@ Tilemap:
     m_Data: {fileID: -819784374, guid: 29e21165cb3ae334d969d4be634eaa9e, type: 3}
   - m_RefCount: 1
     m_Data: {fileID: -503795376, guid: 29e21165cb3ae334d969d4be634eaa9e, type: 3}
+  - m_RefCount: 0
+    m_Data: {fileID: 0}
+  - m_RefCount: 0
+    m_Data: {fileID: 0}
   m_TileMatrixArray:
   - m_RefCount: 49
     m_Data:
@@ -828,13 +833,13 @@ CompositeCollider2D:
   - m_Collider: {fileID: 3561411769300723132}
     m_ColliderPaths:
     - - X: 130000000
-        Y: 90000000
+        Y: 80000000
       - X: 110000000
-        Y: 90000000
+        Y: 80000000
       - X: 110000000
-        Y: 70000000
+        Y: 60000000
       - X: 130000000
-        Y: 70000000
+        Y: 60000000
     - - X: 90000000
         Y: 60000000
       - X: 70000000
@@ -843,6 +848,14 @@ CompositeCollider2D:
         Y: 40000000
       - X: 90000000
         Y: 40000000
+    - - X: 70000000
+        Y: 40000000
+      - X: 60000000
+        Y: 40000000
+      - X: 60000000
+        Y: 30000000
+      - X: 70000000
+        Y: 30000000
     - - X: 200000000
         Y: 20000000
       - X: 0
@@ -853,14 +866,18 @@ CompositeCollider2D:
         Y: 0
   m_CompositePaths:
     m_Paths:
-    - - {x: 12.99997, y: 7}
-      - {x: 12.99997, y: 9}
-      - {x: 11, y: 8.99997}
-      - {x: 11.00003, y: 7}
+    - - {x: 12.99997, y: 6}
+      - {x: 12.99997, y: 8}
+      - {x: 11, y: 7.9999704}
+      - {x: 11.00003, y: 6}
     - - {x: 8.99997, y: 4}
       - {x: 8.99997, y: 6}
       - {x: 7, y: 5.999971}
       - {x: 7.0000296, y: 4}
+    - - {x: 6.9999704, y: 3}
+      - {x: 6.9999704, y: 4}
+      - {x: 6, y: 3.999971}
+      - {x: 6.000029, y: 3}
     - - {x: 19.999971, y: 0}
       - {x: 19.999971, y: 2}
       - {x: 0, y: 1.9999708}

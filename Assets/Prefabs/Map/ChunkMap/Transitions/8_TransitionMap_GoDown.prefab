@@ -631,8 +631,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   chunkType: 0
-  entrance1: {x: 10, y: 7}
-  entrance2: {x: 9, y: 0}
+  entrances:
+  - {x: 10, y: 7}
+  - {x: 9, y: 0}
   coins:
   - {x: 3, y: 4}
   - {x: 4, y: 8}

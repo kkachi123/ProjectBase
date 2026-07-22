@@ -654,8 +654,11 @@ namespace MapSystem.Editor
         {
             var so = new SerializedObject(chunkData);
             so.FindProperty("chunkType").enumValueIndex = (int)s.chunkType;
-            so.FindProperty("entrance1").vector2IntValue = s.entrance1;
-            so.FindProperty("entrance2").vector2IntValue = s.entrance2;
+            bool isCornerRoom = s.entrance1 == s.entrance2;
+            List<Vector2Int> entrances = isCornerRoom
+                ? new List<Vector2Int> { s.entrance1 }
+                : new List<Vector2Int> { s.entrance1, s.entrance2 };
+            SetVector2IntList(so.FindProperty("entrances"), entrances);
             SetVector2IntList(so.FindProperty("coins"), content.coins);
             SetVector2IntList(so.FindProperty("monsters"), content.monsters);
             SetVector2IntList(so.FindProperty("items"), content.items);

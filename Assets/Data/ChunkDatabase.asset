@@ -19,6 +19,8 @@ MonoBehaviour:
     difficulty: 1
     entrance1: {x: 0, y: 3}
     entrance2: {x: 20, y: 3}
+    extraEntrances: []
+    endLineRole: 0
     width: 20
     height: 10
   - prefab: {fileID: 9024553962824336200, guid: 478c18eaddb5a4e479452ed53b29480d, type: 3}
@@ -27,6 +29,8 @@ MonoBehaviour:
     difficulty: 1
     entrance1: {x: 0, y: 3}
     entrance2: {x: 20, y: 3}
+    extraEntrances: []
+    endLineRole: 0
     width: 20
     height: 10
   - prefab: {fileID: 914782992143755131, guid: cb1174e23c9c2b44d8aa37ef14b39e37, type: 3}
@@ -35,6 +39,8 @@ MonoBehaviour:
     difficulty: 1
     entrance1: {x: 0, y: 3}
     entrance2: {x: 20, y: 7}
+    extraEntrances: []
+    endLineRole: 0
     width: 20
     height: 10
   - prefab: {fileID: 1884753945597036584, guid: 228c9d17f57ee6b448e24f607300d496, type: 3}
@@ -43,6 +49,8 @@ MonoBehaviour:
     difficulty: 1
     entrance1: {x: 0, y: 3}
     entrance2: {x: 20, y: 3}
+    extraEntrances: []
+    endLineRole: 0
     width: 20
     height: 10
   - prefab: {fileID: 1006632289620067546, guid: 796b01e4547b28d4dbf09bbf79af8255, type: 3}
@@ -51,6 +59,8 @@ MonoBehaviour:
     difficulty: 1
     entrance1: {x: 0, y: 3}
     entrance2: {x: 20, y: 3}
+    extraEntrances: []
+    endLineRole: 0
     width: 20
     height: 10
   - prefab: {fileID: 2547137522966040057, guid: 6c92feace1db8594c840db7477a32cf3, type: 3}
@@ -59,6 +69,8 @@ MonoBehaviour:
     difficulty: 1
     entrance1: {x: 0, y: 3}
     entrance2: {x: 20, y: 3}
+    extraEntrances: []
+    endLineRole: 0
     width: 20
     height: 10
   - prefab: {fileID: 5140475730122304345, guid: d23f5a45f7606a54db9e14f8e1e6d7fb, type: 3}
@@ -67,6 +79,8 @@ MonoBehaviour:
     difficulty: 3
     entrance1: {x: 0, y: 3}
     entrance2: {x: 20, y: 8}
+    extraEntrances: []
+    endLineRole: 0
     width: 20
     height: 10
   - prefab: {fileID: 167312188415742760, guid: 04df4e29cd4755542ba6a7e29850879c, type: 3}
@@ -75,6 +89,8 @@ MonoBehaviour:
     difficulty: 3
     entrance1: {x: 0, y: 3}
     entrance2: {x: 20, y: 9}
+    extraEntrances: []
+    endLineRole: 0
     width: 20
     height: 10
   - prefab: {fileID: 762714210142627515, guid: ea6059f2e561b0b4cbeb4272ffc53dd9, type: 3}
@@ -83,6 +99,8 @@ MonoBehaviour:
     difficulty: 3
     entrance1: {x: 0, y: 3}
     entrance2: {x: 20, y: 3}
+    extraEntrances: []
+    endLineRole: 0
     width: 20
     height: 10
   - prefab: {fileID: 3696672032363897017, guid: da159771e1bb277409f08ed0151afafb, type: 3}
@@ -91,6 +109,8 @@ MonoBehaviour:
     difficulty: 3
     entrance1: {x: 0, y: 3}
     entrance2: {x: 20, y: 3}
+    extraEntrances: []
+    endLineRole: 0
     width: 20
     height: 10
   - prefab: {fileID: 8598644896221835121, guid: 8e5578dd51ec0c94b90e300acad9c0fd, type: 3}
@@ -99,6 +119,8 @@ MonoBehaviour:
     difficulty: 2
     entrance1: {x: 0, y: 3}
     entrance2: {x: 20, y: 5}
+    extraEntrances: []
+    endLineRole: 0
     width: 20
     height: 10
   - prefab: {fileID: 7430788445010487499, guid: 7ff4419645edf3c40a87deecbd916b96, type: 3}
@@ -107,6 +129,8 @@ MonoBehaviour:
     difficulty: 2
     entrance1: {x: 0, y: 3}
     entrance2: {x: 20, y: 9}
+    extraEntrances: []
+    endLineRole: 0
     width: 20
     height: 10
   - prefab: {fileID: 6220934189908111907, guid: b99625dbdf6ee3444b20ab6b2b0a3504, type: 3}
@@ -115,6 +139,8 @@ MonoBehaviour:
     difficulty: 2
     entrance1: {x: 0, y: 3}
     entrance2: {x: 20, y: 3}
+    extraEntrances: []
+    endLineRole: 0
     width: 20
     height: 10
   - prefab: {fileID: 789413038814178602, guid: 3327f9c97069bc7448d12208cbdc9486, type: 3}
@@ -123,7 +149,149 @@ MonoBehaviour:
     difficulty: 2
     entrance1: {x: 0, y: 3}
     entrance2: {x: 20, y: 7}
+    extraEntrances: []
+    endLineRole: 0
     width: 20
+    height: 10
+  - prefab: {fileID: 1507624208615493524, guid: 4dc4599e28777634db7dca0e87a5fd95, type: 3}
+    prefabName: '@End'
+    type: 4
+    difficulty: 0
+    entrance1: {x: 0, y: 3}
+    entrance2: {x: 0, y: 3}
+    extraEntrances: []
+    endLineRole: 2
+    width: 10
+    height: 10
+  - prefab: {fileID: 8909745981934757197, guid: 621ab7a9281ff564c8c1ea28664d8f35, type: 3}
+    prefabName: '@Start'
+    type: 4
+    difficulty: 0
+    entrance1: {x: 10, y: 3}
+    entrance2: {x: 10, y: 3}
+    extraEntrances: []
+    endLineRole: 1
+    width: 10
+    height: 10
+  - prefab: {fileID: 8676258137787630999, guid: c6ddea2b2d18f294781b6ab3e26a3675, type: 3}
+    prefabName: EndLine1
+    type: 4
+    difficulty: 0
+    entrance1: {x: 0, y: 3}
+    entrance2: {x: 0, y: 3}
+    extraEntrances: []
+    endLineRole: 0
+    width: 10
+    height: 10
+  - prefab: {fileID: 5321053956539186189, guid: 8a8958825f1d4764d8c6016ca2c31ad9, type: 3}
+    prefabName: EndLine2
+    type: 4
+    difficulty: 0
+    entrance1: {x: 0, y: 3}
+    entrance2: {x: 0, y: 3}
+    extraEntrances: []
+    endLineRole: 0
+    width: 10
+    height: 10
+  - prefab: {fileID: 4482324677120334007, guid: 26a431745adf2da4cb3f9da3eb004448, type: 3}
+    prefabName: EndLine3
+    type: 4
+    difficulty: 0
+    entrance1: {x: 0, y: 3}
+    entrance2: {x: 0, y: 3}
+    extraEntrances: []
+    endLineRole: 0
+    width: 10
+    height: 10
+  - prefab: {fileID: 917386421537548920, guid: f71ea482aba3f0b4ebf5d6adfd53a364, type: 3}
+    prefabName: EndLine4
+    type: 4
+    difficulty: 0
+    entrance1: {x: 0, y: 3}
+    entrance2: {x: 0, y: 3}
+    extraEntrances: []
+    endLineRole: 0
+    width: 10
+    height: 10
+  - prefab: {fileID: 3094147182636413521, guid: 4ceaeed06be3743448b9e3dc74f32765, type: 3}
+    prefabName: EndLine5
+    type: 4
+    difficulty: 0
+    entrance1: {x: 0, y: 3}
+    entrance2: {x: 0, y: 3}
+    extraEntrances: []
+    endLineRole: 0
+    width: 10
+    height: 10
+  - prefab: {fileID: 4149656610432871685, guid: e9bbd2acabc477d459f5649902b0dda2, type: 3}
+    prefabName: EndLine6
+    type: 4
+    difficulty: 0
+    entrance1: {x: 0, y: 3}
+    entrance2: {x: 0, y: 3}
+    extraEntrances: []
+    endLineRole: 0
+    width: 10
+    height: 10
+  - prefab: {fileID: 5988474068544832065, guid: e4968be95f3eeb447bc9153f4cf3f623, type: 3}
+    prefabName: EndLine7
+    type: 4
+    difficulty: 0
+    entrance1: {x: 0, y: 3}
+    entrance2: {x: 0, y: 3}
+    extraEntrances: []
+    endLineRole: 0
+    width: 10
+    height: 10
+  - prefab: {fileID: 2618431861240737988, guid: 8062f23558529e64eaf82e136bdad946, type: 3}
+    prefabName: EndLine8
+    type: 4
+    difficulty: 0
+    entrance1: {x: 0, y: 3}
+    entrance2: {x: 0, y: 3}
+    extraEntrances: []
+    endLineRole: 0
+    width: 10
+    height: 10
+  - prefab: {fileID: 39820619594691925, guid: a43aef9c5d87f2548ba7728600fbb827, type: 3}
+    prefabName: EndLine9
+    type: 4
+    difficulty: 0
+    entrance1: {x: 0, y: 3}
+    entrance2: {x: 0, y: 3}
+    extraEntrances: []
+    endLineRole: 0
+    width: 10
+    height: 10
+  - prefab: {fileID: 5810377346294411435, guid: 949f47ca3f7c1994894225d5dc9c7bff, type: 3}
+    prefabName: EndLine_WallBottomEntranceTop
+    type: 4
+    difficulty: 0
+    entrance1: {x: 4, y: 10}
+    entrance2: {x: 4, y: 10}
+    extraEntrances: []
+    endLineRole: 0
+    width: 10
+    height: 10
+  - prefab: {fileID: 551615774822636727, guid: 9f92ce9f101cc7241b5cbe536d62ff0d, type: 3}
+    prefabName: EndLine_WallLeft
+    type: 4
+    difficulty: 0
+    entrance1: {x: 10, y: 3}
+    entrance2: {x: 10, y: 3}
+    extraEntrances: []
+    endLineRole: 0
+    width: 10
+    height: 10
+  - prefab: {fileID: 577218273931826081, guid: 44159481e7bbef840b6664f487563a50, type: 3}
+    prefabName: EndLine_WallTopEntranceBottom
+    type: 4
+    difficulty: 0
+    entrance1: {x: 4, y: 0}
+    entrance2: {x: 4, y: 0}
+    extraEntrances: []
+    endLineRole: 0
+    width: 10
     height: 10
   - prefab: {fileID: 5317187679108202924, guid: fd6431e217443214e924e7409cfbefbe, type: 3}
     prefabName: Puzzle_Easy_A_Basic
@@ -131,6 +299,8 @@ MonoBehaviour:
     difficulty: 1
     entrance1: {x: 0, y: 3}
     entrance2: {x: 20, y: 3}
+    extraEntrances: []
+    endLineRole: 0
     width: 20
     height: 10
   - prefab: {fileID: 7489728383692153079, guid: 1043846fe0205534dafef092a25d9610, type: 3}
@@ -139,6 +309,8 @@ MonoBehaviour:
     difficulty: 1
     entrance1: {x: 0, y: 3}
     entrance2: {x: 20, y: 5}
+    extraEntrances: []
+    endLineRole: 0
     width: 20
     height: 10
   - prefab: {fileID: 694451392745491125, guid: 668837ddef41b1643a4bcbc7e9a8cee5, type: 3}
@@ -147,6 +319,8 @@ MonoBehaviour:
     difficulty: 1
     entrance1: {x: 0, y: 3}
     entrance2: {x: 20, y: 3}
+    extraEntrances: []
+    endLineRole: 0
     width: 20
     height: 10
   - prefab: {fileID: 1284084678678450010, guid: 4e352c00161b4ef4db51db8d97ddece6, type: 3}
@@ -155,6 +329,8 @@ MonoBehaviour:
     difficulty: 1
     entrance1: {x: 0, y: 3}
     entrance2: {x: 20, y: 3}
+    extraEntrances: []
+    endLineRole: 0
     width: 20
     height: 10
   - prefab: {fileID: 5493525658767992658, guid: 5178c525e6e29ed43abdbb2c98518ab9, type: 3}
@@ -163,6 +339,8 @@ MonoBehaviour:
     difficulty: 3
     entrance1: {x: 0, y: 3}
     entrance2: {x: 20, y: 9}
+    extraEntrances: []
+    endLineRole: 0
     width: 20
     height: 10
   - prefab: {fileID: 2919038514800340081, guid: fcf0f56449aa92948a93fa53ce6d1be4, type: 3}
@@ -171,6 +349,8 @@ MonoBehaviour:
     difficulty: 3
     entrance1: {x: 0, y: 3}
     entrance2: {x: 20, y: 3}
+    extraEntrances: []
+    endLineRole: 0
     width: 20
     height: 10
   - prefab: {fileID: 7578430343698527140, guid: bc662f712360f8f4eb5fb822d07b3ab6, type: 3}
@@ -179,6 +359,8 @@ MonoBehaviour:
     difficulty: 3
     entrance1: {x: 0, y: 9}
     entrance2: {x: 20, y: 5}
+    extraEntrances: []
+    endLineRole: 0
     width: 20
     height: 10
   - prefab: {fileID: 4176338083541316816, guid: 99938f5572e1bcc4599c00f07662b349, type: 3}
@@ -187,6 +369,8 @@ MonoBehaviour:
     difficulty: 3
     entrance1: {x: 0, y: 3}
     entrance2: {x: 20, y: 3}
+    extraEntrances: []
+    endLineRole: 0
     width: 20
     height: 10
   - prefab: {fileID: 3237290639001420310, guid: 7f906382602e6e44c9778830e8d9b95b, type: 3}
@@ -195,6 +379,8 @@ MonoBehaviour:
     difficulty: 2
     entrance1: {x: 0, y: 3}
     entrance2: {x: 20, y: 8}
+    extraEntrances: []
+    endLineRole: 0
     width: 20
     height: 10
   - prefab: {fileID: 6231259645050567819, guid: 335fe9b04f9a83b4cb1b613fd196d155, type: 3}
@@ -203,6 +389,8 @@ MonoBehaviour:
     difficulty: 2
     entrance1: {x: 0, y: 3}
     entrance2: {x: 20, y: 9}
+    extraEntrances: []
+    endLineRole: 0
     width: 20
     height: 10
   - prefab: {fileID: 2161644845148018146, guid: 8ea5fcf07e5cec149b2a1d356c34b00f, type: 3}
@@ -211,6 +399,8 @@ MonoBehaviour:
     difficulty: 2
     entrance1: {x: 0, y: 3}
     entrance2: {x: 20, y: 3}
+    extraEntrances: []
+    endLineRole: 0
     width: 20
     height: 10
   - prefab: {fileID: 304742221206822169, guid: 624f4d0251526b6458ae0f419a8dad90, type: 3}
@@ -219,6 +409,8 @@ MonoBehaviour:
     difficulty: 2
     entrance1: {x: 0, y: 3}
     entrance2: {x: 20, y: 3}
+    extraEntrances: []
+    endLineRole: 0
     width: 20
     height: 10
   - prefab: {fileID: 3954179141993485795, guid: d120513dae75933419f1692e98796bef, type: 3}
@@ -227,6 +419,8 @@ MonoBehaviour:
     difficulty: 0
     entrance1: {x: 0, y: 3}
     entrance2: {x: 10, y: 3}
+    extraEntrances: []
+    endLineRole: 0
     width: 10
     height: 10
   - prefab: {fileID: 6723685205293776876, guid: 3d749922d99615444a28b348a91e1810, type: 3}
@@ -235,6 +429,8 @@ MonoBehaviour:
     difficulty: 0
     entrance1: {x: 0, y: 2}
     entrance2: {x: 10, y: 6}
+    extraEntrances: []
+    endLineRole: 0
     width: 10
     height: 10
   - prefab: {fileID: 6858004643134343820, guid: 02feffab94b3ebb4da273d4bc1eb158f, type: 3}
@@ -243,6 +439,8 @@ MonoBehaviour:
     difficulty: 0
     entrance1: {x: 0, y: 6}
     entrance2: {x: 10, y: 2}
+    extraEntrances: []
+    endLineRole: 0
     width: 10
     height: 10
   - prefab: {fileID: 5458151512594592865, guid: f7fd9c57623bf96448b43a1dd5f51ff5, type: 3}
@@ -251,6 +449,8 @@ MonoBehaviour:
     difficulty: 0
     entrance1: {x: 0, y: 3}
     entrance2: {x: 10, y: 7}
+    extraEntrances: []
+    endLineRole: 0
     width: 10
     height: 10
   - prefab: {fileID: 2967518283305337978, guid: 23bb4f68bc010f34c9d656b7c821c095, type: 3}
@@ -259,6 +459,8 @@ MonoBehaviour:
     difficulty: 0
     entrance1: {x: 0, y: 7}
     entrance2: {x: 10, y: 3}
+    extraEntrances: []
+    endLineRole: 0
     width: 10
     height: 10
   - prefab: {fileID: 4714132243365792670, guid: 6e3f6449110bad44aaabe0c17a3a1ed5, type: 3}
@@ -267,6 +469,8 @@ MonoBehaviour:
     difficulty: 0
     entrance1: {x: 0, y: 7}
     entrance2: {x: 1, y: 0}
+    extraEntrances: []
+    endLineRole: 0
     width: 10
     height: 10
   - prefab: {fileID: 2555507268527057286, guid: 3f971a46e8396a441900b35695cf2792, type: 3}
@@ -275,6 +479,8 @@ MonoBehaviour:
     difficulty: 0
     entrance1: {x: 1, y: 10}
     entrance2: {x: 0, y: 3}
+    extraEntrances: []
+    endLineRole: 0
     width: 10
     height: 10
   - prefab: {fileID: 5515949758358363527, guid: 7e7f5023b7ae00c4b88ac46795527857, type: 3}
@@ -283,6 +489,8 @@ MonoBehaviour:
     difficulty: 0
     entrance1: {x: 10, y: 7}
     entrance2: {x: 9, y: 0}
+    extraEntrances: []
+    endLineRole: 0
     width: 10
     height: 10
   - prefab: {fileID: 5515949758358363527, guid: edbbd6b1d96bf6a4da07020555206758, type: 3}
@@ -291,6 +499,22 @@ MonoBehaviour:
     difficulty: 0
     entrance1: {x: 9, y: 10}
     entrance2: {x: 10, y: 3}
+    extraEntrances: []
+    endLineRole: 0
+    width: 10
+    height: 10
+  - prefab: {fileID: 4223637769069020717, guid: 04defd557bb8feb43abeee568b98d3af, type: 3}
+    prefabName: 10_TransitionMap_4Way
+    type: 0
+    difficulty: 0
+    entrance1: {x: 0, y: 3}
+    entrance2: {x: 10, y: 7}
+    extraEntrances:
+    - {x: 0, y: 3}
+    - {x: 10, y: 7}
+    - {x: 5, y: 0}
+    - {x: 7, y: 10}
+    endLineRole: 0
     width: 10
     height: 10
   - prefab: {fileID: 2152955194347054507, guid: 0ebe7cbb040adb6449b78b0eb9edcf78, type: 3}
@@ -299,6 +523,8 @@ MonoBehaviour:
     difficulty: 1
     entrance1: {x: 0, y: 3}
     entrance2: {x: 20, y: 3}
+    extraEntrances: []
+    endLineRole: 0
     width: 20
     height: 10
   - prefab: {fileID: 2274446904694715841, guid: 1576bdb0bf3d9fb4db746794189313ce, type: 3}
@@ -307,6 +533,8 @@ MonoBehaviour:
     difficulty: 1
     entrance1: {x: 0, y: 3}
     entrance2: {x: 20, y: 7}
+    extraEntrances: []
+    endLineRole: 0
     width: 20
     height: 10
   - prefab: {fileID: 5511053255886043270, guid: 98a3458cf0fbad04b8750ff680ba5b8b, type: 3}
@@ -315,6 +543,8 @@ MonoBehaviour:
     difficulty: 1
     entrance1: {x: 0, y: 3}
     entrance2: {x: 20, y: 3}
+    extraEntrances: []
+    endLineRole: 0
     width: 20
     height: 10
   - prefab: {fileID: 1022877035900351313, guid: a5c5b570639ceb84baa815af9b4d1d6d, type: 3}
@@ -323,6 +553,8 @@ MonoBehaviour:
     difficulty: 3
     entrance1: {x: 0, y: 3}
     entrance2: {x: 20, y: 3}
+    extraEntrances: []
+    endLineRole: 0
     width: 20
     height: 10
   - prefab: {fileID: 7840702811368342510, guid: 4d0c67e1a9f4f3547b6806ef6fc6a58c, type: 3}
@@ -331,6 +563,8 @@ MonoBehaviour:
     difficulty: 3
     entrance1: {x: 0, y: 3}
     entrance2: {x: 20, y: 9}
+    extraEntrances: []
+    endLineRole: 0
     width: 20
     height: 10
   - prefab: {fileID: 8629735996003530818, guid: f71f9d2c0b099884581424de74d0a83c, type: 3}
@@ -339,6 +573,8 @@ MonoBehaviour:
     difficulty: 3
     entrance1: {x: 0, y: 3}
     entrance2: {x: 20, y: 3}
+    extraEntrances: []
+    endLineRole: 0
     width: 20
     height: 10
   - prefab: {fileID: 8841147943412525850, guid: 41a95f8ba4b1e3c44ad624b83d2ddb90, type: 3}
@@ -347,6 +583,8 @@ MonoBehaviour:
     difficulty: 2
     entrance1: {x: 0, y: 3}
     entrance2: {x: 20, y: 3}
+    extraEntrances: []
+    endLineRole: 0
     width: 20
     height: 10
   - prefab: {fileID: 3098179180786557955, guid: e8b4540495474934a8c85de6745c4598, type: 3}
@@ -355,6 +593,8 @@ MonoBehaviour:
     difficulty: 2
     entrance1: {x: 0, y: 3}
     entrance2: {x: 20, y: 9}
+    extraEntrances: []
+    endLineRole: 0
     width: 20
     height: 10
   - prefab: {fileID: 569112310148075273, guid: ea11382ea40e9314a845feea063d4f2f, type: 3}
@@ -363,5 +603,7 @@ MonoBehaviour:
     difficulty: 2
     entrance1: {x: 0, y: 3}
     entrance2: {x: 20, y: 3}
+    extraEntrances: []
+    endLineRole: 0
     width: 20
     height: 10
