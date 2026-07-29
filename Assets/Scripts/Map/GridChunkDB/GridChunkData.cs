@@ -6,9 +6,8 @@ namespace GridMapSystem
     public enum GridChunkType
     {
         Transition,
-        Combat,
-        Puzzle,
-        Treasure,
+        Content, // 전투/퍼즐/보물 등 세부 구분 없이 하나로 통합된 콘텐츠 청크. 구조만 다르게
+                 // 만들고, 실제 스폰되는 몬스터/함정/코인 등은 스폰 포인트 + 난이도별 확률로 정한다.
         EndLine, // 막다른길(단일 진입점) 전용 분류. Start/End(시작/목표) 청크도 이 타입을 사용한다.
     }
 
@@ -97,10 +96,12 @@ namespace GridMapSystem
         public GridEndLineRole EndLineRole => endLineRole;
         public GridEntranceSlot EntranceSlots => entranceSlots;
 
-        // 기존 청크들은 전부 폭 10/20, 높이 10(=10의 배수)이라 리사이즈 없이 칸수로 환산 가능하다.
+        // Transition/EndLine = 10x10(1칸), Content = 20x20(2x2칸). 전부 10의 배수라 리사이즈
+        // 없이 칸수로 환산 가능하다.
         public const int CellSize = 10;
-        private int Width => (chunkType == GridChunkType.Transition || chunkType == GridChunkType.EndLine) ? 10 : 20;
-        private const int Height = 10;
+        private bool IsSmall => chunkType == GridChunkType.Transition || chunkType == GridChunkType.EndLine;
+        private int Width => IsSmall ? 10 : 20;
+        private int Height => IsSmall ? 10 : 20;
         public Vector2Int Footprint => new Vector2Int(Width / CellSize, Height / CellSize);
 
         public List<Vector2Int> GetAllEntrances()

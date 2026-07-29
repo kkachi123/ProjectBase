@@ -174,12 +174,6 @@ namespace GridMapSystem.Editor
             return true; // 모든 진입점이 동일 좌표 -> 입구=출구인 막다른길
         }
 
-        internal static GridChunkType RandomContentType(System.Random rng)
-        {
-            GridChunkType[] options = { GridChunkType.Combat, GridChunkType.Puzzle, GridChunkType.Treasure };
-            return options[rng.Next(options.Length)];
-        }
-
         internal static void Shuffle<T>(List<T> list, System.Random rng)
         {
             for (int i = list.Count - 1; i > 0; i--)

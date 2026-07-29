@@ -21,7 +21,7 @@ namespace GridMapSystem.Editor
 
         public static void GenerateGrid(GridChunkDatabase db, int contentChunkCount, int seed)
         {
-            // 구조: Start - (Content(Combat/Puzzle/Treasure) + Transition 반복) - End
+            // 구조: Start - (Content + Transition 반복) - End
             // contentChunkCount는 순수 Content 청크 개수만 센다. Transition은 Content끼리
             // 이어주는 연결용이라 개수에 포함되지 않고, 필요한 만큼 자동으로 끼워 넣는다.
             if (db == null) { Debug.LogError("[ChunkGridGenerator] GridChunkDatabase가 없습니다."); return; }
@@ -66,7 +66,7 @@ namespace GridMapSystem.Editor
                 if (step == stack.Count)
                 {
                     bool wantTransition = rng.Next(2) == 0;
-                    GridChunkType desiredType = wantTransition ? GridChunkType.Transition : RandomContentType(rng);
+                    GridChunkType desiredType = wantTransition ? GridChunkType.Transition : GridChunkType.Content;
                     Vector2Int cursorBefore = (step == 0) ? cursor : stack[step - 1].cursorAfter;
                     stack.Add(new GridPlacementFrame { desiredType = desiredType, cursorBefore = cursorBefore });
                 }
@@ -146,7 +146,7 @@ namespace GridMapSystem.Editor
                 {
                     branchFailSafe++;
                     bool wantTransition = rng.Next(2) == 0;
-                    GridChunkType desiredType = wantTransition ? GridChunkType.Transition : RandomContentType(rng);
+                    GridChunkType desiredType = wantTransition ? GridChunkType.Transition : GridChunkType.Content;
                     List<GridChunkDatabaseEntry> candidates = new List<GridChunkDatabaseEntry>(db.GetByType(desiredType));
                     candidates.RemoveAll(e => IsDeadEndEntry(e));
                     Shuffle(candidates, rng);
@@ -216,7 +216,7 @@ namespace GridMapSystem.Editor
                 while (!canPlaceEndAt(mainEndCursor) && extendAttempts < MAX_EXTEND_ATTEMPTS)
                 {
                     extendAttempts++;
-                    GridChunkType desiredType = (rng.Next(2) == 0) ? GridChunkType.Transition : RandomContentType(rng);
+                    GridChunkType desiredType = (rng.Next(2) == 0) ? GridChunkType.Transition : GridChunkType.Content;
                     List<GridChunkDatabaseEntry> candidates = new List<GridChunkDatabaseEntry>(db.GetByType(desiredType));
                     candidates.RemoveAll(e => IsDeadEndEntry(e));
                     Shuffle(candidates, rng);

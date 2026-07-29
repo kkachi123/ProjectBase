@@ -24,8 +24,8 @@ namespace GridMapSystem
         public GridChunkDifficulty difficulty;
         public System.Collections.Generic.List<Vector2Int> entrances = new System.Collections.Generic.List<Vector2Int>();
         public GridEndLineRole endLineRole = GridEndLineRole.Normal;
-        public int width;    // Combat/Puzzle/Treasure=20, Transition/EndLine=10
-        public int height;   // 10
+        public int width;    // Content=20, Transition/EndLine=10
+        public int height;   // Content=20, Transition/EndLine=10
         public Vector2Int footprint; // width/height를 셀 크기(10)로 나눈 칸수
 
         public System.Collections.Generic.List<Vector2Int> GetAllEntrances()
