@@ -37,6 +37,31 @@ namespace GridMapSystem
         WestHigh = 1 << 7,
     }
 
+    // 스폰 포인트 하나에 실제로 무엇을 놓을지는 저장하지 않는다 — 좌표만 authoring해두고,
+    // 실제 종류는 호출 시점에 무작위로 정한다(난이도별 확률 조정은 이후 스포너 쪽에서 처리).
+    public enum SpawnKind
+    {
+        Coin,
+        Monster,
+        Item,
+        ArrowTrap,
+        SpikeTrap,
+    }
+
+    // GridChunkData.GetResolvedSpawns()가 사용하는 리졸버. GridEntranceSlotResolver와 같은
+    // 패턴 — "무엇을 어디에 배치할지"를 정하는 계산을 데이터 클래스 밖으로 분리해둔다.
+    public static class GridSpawnResolver
+    {
+        public static List<(Vector2Int position, SpawnKind kind)> ResolveAll(List<Vector2Int> points, System.Random rng)
+        {
+            var result = new List<(Vector2Int, SpawnKind)>();
+            SpawnKind[] kinds = (SpawnKind[])System.Enum.GetValues(typeof(SpawnKind));
+            foreach (var p in points)
+                result.Add((p, kinds[rng.Next(kinds.Length)]));
+            return result;
+        }
+    }
+
     // GridEntranceSlot 하나를 실제 청크 로컬 좌표(픽셀)로 변환한다. North/South는 위/아래 변,
     // East/West는 좌/우 변이고, Left·Right(가로 위치)와 Low·High(세로 위치)는 각각 변 위의
     // 고정된 두 지점이다 — 모든 청크가 이 계산식을 공유해야 슬롯이 일치할 때 문도 실제로 이어진다.
@@ -86,11 +111,9 @@ namespace GridMapSystem
         [SerializeField] private GridEntranceSlot entranceSlots = GridEntranceSlot.WestLow | GridEntranceSlot.EastLow;
         // chunkType == EndLine 일 때만 의미 있음. 일반 막다른길인지, 맵의 시작/끝인지 구분.
         [SerializeField] private GridEndLineRole endLineRole = GridEndLineRole.Normal;
-        [SerializeField] private List<Vector2Int> coins;
-        [SerializeField] private List<Vector2Int> monsters;
-        [SerializeField] private List<Vector2Int> items;
-        [SerializeField] private List<Vector2Int> arrowTraps;
-        [SerializeField] private List<Vector2Int> spikeTraps;
+        // 코인/몬스터/아이템/함정 구분 없이 좌표만 authoring한다. 실제 종류는
+        // GetResolvedSpawns()가 호출 시점에 무작위로 정한다.
+        [SerializeField] private List<Vector2Int> spawnPoints;
 
         public GridChunkType ChunkType => chunkType;
         public GridEndLineRole EndLineRole => endLineRole;
@@ -109,11 +132,14 @@ namespace GridMapSystem
             return GridEntranceSlotResolver.ResolveAll(entranceSlots, Width, Height);
         }
 
-        public List<Vector2Int> GetCoins() => coins != null ? new List<Vector2Int>(coins) : new List<Vector2Int>();
-        public List<Vector2Int> GetMonsters() => monsters != null ? new List<Vector2Int>(monsters) : new List<Vector2Int>();
-        public List<Vector2Int> GetItems() => items != null ? new List<Vector2Int>(items) : new List<Vector2Int>();
-        public List<Vector2Int> GetArrowTraps() => arrowTraps != null ? new List<Vector2Int>(arrowTraps) : new List<Vector2Int>();
-        public List<Vector2Int> GetSpikeTraps() => spikeTraps != null ? new List<Vector2Int>(spikeTraps) : new List<Vector2Int>();
+        public List<Vector2Int> GetSpawnPoints() => spawnPoints != null ? new List<Vector2Int>(spawnPoints) : new List<Vector2Int>();
+
+        // 스폰 포인트마다 실제 종류(코인/몬스터/아이템/함정)를 무작위로 배정해서 반환한다.
+        // 호출할 때마다(다른 rng 상태로) 다시 부르면 다른 결과가 나온다 — 결과를 저장해두지 않는다.
+        public List<(Vector2Int position, SpawnKind kind)> GetResolvedSpawns(System.Random rng)
+        {
+            return GridSpawnResolver.ResolveAll(GetSpawnPoints(), rng);
+        }
 
         // Editor Gizmo
         private void OnDrawGizmos()
@@ -123,31 +149,11 @@ namespace GridMapSystem
             {
                 Gizmos.DrawSphere(this.transform.position + new Vector3(entrance.x, entrance.y), 0.5f);
             }
+            // 실제 종류는 호출 시점에 무작위로 정해지므로, 에디터에서는 전부 같은 표시로만 그린다.
             Gizmos.color = Color.yellow;
-            foreach (var coin in coins)
+            foreach (var p in GetSpawnPoints())
             {
-                Gizmos.DrawSphere(this.transform.position + new Vector3(coin.x, coin.y), 0.2f);
-            }
-            Gizmos.color = Color.red;
-            foreach (var monster in monsters)
-            {
-                Gizmos.DrawSphere(this.transform.position + new Vector3(monster.x, monster.y), 0.5f);
-            }
-            Gizmos.color = Color.blue;
-            foreach (var item in items)
-            {
-                Gizmos.DrawSphere(this.transform.position + new Vector3(item.x, item.y), 0.25f);
-            }
-            Gizmos.color = Color.magenta;
-            foreach (var arrowTrap in arrowTraps)
-            {
-                Gizmos.DrawLine(this.transform.position + new Vector3(arrowTrap.x + 0.5f, arrowTrap.y), this.transform.position + new Vector3(arrowTrap.x + 0.5f, arrowTrap.y + 1f));
-                Gizmos.DrawCube(this.transform.position + new Vector3(arrowTrap.x + 0.5f + 4f, arrowTrap.y + 0.5f), Vector3.one);
-            }
-            Gizmos.color = Color.cyan;
-            foreach (var spikeTrap in spikeTraps)
-            {
-                Gizmos.DrawCube(this.transform.position + new Vector3(spikeTrap.x, spikeTrap.y + 0.5f), Vector3.one + 2f * new Vector3(0.5f, 0));
+                Gizmos.DrawSphere(this.transform.position + new Vector3(p.x, p.y), 0.3f);
             }
 
             // 격자 칸 경계 표시(셀 크기 단위)
