@@ -20,21 +20,20 @@ namespace GridMapSystem
         End,
     }
 
-    // 격자 기반 조합을 위한 연결 지점. 방향(4면) x 슬롯(면당 2개)으로 고정된 8개 지점 중에서만
-    // 고를 수 있다 — 임의 좌표 입력을 막아서, 서로 다른 청크라도 같은 슬롯이면 물리적으로도
-    // 문 위치가 정확히 맞물리게 한다(실제 좌표는 GridEntranceSlotResolver가 계산).
+    // 격자 기반 조합을 위한 연결 지점. 방향(4면)당 고정된 지점 1개씩만 쓴다 — 임의 좌표
+    // 입력을 막아서, 서로 다른 청크라도 같은 방향이면 물리적으로도 문 위치가 정확히
+    // 맞물리게 한다(실제 좌표는 GridEntranceSlotResolver가 계산).
+    // 원래는 방향당 슬롯 2개(Low/High, Left/Right)였는데 제작 시간상 방향당 1개로 축소했다.
+    // 남긴 슬롯의 비트값은 기존(Low/Left 계열)과 동일하게 유지 — 이미 만든 프리팹 데이터가
+    // 그대로 유효하다.
     [System.Flags]
     public enum GridEntranceSlot
     {
         None = 0,
-        NorthLeft = 1 << 0,
-        NorthRight = 1 << 1,
-        SouthLeft = 1 << 2,
-        SouthRight = 1 << 3,
-        EastLow = 1 << 4,
-        EastHigh = 1 << 5,
-        WestLow = 1 << 6,
-        WestHigh = 1 << 7,
+        North = 1 << 0,  // 기존 NorthLeft
+        South = 1 << 3,  // 기존 SouthRight
+        East = 1 << 4,   // 기존 EastLow
+        West = 1 << 6,   // 기존 WestLow
     }
 
     // 스폰 포인트 하나에 실제로 무엇을 놓을지는 저장하지 않는다 — 좌표만 authoring해두고,
@@ -63,26 +62,18 @@ namespace GridMapSystem
     }
 
     // GridEntranceSlot 하나를 실제 청크 로컬 좌표(픽셀)로 변환한다. North/South는 위/아래 변,
-    // East/West는 좌/우 변이고, Left·Right(가로 위치)와 Low·High(세로 위치)는 각각 변 위의
-    // 고정된 두 지점이다 — 모든 청크가 이 계산식을 공유해야 슬롯이 일치할 때 문도 실제로 이어진다.
-    //
-    // 주의: Low/High(혹은 Left/Right) 조합이 서로 다르면(예: WestLow+EastHigh) 청크를 통과할 때
-    // 커서가 셀 크기(10)의 배수가 아닌 만큼 밀린다 — 그리드 정렬이 깨지므로, 그리드 생성기 쪽에서
-    // 이런 "불일치 쌍" 청크는 통과 연결 후보에서 정렬 검사로 걸러낸다(이 리졸버 자체는 그대로 둠).
+    // East/West는 좌/우 변의 고정된 지점이다 — 모든 청크가 이 계산식을 공유해야 방향이
+    // 일치할 때 문도 실제로 이어진다.
     public static class GridEntranceSlotResolver
     {
         public static Vector2Int Resolve(GridEntranceSlot slot, int width, int height)
         {
             switch (slot)
             {
-                case GridEntranceSlot.WestLow: return new Vector2Int(0, height * 3 / 10);
-                case GridEntranceSlot.WestHigh: return new Vector2Int(0, height * 7 / 10);
-                case GridEntranceSlot.EastLow: return new Vector2Int(width, height * 3 / 10);
-                case GridEntranceSlot.EastHigh: return new Vector2Int(width, height * 7 / 10);
-                case GridEntranceSlot.SouthLeft: return new Vector2Int(width / 4, 0);
-                case GridEntranceSlot.SouthRight: return new Vector2Int(width * 3 / 4, 0);
-                case GridEntranceSlot.NorthLeft: return new Vector2Int(width / 4, height);
-                case GridEntranceSlot.NorthRight: return new Vector2Int(width * 3 / 4, height);
+                case GridEntranceSlot.West: return new Vector2Int(0, height * 3 / 10);
+                case GridEntranceSlot.East: return new Vector2Int(width, height * 3 / 10);
+                case GridEntranceSlot.South: return new Vector2Int(width * 3 / 4, 0);
+                case GridEntranceSlot.North: return new Vector2Int(width / 4, height);
                 default: return Vector2Int.zero;
             }
         }
@@ -105,10 +96,10 @@ namespace GridMapSystem
     public class GridChunkData : MonoBehaviour
     {
         [SerializeField] private GridChunkType chunkType;
-        // 이 청크가 실제로 연결 가능한 지점들. 4방향 x 슬롯 2개(총 8개) 중 체크된 것만 사용된다.
+        // 이 청크가 실제로 연결 가능한 지점들. 4방향 중 체크된 것만 사용된다.
         // 1개면 막다른길(입구=출구인 단일 진입점), 2개 이상이면 연결 시 그중 하나를 입구로 삼고
         // 나머지 중 하나를 출구로 무작위/조건에 맞게 골라 쓴다.
-        [SerializeField] private GridEntranceSlot entranceSlots = GridEntranceSlot.WestLow | GridEntranceSlot.EastLow;
+        [SerializeField] private GridEntranceSlot entranceSlots = GridEntranceSlot.West | GridEntranceSlot.East;
         // chunkType == EndLine 일 때만 의미 있음. 일반 막다른길인지, 맵의 시작/끝인지 구분.
         [SerializeField] private GridEndLineRole endLineRole = GridEndLineRole.Normal;
         // 코인/몬스터/아이템/함정 구분 없이 좌표만 authoring한다. 실제 종류는
