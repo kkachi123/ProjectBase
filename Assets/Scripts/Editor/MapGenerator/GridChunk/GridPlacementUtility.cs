@@ -23,7 +23,9 @@ namespace GridMapSystem.Editor
             public List<Vector2Int> claimedCells;
         }
 
-        private static List<Vector2Int> OccupiedCellsFor(Vector2Int origin, Vector2Int footprint)
+        // Start처럼 "이전 청크"가 없어 맞춰볼 기준점이 없는 경우에 쓴다 — 원점 계산 없이
+        // 그냥 지정된 origin에 그대로 꽂았을 때 점유하게 될 칸들을 반환한다.
+        internal static List<Vector2Int> OccupiedCellsFor(Vector2Int origin, Vector2Int footprint)
         {
             int baseX = origin.x / GridChunkData.CellSize;
             int baseY = origin.y / GridChunkData.CellSize;

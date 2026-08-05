@@ -5,14 +5,14 @@ using UnityEngine;
 namespace GridMapSystem.Editor
 {
     /// <summary>
-    /// Assets/Prefabs/Map/ChunkMap/ 아래 프리팹을 전부 스캔해서 GridChunkDatabase를 자동으로
+    /// Assets/Prefabs/Map/GridChunk/ 아래 프리팹을 전부 스캔해서 GridChunkDatabase를 자동으로
     /// 재생성한다. GridChunkData 컴포넌트가 없는 프리팹은 건너뛴다(기존 방식 1 전용 ChunkData만
     /// 있는 프리팹도 여기 해당). 난이도는 ChunkDatabaseBuilder와 동일하게 프리팹 경로의 폴더명
     /// (Easy/Medium/Hard)에서 추론한다.
     /// </summary>
     public static class GridChunkDatabaseBuilder
     {
-        private const string ScanRoot = "Assets/Prefabs/Map/ChunkMap";
+        private const string ScanRoot = "Assets/Prefabs/Map/GridChunk";
         private const string DatabasePath = "Assets/Prefabs/@Data/Map/GridChunkDatabase.asset";
 
         [MenuItem("Map/Rebuild Grid Chunk Database")]

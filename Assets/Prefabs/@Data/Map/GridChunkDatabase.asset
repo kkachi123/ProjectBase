@@ -12,4 +12,242 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cbb4aa24731086b48862bece8cc1019d, type: 3}
   m_Name: GridChunkDatabase
   m_EditorClassIdentifier: 
-  entries: []
+  entries:
+  - prefab: {fileID: 565926324478851296, guid: 68549213628ab6c40816d7da3151e779, type: 3}
+    prefabName: 1-E
+    type: 2
+    difficulty: 0
+    entrances:
+    - {x: 20, y: 6}
+    endLineRole: 0
+    width: 20
+    height: 20
+    footprint: {x: 2, y: 2}
+  - prefab: {fileID: 565926324478851296, guid: 8f17ca330eb624345ba7fa981e068c7c, type: 3}
+    prefabName: 1-N
+    type: 2
+    difficulty: 0
+    entrances:
+    - {x: 5, y: 20}
+    endLineRole: 0
+    width: 20
+    height: 20
+    footprint: {x: 2, y: 2}
+  - prefab: {fileID: 565926324478851296, guid: 533f0d1a3ce512d49a55320209de4828, type: 3}
+    prefabName: 1-S
+    type: 2
+    difficulty: 0
+    entrances:
+    - {x: 15, y: 0}
+    endLineRole: 0
+    width: 20
+    height: 20
+    footprint: {x: 2, y: 2}
+  - prefab: {fileID: 565926324478851296, guid: bb61758b512fbba439f97b24bbf9d348, type: 3}
+    prefabName: 1-W
+    type: 2
+    difficulty: 0
+    entrances:
+    - {x: 0, y: 6}
+    endLineRole: 0
+    width: 20
+    height: 20
+    footprint: {x: 2, y: 2}
+  - prefab: {fileID: 565926324478851296, guid: e79ffbf122e58a4488c29e54bdcfa75d, type: 3}
+    prefabName: E-N 1
+    type: 1
+    difficulty: 0
+    entrances:
+    - {x: 5, y: 20}
+    - {x: 20, y: 6}
+    endLineRole: 0
+    width: 20
+    height: 20
+    footprint: {x: 2, y: 2}
+  - prefab: {fileID: 565926324478851296, guid: c632fd539a118d346ac74e696c23a589, type: 3}
+    prefabName: E-N 2
+    type: 1
+    difficulty: 0
+    entrances:
+    - {x: 5, y: 20}
+    - {x: 20, y: 6}
+    endLineRole: 0
+    width: 20
+    height: 20
+    footprint: {x: 2, y: 2}
+  - prefab: {fileID: 565926324478851296, guid: aa4669b2d3dbb9e4eab1bcdcde6a4995, type: 3}
+    prefabName: E-N 3
+    type: 1
+    difficulty: 0
+    entrances:
+    - {x: 5, y: 20}
+    - {x: 20, y: 6}
+    endLineRole: 0
+    width: 20
+    height: 20
+    footprint: {x: 2, y: 2}
+  - prefab: {fileID: 565926324478851296, guid: fb78b3471a65c224da08a51321ec63a7, type: 3}
+    prefabName: E-S 1
+    type: 1
+    difficulty: 0
+    entrances:
+    - {x: 15, y: 0}
+    - {x: 20, y: 6}
+    endLineRole: 0
+    width: 20
+    height: 20
+    footprint: {x: 2, y: 2}
+  - prefab: {fileID: 565926324478851296, guid: 81cceeecc212a404a96ad37843fe6958, type: 3}
+    prefabName: E-S 2
+    type: 1
+    difficulty: 0
+    entrances:
+    - {x: 15, y: 0}
+    - {x: 20, y: 6}
+    endLineRole: 0
+    width: 20
+    height: 20
+    footprint: {x: 2, y: 2}
+  - prefab: {fileID: 565926324478851296, guid: 368623b87419dc14b976173d0630e109, type: 3}
+    prefabName: E-S 3
+    type: 1
+    difficulty: 0
+    entrances:
+    - {x: 15, y: 0}
+    - {x: 20, y: 6}
+    endLineRole: 0
+    width: 20
+    height: 20
+    footprint: {x: 2, y: 2}
+  - prefab: {fileID: 565926324478851296, guid: 5042d6b7d549dba429665b2cd5b2ed68, type: 3}
+    prefabName: E-W 1
+    type: 1
+    difficulty: 0
+    entrances:
+    - {x: 20, y: 6}
+    - {x: 0, y: 6}
+    endLineRole: 0
+    width: 20
+    height: 20
+    footprint: {x: 2, y: 2}
+  - prefab: {fileID: 565926324478851296, guid: bfb29c2f89f887549acff1ee3c345d40, type: 3}
+    prefabName: E-W 2
+    type: 1
+    difficulty: 0
+    entrances:
+    - {x: 20, y: 6}
+    - {x: 0, y: 6}
+    endLineRole: 0
+    width: 20
+    height: 20
+    footprint: {x: 2, y: 2}
+  - prefab: {fileID: 565926324478851296, guid: e5a29580e8b30eb46af89bb9cfed98b1, type: 3}
+    prefabName: E-W 3
+    type: 1
+    difficulty: 0
+    entrances:
+    - {x: 20, y: 6}
+    - {x: 0, y: 6}
+    endLineRole: 0
+    width: 20
+    height: 20
+    footprint: {x: 2, y: 2}
+  - prefab: {fileID: 565926324478851296, guid: 3387a82880929aa4bbd1d382b1fd875a, type: 3}
+    prefabName: N-S 1
+    type: 1
+    difficulty: 0
+    entrances:
+    - {x: 5, y: 20}
+    - {x: 15, y: 0}
+    endLineRole: 0
+    width: 20
+    height: 20
+    footprint: {x: 2, y: 2}
+  - prefab: {fileID: 565926324478851296, guid: 5c459c2919f9cb040922d96491bc56bb, type: 3}
+    prefabName: N-S 2
+    type: 1
+    difficulty: 0
+    entrances:
+    - {x: 5, y: 20}
+    - {x: 15, y: 0}
+    endLineRole: 0
+    width: 20
+    height: 20
+    footprint: {x: 2, y: 2}
+  - prefab: {fileID: 565926324478851296, guid: ae2332051e1538c47b1ad9437a063e43, type: 3}
+    prefabName: N-S 3
+    type: 1
+    difficulty: 0
+    entrances:
+    - {x: 5, y: 20}
+    - {x: 15, y: 0}
+    endLineRole: 0
+    width: 20
+    height: 20
+    footprint: {x: 2, y: 2}
+  - prefab: {fileID: 565926324478851296, guid: 908bdb7b519a71b41a8e714cb496555e, type: 3}
+    prefabName: W-N 1
+    type: 1
+    difficulty: 0
+    entrances:
+    - {x: 5, y: 20}
+    - {x: 0, y: 6}
+    endLineRole: 0
+    width: 20
+    height: 20
+    footprint: {x: 2, y: 2}
+  - prefab: {fileID: 565926324478851296, guid: acb05a471f39a0a4ea72547116223034, type: 3}
+    prefabName: W-N 2
+    type: 1
+    difficulty: 0
+    entrances:
+    - {x: 5, y: 20}
+    - {x: 0, y: 6}
+    endLineRole: 0
+    width: 20
+    height: 20
+    footprint: {x: 2, y: 2}
+  - prefab: {fileID: 565926324478851296, guid: 810e8b353deeb16419f12fa3e4c049ef, type: 3}
+    prefabName: W-N 3
+    type: 1
+    difficulty: 0
+    entrances:
+    - {x: 5, y: 20}
+    - {x: 0, y: 6}
+    endLineRole: 0
+    width: 20
+    height: 20
+    footprint: {x: 2, y: 2}
+  - prefab: {fileID: 565926324478851296, guid: 3536c0c921fef9d4ea97a8155924611b, type: 3}
+    prefabName: W-S 1
+    type: 1
+    difficulty: 0
+    entrances:
+    - {x: 15, y: 0}
+    - {x: 0, y: 6}
+    endLineRole: 0
+    width: 20
+    height: 20
+    footprint: {x: 2, y: 2}
+  - prefab: {fileID: 565926324478851296, guid: d3cb3383fd986e94cae7d0dd94b9f14b, type: 3}
+    prefabName: W-S 2
+    type: 1
+    difficulty: 0
+    entrances:
+    - {x: 15, y: 0}
+    - {x: 0, y: 6}
+    endLineRole: 0
+    width: 20
+    height: 20
+    footprint: {x: 2, y: 2}
+  - prefab: {fileID: 565926324478851296, guid: 151f6d551c5a84a4486c78e1494de81d, type: 3}
+    prefabName: W-S 3
+    type: 1
+    difficulty: 0
+    entrances:
+    - {x: 15, y: 0}
+    - {x: 0, y: 6}
+    endLineRole: 0
+    width: 20
+    height: 20
+    footprint: {x: 2, y: 2}

@@ -13,6 +13,7 @@ namespace GridMapSystem.Editor
         private int stepCount = 10;
         private int seed = 0;
         private bool useRandomSeed = true;
+        [SerializeField] private SpawnPrefabSet spawnPrefabs = new SpawnPrefabSet();
 
         [MenuItem("Map/Generate Grid Map")]
         public static void Open()
@@ -24,6 +25,8 @@ namespace GridMapSystem.Editor
         {
             if (database == null)
                 database = AssetDatabase.LoadAssetAtPath<GridChunkDatabase>("Assets/Prefabs/@Data/Map/GridChunkDatabase.asset");
+            if (spawnPrefabs.monsterPrefab == null)
+                spawnPrefabs.monsterPrefab = AssetDatabase.LoadAssetAtPath<GameObject>("Assets/Prefabs/Monster/Orc/OrcAI.prefab");
         }
 
         private void OnGUI()
@@ -35,10 +38,18 @@ namespace GridMapSystem.Editor
                 seed = EditorGUILayout.IntField("Seed", seed);
 
             EditorGUILayout.Space();
+            EditorGUILayout.LabelField("스폰 프리팹 (비워두면 그 종류는 스킵)", EditorStyles.boldLabel);
+            spawnPrefabs.coinPrefab = (GameObject)EditorGUILayout.ObjectField("Coin", spawnPrefabs.coinPrefab, typeof(GameObject), false);
+            spawnPrefabs.monsterPrefab = (GameObject)EditorGUILayout.ObjectField("Monster", spawnPrefabs.monsterPrefab, typeof(GameObject), false);
+            spawnPrefabs.itemPrefab = (GameObject)EditorGUILayout.ObjectField("Item", spawnPrefabs.itemPrefab, typeof(GameObject), false);
+            spawnPrefabs.arrowTrapPrefab = (GameObject)EditorGUILayout.ObjectField("Arrow Trap", spawnPrefabs.arrowTrapPrefab, typeof(GameObject), false);
+            spawnPrefabs.spikeTrapPrefab = (GameObject)EditorGUILayout.ObjectField("Spike Trap", spawnPrefabs.spikeTrapPrefab, typeof(GameObject), false);
+
+            EditorGUILayout.Space();
             if (GUILayout.Button("Generate Map (그리드)"))
             {
                 int actualSeed = useRandomSeed ? System.Environment.TickCount : seed;
-                ChunkGridGenerator.GenerateGrid(database, stepCount, actualSeed);
+                ChunkGridGenerator.GenerateGrid(database, stepCount, actualSeed, spawnPrefabs);
             }
             if (GUILayout.Button("Clear Generated Grid Map"))
             {

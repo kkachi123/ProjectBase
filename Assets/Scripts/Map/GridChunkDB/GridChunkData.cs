@@ -110,10 +110,12 @@ namespace GridMapSystem
         public GridEndLineRole EndLineRole => endLineRole;
         public GridEntranceSlot EntranceSlots => entranceSlots;
 
-        // Transition/EndLine = 10x10(1칸), Content = 20x20(2x2칸). 전부 10의 배수라 리사이즈
-        // 없이 칸수로 환산 가능하다.
+        // Transition만 10x10(1칸), Content/EndLine은 20x20(2x2칸). entranceSlots 공식(예:
+        // height*3/10)은 청크 자신의 너비/높이에 대한 상대값이라, 서로 크기가 다른 청크는
+        // 절대 좌표가 어긋나 정렬 가드에 걸린다 — 그래서 실제로 서로 연결되는 Content/EndLine은
+        // 반드시 같은 크기여야 한다(Transition은 현재 아예 안 쓰므로 크기 불일치 문제가 없음).
         public const int CellSize = 10;
-        private bool IsSmall => chunkType == GridChunkType.Transition || chunkType == GridChunkType.EndLine;
+        private bool IsSmall => chunkType == GridChunkType.Transition;
         private int Width => IsSmall ? 10 : 20;
         private int Height => IsSmall ? 10 : 20;
         public Vector2Int Footprint => new Vector2Int(Width / CellSize, Height / CellSize);

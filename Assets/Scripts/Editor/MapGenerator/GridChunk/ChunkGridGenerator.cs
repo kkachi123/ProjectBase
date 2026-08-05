@@ -19,11 +19,31 @@ namespace GridMapSystem.Editor
             public int stepBudget;
         }
 
-        public static void GenerateGrid(GridChunkDatabase db, int contentChunkCount, int seed)
+        // 방금 배치한 청크 인스턴스의 GridChunkData.GetResolvedSpawns()를 읽어서, SpawnKind별로
+        // 매핑된 프리팹을 그 자식으로 심는다. 매핑이 비어있는 종류(아직 프리팹이 없는 경우)는
+        // 조용히 건너뛴다.
+        private static void SpawnContentFor(GameObject chunkInstance, System.Random rng, SpawnPrefabSet spawnPrefabs)
         {
-            // 구조: Start - (Content + Transition 반복) - End
-            // contentChunkCount는 순수 Content 청크 개수만 센다. Transition은 Content끼리
-            // 이어주는 연결용이라 개수에 포함되지 않고, 필요한 만큼 자동으로 끼워 넣는다.
+            GridChunkData data = chunkInstance.GetComponent<GridChunkData>();
+            if (data == null) return;
+
+            int index = 0;
+            foreach (var (position, kind) in data.GetResolvedSpawns(rng))
+            {
+                GameObject prefab = spawnPrefabs.Get(kind);
+                if (prefab == null) continue;
+
+                GameObject spawned = (GameObject)PrefabUtility.InstantiatePrefab(prefab, chunkInstance.transform);
+                spawned.transform.position = chunkInstance.transform.position + new Vector3(position.x, position.y, 0f);
+                spawned.name = $"{kind}_{index++}";
+            }
+        }
+
+        public static void GenerateGrid(GridChunkDatabase db, int contentChunkCount, int seed, SpawnPrefabSet spawnPrefabs = null)
+        {
+            spawnPrefabs = spawnPrefabs ?? new SpawnPrefabSet();
+            // 구조: Start - Content 반복 - End. Content는 전부 20x20(2x2칸)이고, 이번 세대는
+            // 별도의 Transition(10x10) 연결용 청크를 두지 않기로 해서 항상 Content만 뽑는다.
             if (db == null) { Debug.LogError("[ChunkGridGenerator] GridChunkDatabase가 없습니다."); return; }
 
             GameObject oldRoot = GameObject.Find(RootName);
@@ -44,18 +64,30 @@ namespace GridMapSystem.Editor
             Vector2Int cursor = new Vector2Int(0, 0);
 
             // ---- 시작(Start) 청크 배치 ----
+            // Start/End/일반 막다른길을 역할로 구분하지 않고 EndLine 전체를 겸용으로 쓴다.
+            // Start는 맞춰볼 "이전 청크"가 없으므로 TryConnectGridTerminal(커서 - 입구 로 원점을
+            // 역산하는 방식)을 쓰지 않는다 — 입구 좌표 자체가 셀 배수가 아니라서 그 방식으로는
+            // 항상 정렬 가드에 걸린다. 대신 원점(0,0)에 그냥 꽂고, 그 청크의 입구 좌표를 그대로
+            // 다음 커서로 삼는다(이후 모든 배치는 이 커서를 기준으로 상대적으로 정렬됨).
             {
                 List<GridChunkDatabaseEntry> startCandidates = new List<GridChunkDatabaseEntry>(db.GetByType(GridChunkType.EndLine));
-                startCandidates.RemoveAll(e => e.endLineRole != GridEndLineRole.Start);
                 Shuffle(startCandidates, rng);
                 foreach (GridChunkDatabaseEntry entry in startCandidates)
                 {
-                    if (!TryConnectGridTerminal(entry, cursor, occupiedCells, rng, out Vector2Int origin, out List<Vector2Int> claimedCells))
-                        continue;
+                    List<Vector2Int> entrances = entry.GetAllEntrances();
+                    if (entrances.Count == 0) continue;
+
+                    Vector2Int origin = Vector2Int.zero;
+                    Vector2Int chosenEntrance = entrances[rng.Next(entrances.Count)];
+                    List<Vector2Int> claimedCells = OccupiedCellsFor(origin, entry.footprint);
+
                     GameObject inst = (GameObject)PrefabUtility.InstantiatePrefab(entry.prefab, root.transform);
                     inst.transform.position = new Vector3(origin.x, origin.y, 0f);
                     inst.name = entry.prefabName + "_start" + globalIndex++;
                     foreach (var c in claimedCells) occupiedCells.Add(c);
+                    SpawnContentFor(inst, rng, spawnPrefabs);
+
+                    cursor = origin + chosenEntrance;
                     break;
                 }
             }
@@ -65,8 +97,7 @@ namespace GridMapSystem.Editor
             {
                 if (step == stack.Count)
                 {
-                    bool wantTransition = rng.Next(2) == 0;
-                    GridChunkType desiredType = wantTransition ? GridChunkType.Transition : GridChunkType.Content;
+                    GridChunkType desiredType = GridChunkType.Content;
                     Vector2Int cursorBefore = (step == 0) ? cursor : stack[step - 1].cursorAfter;
                     stack.Add(new GridPlacementFrame { desiredType = desiredType, cursorBefore = cursorBefore });
                 }
@@ -86,6 +117,7 @@ namespace GridMapSystem.Editor
                     GameObject inst = (GameObject)PrefabUtility.InstantiatePrefab(entry.prefab, root.transform);
                     inst.transform.position = new Vector3(origin.x, origin.y, 0f);
                     inst.name = entry.prefabName + "_main" + globalIndex++;
+                    SpawnContentFor(inst, rng, spawnPrefabs);
 
                     foreach (var c in claimedCells) occupiedCells.Add(c);
                     if (frame.desiredType != GridChunkType.Transition) contentPlaced++;
@@ -145,8 +177,7 @@ namespace GridMapSystem.Editor
                 while (placedInBranch < remainingContent && branchFailSafe < 20)
                 {
                     branchFailSafe++;
-                    bool wantTransition = rng.Next(2) == 0;
-                    GridChunkType desiredType = wantTransition ? GridChunkType.Transition : GridChunkType.Content;
+                    GridChunkType desiredType = GridChunkType.Content;
                     List<GridChunkDatabaseEntry> candidates = new List<GridChunkDatabaseEntry>(db.GetByType(desiredType));
                     candidates.RemoveAll(e => IsDeadEndEntry(e));
                     Shuffle(candidates, rng);
@@ -161,6 +192,7 @@ namespace GridMapSystem.Editor
                         GameObject inst = (GameObject)PrefabUtility.InstantiatePrefab(entry.prefab, root.transform);
                         inst.transform.position = new Vector3(origin.x, origin.y, 0f);
                         inst.name = entry.prefabName + "_side" + globalIndex++;
+                        SpawnContentFor(inst, rng, spawnPrefabs);
                         foreach (var c in claimedCells) occupiedCells.Add(c);
                         if (desiredType != GridChunkType.Transition) placedInBranch++;
 
@@ -174,9 +206,8 @@ namespace GridMapSystem.Editor
                     if (!placedHere) break;
                 }
 
-                // 사이드 브랜치는 일반 막다른길(GridEndLineRole.Normal)로 마무리
+                // 사이드 브랜치는 EndLine 전체(Start/End 겸용) 중 아무거나로 마무리
                 List<GridChunkDatabaseEntry> deadEndCandidates = new List<GridChunkDatabaseEntry>(db.GetByType(GridChunkType.EndLine));
-                deadEndCandidates.RemoveAll(e => e.endLineRole != GridEndLineRole.Normal);
                 Shuffle(deadEndCandidates, rng);
                 foreach (GridChunkDatabaseEntry entry in deadEndCandidates)
                 {
@@ -185,6 +216,7 @@ namespace GridMapSystem.Editor
                     GameObject inst = (GameObject)PrefabUtility.InstantiatePrefab(entry.prefab, root.transform);
                     inst.transform.position = new Vector3(origin.x, origin.y, 0f);
                     inst.name = entry.prefabName + "_cap" + globalIndex++;
+                    SpawnContentFor(inst, rng, spawnPrefabs);
                     foreach (var c in claimedCells) occupiedCells.Add(c);
                     capped = true;
                     break;
@@ -197,7 +229,6 @@ namespace GridMapSystem.Editor
             //      하나 더 끼워서 Start로부터 충분히 멀어지도록 '늘려서' 재시도한다(줄이지 않음) ----
             {
                 List<GridChunkDatabaseEntry> endCandidates = new List<GridChunkDatabaseEntry>(db.GetByType(GridChunkType.EndLine));
-                endCandidates.RemoveAll(e => e.endLineRole != GridEndLineRole.End);
 
                 System.Func<Vector2Int, bool> canPlaceEndAt = (c) =>
                 {
@@ -216,7 +247,7 @@ namespace GridMapSystem.Editor
                 while (!canPlaceEndAt(mainEndCursor) && extendAttempts < MAX_EXTEND_ATTEMPTS)
                 {
                     extendAttempts++;
-                    GridChunkType desiredType = (rng.Next(2) == 0) ? GridChunkType.Transition : GridChunkType.Content;
+                    GridChunkType desiredType = GridChunkType.Content;
                     List<GridChunkDatabaseEntry> candidates = new List<GridChunkDatabaseEntry>(db.GetByType(desiredType));
                     candidates.RemoveAll(e => IsDeadEndEntry(e));
                     Shuffle(candidates, rng);
@@ -230,6 +261,7 @@ namespace GridMapSystem.Editor
                         GameObject inst = (GameObject)PrefabUtility.InstantiatePrefab(entry.prefab, root.transform);
                         inst.transform.position = new Vector3(origin.x, origin.y, 0f);
                         inst.name = entry.prefabName + "_extend" + globalIndex++;
+                        SpawnContentFor(inst, rng, spawnPrefabs);
                         foreach (var c in claimedCells) occupiedCells.Add(c);
                         bool isContent = desiredType != GridChunkType.Transition;
                         if (isContent) contentPlaced++;
@@ -289,12 +321,13 @@ namespace GridMapSystem.Editor
                     GameObject inst = (GameObject)PrefabUtility.InstantiatePrefab(entry.prefab, root.transform);
                     inst.transform.position = new Vector3(origin.x, origin.y, 0f);
                     inst.name = entry.prefabName + "_end" + globalIndex++;
+                    SpawnContentFor(inst, rng, spawnPrefabs);
                     foreach (var c in claimedCells) occupiedCells.Add(c);
                     placedEnd = true;
                     break;
                 }
                 if (!placedEnd)
-                    Debug.LogWarning("[ChunkGridGenerator] End 청크를 배치하지 못했습니다 (GridEndLineRole.End 프리팹이 없거나 자리가 없음).");
+                    Debug.LogWarning("[ChunkGridGenerator] End 청크를 배치하지 못했습니다 (EndLine 프리팹이 없거나 자리가 없음).");
             }
 
             Debug.Log($"[ChunkGridGenerator] 그리드 생성 완료: Content {contentPlaced}개(목표 {contentChunkCount}), 사이드 브랜치 처리 {branchGuard}개. seed={seed}");
