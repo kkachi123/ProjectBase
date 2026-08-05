@@ -53,6 +53,56 @@ MonoBehaviour:
     width: 20
     height: 20
     footprint: {x: 2, y: 2}
+  - prefab: {fileID: 565926324478851296, guid: 4e29ba5221c71714082cca740c2805d6, type: 3}
+    prefabName: End-E
+    type: 2
+    difficulty: 0
+    entrances:
+    - {x: 20, y: 6}
+    endLineRole: 2
+    width: 20
+    height: 20
+    footprint: {x: 2, y: 2}
+  - prefab: {fileID: 565926324478851296, guid: deb942c147737614b9e0334ed71f9aa9, type: 3}
+    prefabName: End-N
+    type: 2
+    difficulty: 0
+    entrances:
+    - {x: 5, y: 20}
+    endLineRole: 2
+    width: 20
+    height: 20
+    footprint: {x: 2, y: 2}
+  - prefab: {fileID: 565926324478851296, guid: 183176a003934b2439fa226a755a6251, type: 3}
+    prefabName: End-S
+    type: 2
+    difficulty: 0
+    entrances:
+    - {x: 15, y: 0}
+    endLineRole: 2
+    width: 20
+    height: 20
+    footprint: {x: 2, y: 2}
+  - prefab: {fileID: 565926324478851296, guid: d04a0ad49bcd5c3498b47215657f4374, type: 3}
+    prefabName: End-W
+    type: 2
+    difficulty: 0
+    entrances:
+    - {x: 0, y: 6}
+    endLineRole: 2
+    width: 20
+    height: 20
+    footprint: {x: 2, y: 2}
+  - prefab: {fileID: 565926324478851296, guid: f9127aa507c914e46b60a9536c3cea8e, type: 3}
+    prefabName: Start
+    type: 2
+    difficulty: 0
+    entrances:
+    - {x: 20, y: 6}
+    endLineRole: 1
+    width: 20
+    height: 20
+    footprint: {x: 2, y: 2}
   - prefab: {fileID: 565926324478851296, guid: e79ffbf122e58a4488c29e54bdcfa75d, type: 3}
     prefabName: E-N 1
     type: 1
@@ -247,6 +297,27 @@ MonoBehaviour:
     entrances:
     - {x: 15, y: 0}
     - {x: 0, y: 6}
+    endLineRole: 0
+    width: 20
+    height: 20
+    footprint: {x: 2, y: 2}
+  - prefab: {fileID: 565926324478851296, guid: 90cf298082819e74d981f5ae0b77f3fe, type: 3}
+    prefabName: 3Dir 1
+    type: 1
+    difficulty: 0
+    entrances:
+    - {x: 5, y: 20}
+    - {x: 20, y: 6}
+    - {x: 0, y: 6}
+    endLineRole: 0
+    width: 20
+    height: 20
+    footprint: {x: 2, y: 2}
+  - prefab: {fileID: 565926324478851296, guid: fa67ff4e31bfc17439400abb135b1a76, type: 3}
+    prefabName: GridChunkBase
+    type: 1
+    difficulty: 0
+    entrances: []
     endLineRole: 0
     width: 20
     height: 20

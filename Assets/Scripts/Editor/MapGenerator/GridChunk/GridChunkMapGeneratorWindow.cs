@@ -46,6 +46,9 @@ namespace GridMapSystem.Editor
             spawnPrefabs.spikeTrapPrefab = (GameObject)EditorGUILayout.ObjectField("Spike Trap", spawnPrefabs.spikeTrapPrefab, typeof(GameObject), false);
 
             EditorGUILayout.Space();
+            EditorGUILayout.LabelField("Start/End 위치는 GeneratedMapInfo 컴포넌트(생성된 맵 루트)에 기록되고,\n실제 Player 생성/종료 처리는 런타임 GameManager가 그 값을 읽어서 처리합니다.", EditorStyles.wordWrappedMiniLabel);
+
+            EditorGUILayout.Space();
             if (GUILayout.Button("Generate Map (그리드)"))
             {
                 int actualSeed = useRandomSeed ? System.Environment.TickCount : seed;
