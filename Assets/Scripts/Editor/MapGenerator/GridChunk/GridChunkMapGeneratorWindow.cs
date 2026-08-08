@@ -11,6 +11,7 @@ namespace GridMapSystem.Editor
     {
         private GridChunkDatabase database;
         private int stepCount = 10;
+        private int maxThreeDirCount = 2;
         private int seed = 0;
         private bool useRandomSeed = true;
         [SerializeField] private SpawnPrefabSet spawnPrefabs = new SpawnPrefabSet();
@@ -33,6 +34,7 @@ namespace GridMapSystem.Editor
         {
             database = (GridChunkDatabase)EditorGUILayout.ObjectField("Grid Chunk Database", database, typeof(GridChunkDatabase), false);
             stepCount = EditorGUILayout.IntField("Content Chunk Count", stepCount);
+            maxThreeDirCount = EditorGUILayout.IntField("Max 3Direction Count", maxThreeDirCount);
             useRandomSeed = EditorGUILayout.Toggle("Random Seed", useRandomSeed);
             if (!useRandomSeed)
                 seed = EditorGUILayout.IntField("Seed", seed);
@@ -52,7 +54,7 @@ namespace GridMapSystem.Editor
             if (GUILayout.Button("Generate Map (그리드)"))
             {
                 int actualSeed = useRandomSeed ? System.Environment.TickCount : seed;
-                ChunkGridGenerator.GenerateGrid(database, stepCount, actualSeed, spawnPrefabs);
+                ChunkGridGenerator.GenerateGrid(database, stepCount, actualSeed, spawnPrefabs, maxThreeDirCount);
             }
             if (GUILayout.Button("Clear Generated Grid Map"))
             {

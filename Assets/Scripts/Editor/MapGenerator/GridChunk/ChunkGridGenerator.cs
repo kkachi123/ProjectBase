@@ -59,7 +59,11 @@ namespace GridMapSystem.Editor
             return true;
         }
 
-        public static void GenerateGrid(GridChunkDatabase db, int contentChunkCount, int seed, SpawnPrefabSet spawnPrefabs = null)
+        // maxThreeDirCount: 진입점 3개 이상인 분기 청크(3Direction)를 메인 경로 + 사이드 브랜치를
+        // 합쳐서 총 몇 개까지 허용할지. 이 개수에 도달하면 그 이후로는 후보에서 3Direction 청크를
+        // 아예 제외한다(사후에 지우는 대신 사전에 못 고르게 막아서, 이미 연결된 다른 청크가
+        // 끊어지는 일이 없게 한다).
+        public static void GenerateGrid(GridChunkDatabase db, int contentChunkCount, int seed, SpawnPrefabSet spawnPrefabs = null, int maxThreeDirCount = 2)
         {
             spawnPrefabs = spawnPrefabs ?? new SpawnPrefabSet();
             if (db == null) { Debug.LogError("[ChunkGridGenerator] GridChunkDatabase가 없습니다."); return; }
@@ -86,6 +90,7 @@ namespace GridMapSystem.Editor
             int step = 0;
             int contentPlaced = 0;
             int globalIndex = 0;
+            int threeDirPlaced = 0; // 지금까지 배치된 3Direction(진입점 3개 이상) 청크 총 개수
 
             Vector2Int cursor = new Vector2Int(0, 0);
 
@@ -158,11 +163,15 @@ namespace GridMapSystem.Editor
                     if (endRetryFrame.instance != null) Object.DestroyImmediate(endRetryFrame.instance);
                     if (endRetryFrame.claimedCells != null)
                         foreach (var c in endRetryFrame.claimedCells) occupiedCells.Remove(c);
+                    if (endRetryFrame.queuedSideBranchCount > 0)
+                        sideBranches.RemoveRange(sideBranches.Count - endRetryFrame.queuedSideBranchCount, endRetryFrame.queuedSideBranchCount);
+                    if (endRetryFrame.placedEntry != null && IsThreeDirEntry(endRetryFrame.placedEntry)) threeDirPlaced--;
                     contentPlaced--; // desiredType은 항상 Content
                     endRetryFrame.excluded.Add(endRetryFrame.placedEntry);
                     endRetryFrame.placedEntry = null;
                     endRetryFrame.instance = null;
                     endRetryFrame.claimedCells = null;
+                    endRetryFrame.queuedSideBranchCount = 0;
                     if (stack.Count > step + 1) stack.RemoveRange(step + 1, stack.Count - step - 1);
                     continue; // 위로 돌아가서 이번엔 이 칸을 일반 로직으로 다시 채움
                 }
@@ -176,6 +185,7 @@ namespace GridMapSystem.Editor
                 GridPlacementFrame frame = stack[step];
                 List<GridChunkDatabaseEntry> candidates = new List<GridChunkDatabaseEntry>(db.GetByType(frame.desiredType));
                 candidates.RemoveAll(e => frame.excluded.Contains(e) || IsDeadEndEntry(e));
+                if (threeDirPlaced >= maxThreeDirCount) candidates.RemoveAll(IsThreeDirEntry);
                 Shuffle(candidates, rng);
 
                 bool placed = false;
@@ -192,11 +202,13 @@ namespace GridMapSystem.Editor
 
                     foreach (var c in claimedCells) occupiedCells.Add(c);
                     if (frame.desiredType != GridChunkType.Transition) contentPlaced++;
+                    if (IsThreeDirEntry(entry)) threeDirPlaced++;
 
                     frame.placedEntry = entry;
                     frame.instance = inst;
                     frame.cursorAfter = nextCursor;
                     frame.claimedCells = claimedCells;
+                    frame.queuedSideBranchCount = unusedWorldPoints.Count;
 
                     foreach (Vector2Int p in unusedWorldPoints)
                         sideBranches.Add(new SideBranchTask { cursor = p, stepBudget = rng.Next(2, 6) });
@@ -220,11 +232,15 @@ namespace GridMapSystem.Editor
                     if (prevFrame.instance != null) Object.DestroyImmediate(prevFrame.instance);
                     if (prevFrame.claimedCells != null)
                         foreach (var c in prevFrame.claimedCells) occupiedCells.Remove(c);
+                    if (prevFrame.queuedSideBranchCount > 0)
+                        sideBranches.RemoveRange(sideBranches.Count - prevFrame.queuedSideBranchCount, prevFrame.queuedSideBranchCount);
+                    if (prevFrame.placedEntry != null && IsThreeDirEntry(prevFrame.placedEntry)) threeDirPlaced--;
                     if (prevFrame.desiredType != GridChunkType.Transition && prevFrame.placedEntry != null) contentPlaced--;
                     prevFrame.excluded.Add(prevFrame.placedEntry);
                     prevFrame.placedEntry = null;
                     prevFrame.instance = null;
                     prevFrame.claimedCells = null;
+                    prevFrame.queuedSideBranchCount = 0;
                     if (stack.Count > step + 1) stack.RemoveRange(step + 1, stack.Count - step - 1);
                 }
             }
@@ -242,7 +258,6 @@ namespace GridMapSystem.Editor
                 Vector2Int branchCursor = task.cursor;
                 int remainingContent = task.stepBudget;
                 int placedInBranch = 0;
-                bool capped = false;
                 int branchFailSafe = 0;
 
                 while (placedInBranch < remainingContent && branchFailSafe < 20)
@@ -251,6 +266,7 @@ namespace GridMapSystem.Editor
                     GridChunkType desiredType = GridChunkType.Content;
                     List<GridChunkDatabaseEntry> candidates = new List<GridChunkDatabaseEntry>(db.GetByType(desiredType));
                     candidates.RemoveAll(e => IsDeadEndEntry(e));
+                    if (threeDirPlaced >= maxThreeDirCount) candidates.RemoveAll(IsThreeDirEntry);
                     Shuffle(candidates, rng);
 
                     bool placedHere = false;
@@ -266,6 +282,7 @@ namespace GridMapSystem.Editor
                         SpawnContentFor(inst, rng, spawnPrefabs);
                         foreach (var c in claimedCells) occupiedCells.Add(c);
                         if (desiredType != GridChunkType.Transition) placedInBranch++;
+                        if (IsThreeDirEntry(entry)) threeDirPlaced++;
 
                         foreach (Vector2Int p in unusedWorldPoints)
                             sideBranches.Add(new SideBranchTask { cursor = p, stepBudget = rng.Next(2, 6) });
@@ -277,7 +294,10 @@ namespace GridMapSystem.Editor
                     if (!placedHere) break;
                 }
 
-                // 사이드 브랜치는 일반 막다른길(EndLineRole.Normal)로 마무리
+                // 사이드 브랜치는 1Direction 청크(EndLineRole.Normal)로만 마무리한다. 여기서
+                // 맞는 후보를 하나도 못 찾으면(자리가 없거나 방향이 안 맞음) 그냥 이 브랜치를
+                // 건너뛴다 — 억지로 다른 타입을 끌어오지 않는다(3Direction 등과의 연결은
+                // 이후 별도 작업으로 남겨둠).
                 List<GridChunkDatabaseEntry> deadEndCandidates = new List<GridChunkDatabaseEntry>(db.GetByType(GridChunkType.EndLine));
                 deadEndCandidates.RemoveAll(e => e.endLineRole != GridEndLineRole.Normal);
                 Shuffle(deadEndCandidates, rng);
@@ -290,11 +310,9 @@ namespace GridMapSystem.Editor
                     inst.name = entry.prefabName + "_cap" + globalIndex++;
                     SpawnContentFor(inst, rng, spawnPrefabs);
                     foreach (var c in claimedCells) occupiedCells.Add(c);
-                    capped = true;
                     break;
                 }
-                if (!capped)
-                    Debug.LogWarning($"[ChunkGridGenerator] 사이드 브랜치 하나를 막다른길로 마무리하지 못했습니다 (커서={branchCursor}).");
+                // 여기까지 왔는데 못 붙였으면 1Direction으로 마무리할 자리가 없었다는 뜻 -> 조용히 skip.
             }
 
             // ---- 끝(End) 청크 배치: 메인 경로 루프가 이미 "여기서 End가 붙는다"를 확인하고
@@ -322,7 +340,7 @@ namespace GridMapSystem.Editor
             info.playerSpawnPosition = playerSpawnPosition;
             info.endPosition = endPosition;
 
-            Debug.Log($"[ChunkGridGenerator] 그리드 생성 완료: Content {contentPlaced}개(목표 {contentChunkCount}), 사이드 브랜치 처리 {branchGuard}개. seed={seed}");
+            Debug.Log($"[ChunkGridGenerator] 그리드 생성 완료: Content {contentPlaced}개(목표 {contentChunkCount}), 3Direction {threeDirPlaced}개(최대 {maxThreeDirCount}), 사이드 브랜치 처리 {branchGuard}개. seed={seed}");
         }
     }
 }

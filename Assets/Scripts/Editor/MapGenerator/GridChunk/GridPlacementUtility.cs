@@ -21,6 +21,10 @@ namespace GridMapSystem.Editor
             public GameObject instance;
             public Vector2Int cursorAfter;
             public List<Vector2Int> claimedCells;
+            // 이 프레임이 배치될 때 sideBranches 큐에 몇 개를 추가했는지(다방향 청크의 안 쓴
+            // 진입점 개수). 이 프레임을 되돌릴 때 정확히 이만큼을 큐 끝에서 같이 제거해야
+            // "사라진 청크가 만든 유령 사이드 브랜치"가 안 남는다.
+            public int queuedSideBranchCount;
         }
 
         // Start처럼 "이전 청크"가 없어 맞춰볼 기준점이 없는 경우에 쓴다 — 원점 계산 없이
@@ -174,6 +178,12 @@ namespace GridMapSystem.Editor
             for (int i = 1; i < all.Count; i++)
                 if (all[i] != all[0]) return false;
             return true; // 모든 진입점이 동일 좌표 -> 입구=출구인 막다른길
+        }
+
+        // 진입점이 3개 이상인 청크(3Direction 분기 청크)인지 판별.
+        internal static bool IsThreeDirEntry(GridChunkDatabaseEntry entry)
+        {
+            return entry.GetAllEntrances().Count >= 3;
         }
 
         internal static void Shuffle<T>(List<T> list, System.Random rng)

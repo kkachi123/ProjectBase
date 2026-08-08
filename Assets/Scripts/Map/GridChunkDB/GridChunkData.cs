@@ -73,7 +73,7 @@ namespace GridMapSystem
                 case GridEntranceSlot.West: return new Vector2Int(0, height * 3 / 10);
                 case GridEntranceSlot.East: return new Vector2Int(width, height * 3 / 10);
                 case GridEntranceSlot.South: return new Vector2Int(width * 3 / 4, 0);
-                case GridEntranceSlot.North: return new Vector2Int(width / 4, height);
+                case GridEntranceSlot.North: return new Vector2Int(width * 3 / 4, height); // South와 x를 맞춤(직선 통로가 대각선으로 안 어긋나게)
                 default: return Vector2Int.zero;
             }
         }
