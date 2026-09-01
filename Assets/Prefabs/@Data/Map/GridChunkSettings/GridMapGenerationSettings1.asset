@@ -1,0 +1,25 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8ae17ea6f46553349a2641a74f9c96fa, type: 3}
+  m_Name: GridMapGenerationSettings1
+  m_EditorClassIdentifier: 
+  database: {fileID: 11400000, guid: 9cd2267ce5d2d8c4a9085482fbedfc98, type: 2}
+  contentChunkCount: 10
+  maxThreeDirCount: 2
+  useRandomSeed: 1
+  seed: 0
+  spawnPrefabs:
+    coinPrefab: {fileID: 0}
+    monsterPrefab: {fileID: 7604613995129864266, guid: 49e629522f7410f488748430ca50f6aa, type: 3}
+    itemPrefab: {fileID: 0}
+    arrowTrapPrefab: {fileID: 0}
+    spikeTrapPrefab: {fileID: 0}

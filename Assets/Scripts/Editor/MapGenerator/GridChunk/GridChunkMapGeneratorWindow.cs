@@ -1,5 +1,6 @@
 using UnityEditor;
 using UnityEngine;
+using GridMapSystem;
 
 namespace GridMapSystem.Editor
 {
@@ -9,12 +10,13 @@ namespace GridMapSystem.Editor
     /// </summary>
     public class GridChunkMapGeneratorWindow : EditorWindow
     {
+        private GridMapGenerationSettings settings;
         private GridChunkDatabase database;
         private int stepCount = 10;
         private int maxThreeDirCount = 2;
-        private int seed = 0;
+        private int randomSeed = 0;
         private bool useRandomSeed = true;
-        [SerializeField] private SpawnPrefabSet spawnPrefabs = new SpawnPrefabSet();
+        [SerializeField] private GridSpawnPrefabSet spawnPrefabs = new GridSpawnPrefabSet();
 
         [MenuItem("Map/Generate Grid Map")]
         public static void Open()
@@ -32,12 +34,22 @@ namespace GridMapSystem.Editor
 
         private void OnGUI()
         {
+            settings = (GridMapGenerationSettings)EditorGUILayout.ObjectField("Generation Settings", settings, typeof(GridMapGenerationSettings), false);
+            using (new EditorGUILayout.HorizontalScope())
+            {
+                if (GUILayout.Button("Load From Settings"))
+                    LoadFromSettings();
+                if (GUILayout.Button("Apply To Settings"))
+                    ApplyToSettings();
+            }
+
+            EditorGUILayout.Space();
             database = (GridChunkDatabase)EditorGUILayout.ObjectField("Grid Chunk Database", database, typeof(GridChunkDatabase), false);
             stepCount = EditorGUILayout.IntField("Content Chunk Count", stepCount);
             maxThreeDirCount = EditorGUILayout.IntField("Max 3Direction Count", maxThreeDirCount);
             useRandomSeed = EditorGUILayout.Toggle("Random Seed", useRandomSeed);
             if (!useRandomSeed)
-                seed = EditorGUILayout.IntField("Seed", seed);
+                randomSeed = EditorGUILayout.IntField("Random Seed", randomSeed);
 
             EditorGUILayout.Space();
             EditorGUILayout.LabelField("스폰 프리팹 (비워두면 그 종류는 스킵)", EditorStyles.boldLabel);
@@ -52,15 +64,56 @@ namespace GridMapSystem.Editor
 
             EditorGUILayout.Space();
             if (GUILayout.Button("Generate Map (그리드)"))
-            {
-                int actualSeed = useRandomSeed ? System.Environment.TickCount : seed;
-                ChunkGridGenerator.GenerateGrid(database, stepCount, actualSeed, spawnPrefabs, maxThreeDirCount);
+            {   
+                // Random seed : useRandomSeed가 true면 시간 기반으로 난수 생성기 초기화.
+                ApplyToSettings();
+                GridChunkRuntimeGenerator.GenerateGrid(database, stepCount, ResolveSeed(), spawnPrefabs, maxThreeDirCount, CreateEditorContext());
             }
             if (GUILayout.Button("Clear Generated Grid Map"))
             {
-                GameObject existingRoot = GameObject.Find(GridPlacementUtility.RootName);
-                if (existingRoot != null) Object.DestroyImmediate(existingRoot);
+                GridChunkRuntimeGenerator.ClearGeneratedMap(CreateEditorContext());
             }
+        }
+
+        private void LoadFromSettings()
+        {
+            if (settings == null) return;
+
+            database = settings.database;
+            stepCount = settings.contentChunkCount;
+            maxThreeDirCount = settings.maxThreeDirCount;
+            useRandomSeed = settings.useRandomSeed;
+            randomSeed = settings.randomSeed;
+            spawnPrefabs = settings.spawnPrefabs ?? new GridSpawnPrefabSet();
+        }
+
+        private void ApplyToSettings()
+        {
+            if (settings == null) return;
+
+            settings.database = database;
+            settings.contentChunkCount = stepCount;
+            settings.maxThreeDirCount = maxThreeDirCount;
+            settings.useRandomSeed = useRandomSeed;
+            settings.randomSeed = randomSeed;
+            settings.spawnPrefabs = spawnPrefabs;
+
+            EditorUtility.SetDirty(settings);
+            AssetDatabase.SaveAssets();
+        }
+
+        private int ResolveSeed()
+        {
+            return useRandomSeed ? System.Environment.TickCount : randomSeed;
+        }
+
+        private static GridChunkGenerationContext CreateEditorContext()
+        {
+            return new GridChunkGenerationContext
+            {
+                InstantiatePrefab = (prefab, parent) => (GameObject)PrefabUtility.InstantiatePrefab(prefab, parent),
+                DestroyObject = Object.DestroyImmediate,
+            };
         }
     }
 }

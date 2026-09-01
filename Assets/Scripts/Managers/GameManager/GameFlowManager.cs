@@ -36,7 +36,12 @@ public class GameFlowManager : MonoBehaviour
         overlay.Loading.SetProgress(1f);
         Time.timeScale = 1f;
         if (nextState == FlowState.InGame)
-            Managers.Instance.Game.Reset();
+        {
+            if (Managers.Instance.AdventureRun != null)
+                Managers.Instance.AdventureRun.StartRun();
+            else
+                Managers.Instance.Game.Reset();
+        }
         State = nextState;
         overlay.ShowLoading(false);
         overlay.FadeOut(_fadeTime);
