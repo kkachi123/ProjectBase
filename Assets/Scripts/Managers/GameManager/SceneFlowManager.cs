@@ -2,24 +2,24 @@ using System.Collections;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-public class GameFlowManager : MonoBehaviour
+public class SceneFlowManager : MonoBehaviour
 {
-    public enum FlowState { Title, InGame, Loading }
+    public enum SceneFlowState { Title, InGame, Loading }
 
     [SerializeField] private string _titleScene = "Title";
     [SerializeField] private string _gameScene = "Game";
     [SerializeField] private float _fadeTime = 0.5f;
 
-    public FlowState State { get; private set; } = FlowState.Title;
+    public SceneFlowState State { get; private set; } = SceneFlowState.Title;
 
-    public void StartGame() => StartCoroutine(TransitionTo(_gameScene, FlowState.InGame));
-    public void RestartGame() => StartCoroutine(TransitionTo(_gameScene, FlowState.InGame));
-    public void GoToTitle() => StartCoroutine(TransitionTo(_titleScene, FlowState.Title));
+    public void StartGame() => StartCoroutine(TransitionTo(_gameScene, SceneFlowState.InGame));
+    public void RestartGame() => StartCoroutine(TransitionTo(_gameScene, SceneFlowState.InGame));
+    public void GoToTitle() => StartCoroutine(TransitionTo(_titleScene, SceneFlowState.Title));
 
-    private IEnumerator TransitionTo(string sceneName, FlowState nextState)
+    private IEnumerator TransitionTo(string sceneName, SceneFlowState nextState)
     {
-        if (State == FlowState.Loading) yield break;
-        State = FlowState.Loading;
+        if (State == SceneFlowState.Loading) yield break;
+        State = SceneFlowState.Loading;
 
         UIOverlayController overlay = Managers.Instance.UI.Overlay;
         overlay.FadeIn(_fadeTime);
@@ -35,7 +35,7 @@ public class GameFlowManager : MonoBehaviour
 
         overlay.Loading.SetProgress(1f);
         Time.timeScale = 1f;
-        if (nextState == FlowState.InGame)
+        if (nextState == SceneFlowState.InGame)
         {
             if (Managers.Instance.AdventureRun != null)
                 Managers.Instance.AdventureRun.StartRun();

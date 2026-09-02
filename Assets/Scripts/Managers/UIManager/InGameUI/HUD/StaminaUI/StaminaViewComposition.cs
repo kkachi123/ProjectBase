@@ -7,6 +7,7 @@ public class StaminaViewComposition : MonoBehaviour
 
     private void Awake()
     {
+        model = Managers.Instance.Player.CurrentPlayer.Stamina;
         var viewModel = new StaminaViewModel(model);
         view.Bind(viewModel);
     }

@@ -3,7 +3,7 @@ public class TitleScreen : UIScreen
 {
     public void OnClickStartButton()
     {
-        Managers.Instance.Flow.StartGame();
+        Managers.Instance.SceneFlow.StartGame();
     }
 
     public void OnClickQuitButton()

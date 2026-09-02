@@ -7,6 +7,7 @@ public class HealthViewComposition : MonoBehaviour
 
     private void Awake()
     {
+        model = Managers.Instance.Player.CurrentPlayer.Health;
         var viewModel = new HealthViewModel(model); 
         view.Bind(viewModel);                      
     }
