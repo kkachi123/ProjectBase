@@ -7,11 +7,28 @@ public class StaminaView : MonoBehaviour
 {
     [SerializeField] private Image _staminaBarImage;
 
+    private CompositeDisposable _bindings = new();
     private Tween _currentTween;
 
     public void Bind(StaminaViewModel viewModel)
     {
-        viewModel.StaminaRatio.Subscribe(OnStaminaChanged).AddTo(this);
+        Unbind();
+
+        viewModel.StaminaRatio.Subscribe(OnStaminaChanged).AddTo(_bindings);
+    }
+
+    public void Unbind()
+    {
+        _bindings.Dispose();
+        _bindings = new CompositeDisposable();
+
+        _currentTween?.Kill();
+        _currentTween = null;
+    }
+
+    private void OnDestroy()
+    {
+        Unbind();
     }
 
     private void OnStaminaChanged(float ratio)

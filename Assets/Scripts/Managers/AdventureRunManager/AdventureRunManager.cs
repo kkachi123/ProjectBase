@@ -48,8 +48,6 @@ public class AdventureRunManager : MonoBehaviour
         }
 
         PlayerController player = _playerSpawnManager.Spawn(CurrentMapInfo.playerSpawnPosition);
-        // BindCamera(player); //추가 예정.
-        // BindHUD(player); //추가 예정.
         if (player == null)
         {
             State = RunState.Failed;
@@ -76,19 +74,33 @@ public class AdventureRunManager : MonoBehaviour
 
     public void EndRun()
     {
+        if (State != RunState.Playing) return;
+
         State = RunState.Completed;
+        ClearRunObjects();
+        Managers.Instance.SceneFlow.GoToTitle();
     }
 
     public void FailRun()
     {
+        if (State != RunState.Playing) return;
+
         State = RunState.Failed;
+        ClearRunObjects();
+        Managers.Instance.Game.TriggerGameOver();
+        Managers.Instance.SceneFlow.GoToTitle();
     }
 
     public void ClearRun()
     {
+        ClearRunObjects();
+        State = RunState.None;
+    }
+
+    private void ClearRunObjects()
+    {
         _playerSpawnManager?.ClearCurrentPlayer();
         Managers.Instance.Map?.ClearMap();
         CurrentMapInfo = null;
-        State = RunState.None;
     }
 }

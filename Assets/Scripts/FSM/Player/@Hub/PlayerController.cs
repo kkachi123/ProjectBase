@@ -35,7 +35,7 @@ public class PlayerController : GroundedAgentController
     #region State Animation Event
     public override void OnDeathFinished()
     {
-        Managers.Instance.Game.TriggerGameOver();
+        Managers.Instance.AdventureRun.FailRun();
     }
     #endregion
 

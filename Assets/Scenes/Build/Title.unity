@@ -1093,7 +1093,7 @@ MonoBehaviour:
   _sceneFlow: {fileID: 1135761944}
   _map: {fileID: 1597629570}
   _camera: {fileID: 1993116006}
-  _lighting: {fileID: 0}
+  _lighting: {fileID: 2138193811}
   _adventureRun: {fileID: 1818831842}
 --- !u!4 &718685768
 Transform:
@@ -1113,6 +1113,7 @@ Transform:
   - {fileID: 1135761945}
   - {fileID: 1597629569}
   - {fileID: 1993116005}
+  - {fileID: 2138193812}
   - {fileID: 1818831841}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -2485,6 +2486,54 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _cameraPrefab: {fileID: 559862272920388629, guid: e1425c9cd496e1c4c87f2c1a577c38a0, type: 3}
+--- !u!1 &2138193810
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2138193812}
+  - component: {fileID: 2138193811}
+  m_Layer: 0
+  m_Name: LightManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &2138193811
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2138193810}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5b920975b59793f45be2e40d9eafe73a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _ensureGlobalLightOnRun: 1
+  _globalLightColor: {r: 1, g: 1, b: 1, a: 1}
+  _globalLightIntensity: 1
+  _globalLightName: Global Light 2D
+--- !u!4 &2138193812
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2138193810}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 718685768}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
