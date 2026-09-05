@@ -13,13 +13,13 @@ MonoBehaviour:
   m_Name: GridMapGenerationSettings1
   m_EditorClassIdentifier: 
   database: {fileID: 11400000, guid: 9cd2267ce5d2d8c4a9085482fbedfc98, type: 2}
-  contentChunkCount: 10
-  maxThreeDirCount: 2
+  contentChunkCount: 5
+  maxThreeDirCount: 1
   useRandomSeed: 1
-  seed: 0
+  randomSeed: 0
   spawnPrefabs:
-    coinPrefab: {fileID: 0}
+    coinPrefab: {fileID: 5020910305047059617, guid: 96e5990b4cffaec4f9f2e56fe3b05bef, type: 3}
     monsterPrefab: {fileID: 7604613995129864266, guid: 49e629522f7410f488748430ca50f6aa, type: 3}
-    itemPrefab: {fileID: 0}
-    arrowTrapPrefab: {fileID: 0}
-    spikeTrapPrefab: {fileID: 0}
+    itemPrefab: {fileID: 8191700671622900631, guid: 32279033c6dc94b4da0b372ff9461734, type: 3}
+    arrowTrapPrefab: {fileID: 4810178898917314733, guid: b1fb5d837b92e994bbe4ecb55dbc2987, type: 3}
+    spikeTrapPrefab: {fileID: 7604613995129864266, guid: 49e629522f7410f488748430ca50f6aa, type: 3}
