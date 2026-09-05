@@ -9,5 +9,5 @@ public class UIManager : MonoBehaviour
     public InGameUI InGameUI           => _inGameUI;
 
     public void Register(InGameUI inGameUI)  => _inGameUI = inGameUI;
-    public void Unregister(InGameUI _)       => _inGameUI = null;
+    public void Unregister()       => _inGameUI = null;
 }

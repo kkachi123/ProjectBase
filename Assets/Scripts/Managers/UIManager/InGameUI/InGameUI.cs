@@ -24,7 +24,7 @@ public class InGameUI : MonoBehaviour
     void OnDestroy()
     {
         if (!Managers.Instance) return;
-        Managers.Instance.UI.Unregister(this);
+        Managers.Instance.UI.Unregister();
         Managers.Instance.Player.Inventory.OnItemAdded -= OnItemAdded;
     }
 

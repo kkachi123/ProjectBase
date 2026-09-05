@@ -5,32 +5,20 @@ public class NPCDialogue : MonoBehaviour, IInteractable
 {
     [SerializeField] private DialogueDataSO _data;
 
-    private UIDialogueController _dialogue;
-    private int _lineIndex;
+    private readonly DialogueSequencePlayer _sequencePlayer = new();
 
-    void Start()
+    private void OnEnable()
     {
-        InGameUI inGameUI = Managers.Instance.UI.InGameUI;
-        if (inGameUI) _dialogue = inGameUI.Dialogue;
+        _sequencePlayer.RegisterDialogue(Managers.Instance?.UI?.InGameUI?.Dialogue);
     }
-
-    void OnDestroy() => _dialogue = null;
+    
+    private void OnDisable()
+    {
+        _sequencePlayer.UnregisterDialogue();
+    }
 
     public void Interact()
     {
-        if (_dialogue == null || _data == null || _data.Lines.Length == 0) return;
-        if (_dialogue.IsOpen) return;
-
-        _lineIndex = 0;
-        _dialogue.Open(_data.SpeakerName, _data.Lines[0], Advance);
-    }
-
-    private void Advance()
-    {
-        _lineIndex++;
-        if (_lineIndex >= _data.Lines.Length)
-            _dialogue.Close();
-        else
-            _dialogue.UpdateContent(_data.Lines[_lineIndex]);
+        _sequencePlayer.Play(_data);
     }
 }
