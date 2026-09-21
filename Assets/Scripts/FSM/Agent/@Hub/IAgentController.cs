@@ -1,11 +1,4 @@
 using UnityEngine;
-public interface IAgentHealthListener
-{
-    Health Health { get; }
-    GameObject gameObject { get; }
-    void OnHit();
-    void OnDeath();
-}
 public interface IAgentInputListener
 {
     GameObject gameObject { get; }

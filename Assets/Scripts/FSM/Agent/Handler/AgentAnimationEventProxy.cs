@@ -1,5 +1,11 @@
 using UnityEngine;
 
+public enum AnimEventType
+{
+    OnFrame,
+    End
+}
+
 public class AgentAnimationEventProxy : MonoBehaviour
 {
     private IAgentAnimationListener _controller;

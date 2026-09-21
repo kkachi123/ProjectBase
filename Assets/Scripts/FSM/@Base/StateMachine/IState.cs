@@ -5,12 +5,6 @@ public interface IState
     public void Exit();
 }
 
-public interface IAgentState : IState
-{
-    public void FixedExecute();
-    public void OnAnimationEvent(AnimEventType type);
-    public void OnInputEvent(InputKeyType type);
-}
 
 public enum StateType
 {
@@ -23,16 +17,4 @@ public enum StateType
     // Grounded States
     Jump,
     Fall,
-}
-
-public enum AnimEventType
-{
-    OnFrame,
-    End,
-}
-public enum InputKeyType
-{
-    None,
-    Jump,
-    Attack,
 }

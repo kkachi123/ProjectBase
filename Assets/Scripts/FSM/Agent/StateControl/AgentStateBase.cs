@@ -1,20 +1,60 @@
-public abstract class AgentStateBase<T> : IAgentState where T : AgentController
+using System;
+using System.Collections.Generic;
+
+public abstract class AgentStateBase
 {
-    protected T _agent;
-    public AgentStateBase(T agentController)
+    public List<ITransitionRule> _transitionRules = new();
+    public Action<StateType> OnTransition;
+
+    public void Enter()
     {
-        _agent = agentController;
+        foreach (var rule in _transitionRules)
+        {
+            if (rule is IEventTransitionRule eventRule)
+            {
+                eventRule.Subscribe();
+            }
+        }
+        OnEnter();
     }
-    public abstract void Enter();
-    public abstract void Execute();
-    public virtual void FixedExecute() { }
+    // Enter로 IEventTransitionRule 구독 및 상태 진입 시 초기화 로직 수행
+    // 상속된 클래스에서 OnEnter를 구현하여 상태 진입 시 초기화 로직을 수행
+    protected abstract void OnEnter();
+    public void Execute(float deltaTime)
+    {
+        if (ShouldTransition(deltaTime))
+            return;
+        OnExecute(deltaTime);
+    }
+    // Execute로 전환조건(ShouldTransition) 체크
+    // 상속된 클래스에서 OnExecute를 구현하여 상태별 로직을 수행
+    protected abstract void OnExecute(float deltaTime);
     public abstract void Exit();
 
-    public virtual void OnAnimationEvent(AnimEventType type) { }
-    public virtual void OnInputEvent(InputKeyType type) { }
-}
+    // Exit로 IEventTransitionRule 구독 해제 및 상태 종료 시 정리 로직 수행
+    private bool ShouldTransition(float deltaTime)
+    {
+        foreach (var rule in _transitionRules)
+        {
+            if (rule.ShouldTransition(deltaTime))
+            {
+                if(rule is IEventTransitionRule eventRule)
+                {
+                    eventRule.Unsubscribe();
+                }
+                OnTransition?.Invoke(rule.NextState);
+                return true;
+            }
+        }
+        return false;
+    }
 
-public abstract class AgentStateBase : AgentStateBase<AgentController>
-{
-    public AgentStateBase(AgentController agentController) : base(agentController) { }
+    public void AddTransition(ITransitionRule rule)
+    {
+        _transitionRules.Add(rule);
+        if (rule is IEventTransitionRule eventRule)
+        {
+            eventRule.Subscribe();
+        }
+    }
 }

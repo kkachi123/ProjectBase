@@ -18,19 +18,18 @@ public class PlayerController : GroundedAgentController
         _playerInput = GetComponent<PlayerInput>();
         _impactHandler = GetComponent<AgentImpactHandler>();
         _impactHandler.Initialize(_motor, _motorData);
-
-        _states = new PlayerStateFactory().CreateStates(this);
+    
+        _states = new PlayerStateFactory().CreateStates(
+            new PlayerStateFactoryData
+            {
+                Animator = _animator,
+                MovementHandler = _movementHandler,
+                MovementInput = _moveInput,
+                CombatHandler = _combatHandler,
+                GroundDetector = _groundDetector
+            }
+        );
     }
-
-    #region Action Methods - State Operations
-
-    public override void Attack(bool isAttack)
-    {
-        base.Attack(isAttack);
-        if(IsGrounded) _movementHandler.HandleMove(Vector2.zero); 
-    }
-
-    #endregion
 
     #region State Animation Event
     public override void OnDeathFinished()
@@ -46,7 +45,6 @@ public class PlayerController : GroundedAgentController
         if (_combatHandler.CurrentAttackType != 0) return;
         if (!Stamina.Use(_statData.attackDatas[attackType - 1].usedStamina)) return;
         _combatHandler.SetAttackType(attackType);
-        _stateMachine.CurrentState?.OnInputEvent(InputKeyType.Attack);
     }
 
     #endregion

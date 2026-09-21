@@ -2,28 +2,25 @@ using UnityEngine;
 
 public class HitState : AgentStateBase
 {
-    private bool _isHitFinished;
-    public HitState(AgentController agent) : base(agent) { }
-    public override void Enter()
+    private AgentAnimator _animator;
+    private AgentCombatHandler _combatHandler;
+
+    public HitState(AgentAnimator animator, AgentCombatHandler combatHandler)
     {
-        _isHitFinished = false;
-        _agent.Hit(true);
+        _animator = animator;
+        _combatHandler = combatHandler;
     }
-    public override void Execute()
+    protected override void OnEnter()
     {
-        if(_isHitFinished) _agent.ChangeState(StateType.Idle);
+        _combatHandler.ResetAttackType();
+        _animator.SetBool(StateType.Hit, true);
+    }
+    protected override void OnExecute(float deltaTime)
+    {
+        return;
     }
     public override void Exit() 
     {
-        _agent.Hit(false);
+        return;
     }
-
-    public override void OnAnimationEvent(AnimEventType type)
-    {
-        if(type == AnimEventType.End)
-        {
-            _isHitFinished = true;
-        }
-    }
-    
 }

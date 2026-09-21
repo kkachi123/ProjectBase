@@ -8,7 +8,12 @@ public interface IAgentCombatInput
 public interface IAgentMovementInput
 {
     Vector2 GetMovementInput();
-} 
+}
+
+public interface IAgentJumpInput
+{
+    IReadOnlyReactiveProperty<bool> JumpPressed { get; }
+}
 
 public interface IAgentInteractionInput
 {

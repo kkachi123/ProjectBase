@@ -1,40 +1,29 @@
-using UnityEngine;
-
-public class MoveState<T> : AgentStateBase<T> where T : AgentController
+public class MoveState : AgentStateBase
 {
-    public MoveState(T agent) : base(agent) { }
+    private AgentAnimator _animator;
+    private AgentMovementHandler2D _movementHandler;
+    private IAgentMovementInput _moveInput;
 
-    public override void Enter()
+    public MoveState(AgentAnimator animator, AgentMovementHandler2D movementHandler, IAgentMovementInput moveInput)
     {
-        _agent.Move(true);
+        _animator = animator;
+        _movementHandler = movementHandler;
+        _moveInput = moveInput;
     }
 
-    public override void Execute()
+    protected override void OnEnter()
     {
-        if (_agent.IsIdle) _agent.ChangeState(StateType.Idle);
+        _animator.SetBool(StateType.Move, true);
     }
 
-    public override void FixedExecute()
+    protected override void OnExecute(float deltaTime)
     {
-        _agent.HandleMovement();
+        //if (_agent.IsIdle) _agent.ChangeState(StateType.Idle);
+        _movementHandler.HandleMove(_moveInput.GetMovementInput());
     }
 
     public override void Exit() 
     {
-        _agent.Move(false);
+        _animator.SetBool(StateType.Move, false);
     }
-    public override void OnInputEvent(InputKeyType type)
-    {
-        switch (type)
-        {
-            case InputKeyType.Attack:
-                _agent.ChangeState(StateType.Attack);
-                break;
-        }
-    }
-}
-
-public class MoveState : MoveState<AgentController>
-{
-    public MoveState(AgentController agent) : base(agent) { }
 }

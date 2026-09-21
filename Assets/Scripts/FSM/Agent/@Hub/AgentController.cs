@@ -4,7 +4,7 @@ using UnityEngine;
 
 [RequireComponent(typeof(AgentMotor2D), typeof(Health), typeof(AgentCombatHandler))]
 
-public abstract class AgentController : MonoBehaviour, IAgentHealthListener, IAgentInputListener, IAgentAnimationListener
+public abstract class AgentController : MonoBehaviour, IAgentInputListener, IAgentAnimationListener , IAnimationEventSource
 {
     [Header("Data Assets")]
     [SerializeField] protected AgentStatData _statData;
@@ -21,16 +21,16 @@ public abstract class AgentController : MonoBehaviour, IAgentHealthListener, IAg
     [SerializeField] protected AgentAnimator _animator;
     [SerializeField] protected AgentAnimationEventProxy _animationEventProxy;
     public Health Health { get; private set; }
+    public event Action OnAnimationEnded;
 
     [Header("Handlers")]
     [SerializeField] protected AgentCombatHandler _combatHandler;
     protected AgentMovementHandler2D _movementHandler;
-    protected AgentHealthHandler _healthHandler;
     protected AgentInputHandler _inputHandler;
 
     [Header("State Machine")]
-    protected AgentStateMachine<IAgentState> _stateMachine;
-    protected Dictionary<StateType, IAgentState> _states;
+    protected Dictionary<StateType, AgentStateBase> _states = new();
+    protected AgentStateBase _currentState;
 
     // State Check Properties
     public virtual bool IsIdle => _moveInput.GetMovementInput().sqrMagnitude < 0.0001f;
@@ -53,10 +53,7 @@ public abstract class AgentController : MonoBehaviour, IAgentHealthListener, IAg
         _combatHandler?.Initialize(_statData.attackDatas);
 
         _movementHandler =  new AgentMovementHandler2D(_motor, _motorData);
-        _healthHandler = new AgentHealthHandler(this);
         _inputHandler = new AgentInputHandler(this);
-
-        _stateMachine = new AgentStateMachine<IAgentState>();
     }
 
     protected virtual void Start()
@@ -65,81 +62,49 @@ public abstract class AgentController : MonoBehaviour, IAgentHealthListener, IAg
     }
     protected virtual void Update()
     {
-        _stateMachine.Operate();
+        _currentState?.Execute(Time.deltaTime);
     }
-    protected virtual void FixedUpdate()
-    {
-        _stateMachine.FixedOperate();
-    }
+    protected abstract void FixedUpdate();
 
     public virtual void ChangeState(StateType type)
     {
-        if (_states.TryGetValue(type, out IAgentState newState))
+        if (_states.TryGetValue(type, out AgentStateBase newState))
         {
-            _stateMachine.ChangeState(newState);
+            _currentState?.Exit();
+            _currentState = newState;
+            _currentState?.Enter();
         }
     }
-
-    #region Action Methods - State Operations
-    public virtual void Idle(bool isIdle)
-    {
-        _animator.SetBool(StateType.Idle, isIdle);
-        if (isIdle) _movementHandler.HandleMove(Vector2.zero);
-    }
-    public virtual void Move(bool isMove)
-    {
-        _animator.SetBool(StateType.Move, isMove);
-    }
-
-    public virtual void Attack(bool isAttack)
-    {
-        _animator.SetBool(StateType.Attack, isAttack);
-        if (isAttack) _animator.SetInteger(AnimationIntType.AttackType, _combatHandler.CurrentAttackType);
-        else
-        {
-            _combatHandler.ResetAttackType();
-            _animator.SetInteger(AnimationIntType.AttackType, 0);
-        }
-    }
-    public virtual void Hit(bool isHit)
-    {
-        _combatHandler.ResetAttackType();
-        _animator.SetBool(StateType.Hit, isHit);
-    }
-    public virtual void Death(bool isDeath)
-    {
-        _animator.SetBool(StateType.Death, isDeath);
-        if (isDeath)
-        {
-            _combatHandler.ResetAttackType();
-            _movementHandler.HandleMove(Vector2.zero);
-        }
-    }
-    #endregion
     
     #region State Animation Event
-    public virtual void OnAttackHitFrame()
-    {
-        _combatHandler.PerformAttack();
-    }
+
     public virtual void OnAnimationEvent(AnimEventType type)
     {
-        _stateMachine.CurrentState.OnAnimationEvent(type);
+        if(_currentState is AttackState)
+        {
+            if(type == AnimEventType.OnFrame)
+            {
+                _combatHandler.PerformAttack();
+            }
+        }
+        else if(_currentState is HitState)
+        {
+            if(type == AnimEventType.End)
+            {
+                OnAnimationEnded?.Invoke();
+            }
+        }
+        else if(_currentState is DeathState)
+        {
+            if(type == AnimEventType.End)
+            {
+                OnDeathFinished();
+            }
+        }
     }
     public virtual void OnDeathFinished() { }
     #endregion
-
-    #region IAgentHealthListener
-    public virtual void OnHit() => ChangeState(StateType.Hit);
-
-    public virtual void OnDeath() => ChangeState(StateType.Death);
-    #endregion
-
     #region  State Input Event
-    public virtual void HandleMovement()
-    {
-        _movementHandler.HandleMove(_moveInput.GetMovementInput());
-    }
     public virtual void OnAttackAction(int attackType) { }
     #endregion
 }

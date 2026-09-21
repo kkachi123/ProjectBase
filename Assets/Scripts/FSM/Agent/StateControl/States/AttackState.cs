@@ -1,32 +1,28 @@
-using UnityEngine;
-
 public class AttackState : AgentStateBase
 {
-    private bool _isAttackFinished;
-    public AttackState(AgentController agent) : base(agent) { }
-    public override void Enter()
+    private AgentAnimator _animator;
+    private AgentCombatHandler _combatHandler;
+
+    public AttackState(AgentAnimator animator , AgentCombatHandler combatHandler)
     {
-        _isAttackFinished = false;
-        _agent.Attack(true);
-    }
-    public override void Execute()
-    {
-        if(_isAttackFinished) _agent.ChangeState(StateType.Idle);
-    }
-    public override void Exit() 
-    { 
-        _agent.Attack(false); 
+        _animator = animator;
+        _combatHandler = combatHandler;
     }
 
-    public override void OnAnimationEvent(AnimEventType type)
+    protected override void OnEnter()
     {
-        if(type == AnimEventType.OnFrame)
-        {
-            _agent.OnAttackHitFrame();
-        }
-        if(type == AnimEventType.End)
-        {
-            _isAttackFinished = true;
-        }
+        _animator.SetBool(StateType.Attack, true);
+        _animator.SetInteger(AnimationIntType.AttackType, _combatHandler.CurrentAttackType);
+    }
+    protected override void OnExecute(float deltatime)
+    {
+        return;
+    }
+    
+    public override void Exit() 
+    { 
+        _animator.SetBool(StateType.Attack, false);
+        _combatHandler.ResetAttackType();
+        _animator.SetInteger(AnimationIntType.AttackType, 0);
     }
 }

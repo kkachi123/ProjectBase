@@ -1,41 +1,27 @@
-using UnityEngine;
-
-public class FallState : GroundedAgentStateBase
+public class FallState : AgentStateBase
 {
-    public FallState(GroundedAgentController agent) : base(agent) { }
+    private AgentAnimator _animator;
+    private AgentMovementHandler2D _movementHandler;
+    private IAgentMovementInput _moveInput;
 
-    public override void Enter()
+    public FallState(AgentAnimator animator, AgentMovementHandler2D movementHandler, IAgentMovementInput moveInput)
     {
-        _agent.Falling(true);
+        _animator = animator;
+        _movementHandler = movementHandler;
+        _moveInput = moveInput;
+    }
+    protected override void OnEnter()
+    {
+        _animator.SetBool(StateType.Fall, true);
     }
 
-    public override void Execute()
+    protected override void OnExecute(float deltaTime)
     {
-        if (_agent.IsGrounded)
-        {
-            if(_agent.IsIdle) _agent.ChangeState(StateType.Idle);
-            else _agent.ChangeState(StateType.Move);
-        }
-            
-    }
-
-    public override void FixedExecute()
-    {
-        _agent.HandleMovement();
+        _movementHandler.HandleAirMove(_moveInput.GetMovementInput());
     }
     public override void Exit()
     {
-        _agent.Falling(false);
+        _animator.SetBool(StateType.Fall, false);
     }
 
-    public override void OnInputEvent(InputKeyType type)
-    {
-        if(_agent.IsGrounded) return;
-        switch (type)
-        {
-            case InputKeyType.Attack:
-                _agent.ChangeState(StateType.Attack);
-                break;
-        }
-    }
 }

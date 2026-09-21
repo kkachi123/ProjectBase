@@ -1,36 +1,29 @@
 using UnityEngine;
 
-public class IdleState<T> : AgentStateBase<T> where T : AgentController
+public class IdleState : AgentStateBase
 {
-    public IdleState(T agent) : base(agent) { }
-
-    public override void Enter()
+    private AgentAnimator _animator;
+    private AgentMovementHandler2D _movementHandler;
+    
+    public IdleState(AgentAnimator animator, AgentMovementHandler2D movementHandler)
     {
-        _agent.Idle(true);
+        _animator = animator;
+        _movementHandler = movementHandler;
     }
 
-    public override void Execute()
+    protected override void OnEnter()
     {
-        if (!_agent.IsIdle) _agent.ChangeState(StateType.Move);
+        _animator.SetBool(StateType.Idle, true);
+        _movementHandler.HandleMove(Vector2.zero);
+    }
+
+    protected override void OnExecute(float deltaTime)
+    {
+        //if (!_agent.IsIdle) _agent.ChangeState(StateType.Move);
     }
 
     public override void Exit() 
     {
-        _agent.Idle(false);
+        _animator.SetBool(StateType.Idle, false);
     }
-
-    public override void OnInputEvent(InputKeyType type)
-    {
-        switch (type)
-        {
-            case InputKeyType.Attack:
-                _agent.ChangeState(StateType.Attack);
-                break;
-        }
-    }
-}
-
-public class IdleState : IdleState<AgentController>
-{
-    public IdleState(AgentController agent) : base(agent) { }
 }

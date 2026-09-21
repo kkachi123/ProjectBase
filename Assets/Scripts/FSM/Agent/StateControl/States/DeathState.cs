@@ -1,17 +1,27 @@
+using UnityEngine;
 public class DeathState : AgentStateBase
 {
-    public DeathState(AgentController agent) : base(agent) { }
+    private AgentAnimator _animator;
+    private AgentCombatHandler _combatHandler;
+    private AgentMovementHandler2D _movementHandler;
 
-    public override void Enter()
+    public DeathState(AgentAnimator animator, AgentCombatHandler combatHandler, AgentMovementHandler2D movementHandler)
     {
-        _agent.Death(true);
+        _animator = animator;
+        _combatHandler = combatHandler;
+        _movementHandler = movementHandler;
     }
 
-    public override void Execute() { }
+    protected override void OnEnter()
+    {
+        _animator.SetBool(StateType.Death, true);
+        _combatHandler.ResetAttackType();
+        _movementHandler.HandleMove(Vector2.zero);
+    }
+
+    protected override void OnExecute(float deltaTime)
+    {
+        return;
+    }
     public override void Exit() { }
-
-    public override void OnAnimationEvent(AnimEventType type)
-    {
-        if (type == AnimEventType.End) _agent.OnDeathFinished();
-    }
 }

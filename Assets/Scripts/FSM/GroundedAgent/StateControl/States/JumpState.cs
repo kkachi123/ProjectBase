@@ -1,52 +1,29 @@
-using UnityEngine;
-public class JumpState : GroundedAgentStateBase
+public class JumpState : AgentStateBase
 {
-    private float _jumpTimer;
-    private bool _isJumpFinished;
-    private const float MIN_JUMP_TIME = 0.1f;
-    public JumpState(GroundedAgentController agent) : base(agent) { }
-
-    public override void Enter() 
+    private AgentAnimator _animator;
+    private AgentMovementHandler2D _movementHandler;
+    private IAgentMovementInput _moveInput;
+    
+    public JumpState(AgentAnimator animator, AgentMovementHandler2D movementHandler, IAgentMovementInput moveInput)
     {
-        _jumpTimer = 0f;
-        _isJumpFinished = false;
-        _agent.Jump(true);
+        _animator = animator;
+        _movementHandler = movementHandler;
+        _moveInput = moveInput;
     }
 
-    public override void Execute()
+    protected override void OnEnter() 
     {
-        _jumpTimer += Time.deltaTime;
-        if(_jumpTimer >= MIN_JUMP_TIME)
-        {
-            if (_agent.IsGrounded) _agent.ChangeState(StateType.Idle);
-            else if(!_agent.IsGrounded && _isJumpFinished) _agent.ChangeState(StateType.Fall);
-        }
+        _animator.SetBool(StateType.Jump, true);
+        _movementHandler.HandleJump();
     }
 
-    public override void FixedExecute()
+    protected override void OnExecute(float deltaTime)
     {
-        _agent.HandleMovement();
+        _movementHandler.HandleMove(_moveInput.GetMovementInput());
     }
 
     public override void Exit() 
     {
-        _agent.Jump(false);
-    }
-    public override void OnAnimationEvent(AnimEventType type)
-    {
-        if(type == AnimEventType.End)
-        {
-            _isJumpFinished = true;
-        }
-    }
-    public override void OnInputEvent(InputKeyType type)
-    {
-        if( _agent.IsGrounded) return;
-        switch (type)
-        {
-            case InputKeyType.Attack:
-                _agent.ChangeState(StateType.Attack);
-                break;
-        }
+        _animator.SetBool(StateType.Jump, false);
     }
 }
