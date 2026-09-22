@@ -13,4 +13,6 @@ public class AnimationDataSO : ScriptableObject
     public string IsAttackBool = "IsAttack";
     public string IsHitBool = "IsHit";
     public string IsDeathBool = "IsDeath";
+    [Header("Animation Trigger")]
+    public string AttackTrigger = "AttackTrigger";
 }

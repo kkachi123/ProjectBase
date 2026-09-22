@@ -1,19 +1,19 @@
-using System;
-public interface IAnimationEventSource
-{
-    event Action OnAnimationEnded;
-}
-public class GetHitEndTransition : IEventTransitionRule
+public class AttackEndTransition : IEventTransitionRule
 {
     public StateType NextState => StateType.Idle;
 
     private readonly IAnimationEventSource _eventSource;
+    private readonly IAgentCombatInput _combatInput;
+    private readonly GroundDetector _groundDetector;
+
     private bool _isSubscribed;
     private bool _shouldTransition;
 
-    public GetHitEndTransition(IAnimationEventSource eventSource)
+    public AttackEndTransition(IAnimationEventSource eventSource, IAgentCombatInput combatInput, GroundDetector groundDetector)
     {
         _eventSource = eventSource;
+        _combatInput = combatInput;
+        _groundDetector = groundDetector;
     }
 
     public void Subscribe()
@@ -49,5 +49,4 @@ public class GetHitEndTransition : IEventTransitionRule
     {
         _shouldTransition = true;
     }
-    
 }

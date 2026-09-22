@@ -18,7 +18,7 @@ public class PlayerController : GroundedAgentController
         _playerInput = GetComponent<PlayerInput>();
         _impactHandler = GetComponent<AgentImpactHandler>();
         _impactHandler.Initialize(_motor, _motorData);
-    
+
         _states = new PlayerStateFactory().CreateStates(
             new PlayerStateFactoryData
             {
@@ -26,7 +26,12 @@ public class PlayerController : GroundedAgentController
                 MovementHandler = _movementHandler,
                 MovementInput = _moveInput,
                 CombatHandler = _combatHandler,
-                GroundDetector = _groundDetector
+                Health = this.Health,
+                GroundDetector = _groundDetector,
+                JumpInput = _playerInput,
+                CombatInput = CombatInput,
+                AnimationEventSource = this,
+                AttackStarter = this
             }
         );
     }
@@ -39,13 +44,22 @@ public class PlayerController : GroundedAgentController
     #endregion
 
     #region State Input Event
-    public override void OnAttackAction(int attackType)
+    public override bool CanStartAttack(int requestedAttackType)
     {
-        if (!IsGrounded) attackType = 3;
-        if (_combatHandler.CurrentAttackType != 0) return;
-        if (!Stamina.Use(_statData.attackDatas[attackType - 1].usedStamina)) return;
-        _combatHandler.SetAttackType(attackType);
-    }
+        int attackType = IsGrounded ? requestedAttackType : 3;
 
+        return _combatHandler.CurrentAttackType == 0
+            && Stamina.CanUse(_statData.attackDatas[attackType - 1].usedStamina);
+    }
+    
+    public override bool TryStartAttack(int requestedAttackType)
+    {
+        int attackType = IsGrounded ? requestedAttackType : 3;
+
+        if (!Stamina.Use(_statData.attackDatas[attackType - 1].usedStamina))
+            return false;
+
+        return _combatHandler.SetAttackType(attackType);
+    }
     #endregion
 }

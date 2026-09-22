@@ -11,7 +11,7 @@ public class MonsterStateFactory
         {
             { StateType.Idle, new IdleState(data.Animator , data.MovementHandler) },
             { StateType.Move, new MoveState(data.Animator, data.MovementHandler, data.MovementInput) },
-            { StateType.Attack, new AttackState(data.Animator, data.CombatHandler) },
+            //{ StateType.Attack, new AttackState(data.Animator, data.CombatHandler) },
             { StateType.Hit, new HitState(data.Animator, data.CombatHandler) },
             { StateType.Death, new DeathState(data.Animator, data.CombatHandler, data.MovementHandler) }
         };

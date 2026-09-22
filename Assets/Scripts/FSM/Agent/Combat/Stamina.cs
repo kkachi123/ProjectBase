@@ -21,6 +21,11 @@ public class Stamina : MonoBehaviour
         if (_currentStamina.Value < MaxStamina)
             _currentStamina.Value = Mathf.Min(_currentStamina.Value + _recoveryRate * Time.deltaTime, MaxStamina);
     }
+    public bool CanUse(float amount)
+    {
+        return amount >= 0f && _currentStamina.Value >= amount;
+    }
+
 
     public bool Use(float amount)
     {

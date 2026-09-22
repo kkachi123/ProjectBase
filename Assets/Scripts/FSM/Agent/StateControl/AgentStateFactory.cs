@@ -6,6 +6,9 @@ public class StateFactoryData
     public IAgentMovementInput MovementInput { get; set; }
     public AgentCombatHandler CombatHandler { get; set; }
     public IAgentCombatInput CombatInput { get; set; }
+    public IAttackStarter AttackStarter { get; set; }
+    public IAnimationEventSource AnimationEventSource { get; set; }
+    public Health Health { get; set; }
 }
 
 public abstract class AgentStateFactory

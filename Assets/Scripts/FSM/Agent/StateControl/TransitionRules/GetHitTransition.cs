@@ -12,7 +12,7 @@ public class GetHitTransition : IEventTransitionRule
 
     public void Subscribe()
     {
-        if(CurrentHealth != null) return;
+        if(CurrentHealth == null) return;
         CurrentHealth
             .Pairwise()
             .Where(pair => pair.Current < pair.Previous)

@@ -4,7 +4,7 @@ using UnityEngine;
 
 [RequireComponent(typeof(AgentMotor2D), typeof(Health), typeof(AgentCombatHandler))]
 
-public abstract class AgentController : MonoBehaviour, IAgentInputListener, IAgentAnimationListener , IAnimationEventSource
+public abstract class AgentController : MonoBehaviour, IAgentAnimationListener , IAnimationEventSource , IAttackStarter
 {
     [Header("Data Assets")]
     [SerializeField] protected AgentStatData _statData;
@@ -26,7 +26,6 @@ public abstract class AgentController : MonoBehaviour, IAgentInputListener, IAge
     [Header("Handlers")]
     [SerializeField] protected AgentCombatHandler _combatHandler;
     protected AgentMovementHandler2D _movementHandler;
-    protected AgentInputHandler _inputHandler;
 
     [Header("State Machine")]
     protected Dictionary<StateType, AgentStateBase> _states = new();
@@ -53,11 +52,14 @@ public abstract class AgentController : MonoBehaviour, IAgentInputListener, IAge
         _combatHandler?.Initialize(_statData.attackDatas);
 
         _movementHandler =  new AgentMovementHandler2D(_motor, _motorData);
-        _inputHandler = new AgentInputHandler(this);
     }
 
     protected virtual void Start()
     {
+        foreach (AgentStateBase state in _states.Values)
+        {
+            state.OnTransition += ChangeState;
+        }
         ChangeState(StateType.Idle);
     }
     protected virtual void Update()
@@ -74,10 +76,9 @@ public abstract class AgentController : MonoBehaviour, IAgentInputListener, IAge
             _currentState = newState;
             _currentState?.Enter();
         }
+        //Debug.Log($"State Changed to: {type}");
     }
     
-    #region State Animation Event
-
     public virtual void OnAnimationEvent(AnimEventType type)
     {
         if(_currentState is AttackState)
@@ -85,6 +86,10 @@ public abstract class AgentController : MonoBehaviour, IAgentInputListener, IAge
             if(type == AnimEventType.OnFrame)
             {
                 _combatHandler.PerformAttack();
+            }
+            else if(type == AnimEventType.End)
+            {
+                OnAnimationEnded?.Invoke();
             }
         }
         else if(_currentState is HitState)
@@ -103,8 +108,6 @@ public abstract class AgentController : MonoBehaviour, IAgentInputListener, IAge
         }
     }
     public virtual void OnDeathFinished() { }
-    #endregion
-    #region  State Input Event
-    public virtual void OnAttackAction(int attackType) { }
-    #endregion
+    public virtual bool CanStartAttack(int requestedAttackType) { return false; }
+    public virtual bool TryStartAttack(int requestedAttackType) { return false; }
 }
