@@ -5,7 +5,6 @@ public abstract class GroundedAgentController : AgentController
 {
     [SerializeField] protected GroundDetector _groundDetector;
     protected IAgentJumpInput _jumpInput;
-    public IAgentJumpInput JumpInput => _jumpInput;
 
     // State Check Properties
     public bool IsGrounded => _groundDetector != null && _groundDetector.IsGrounded;

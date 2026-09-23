@@ -31,10 +31,6 @@ public abstract class AgentController : MonoBehaviour, IAgentAnimationListener ,
     protected Dictionary<StateType, AgentStateBase> _states = new();
     protected AgentStateBase _currentState;
 
-    // State Check Properties
-    public virtual bool IsIdle => _moveInput.GetMovementInput().sqrMagnitude < 0.0001f;
-
-
     protected virtual void Awake()
     {
         // Core Component Initialization
@@ -76,7 +72,6 @@ public abstract class AgentController : MonoBehaviour, IAgentAnimationListener ,
             _currentState = newState;
             _currentState?.Enter();
         }
-        //Debug.Log($"State Changed to: {type}");
     }
     
     public virtual void OnAnimationEvent(AnimEventType type)
