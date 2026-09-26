@@ -1,7 +1,9 @@
+using System;
+
 public class IdleToMoveTransition : ITransitionRule
 {
     // 현재 상태가 Idle이면 Move로 전환, Move이면 Idle로 전환
-    public StateType NextState => _isIdle ? StateType.Move : StateType.Idle;
+    public Type NextStateType => _isIdle ? typeof(MoveState) : typeof(IdleState);
 
     private IAgentMovementInput _movementInput;
 

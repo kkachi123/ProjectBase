@@ -1,0 +1,1 @@
+Asset used in multiple samples.

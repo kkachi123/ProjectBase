@@ -1,0 +1,53 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 1455135332, guid: af56af93b18e8464f9915f7a446a8088, type: 3}
+  m_Name: Documentation
+  m_EditorClassIdentifier: 
+  _markdownContent: '# Pixel Platformer
+
+
+    A mini platformer with player, enemies,
+    pickups, levels, etc.
+
+
+    **NOTE: Add Scenes to Build Settings to load the
+    next level when completed.**
+
+
+    {height=300}![screenshot](Packages/com.hutonggames.playmaker/Editor/Addons/Packages/com.hutonggames.playmaker.samples.pixel-platformer.jpg)
+
+
+    ##
+    Features
+
+
+    - Uses Input and 2d Physics to control the player.
+
+    - Sync
+    animator parameters to player state.
+
+    - Collect pickups.
+
+    - Traps that
+    kill the player.
+
+    - Enemies with patrol routes.
+
+    - Respawn player when
+    killed.
+
+    - One way and falling platforms.
+
+    - Detect level cleared and
+    load next level.
+
+'

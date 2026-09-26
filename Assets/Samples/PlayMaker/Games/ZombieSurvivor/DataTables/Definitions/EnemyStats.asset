@@ -1,0 +1,102 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: -143357391, guid: af56af93b18e8464f9915f7a446a8088, type: 3}
+  m_Name: EnemyStats
+  m_EditorClassIdentifier: 
+  _group: {fileID: 11400000, guid: c6fb0d919f6a8d34aa5bce7a533a86c6, type: 2}
+  _variables:
+    _list:
+    - rid: 5293901527461135071
+    - rid: 5293901564970008777
+    - rid: 5293901564970008770
+    - rid: 5293901565055730407
+    _ownerValue:
+      rid: -2
+    _owner: {fileID: 11400000}
+    Expanded: 1
+    _editorOnlyList:
+      _items:
+      - rid: 5293901565055730408
+      - rid: 5293901564970008771
+      - rid: 5293901527461135072
+      - rid: 5293901564970008769
+      _locked: 0
+  _description: Common stats for all enemies
+  references:
+    version: 2
+    RefIds:
+    - rid: -2
+      type: {class: , ns: , asm: }
+    - rid: 5293901527461135071
+      type: {class: FloatVariable, ns: HutongGames.PlayMaker, asm: PlayMaker.Runtime}
+      data:
+        _guid:
+          _value0: 8405103230248297048
+          _value1: 13533017483151351625
+        _debug: 0
+        _saveMode: 0
+        _description: Damage dealt to player on touch
+        _name: ContactDamage
+        _value: 1
+    - rid: 5293901527461135072
+      type: {class: VariableItem, ns: HutongGames.PlayMaker, asm: PlayMaker.Runtime}
+      data:
+        _variable:
+          rid: 5293901527461135071
+    - rid: 5293901564970008769
+      type: {class: VariableItem, ns: HutongGames.PlayMaker, asm: PlayMaker.Runtime}
+      data:
+        _variable:
+          rid: 5293901564970008777
+    - rid: 5293901564970008770
+      type: {class: FloatVariable, ns: HutongGames.PlayMaker, asm: PlayMaker.Runtime}
+      data:
+        _guid:
+          _value0: 9101327525704294908
+          _value1: 13722908621455637426
+        _debug: 0
+        _saveMode: 0
+        _description: Starting health.
+        _name: Health
+        _value: 0
+    - rid: 5293901564970008771
+      type: {class: VariableItem, ns: HutongGames.PlayMaker, asm: PlayMaker.Runtime}
+      data:
+        _variable:
+          rid: 5293901564970008770
+    - rid: 5293901564970008777
+      type: {class: IntegerVariable, ns: HutongGames.PlayMaker, asm: PlayMaker.Runtime}
+      data:
+        _guid:
+          _value0: 10990749657491060788
+          _value1: 14595252303104581160
+        _debug: 0
+        _saveMode: 0
+        _description: The number of ortbs dropped when killed.
+        _name: Orbs
+        _value: 0
+    - rid: 5293901565055730407
+      type: {class: FloatVariable, ns: HutongGames.PlayMaker, asm: PlayMaker.Runtime}
+      data:
+        _guid:
+          _value0: 3015377758009772497
+          _value1: 18367002206194119435
+        _debug: 0
+        _saveMode: 0
+        _description: Movement speed
+        _name: Speed
+        _value: 1
+    - rid: 5293901565055730408
+      type: {class: VariableItem, ns: HutongGames.PlayMaker, asm: PlayMaker.Runtime}
+      data:
+        _variable:
+          rid: 5293901565055730407

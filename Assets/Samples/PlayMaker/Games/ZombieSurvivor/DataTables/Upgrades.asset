@@ -1,0 +1,901 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: -910749130, guid: af56af93b18e8464f9915f7a446a8088, type: 3}
+  m_Name: Upgrades
+  m_EditorClassIdentifier: 
+  _guid:
+    _value0: 7049295947882966097
+    _value1: 2665359120174824307
+  _table:
+    _dataDefinition: {fileID: 11400000, guid: 3c25107ccf98a9841b7d57eb812945eb, type: 2}
+    _rows:
+    - _id:
+        _value0: 3961215320324912166
+        _value1: 9380993763562947568
+      _key: 
+      _cells:
+      - _fieldGuid:
+          _value0: 4590706171379465250
+          _value1: 6772412537030104621
+        _value:
+          rid: 5293901363998360199
+      - _fieldGuid:
+          _value0: 4659876963107272962
+          _value1: 8056241943143001510
+        _value:
+          rid: 5293901363998360200
+      - _fieldGuid:
+          _value0: 8842159553783023800
+          _value1: 3675738929309752841
+        _value:
+          rid: 5293901363998360201
+      - _fieldGuid:
+          _value0: 10123559568830524670
+          _value1: 14945889284324310505
+        _value:
+          rid: 5293901363998360202
+      - _fieldGuid:
+          _value0: 15365934955627999042
+          _value1: 8928717556242745170
+        _value:
+          rid: 5293901363998360203
+      - _fieldGuid:
+          _value0: 8288093666655282964
+          _value1: 17463565765762075037
+        _value:
+          rid: 5293901463279370356
+    - _id:
+        _value0: 10343131343347123433
+        _value1: 6440904124843952915
+      _key: 
+      _cells:
+      - _fieldGuid:
+          _value0: 4590706171379465250
+          _value1: 6772412537030104621
+        _value:
+          rid: 5293901363998360204
+      - _fieldGuid:
+          _value0: 4659876963107272962
+          _value1: 8056241943143001510
+        _value:
+          rid: 5293901363998360205
+      - _fieldGuid:
+          _value0: 8842159553783023800
+          _value1: 3675738929309752841
+        _value:
+          rid: 5293901363998360206
+      - _fieldGuid:
+          _value0: 10123559568830524670
+          _value1: 14945889284324310505
+        _value:
+          rid: 5293901363998360207
+      - _fieldGuid:
+          _value0: 15365934955627999042
+          _value1: 8928717556242745170
+        _value:
+          rid: 5293901363998360208
+      - _fieldGuid:
+          _value0: 8288093666655282964
+          _value1: 17463565765762075037
+        _value:
+          rid: 5293901463279370357
+    - _id:
+        _value0: 17824408916615610636
+        _value1: 4198240738438043966
+      _key: 
+      _cells:
+      - _fieldGuid:
+          _value0: 4590706171379465250
+          _value1: 6772412537030104621
+        _value:
+          rid: 5293901363998360209
+      - _fieldGuid:
+          _value0: 4659876963107272962
+          _value1: 8056241943143001510
+        _value:
+          rid: 5293901363998360210
+      - _fieldGuid:
+          _value0: 8842159553783023800
+          _value1: 3675738929309752841
+        _value:
+          rid: 5293901363998360211
+      - _fieldGuid:
+          _value0: 10123559568830524670
+          _value1: 14945889284324310505
+        _value:
+          rid: 5293901363998360212
+      - _fieldGuid:
+          _value0: 15365934955627999042
+          _value1: 8928717556242745170
+        _value:
+          rid: 5293901363998360213
+      - _fieldGuid:
+          _value0: 8288093666655282964
+          _value1: 17463565765762075037
+        _value:
+          rid: 5293901463279370358
+    - _id:
+        _value0: 17057322934075595342
+        _value1: 16819321583590108015
+      _key: 
+      _cells:
+      - _fieldGuid:
+          _value0: 4590706171379465250
+          _value1: 6772412537030104621
+        _value:
+          rid: 5293901364292223680
+      - _fieldGuid:
+          _value0: 4659876963107272962
+          _value1: 8056241943143001510
+        _value:
+          rid: 5293901364292223681
+      - _fieldGuid:
+          _value0: 8842159553783023800
+          _value1: 3675738929309752841
+        _value:
+          rid: 5293901364292223682
+      - _fieldGuid:
+          _value0: 10123559568830524670
+          _value1: 14945889284324310505
+        _value:
+          rid: 5293901364292223683
+      - _fieldGuid:
+          _value0: 15365934955627999042
+          _value1: 8928717556242745170
+        _value:
+          rid: 5293901364292223684
+      - _fieldGuid:
+          _value0: 8288093666655282964
+          _value1: 17463565765762075037
+        _value:
+          rid: 5293901463279370359
+    - _id:
+        _value0: 7046866819508606884
+        _value1: 1947361090768225138
+      _key: 
+      _cells:
+      - _fieldGuid:
+          _value0: 4590706171379465250
+          _value1: 6772412537030104621
+        _value:
+          rid: 5293901501249617958
+      - _fieldGuid:
+          _value0: 4659876963107272962
+          _value1: 8056241943143001510
+        _value:
+          rid: 5293901501249617959
+      - _fieldGuid:
+          _value0: 15365934955627999042
+          _value1: 8928717556242745170
+        _value:
+          rid: 5293901501249617960
+      - _fieldGuid:
+          _value0: 8288093666655282964
+          _value1: 17463565765762075037
+        _value:
+          rid: 5293901501249617961
+    - _id:
+        _value0: 12397722840855747007
+        _value1: 4497026879496073342
+      _key: 
+      _cells:
+      - _fieldGuid:
+          _value0: 4590706171379465250
+          _value1: 6772412537030104621
+        _value:
+          rid: 5293901501249617962
+      - _fieldGuid:
+          _value0: 4659876963107272962
+          _value1: 8056241943143001510
+        _value:
+          rid: 5293901501249617963
+      - _fieldGuid:
+          _value0: 15365934955627999042
+          _value1: 8928717556242745170
+        _value:
+          rid: 5293901501249617964
+      - _fieldGuid:
+          _value0: 8288093666655282964
+          _value1: 17463565765762075037
+        _value:
+          rid: 5293901501249617965
+    - _id:
+        _value0: 6728019162434842412
+        _value1: 10857288696201236289
+      _key: 
+      _cells:
+      - _fieldGuid:
+          _value0: 4590706171379465250
+          _value1: 6772412537030104621
+        _value:
+          rid: 5293901501249617966
+      - _fieldGuid:
+          _value0: 4659876963107272962
+          _value1: 8056241943143001510
+        _value:
+          rid: 5293901501249617967
+      - _fieldGuid:
+          _value0: 15365934955627999042
+          _value1: 8928717556242745170
+        _value:
+          rid: 5293901501249617968
+      - _fieldGuid:
+          _value0: 8288093666655282964
+          _value1: 17463565765762075037
+        _value:
+          rid: 5293901501249617969
+    - _id:
+        _value0: 12307943791636261714
+        _value1: 1610878600271641288
+      _key: 
+      _cells:
+      - _fieldGuid:
+          _value0: 4590706171379465250
+          _value1: 6772412537030104621
+        _value:
+          rid: 5293901364292223685
+      - _fieldGuid:
+          _value0: 4659876963107272962
+          _value1: 8056241943143001510
+        _value:
+          rid: 5293901364292223686
+      - _fieldGuid:
+          _value0: 8842159553783023800
+          _value1: 3675738929309752841
+        _value:
+          rid: 5293901364292223687
+      - _fieldGuid:
+          _value0: 10123559568830524670
+          _value1: 14945889284324310505
+        _value:
+          rid: 5293901364292223688
+      - _fieldGuid:
+          _value0: 15365934955627999042
+          _value1: 8928717556242745170
+        _value:
+          rid: 5293901364292223689
+      - _fieldGuid:
+          _value0: 8288093666655282964
+          _value1: 17463565765762075037
+        _value:
+          rid: 5293901463279370360
+    - _id:
+        _value0: 11215598299761797319
+        _value1: 1565169604408295815
+      _key: 
+      _cells:
+      - _fieldGuid:
+          _value0: 4590706171379465250
+          _value1: 6772412537030104621
+        _value:
+          rid: 5293901639283638556
+      - _fieldGuid:
+          _value0: 4659876963107272962
+          _value1: 8056241943143001510
+        _value:
+          rid: 5293901639283638557
+      - _fieldGuid:
+          _value0: 15365934955627999042
+          _value1: 8928717556242745170
+        _value:
+          rid: 5293901639283638558
+      - _fieldGuid:
+          _value0: 8288093666655282964
+          _value1: 17463565765762075037
+        _value:
+          rid: 5293901639283638559
+    - _id:
+        _value0: 13716635457583439193
+        _value1: 9039203234771735345
+      _key: 
+      _cells:
+      - _fieldGuid:
+          _value0: 4590706171379465250
+          _value1: 6772412537030104621
+        _value:
+          rid: 5293901639283638729
+      - _fieldGuid:
+          _value0: 4659876963107272962
+          _value1: 8056241943143001510
+        _value:
+          rid: 5293901639283638730
+      - _fieldGuid:
+          _value0: 15365934955627999042
+          _value1: 8928717556242745170
+        _value:
+          rid: 5293901639283638731
+      - _fieldGuid:
+          _value0: 8288093666655282964
+          _value1: 17463565765762075037
+        _value:
+          rid: 5293901639283638732
+    - _id:
+        _value0: 2332189861347194775
+        _value1: 10158755954453255887
+      _key: 
+      _cells:
+      - _fieldGuid:
+          _value0: 4590706171379465250
+          _value1: 6772412537030104621
+        _value:
+          rid: 5293901639283638733
+      - _fieldGuid:
+          _value0: 4659876963107272962
+          _value1: 8056241943143001510
+        _value:
+          rid: 5293901639283638734
+      - _fieldGuid:
+          _value0: 15365934955627999042
+          _value1: 8928717556242745170
+        _value:
+          rid: 5293901639283638735
+      - _fieldGuid:
+          _value0: 8288093666655282964
+          _value1: 17463565765762075037
+        _value:
+          rid: 5293901639283638736
+    - _id:
+        _value0: 6615041333096883507
+        _value1: 4930478170866911929
+      _key: 
+      _cells:
+      - _fieldGuid:
+          _value0: 4590706171379465250
+          _value1: 6772412537030104621
+        _value:
+          rid: 5293901639283638737
+      - _fieldGuid:
+          _value0: 4659876963107272962
+          _value1: 8056241943143001510
+        _value:
+          rid: 5293901639283638738
+      - _fieldGuid:
+          _value0: 15365934955627999042
+          _value1: 8928717556242745170
+        _value:
+          rid: 5293901639283638739
+      - _fieldGuid:
+          _value0: 8288093666655282964
+          _value1: 17463565765762075037
+        _value:
+          rid: 5293901639283638740
+    _writePolicy: 1
+  _saveMode: 0
+  _description: All upgrades in the game.
+  _group: {fileID: 11400000, guid: c6fb0d919f6a8d34aa5bce7a533a86c6, type: 2}
+  references:
+    version: 2
+    RefIds:
+    - rid: -2
+      type: {class: , ns: , asm: }
+    - rid: 5293901363998360199
+      type: {class: StringVar, ns: HutongGames.PlayMaker, asm: PlayMaker.Runtime}
+      data:
+        _variable:
+          rid: -2
+        _isWriteOnly: 0
+        _fieldName: ID
+        _value: Hero/Knife
+        _isConstant: 1
+    - rid: 5293901363998360200
+      type: {class: IntegerVar, ns: HutongGames.PlayMaker, asm: PlayMaker.Runtime}
+      data:
+        _variable:
+          rid: -2
+        _isWriteOnly: 0
+        _fieldName: Level
+        _value: 1
+        _isConstant: 1
+    - rid: 5293901363998360201
+      type: {class: StringVar, ns: HutongGames.PlayMaker, asm: PlayMaker.Runtime}
+      data:
+        _variable:
+          rid: -2
+        _isWriteOnly: 0
+        _fieldName: Name
+        _value: Knife
+        _isConstant: 1
+    - rid: 5293901363998360202
+      type: {class: SpriteVar, ns: HutongGames.PlayMaker.Actions, asm: HutongGames.PlayMaker}
+      data:
+        _variable:
+          rid: -2
+        _isWriteOnly: 0
+        _fieldName: Image
+        _value: {fileID: 0}
+        _isConstant: 1
+    - rid: 5293901363998360203
+      type: {class: StringVar, ns: HutongGames.PlayMaker, asm: PlayMaker.Runtime}
+      data:
+        _variable:
+          rid: -2
+        _isWriteOnly: 0
+        _fieldName: Description
+        _value: Throw knives
+        _isConstant: 1
+    - rid: 5293901363998360204
+      type: {class: StringVar, ns: HutongGames.PlayMaker, asm: PlayMaker.Runtime}
+      data:
+        _variable:
+          rid: -2
+        _isWriteOnly: 0
+        _fieldName: ID
+        _value: Hero/Knife
+        _isConstant: 1
+    - rid: 5293901363998360205
+      type: {class: IntegerVar, ns: HutongGames.PlayMaker, asm: PlayMaker.Runtime}
+      data:
+        _variable:
+          rid: -2
+        _isWriteOnly: 0
+        _fieldName: Level
+        _value: 2
+        _isConstant: 1
+    - rid: 5293901363998360206
+      type: {class: StringVar, ns: HutongGames.PlayMaker, asm: PlayMaker.Runtime}
+      data:
+        _variable:
+          rid: -2
+        _isWriteOnly: 0
+        _fieldName: Name
+        _value: Knife
+        _isConstant: 1
+    - rid: 5293901363998360207
+      type: {class: SpriteVar, ns: HutongGames.PlayMaker.Actions, asm: HutongGames.PlayMaker}
+      data:
+        _variable:
+          rid: -2
+        _isWriteOnly: 0
+        _fieldName: Image
+        _value: {fileID: 0}
+        _isConstant: 1
+    - rid: 5293901363998360208
+      type: {class: StringVar, ns: HutongGames.PlayMaker, asm: PlayMaker.Runtime}
+      data:
+        _variable:
+          rid: -2
+        _isWriteOnly: 0
+        _fieldName: Description
+        _value: Throw knives faster
+        _isConstant: 1
+    - rid: 5293901363998360209
+      type: {class: StringVar, ns: HutongGames.PlayMaker, asm: PlayMaker.Runtime}
+      data:
+        _variable:
+          rid: -2
+        _isWriteOnly: 0
+        _fieldName: ID
+        _value: Hero/Knife
+        _isConstant: 1
+    - rid: 5293901363998360210
+      type: {class: IntegerVar, ns: HutongGames.PlayMaker, asm: PlayMaker.Runtime}
+      data:
+        _variable:
+          rid: -2
+        _isWriteOnly: 0
+        _fieldName: Level
+        _value: 3
+        _isConstant: 1
+    - rid: 5293901363998360211
+      type: {class: StringVar, ns: HutongGames.PlayMaker, asm: PlayMaker.Runtime}
+      data:
+        _variable:
+          rid: -2
+        _isWriteOnly: 0
+        _fieldName: Name
+        _value: Knife
+        _isConstant: 1
+    - rid: 5293901363998360212
+      type: {class: SpriteVar, ns: HutongGames.PlayMaker.Actions, asm: HutongGames.PlayMaker}
+      data:
+        _variable:
+          rid: -2
+        _isWriteOnly: 0
+        _fieldName: Image
+        _value: {fileID: 0}
+        _isConstant: 1
+    - rid: 5293901363998360213
+      type: {class: StringVar, ns: HutongGames.PlayMaker, asm: PlayMaker.Runtime}
+      data:
+        _variable:
+          rid: -2
+        _isWriteOnly: 0
+        _fieldName: Description
+        _value: Throw more knives
+        _isConstant: 1
+    - rid: 5293901364292223680
+      type: {class: StringVar, ns: HutongGames.PlayMaker, asm: PlayMaker.Runtime}
+      data:
+        _variable:
+          rid: -2
+        _isWriteOnly: 0
+        _fieldName: ID
+        _value: Hero/Knife
+        _isConstant: 1
+    - rid: 5293901364292223681
+      type: {class: IntegerVar, ns: HutongGames.PlayMaker, asm: PlayMaker.Runtime}
+      data:
+        _variable:
+          rid: -2
+        _isWriteOnly: 0
+        _fieldName: Level
+        _value: 4
+        _isConstant: 1
+    - rid: 5293901364292223682
+      type: {class: StringVar, ns: HutongGames.PlayMaker, asm: PlayMaker.Runtime}
+      data:
+        _variable:
+          rid: -2
+        _isWriteOnly: 0
+        _fieldName: Name
+        _value: Knife
+        _isConstant: 1
+    - rid: 5293901364292223683
+      type: {class: SpriteVar, ns: HutongGames.PlayMaker.Actions, asm: HutongGames.PlayMaker}
+      data:
+        _variable:
+          rid: -2
+        _isWriteOnly: 0
+        _fieldName: Image
+        _value: {fileID: 0}
+        _isConstant: 1
+    - rid: 5293901364292223684
+      type: {class: StringVar, ns: HutongGames.PlayMaker, asm: PlayMaker.Runtime}
+      data:
+        _variable:
+          rid: -2
+        _isWriteOnly: 0
+        _fieldName: Description
+        _value: Many knives!
+        _isConstant: 1
+    - rid: 5293901364292223685
+      type: {class: StringVar, ns: HutongGames.PlayMaker, asm: PlayMaker.Runtime}
+      data:
+        _variable:
+          rid: -2
+        _isWriteOnly: 0
+        _fieldName: ID
+        _value: Hero/Health
+        _isConstant: 1
+    - rid: 5293901364292223686
+      type: {class: IntegerVar, ns: HutongGames.PlayMaker, asm: PlayMaker.Runtime}
+      data:
+        _variable:
+          rid: -2
+        _isWriteOnly: 0
+        _fieldName: Level
+        _value: 1
+        _isConstant: 1
+    - rid: 5293901364292223687
+      type: {class: StringVar, ns: HutongGames.PlayMaker, asm: PlayMaker.Runtime}
+      data:
+        _variable:
+          rid: -2
+        _isWriteOnly: 0
+        _fieldName: Name
+        _value: Health
+        _isConstant: 1
+    - rid: 5293901364292223688
+      type: {class: SpriteVar, ns: HutongGames.PlayMaker.Actions, asm: HutongGames.PlayMaker}
+      data:
+        _variable:
+          rid: -2
+        _isWriteOnly: 0
+        _fieldName: Image
+        _value: {fileID: 0}
+        _isConstant: 1
+    - rid: 5293901364292223689
+      type: {class: StringVar, ns: HutongGames.PlayMaker, asm: PlayMaker.Runtime}
+      data:
+        _variable:
+          rid: -2
+        _isWriteOnly: 0
+        _fieldName: Description
+        _value: +20 Health
+        _isConstant: 1
+    - rid: 5293901463279370356
+      type: {class: IntegerVar, ns: HutongGames.PlayMaker, asm: PlayMaker.Runtime}
+      data:
+        _variable:
+          rid: -2
+        _isWriteOnly: 0
+        _fieldName: MinPlayerLevel
+        _value: 1
+        _isConstant: 1
+    - rid: 5293901463279370357
+      type: {class: IntegerVar, ns: HutongGames.PlayMaker, asm: PlayMaker.Runtime}
+      data:
+        _variable:
+          rid: -2
+        _isWriteOnly: 0
+        _fieldName: MinPlayerLevel
+        _value: 2
+        _isConstant: 1
+    - rid: 5293901463279370358
+      type: {class: IntegerVar, ns: HutongGames.PlayMaker, asm: PlayMaker.Runtime}
+      data:
+        _variable:
+          rid: -2
+        _isWriteOnly: 0
+        _fieldName: MinPlayerLevel
+        _value: 4
+        _isConstant: 1
+    - rid: 5293901463279370359
+      type: {class: IntegerVar, ns: HutongGames.PlayMaker, asm: PlayMaker.Runtime}
+      data:
+        _variable:
+          rid: -2
+        _isWriteOnly: 0
+        _fieldName: MinPlayerLevel
+        _value: 6
+        _isConstant: 1
+    - rid: 5293901463279370360
+      type: {class: IntegerVar, ns: HutongGames.PlayMaker, asm: PlayMaker.Runtime}
+      data:
+        _variable:
+          rid: -2
+        _isWriteOnly: 0
+        _fieldName: MinPlayerLevel
+        _value: 1
+        _isConstant: 1
+    - rid: 5293901501249617958
+      type: {class: StringVar, ns: HutongGames.PlayMaker, asm: PlayMaker.Runtime}
+      data:
+        _variable:
+          rid: -2
+        _isWriteOnly: 0
+        _fieldName: ID
+        _value: Hero/Shield
+        _isConstant: 1
+    - rid: 5293901501249617959
+      type: {class: IntegerVar, ns: HutongGames.PlayMaker, asm: PlayMaker.Runtime}
+      data:
+        _variable:
+          rid: -2
+        _isWriteOnly: 0
+        _fieldName: Level
+        _value: 1
+        _isConstant: 1
+    - rid: 5293901501249617960
+      type: {class: StringVar, ns: HutongGames.PlayMaker, asm: PlayMaker.Runtime}
+      data:
+        _variable:
+          rid: -2
+        _isWriteOnly: 0
+        _fieldName: Description
+        _value: Push back enemies
+        _isConstant: 1
+    - rid: 5293901501249617961
+      type: {class: IntegerVar, ns: HutongGames.PlayMaker, asm: PlayMaker.Runtime}
+      data:
+        _variable:
+          rid: -2
+        _isWriteOnly: 0
+        _fieldName: MinPlayerLevel
+        _value: 3
+        _isConstant: 1
+    - rid: 5293901501249617962
+      type: {class: StringVar, ns: HutongGames.PlayMaker, asm: PlayMaker.Runtime}
+      data:
+        _variable:
+          rid: -2
+        _isWriteOnly: 0
+        _fieldName: ID
+        _value: Hero/Shield
+        _isConstant: 1
+    - rid: 5293901501249617963
+      type: {class: IntegerVar, ns: HutongGames.PlayMaker, asm: PlayMaker.Runtime}
+      data:
+        _variable:
+          rid: -2
+        _isWriteOnly: 0
+        _fieldName: Level
+        _value: 2
+        _isConstant: 1
+    - rid: 5293901501249617964
+      type: {class: StringVar, ns: HutongGames.PlayMaker, asm: PlayMaker.Runtime}
+      data:
+        _variable:
+          rid: -2
+        _isWriteOnly: 0
+        _fieldName: Description
+        _value: Increased range
+        _isConstant: 1
+    - rid: 5293901501249617965
+      type: {class: IntegerVar, ns: HutongGames.PlayMaker, asm: PlayMaker.Runtime}
+      data:
+        _variable:
+          rid: -2
+        _isWriteOnly: 0
+        _fieldName: MinPlayerLevel
+        _value: 5
+        _isConstant: 1
+    - rid: 5293901501249617966
+      type: {class: StringVar, ns: HutongGames.PlayMaker, asm: PlayMaker.Runtime}
+      data:
+        _variable:
+          rid: -2
+        _isWriteOnly: 0
+        _fieldName: ID
+        _value: Hero/Shield
+        _isConstant: 1
+    - rid: 5293901501249617967
+      type: {class: IntegerVar, ns: HutongGames.PlayMaker, asm: PlayMaker.Runtime}
+      data:
+        _variable:
+          rid: -2
+        _isWriteOnly: 0
+        _fieldName: Level
+        _value: 3
+        _isConstant: 1
+    - rid: 5293901501249617968
+      type: {class: StringVar, ns: HutongGames.PlayMaker, asm: PlayMaker.Runtime}
+      data:
+        _variable:
+          rid: -2
+        _isWriteOnly: 0
+        _fieldName: Description
+        _value: Increased range
+        _isConstant: 1
+    - rid: 5293901501249617969
+      type: {class: IntegerVar, ns: HutongGames.PlayMaker, asm: PlayMaker.Runtime}
+      data:
+        _variable:
+          rid: -2
+        _isWriteOnly: 0
+        _fieldName: MinPlayerLevel
+        _value: 7
+        _isConstant: 1
+    - rid: 5293901639283638556
+      type: {class: StringVar, ns: HutongGames.PlayMaker, asm: PlayMaker.Runtime}
+      data:
+        _variable:
+          rid: -2
+        _isWriteOnly: 0
+        _fieldName: ID
+        _value: Hero/OrbPickup
+        _isConstant: 1
+    - rid: 5293901639283638557
+      type: {class: IntegerVar, ns: HutongGames.PlayMaker, asm: PlayMaker.Runtime}
+      data:
+        _variable:
+          rid: -2
+        _isWriteOnly: 0
+        _fieldName: Level
+        _value: 1
+        _isConstant: 1
+    - rid: 5293901639283638558
+      type: {class: StringVar, ns: HutongGames.PlayMaker, asm: PlayMaker.Runtime}
+      data:
+        _variable:
+          rid: -2
+        _isWriteOnly: 0
+        _fieldName: Description
+        _value: +Distance
+        _isConstant: 1
+    - rid: 5293901639283638559
+      type: {class: IntegerVar, ns: HutongGames.PlayMaker, asm: PlayMaker.Runtime}
+      data:
+        _variable:
+          rid: -2
+        _isWriteOnly: 0
+        _fieldName: MinPlayerLevel
+        _value: 2
+        _isConstant: 1
+    - rid: 5293901639283638729
+      type: {class: StringVar, ns: HutongGames.PlayMaker, asm: PlayMaker.Runtime}
+      data:
+        _variable:
+          rid: -2
+        _isWriteOnly: 0
+        _fieldName: ID
+        _value: Hero/OrbPickup
+        _isConstant: 1
+    - rid: 5293901639283638730
+      type: {class: IntegerVar, ns: HutongGames.PlayMaker, asm: PlayMaker.Runtime}
+      data:
+        _variable:
+          rid: -2
+        _isWriteOnly: 0
+        _fieldName: Level
+        _value: 2
+        _isConstant: 1
+    - rid: 5293901639283638731
+      type: {class: StringVar, ns: HutongGames.PlayMaker, asm: PlayMaker.Runtime}
+      data:
+        _variable:
+          rid: -2
+        _isWriteOnly: 0
+        _fieldName: Description
+        _value: +Distance
+        _isConstant: 1
+    - rid: 5293901639283638732
+      type: {class: IntegerVar, ns: HutongGames.PlayMaker, asm: PlayMaker.Runtime}
+      data:
+        _variable:
+          rid: -2
+        _isWriteOnly: 0
+        _fieldName: MinPlayerLevel
+        _value: 4
+        _isConstant: 1
+    - rid: 5293901639283638733
+      type: {class: StringVar, ns: HutongGames.PlayMaker, asm: PlayMaker.Runtime}
+      data:
+        _variable:
+          rid: -2
+        _isWriteOnly: 0
+        _fieldName: ID
+        _value: Hero/OrbPickup
+        _isConstant: 1
+    - rid: 5293901639283638734
+      type: {class: IntegerVar, ns: HutongGames.PlayMaker, asm: PlayMaker.Runtime}
+      data:
+        _variable:
+          rid: -2
+        _isWriteOnly: 0
+        _fieldName: Level
+        _value: 3
+        _isConstant: 1
+    - rid: 5293901639283638735
+      type: {class: StringVar, ns: HutongGames.PlayMaker, asm: PlayMaker.Runtime}
+      data:
+        _variable:
+          rid: -2
+        _isWriteOnly: 0
+        _fieldName: Description
+        _value: +Distance
+        _isConstant: 1
+    - rid: 5293901639283638736
+      type: {class: IntegerVar, ns: HutongGames.PlayMaker, asm: PlayMaker.Runtime}
+      data:
+        _variable:
+          rid: -2
+        _isWriteOnly: 0
+        _fieldName: MinPlayerLevel
+        _value: 6
+        _isConstant: 1
+    - rid: 5293901639283638737
+      type: {class: StringVar, ns: HutongGames.PlayMaker, asm: PlayMaker.Runtime}
+      data:
+        _variable:
+          rid: -2
+        _isWriteOnly: 0
+        _fieldName: ID
+        _value: Hero/OrbPickup
+        _isConstant: 1
+    - rid: 5293901639283638738
+      type: {class: IntegerVar, ns: HutongGames.PlayMaker, asm: PlayMaker.Runtime}
+      data:
+        _variable:
+          rid: -2
+        _isWriteOnly: 0
+        _fieldName: Level
+        _value: 4
+        _isConstant: 1
+    - rid: 5293901639283638739
+      type: {class: StringVar, ns: HutongGames.PlayMaker, asm: PlayMaker.Runtime}
+      data:
+        _variable:
+          rid: -2
+        _isWriteOnly: 0
+        _fieldName: Description
+        _value: +Distance
+        _isConstant: 1
+    - rid: 5293901639283638740
+      type: {class: IntegerVar, ns: HutongGames.PlayMaker, asm: PlayMaker.Runtime}
+      data:
+        _variable:
+          rid: -2
+        _isWriteOnly: 0
+        _fieldName: MinPlayerLevel
+        _value: 8
+        _isConstant: 1

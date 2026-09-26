@@ -1,6 +1,8 @@
+using System;
+
 public interface ITransitionRule
 {
-    StateType NextState { get; }
+    Type NextStateType { get; }
     bool ShouldTransition(float deltatime);
 }
 

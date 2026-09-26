@@ -1,0 +1,63 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 1768009849, guid: af56af93b18e8464f9915f7a446a8088, type: 3}
+  m_Name: Heal
+  m_EditorClassIdentifier: 
+  _group: {fileID: 11400000, guid: c6fb0d919f6a8d34aa5bce7a533a86c6, type: 2}
+  TestData:
+    rid: 5293901183867158997
+  _event:
+    _type: 2
+    _name: Heal
+    _data:
+      rid: 5293901183867158996
+    _description: 
+    _icon: {fileID: 0}
+    _color:
+      serializedVersion: 2
+      rgba: 4286085240
+    _eventAsset: {fileID: 11400000}
+    _guid: 517e9ea9177584c42aa1de51fdcc76a4
+  references:
+    version: 2
+    RefIds:
+    - rid: -2
+      type: {class: , ns: , asm: }
+    - rid: 5293901183867158996
+      type: {class: FloatVariable, ns: HutongGames.PlayMaker, asm: PlayMaker.Runtime}
+      data:
+        _guid:
+          _value0: 2568810613109248631
+          _value1: 14400456630202093279
+        _debug: 0
+        _saveMode: 0
+        _description: 
+        _name: Amount
+        _value: 0
+    - rid: 5293901183867158997
+      type: {class: FloatOverride, ns: HutongGames.PlayMaker, asm: PlayMaker.Runtime}
+      data:
+        _variable:
+          rid: 5293901183867158996
+        _variableGuid:
+          _value0: 0
+          _value1: 0
+        _variableName: 
+        _managedReferenceId: -2
+        _targetOwner: {fileID: 0}
+        _override:
+          _variable:
+            rid: -2
+          _isWriteOnly: 0
+          _fieldName: Amount
+          _value: 0
+          _isConstant: 1

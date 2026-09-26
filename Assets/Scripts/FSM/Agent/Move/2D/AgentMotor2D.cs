@@ -4,6 +4,7 @@ using UnityEngine;
 public class AgentMotor2D : MonoBehaviour
 {
     Rigidbody2D _rb;
+    public float VerticalVelocity => _rb.linearVelocity.y;
 
     private void Awake()
     {

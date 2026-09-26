@@ -1,16 +1,20 @@
+using System;
+
 public class JumpTransition : ITransitionRule
 {
-    public StateType NextState => StateType.Jump;
+    public Type NextStateType => typeof(JumpState);
 
     private IAgentJumpInput _jumpInput;
+    private GroundDetector _groundDetector;
 
-    public JumpTransition(IAgentJumpInput jumpInput)
+    public JumpTransition(IAgentJumpInput jumpInput, GroundDetector groundDetector)
     {
         _jumpInput = jumpInput;
-
+        _groundDetector = groundDetector;
     }
     public bool ShouldTransition(float deltatime)
     {
-        return _jumpInput.JumpPressed.Value;
+        bool requested = _jumpInput.TryConsumeJumpRequest();
+        return requested && _groundDetector.IsGrounded;
     }
 }

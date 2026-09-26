@@ -1,0 +1,85 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: -143357391, guid: af56af93b18e8464f9915f7a446a8088, type: 3}
+  m_Name: UpgradeType
+  m_EditorClassIdentifier: 
+  _group: {fileID: 11400000, guid: c6fb0d919f6a8d34aa5bce7a533a86c6, type: 2}
+  _variables:
+    _list:
+    - rid: 5293901463279370479
+    - rid: 5293901463279370482
+    - rid: 5293901463279370485
+    _ownerValue:
+      rid: -2
+    _owner: {fileID: 11400000}
+    Expanded: 1
+    _editorOnlyList:
+      _items:
+      - rid: 5293901463279370478
+      - rid: 5293901463279370481
+      - rid: 5293901463279370484
+      _locked: 0
+  _description: Describes an upgrade. The ID is the scene path to the FSM that handles
+    the Upgrade.
+  references:
+    version: 2
+    RefIds:
+    - rid: -2
+      type: {class: , ns: , asm: }
+    - rid: 5293901463279370478
+      type: {class: VariableItem, ns: HutongGames.PlayMaker, asm: PlayMaker.Runtime}
+      data:
+        _variable:
+          rid: 5293901463279370479
+    - rid: 5293901463279370479
+      type: {class: StringVariable, ns: HutongGames.PlayMaker, asm: PlayMaker.Runtime}
+      data:
+        _guid:
+          _value0: 1616224688466178134
+          _value1: 17689670929307867794
+        _debug: 0
+        _saveMode: 0
+        _description: 
+        _name: ID
+        _value: 
+    - rid: 5293901463279370481
+      type: {class: VariableItem, ns: HutongGames.PlayMaker, asm: PlayMaker.Runtime}
+      data:
+        _variable:
+          rid: 5293901463279370482
+    - rid: 5293901463279370482
+      type: {class: StringVariable, ns: HutongGames.PlayMaker, asm: PlayMaker.Runtime}
+      data:
+        _guid:
+          _value0: 14522983086185491288
+          _value1: 14506226692811688407
+        _debug: 0
+        _saveMode: 0
+        _description: 
+        _name: Name
+        _value: 
+    - rid: 5293901463279370484
+      type: {class: VariableItem, ns: HutongGames.PlayMaker, asm: PlayMaker.Runtime}
+      data:
+        _variable:
+          rid: 5293901463279370485
+    - rid: 5293901463279370485
+      type: {class: SpriteVariable, ns: HutongGames.PlayMaker.Actions, asm: HutongGames.PlayMaker}
+      data:
+        _guid:
+          _value0: 1392854487600937610
+          _value1: 6969485588883367639
+        _debug: 0
+        _saveMode: 0
+        _description: 
+        _name: Icon
+        _value: {fileID: 0}

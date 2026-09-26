@@ -23,6 +23,7 @@ public class PlayerController : GroundedAgentController
             new PlayerStateFactoryData
             {
                 Animator = _animator,
+                Motor = _motor,
                 MovementHandler = _movementHandler,
                 MovementInput = _moveInput,
                 CombatHandler = _combatHandler,

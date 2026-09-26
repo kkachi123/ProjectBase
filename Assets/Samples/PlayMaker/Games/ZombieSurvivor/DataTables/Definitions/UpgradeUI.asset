@@ -1,0 +1,121 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: -143357391, guid: af56af93b18e8464f9915f7a446a8088, type: 3}
+  m_Name: UpgradeUI
+  m_EditorClassIdentifier: 
+  _group: {fileID: 11400000, guid: c6fb0d919f6a8d34aa5bce7a533a86c6, type: 2}
+  _variables:
+    _list:
+    - rid: 5293901463279370497
+    - rid: 5293901463279370500
+    - rid: 5293901463279370501
+    - rid: 5293901463279370503
+    - rid: 5293901463279370505
+    _ownerValue:
+      rid: -2
+    _owner: {fileID: 11400000}
+    Expanded: 1
+    _editorOnlyList:
+      _items:
+      - rid: 5293901463279370496
+      - rid: 5293901463279370499
+      - rid: 5293901463279370504
+      - rid: 5293901463279370506
+      - rid: 5293901463279370502
+      _locked: 0
+  _description: "Upgrade fields that we want to show in the UI.  \nWe use the ID
+    field to link back to the selected Upgrade."
+  references:
+    version: 2
+    RefIds:
+    - rid: -2
+      type: {class: , ns: , asm: }
+    - rid: 5293901463279370496
+      type: {class: VariableItem, ns: HutongGames.PlayMaker, asm: PlayMaker.Runtime}
+      data:
+        _variable:
+          rid: 5293901463279370497
+    - rid: 5293901463279370497
+      type: {class: StringVariable, ns: HutongGames.PlayMaker, asm: PlayMaker.Runtime}
+      data:
+        _guid:
+          _value0: 5427216773754462170
+          _value1: 1770986265764217044
+        _debug: 0
+        _saveMode: 0
+        _description: 
+        _name: ID
+        _value: 
+    - rid: 5293901463279370499
+      type: {class: VariableItem, ns: HutongGames.PlayMaker, asm: PlayMaker.Runtime}
+      data:
+        _variable:
+          rid: 5293901463279370500
+    - rid: 5293901463279370500
+      type: {class: StringVariable, ns: HutongGames.PlayMaker, asm: PlayMaker.Runtime}
+      data:
+        _guid:
+          _value0: 13166217153917113460
+          _value1: 17264704782490107524
+        _debug: 0
+        _saveMode: 0
+        _description: 
+        _name: Name
+        _value: 
+    - rid: 5293901463279370501
+      type: {class: StringVariable, ns: HutongGames.PlayMaker, asm: PlayMaker.Runtime}
+      data:
+        _guid:
+          _value0: 6981454118971855704
+          _value1: 3432335369511732879
+        _debug: 0
+        _saveMode: 0
+        _description: 
+        _name: Description
+        _value: 
+    - rid: 5293901463279370502
+      type: {class: VariableItem, ns: HutongGames.PlayMaker, asm: PlayMaker.Runtime}
+      data:
+        _variable:
+          rid: 5293901463279370501
+    - rid: 5293901463279370503
+      type: {class: SpriteVariable, ns: HutongGames.PlayMaker.Actions, asm: HutongGames.PlayMaker}
+      data:
+        _guid:
+          _value0: 17801613726374427494
+          _value1: 1999554486687299845
+        _debug: 0
+        _saveMode: 0
+        _description: 
+        _name: Icon
+        _value: {fileID: 0}
+    - rid: 5293901463279370504
+      type: {class: VariableItem, ns: HutongGames.PlayMaker, asm: PlayMaker.Runtime}
+      data:
+        _variable:
+          rid: 5293901463279370503
+    - rid: 5293901463279370505
+      type: {class: IntegerVariable, ns: HutongGames.PlayMaker, asm: PlayMaker.Runtime}
+      data:
+        _guid:
+          _value0: 6398555511318324692
+          _value1: 15384882784777174982
+        _debug: 0
+        _saveMode: 0
+        _description: 
+        _name: Level
+        _value: 0
+    - rid: 5293901463279370506
+      type: {class: VariableItem, ns: HutongGames.PlayMaker, asm: PlayMaker.Runtime}
+      data:
+        _variable:
+          rid: 5293901463279370505

@@ -15,7 +15,7 @@ public class AttackState : AgentStateBase
 
     protected override void OnEnter()
     {
-        int requestedType = _combatInput.AttackPressed.Value;
+        int requestedType = _combatInput.HeldAttackType;
 
         if (!_attackStarter.TryStartAttack(requestedType))
             return;

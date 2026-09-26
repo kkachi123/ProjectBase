@@ -28,7 +28,7 @@ public abstract class AgentController : MonoBehaviour, IAgentAnimationListener ,
     protected AgentMovementHandler2D _movementHandler;
 
     [Header("State Machine")]
-    protected Dictionary<StateType, AgentStateBase> _states = new();
+    protected Dictionary<Type, AgentStateBase> _states = new();
     protected AgentStateBase _currentState;
 
     protected virtual void Awake()
@@ -56,7 +56,7 @@ public abstract class AgentController : MonoBehaviour, IAgentAnimationListener ,
         {
             state.OnTransition += ChangeState;
         }
-        ChangeState(StateType.Idle);
+        ChangeState(typeof(IdleState));
     }
     protected virtual void Update()
     {
@@ -64,9 +64,9 @@ public abstract class AgentController : MonoBehaviour, IAgentAnimationListener ,
     }
     protected abstract void FixedUpdate();
 
-    public virtual void ChangeState(StateType type)
+    public virtual void ChangeState(Type stateType)
     {
-        if (_states.TryGetValue(type, out AgentStateBase newState))
+        if (_states.TryGetValue(stateType, out AgentStateBase newState))
         {
             _currentState?.Exit();
             _currentState = newState;

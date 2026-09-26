@@ -1,7 +1,9 @@
+using System;
+
 public class GroundedFallTransition : ITransitionRule
 {
     private GroundDetector _groundDetector;
-    public StateType NextState => StateType.Fall;
+    public Type NextStateType => typeof(FallState);
 
     public GroundedFallTransition(GroundDetector groundDetector)
     {

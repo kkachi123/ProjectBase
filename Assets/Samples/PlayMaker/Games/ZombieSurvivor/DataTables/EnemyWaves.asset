@@ -1,0 +1,273 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: -910749130, guid: af56af93b18e8464f9915f7a446a8088, type: 3}
+  m_Name: EnemyWaves
+  m_EditorClassIdentifier: 
+  _guid:
+    _value0: 1012943036001273986
+    _value1: 2848629039012694603
+  _table:
+    _dataDefinition: {fileID: 11400000, guid: 96485fbd7e9cf4f4dbaecb7d1d3f40ef, type: 2}
+    _rows:
+    - _id:
+        _value0: 1467762698115386435
+        _value1: 6030806000876203256
+      _key: 
+      _cells:
+      - _fieldGuid:
+          _value0: 17600607126859439601
+          _value1: 6384111288184539839
+        _value:
+          rid: 5293901527461135088
+      - _fieldGuid:
+          _value0: 7759561374661004102
+          _value1: 8500015912623951036
+        _value:
+          rid: 5293901527461135089
+      - _fieldGuid:
+          _value0: 758848229212257580
+          _value1: 7835649087227132440
+        _value:
+          rid: 5293901527461135090
+      - _fieldGuid:
+          _value0: 1955623323568159055
+          _value1: 7994453070095760652
+        _value:
+          rid: 5293901527461135091
+    - _id:
+        _value0: 3461156205711131247
+        _value1: 11952554696856106735
+      _key: 
+      _cells:
+      - _fieldGuid:
+          _value0: 17600607126859439601
+          _value1: 6384111288184539839
+        _value:
+          rid: 5293901545258352987
+      - _fieldGuid:
+          _value0: 7759561374661004102
+          _value1: 8500015912623951036
+        _value:
+          rid: 5293901545258352988
+      - _fieldGuid:
+          _value0: 758848229212257580
+          _value1: 7835649087227132440
+        _value:
+          rid: 5293901545258352989
+      - _fieldGuid:
+          _value0: 1955623323568159055
+          _value1: 7994453070095760652
+        _value:
+          rid: 5293901545258352990
+    - _id:
+        _value0: 2804360690451591944
+        _value1: 10744138083556269437
+      _key: 
+      _cells:
+      - _fieldGuid:
+          _value0: 17600607126859439601
+          _value1: 6384111288184539839
+        _value:
+          rid: 5293901568211419574
+      - _fieldGuid:
+          _value0: 7759561374661004102
+          _value1: 8500015912623951036
+        _value:
+          rid: 5293901568211419575
+      - _fieldGuid:
+          _value0: 758848229212257580
+          _value1: 7835649087227132440
+        _value:
+          rid: 5293901568211419576
+      - _fieldGuid:
+          _value0: 1955623323568159055
+          _value1: 7994453070095760652
+        _value:
+          rid: 5293901568211419577
+    - _id:
+        _value0: 7924506986902464683
+        _value1: 18410826635008727646
+      _key: 
+      _cells:
+      - _fieldGuid:
+          _value0: 17600607126859439601
+          _value1: 6384111288184539839
+        _value:
+          rid: 5293901565055730623
+      - _fieldGuid:
+          _value0: 7759561374661004102
+          _value1: 8500015912623951036
+        _value:
+          rid: 5293901565055730624
+      - _fieldGuid:
+          _value0: 758848229212257580
+          _value1: 7835649087227132440
+        _value:
+          rid: 5293901565055730625
+      - _fieldGuid:
+          _value0: 1955623323568159055
+          _value1: 7994453070095760652
+        _value:
+          rid: 5293901565055730626
+    _writePolicy: 1
+  _saveMode: 0
+  _description: Defines each enemy wave.
+  _group: {fileID: 11400000, guid: c6fb0d919f6a8d34aa5bce7a533a86c6, type: 2}
+  references:
+    version: 2
+    RefIds:
+    - rid: -2
+      type: {class: , ns: , asm: }
+    - rid: 5293901527461135088
+      type: {class: GameObjectVar, ns: HutongGames.PlayMaker, asm: PlayMaker.Runtime}
+      data:
+        _variable:
+          rid: -2
+        _isWriteOnly: 0
+        _fieldName: Enemy
+        _value: {fileID: 1955505499526802413, guid: 9081bf44584c6ef44a9328f02d1e2a37, type: 3}
+        _isConstant: 1
+    - rid: 5293901527461135089
+      type: {class: FloatVar, ns: HutongGames.PlayMaker, asm: PlayMaker.Runtime}
+      data:
+        _variable:
+          rid: -2
+        _isWriteOnly: 0
+        _fieldName: Duration
+        _value: 10
+        _isConstant: 1
+    - rid: 5293901527461135090
+      type: {class: FloatVar, ns: HutongGames.PlayMaker, asm: PlayMaker.Runtime}
+      data:
+        _variable:
+          rid: -2
+        _isWriteOnly: 0
+        _fieldName: SpawnRate
+        _value: 20
+        _isConstant: 1
+    - rid: 5293901527461135091
+      type: {class: IntegerVar, ns: HutongGames.PlayMaker, asm: PlayMaker.Runtime}
+      data:
+        _variable:
+          rid: -2
+        _isWriteOnly: 0
+        _fieldName: TotalCount
+        _value: 20
+        _isConstant: 1
+    - rid: 5293901545258352987
+      type: {class: GameObjectVar, ns: HutongGames.PlayMaker, asm: PlayMaker.Runtime}
+      data:
+        _variable:
+          rid: -2
+        _isWriteOnly: 0
+        _fieldName: Enemy
+        _value: {fileID: 229429822921774609, guid: 5017b17f1f6ab3d4ba6657aadd3596ed, type: 3}
+        _isConstant: 1
+    - rid: 5293901545258352988
+      type: {class: FloatVar, ns: HutongGames.PlayMaker, asm: PlayMaker.Runtime}
+      data:
+        _variable:
+          rid: -2
+        _isWriteOnly: 0
+        _fieldName: Duration
+        _value: 10
+        _isConstant: 1
+    - rid: 5293901545258352989
+      type: {class: FloatVar, ns: HutongGames.PlayMaker, asm: PlayMaker.Runtime}
+      data:
+        _variable:
+          rid: -2
+        _isWriteOnly: 0
+        _fieldName: SpawnRate
+        _value: 4
+        _isConstant: 1
+    - rid: 5293901545258352990
+      type: {class: IntegerVar, ns: HutongGames.PlayMaker, asm: PlayMaker.Runtime}
+      data:
+        _variable:
+          rid: -2
+        _isWriteOnly: 0
+        _fieldName: TotalCount
+        _value: 40
+        _isConstant: 1
+    - rid: 5293901565055730623
+      type: {class: GameObjectVar, ns: HutongGames.PlayMaker, asm: PlayMaker.Runtime}
+      data:
+        _variable:
+          rid: -2
+        _isWriteOnly: 0
+        _fieldName: Enemy
+        _value: {fileID: 229429822921774609, guid: 3036edd85d63f124e8990fd03281e915, type: 3}
+        _isConstant: 1
+    - rid: 5293901565055730624
+      type: {class: FloatVar, ns: HutongGames.PlayMaker, asm: PlayMaker.Runtime}
+      data:
+        _variable:
+          rid: -2
+        _isWriteOnly: 0
+        _fieldName: Duration
+        _value: 10
+        _isConstant: 1
+    - rid: 5293901565055730625
+      type: {class: FloatVar, ns: HutongGames.PlayMaker, asm: PlayMaker.Runtime}
+      data:
+        _variable:
+          rid: -2
+        _isWriteOnly: 0
+        _fieldName: SpawnRate
+        _value: 1
+        _isConstant: 1
+    - rid: 5293901565055730626
+      type: {class: IntegerVar, ns: HutongGames.PlayMaker, asm: PlayMaker.Runtime}
+      data:
+        _variable:
+          rid: -2
+        _isWriteOnly: 0
+        _fieldName: TotalCount
+        _value: 10
+        _isConstant: 1
+    - rid: 5293901568211419574
+      type: {class: GameObjectVar, ns: HutongGames.PlayMaker, asm: PlayMaker.Runtime}
+      data:
+        _variable:
+          rid: -2
+        _isWriteOnly: 0
+        _fieldName: Enemy
+        _value: {fileID: 7748048594720197312, guid: c47b5ca6113da204d99bafcc7cc5406a, type: 3}
+        _isConstant: 1
+    - rid: 5293901568211419575
+      type: {class: FloatVar, ns: HutongGames.PlayMaker, asm: PlayMaker.Runtime}
+      data:
+        _variable:
+          rid: -2
+        _isWriteOnly: 0
+        _fieldName: Duration
+        _value: 10
+        _isConstant: 1
+    - rid: 5293901568211419576
+      type: {class: FloatVar, ns: HutongGames.PlayMaker, asm: PlayMaker.Runtime}
+      data:
+        _variable:
+          rid: -2
+        _isWriteOnly: 0
+        _fieldName: SpawnRate
+        _value: 1
+        _isConstant: 1
+    - rid: 5293901568211419577
+      type: {class: IntegerVar, ns: HutongGames.PlayMaker, asm: PlayMaker.Runtime}
+      data:
+        _variable:
+          rid: -2
+        _isWriteOnly: 0
+        _fieldName: TotalCount
+        _value: 1
+        _isConstant: 1

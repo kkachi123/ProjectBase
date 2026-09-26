@@ -1,7 +1,8 @@
+using System;
 using UniRx;
 public class GetHitTransition : IEventTransitionRule
 {
-    public StateType NextState => StateType.Hit;
+    public Type NextStateType => typeof(HitState);
     private IReadOnlyReactiveProperty<float> CurrentHealth;
     private bool m_shouldTransition = false;
 

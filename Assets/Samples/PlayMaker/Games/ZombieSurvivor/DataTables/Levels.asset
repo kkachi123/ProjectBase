@@ -1,0 +1,293 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: -910749130, guid: af56af93b18e8464f9915f7a446a8088, type: 3}
+  m_Name: Levels
+  m_EditorClassIdentifier: 
+  _guid:
+    _value0: 14037033781674828692
+    _value1: 367629275646797455
+  _table:
+    _dataDefinition: {fileID: 11400000, guid: 35dcc890822b3a14e82dcbc9ce08cf9e, type: 2}
+    _rows:
+    - _id:
+        _value0: 10373204337407769120
+        _value1: 9086919269774838258
+      _key: 
+      _cells:
+      - _fieldGuid:
+          _value0: 7614252941431481323
+          _value1: 17477314890591902779
+        _value:
+          rid: 5293901190142099768
+      - _fieldGuid:
+          _value0: 316565189664238792
+          _value1: 9286141932527495296
+        _value:
+          rid: 5293901190142099769
+    - _id:
+        _value0: 16930018501156600109
+        _value1: 15192891181532765286
+      _key: 
+      _cells:
+      - _fieldGuid:
+          _value0: 7614252941431481323
+          _value1: 17477314890591902779
+        _value:
+          rid: 5293901190142099770
+      - _fieldGuid:
+          _value0: 316565189664238792
+          _value1: 9286141932527495296
+        _value:
+          rid: 5293901190142099771
+    - _id:
+        _value0: 9446382107842552066
+        _value1: 4975454825277626379
+      _key: 
+      _cells:
+      - _fieldGuid:
+          _value0: 7614252941431481323
+          _value1: 17477314890591902779
+        _value:
+          rid: 5293901190142099772
+      - _fieldGuid:
+          _value0: 316565189664238792
+          _value1: 9286141932527495296
+        _value:
+          rid: 5293901190142099773
+    - _id:
+        _value0: 3616470510209462314
+        _value1: 6876596458619534119
+      _key: 
+      _cells:
+      - _fieldGuid:
+          _value0: 7614252941431481323
+          _value1: 17477314890591902779
+        _value:
+          rid: 5293901190142099776
+      - _fieldGuid:
+          _value0: 316565189664238792
+          _value1: 9286141932527495296
+        _value:
+          rid: 5293901190142099777
+    - _id:
+        _value0: 12598217125115633568
+        _value1: 17708242158970217530
+      _key: 
+      _cells:
+      - _fieldGuid:
+          _value0: 7614252941431481323
+          _value1: 17477314890591902779
+        _value:
+          rid: 5293901641547784763
+      - _fieldGuid:
+          _value0: 316565189664238792
+          _value1: 9286141932527495296
+        _value:
+          rid: 5293901641547784764
+    - _id:
+        _value0: 15383453542919995291
+        _value1: 6888609441341463916
+      _key: 
+      _cells:
+      - _fieldGuid:
+          _value0: 7614252941431481323
+          _value1: 17477314890591902779
+        _value:
+          rid: 5293901641547784765
+      - _fieldGuid:
+          _value0: 316565189664238792
+          _value1: 9286141932527495296
+        _value:
+          rid: 5293901641547784766
+    - _id:
+        _value0: 1094802010433109566
+        _value1: 11670661876017296934
+      _key: 
+      _cells:
+      - _fieldGuid:
+          _value0: 7614252941431481323
+          _value1: 17477314890591902779
+        _value:
+          rid: 5293901641547784767
+      - _fieldGuid:
+          _value0: 316565189664238792
+          _value1: 9286141932527495296
+        _value:
+          rid: 5293901641547784768
+    - _id:
+        _value0: 9040663538381373822
+        _value1: 5455717509551668341
+      _key: 
+      _cells:
+      - _fieldGuid:
+          _value0: 7614252941431481323
+          _value1: 17477314890591902779
+        _value:
+          rid: 5293901641547784769
+      - _fieldGuid:
+          _value0: 316565189664238792
+          _value1: 9286141932527495296
+        _value:
+          rid: 5293901641547784770
+    _writePolicy: 1
+  _saveMode: 0
+  _description: PlayerXP required for each level.
+  _group: {fileID: 11400000, guid: c6fb0d919f6a8d34aa5bce7a533a86c6, type: 2}
+  references:
+    version: 2
+    RefIds:
+    - rid: -2
+      type: {class: , ns: , asm: }
+    - rid: 5293901190142099768
+      type: {class: IntegerVar, ns: HutongGames.PlayMaker, asm: PlayMaker.Runtime}
+      data:
+        _variable:
+          rid: -2
+        _isWriteOnly: 0
+        _fieldName: XP
+        _value: 0
+        _isConstant: 1
+    - rid: 5293901190142099769
+      type: {class: StringVar, ns: HutongGames.PlayMaker, asm: PlayMaker.Runtime}
+      data:
+        _variable:
+          rid: -2
+        _isWriteOnly: 0
+        _fieldName: Message
+        _value: 
+        _isConstant: 1
+    - rid: 5293901190142099770
+      type: {class: IntegerVar, ns: HutongGames.PlayMaker, asm: PlayMaker.Runtime}
+      data:
+        _variable:
+          rid: -2
+        _isWriteOnly: 0
+        _fieldName: XP
+        _value: 10
+        _isConstant: 1
+    - rid: 5293901190142099771
+      type: {class: StringVar, ns: HutongGames.PlayMaker, asm: PlayMaker.Runtime}
+      data:
+        _variable:
+          rid: -2
+        _isWriteOnly: 0
+        _fieldName: Message
+        _value: 
+        _isConstant: 1
+    - rid: 5293901190142099772
+      type: {class: IntegerVar, ns: HutongGames.PlayMaker, asm: PlayMaker.Runtime}
+      data:
+        _variable:
+          rid: -2
+        _isWriteOnly: 0
+        _fieldName: XP
+        _value: 20
+        _isConstant: 1
+    - rid: 5293901190142099773
+      type: {class: StringVar, ns: HutongGames.PlayMaker, asm: PlayMaker.Runtime}
+      data:
+        _variable:
+          rid: -2
+        _isWriteOnly: 0
+        _fieldName: Message
+        _value: 
+        _isConstant: 1
+    - rid: 5293901190142099776
+      type: {class: IntegerVar, ns: HutongGames.PlayMaker, asm: PlayMaker.Runtime}
+      data:
+        _variable:
+          rid: -2
+        _isWriteOnly: 0
+        _fieldName: XP
+        _value: 40
+        _isConstant: 1
+    - rid: 5293901190142099777
+      type: {class: StringVar, ns: HutongGames.PlayMaker, asm: PlayMaker.Runtime}
+      data:
+        _variable:
+          rid: -2
+        _isWriteOnly: 0
+        _fieldName: Message
+        _value: 
+        _isConstant: 1
+    - rid: 5293901641547784763
+      type: {class: IntegerVar, ns: HutongGames.PlayMaker, asm: PlayMaker.Runtime}
+      data:
+        _variable:
+          rid: -2
+        _isWriteOnly: 0
+        _fieldName: XP
+        _value: 80
+        _isConstant: 1
+    - rid: 5293901641547784764
+      type: {class: StringVar, ns: HutongGames.PlayMaker, asm: PlayMaker.Runtime}
+      data:
+        _variable:
+          rid: -2
+        _isWriteOnly: 0
+        _fieldName: Message
+        _value: 
+        _isConstant: 1
+    - rid: 5293901641547784765
+      type: {class: IntegerVar, ns: HutongGames.PlayMaker, asm: PlayMaker.Runtime}
+      data:
+        _variable:
+          rid: -2
+        _isWriteOnly: 0
+        _fieldName: XP
+        _value: 160
+        _isConstant: 1
+    - rid: 5293901641547784766
+      type: {class: StringVar, ns: HutongGames.PlayMaker, asm: PlayMaker.Runtime}
+      data:
+        _variable:
+          rid: -2
+        _isWriteOnly: 0
+        _fieldName: Message
+        _value: 
+        _isConstant: 1
+    - rid: 5293901641547784767
+      type: {class: IntegerVar, ns: HutongGames.PlayMaker, asm: PlayMaker.Runtime}
+      data:
+        _variable:
+          rid: -2
+        _isWriteOnly: 0
+        _fieldName: XP
+        _value: 320
+        _isConstant: 1
+    - rid: 5293901641547784768
+      type: {class: StringVar, ns: HutongGames.PlayMaker, asm: PlayMaker.Runtime}
+      data:
+        _variable:
+          rid: -2
+        _isWriteOnly: 0
+        _fieldName: Message
+        _value: 
+        _isConstant: 1
+    - rid: 5293901641547784769
+      type: {class: IntegerVar, ns: HutongGames.PlayMaker, asm: PlayMaker.Runtime}
+      data:
+        _variable:
+          rid: -2
+        _isWriteOnly: 0
+        _fieldName: XP
+        _value: 640
+        _isConstant: 1
+    - rid: 5293901641547784770
+      type: {class: StringVar, ns: HutongGames.PlayMaker, asm: PlayMaker.Runtime}
+      data:
+        _variable:
+          rid: -2
+        _isWriteOnly: 0
+        _fieldName: Message
+        _value: 
+        _isConstant: 1

@@ -1,6 +1,6 @@
 using System;
 
-public class PlayerManager
+public class TestPlayerManager
 {
     public InventorySystem Inventory { get; } = new();
     public PlayerEquipment Equipment { get; } = new();

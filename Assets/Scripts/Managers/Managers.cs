@@ -21,7 +21,7 @@ public class Managers : MonoBehaviour
     public CameraManager Camera => _camera;
     public LightingManager Lighting => _lighting;
     public AdventureRunManager AdventureRun => _adventureRun;
-    public PlayerManager Player { get; private set; }
+    public TestPlayerManager Player { get; private set; }
 
     void Awake()
     {
@@ -29,6 +29,6 @@ public class Managers : MonoBehaviour
         Instance = this;
         DontDestroyOnLoad(gameObject);
 
-        Player = new PlayerManager();
+        Player = new TestPlayerManager();
     }
 }

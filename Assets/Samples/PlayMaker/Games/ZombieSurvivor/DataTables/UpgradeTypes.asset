@@ -1,0 +1,217 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: -910749130, guid: af56af93b18e8464f9915f7a446a8088, type: 3}
+  m_Name: UpgradeTypes
+  m_EditorClassIdentifier: 
+  _guid:
+    _value0: 17172474023562808395
+    _value1: 12551198404021382244
+  _table:
+    _dataDefinition: {fileID: 11400000, guid: 42980f87c2abcd94ab4f6eb9cc1f3c06, type: 2}
+    _rows:
+    - _id:
+        _value0: 7418216102352084117
+        _value1: 3146334746125233213
+      _key: 
+      _cells:
+      - _fieldGuid:
+          _value0: 1616224688466178134
+          _value1: 17689670929307867794
+        _value:
+          rid: 5293901463279370486
+      - _fieldGuid:
+          _value0: 14522983086185491288
+          _value1: 14506226692811688407
+        _value:
+          rid: 5293901463279370487
+      - _fieldGuid:
+          _value0: 1392854487600937610
+          _value1: 6969485588883367639
+        _value:
+          rid: 5293901463279370488
+    - _id:
+        _value0: 11999154555576848293
+        _value1: 11321579608398900776
+      _key: 
+      _cells:
+      - _fieldGuid:
+          _value0: 1616224688466178134
+          _value1: 17689670929307867794
+        _value:
+          rid: 5293901463279370492
+      - _fieldGuid:
+          _value0: 14522983086185491288
+          _value1: 14506226692811688407
+        _value:
+          rid: 5293901463279370493
+      - _fieldGuid:
+          _value0: 1392854487600937610
+          _value1: 6969485588883367639
+        _value:
+          rid: 5293901463279370494
+    - _id:
+        _value0: 5356615312022966625
+        _value1: 11486091983389264431
+      _key: 
+      _cells:
+      - _fieldGuid:
+          _value0: 1616224688466178134
+          _value1: 17689670929307867794
+        _value:
+          rid: 5293901463279370489
+      - _fieldGuid:
+          _value0: 14522983086185491288
+          _value1: 14506226692811688407
+        _value:
+          rid: 5293901463279370490
+      - _fieldGuid:
+          _value0: 1392854487600937610
+          _value1: 6969485588883367639
+        _value:
+          rid: 5293901463279370491
+    - _id:
+        _value0: 15906465134936082142
+        _value1: 11277066064968229497
+      _key: 
+      _cells:
+      - _fieldGuid:
+          _value0: 1616224688466178134
+          _value1: 17689670929307867794
+        _value:
+          rid: 5293901639283638553
+      - _fieldGuid:
+          _value0: 14522983086185491288
+          _value1: 14506226692811688407
+        _value:
+          rid: 5293901639283638554
+      - _fieldGuid:
+          _value0: 1392854487600937610
+          _value1: 6969485588883367639
+        _value:
+          rid: 5293901639283638555
+    _writePolicy: 1
+  _saveMode: 0
+  _description: Lists all upgrade types. Use these IDs in other upgrade data tables.
+  _group: {fileID: 11400000, guid: c6fb0d919f6a8d34aa5bce7a533a86c6, type: 2}
+  references:
+    version: 2
+    RefIds:
+    - rid: -2
+      type: {class: , ns: , asm: }
+    - rid: 5293901463279370486
+      type: {class: StringVar, ns: HutongGames.PlayMaker, asm: PlayMaker.Runtime}
+      data:
+        _variable:
+          rid: -2
+        _isWriteOnly: 0
+        _fieldName: ID
+        _value: Hero/Knife
+        _isConstant: 1
+    - rid: 5293901463279370487
+      type: {class: StringVar, ns: HutongGames.PlayMaker, asm: PlayMaker.Runtime}
+      data:
+        _variable:
+          rid: -2
+        _isWriteOnly: 0
+        _fieldName: Name
+        _value: Knife
+        _isConstant: 1
+    - rid: 5293901463279370488
+      type: {class: SpriteVar, ns: HutongGames.PlayMaker.Actions, asm: HutongGames.PlayMaker}
+      data:
+        _variable:
+          rid: -2
+        _isWriteOnly: 0
+        _fieldName: Icon
+        _value: {fileID: 21300000, guid: 3c3507376a99f5a49be585c733d3f06b, type: 3}
+        _isConstant: 1
+    - rid: 5293901463279370489
+      type: {class: StringVar, ns: HutongGames.PlayMaker, asm: PlayMaker.Runtime}
+      data:
+        _variable:
+          rid: -2
+        _isWriteOnly: 0
+        _fieldName: ID
+        _value: Hero/Health
+        _isConstant: 1
+    - rid: 5293901463279370490
+      type: {class: StringVar, ns: HutongGames.PlayMaker, asm: PlayMaker.Runtime}
+      data:
+        _variable:
+          rid: -2
+        _isWriteOnly: 0
+        _fieldName: Name
+        _value: Health
+        _isConstant: 1
+    - rid: 5293901463279370491
+      type: {class: SpriteVar, ns: HutongGames.PlayMaker.Actions, asm: HutongGames.PlayMaker}
+      data:
+        _variable:
+          rid: -2
+        _isWriteOnly: 0
+        _fieldName: Icon
+        _value: {fileID: 21300000, guid: e4c80768a1dd7d54a9531bf1fcab1363, type: 3}
+        _isConstant: 1
+    - rid: 5293901463279370492
+      type: {class: StringVar, ns: HutongGames.PlayMaker, asm: PlayMaker.Runtime}
+      data:
+        _variable:
+          rid: -2
+        _isWriteOnly: 0
+        _fieldName: ID
+        _value: Hero/Shield
+        _isConstant: 1
+    - rid: 5293901463279370493
+      type: {class: StringVar, ns: HutongGames.PlayMaker, asm: PlayMaker.Runtime}
+      data:
+        _variable:
+          rid: -2
+        _isWriteOnly: 0
+        _fieldName: Name
+        _value: Shield
+        _isConstant: 1
+    - rid: 5293901463279370494
+      type: {class: SpriteVar, ns: HutongGames.PlayMaker.Actions, asm: HutongGames.PlayMaker}
+      data:
+        _variable:
+          rid: -2
+        _isWriteOnly: 0
+        _fieldName: Icon
+        _value: {fileID: 21300000, guid: e4f27ef03815d36458315bf97afe7c70, type: 3}
+        _isConstant: 1
+    - rid: 5293901639283638553
+      type: {class: StringVar, ns: HutongGames.PlayMaker, asm: PlayMaker.Runtime}
+      data:
+        _variable:
+          rid: -2
+        _isWriteOnly: 0
+        _fieldName: ID
+        _value: Hero/OrbPickup
+        _isConstant: 1
+    - rid: 5293901639283638554
+      type: {class: StringVar, ns: HutongGames.PlayMaker, asm: PlayMaker.Runtime}
+      data:
+        _variable:
+          rid: -2
+        _isWriteOnly: 0
+        _fieldName: Name
+        _value: Orb Pickup
+        _isConstant: 1
+    - rid: 5293901639283638555
+      type: {class: SpriteVar, ns: HutongGames.PlayMaker.Actions, asm: HutongGames.PlayMaker}
+      data:
+        _variable:
+          rid: -2
+        _isWriteOnly: 0
+        _fieldName: Icon
+        _value: {fileID: 21300000, guid: ce09fc931b1091e49aee7c354706a4ac, type: 3}
+        _isConstant: 1

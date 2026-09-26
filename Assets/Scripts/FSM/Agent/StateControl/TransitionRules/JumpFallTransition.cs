@@ -1,24 +1,18 @@
+using System;
+
 public class JumpFallTransition : ITransitionRule
 {
-    public StateType NextState => _groundDetector.IsGrounded ? StateType.Idle : StateType.Fall;
+    public Type NextStateType => typeof(FallState);
 
-    private float _jumpTimer = 0f;
-    private const float MIN_JUMP_TIME = 0.1f;
-    private GroundDetector _groundDetector;
+    private readonly AgentMotor2D _motor;
 
-    public JumpFallTransition(GroundDetector groundDetector)
+    public JumpFallTransition(AgentMotor2D motor)
     {
-        _groundDetector = groundDetector;
+        _motor = motor;
     }
 
     public bool ShouldTransition(float deltatime)
     {
-        _jumpTimer += deltatime;
-        if (_jumpTimer >= MIN_JUMP_TIME)
-        {
-            _jumpTimer = 0f;
-            return true;
-        }
-        return false;
+        return _motor.VerticalVelocity <= 0f;
     }
 }

@@ -1,8 +1,8 @@
-using UniRx;
+using System;
 using UnityEngine;
 public interface IAgentCombatInput
 {
-    IReadOnlyReactiveProperty<int> AttackPressed { get; }
+    int HeldAttackType { get; }
 }
 
 public interface IAgentMovementInput
@@ -12,10 +12,11 @@ public interface IAgentMovementInput
 
 public interface IAgentJumpInput
 {
-    IReadOnlyReactiveProperty<bool> JumpPressed { get; }
+    bool IsJumpHeld { get; }
+    bool TryConsumeJumpRequest();
 }
 
 public interface IAgentInteractionInput
 {
-    IReadOnlyReactiveProperty<bool> InteractPressed { get; }
+    event Action OnInteractRequested;
 }

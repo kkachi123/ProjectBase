@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 
 public class MonsterStateFactoryData : StateFactoryData
@@ -5,15 +6,15 @@ public class MonsterStateFactoryData : StateFactoryData
 }
 public class MonsterStateFactory
 {
-    public Dictionary<StateType, AgentStateBase> CreateStates(MonsterStateFactoryData data)
+    public Dictionary<Type, AgentStateBase> CreateStates(MonsterStateFactoryData data)
     {
-        return new Dictionary<StateType, AgentStateBase>
+        return new Dictionary<Type, AgentStateBase>
         {
-            { StateType.Idle, new IdleState(data.Animator , data.MovementHandler) },
-            { StateType.Move, new MoveState(data.Animator, data.MovementHandler, data.MovementInput) },
-            //{ StateType.Attack, new AttackState(data.Animator, data.CombatHandler) },
-            { StateType.Hit, new HitState(data.Animator, data.CombatHandler) },
-            { StateType.Death, new DeathState(data.Animator, data.CombatHandler, data.MovementHandler) }
+            { typeof(IdleState), new IdleState(data.Animator , data.MovementHandler) },
+            { typeof(MoveState), new MoveState(data.Animator, data.MovementHandler, data.MovementInput) },
+            //{ typeof(AttackState), new AttackState(data.Animator, data.CombatHandler) },
+            { typeof(HitState), new HitState(data.Animator, data.CombatHandler) },
+            { typeof(DeathState), new DeathState(data.Animator, data.CombatHandler, data.MovementHandler) }
         };
     }
 }

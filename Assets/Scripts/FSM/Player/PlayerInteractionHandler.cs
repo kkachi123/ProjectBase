@@ -1,5 +1,4 @@
 using UnityEngine;
-using UniRx;
 
 public class PlayerInteractionHandler : MonoBehaviour
 {
@@ -20,10 +19,16 @@ public class PlayerInteractionHandler : MonoBehaviour
         _contactFilter.SetLayerMask(_interactLayer);
         _contactFilter.useTriggers = true;
 
-        _playerInput.InteractPressed
-            .Where(v => v)
-            .Subscribe(_ => TryInteract())
-            .AddTo(this);
+    }
+
+    private void OnEnable()
+    {
+        _playerInput.OnInteractRequested += TryInteract;
+    }
+
+    private void OnDisable()
+    {
+        _playerInput.OnInteractRequested -= TryInteract;
     }
 
     private void Update() => DetectNearbyTarget();

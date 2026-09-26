@@ -1,6 +1,8 @@
+using System;
+
 public class AttackTransition : ITransitionRule
 {
-    public StateType NextState => StateType.Attack;
+    public Type NextStateType => typeof(AttackState);
 
     private IAgentCombatInput _combatInput;
     private IAttackStarter _attackStarter;
@@ -12,7 +14,7 @@ public class AttackTransition : ITransitionRule
     }
     public bool ShouldTransition(float deltatime)
     {
-        int requestedType = _combatInput.AttackPressed.Value;
+        int requestedType = _combatInput.HeldAttackType;
 
         return requestedType > 0
             && _attackStarter.CanStartAttack(requestedType);

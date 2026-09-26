@@ -1,0 +1,81 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &5859400652689034318
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 4549747314223149108}
+  - component: {fileID: 8441882745749073911}
+  - component: {fileID: 8594193501470483704}
+  m_Layer: 0
+  m_Name: AutoUpdate
+  m_TagString: EditorOnly
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &4549747314223149108
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5859400652689034318}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 938.5, y: 472, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &8441882745749073911
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5859400652689034318}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 1503127169, guid: af56af93b18e8464f9915f7a446a8088, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Notes: 'EditorOnly script to make sure sample scene materials work in any render
+    pipeline.
+
+
+    See [online help](https://hutonggames.com/playmaker/docs/welcome/samples/#render-pipelines)
+
+'
+--- !u!114 &8594193501470483704
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5859400652689034318}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 674faa6fed13208478e3d502229fd395, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  autoRunOnLoad: 1
+  includeAllLoadedScenes: 0
+  materials:
+  - BuiltInMaterial: {fileID: 2100000, guid: fddf13eac51d6c04da368778921c9bae, type: 2}
+    UrpMaterial: {fileID: 2100000, guid: a6dfc9b8b030f444f9bf9a8bb95e4ec4, type: 2}
+    HdrpMaterial: {fileID: 0}
+  - BuiltInMaterial: {fileID: 2100000, guid: 45d6431d5737c9942aab2ea5f40f4fa8, type: 2}
+    UrpMaterial: {fileID: 2100000, guid: 75a649f7bc2340247b338440bdb19ebe, type: 2}
+    HdrpMaterial: {fileID: 0}
+  - BuiltInMaterial: {fileID: 2100000, guid: f7bbdc9c6dbee914d811845bdd27fec0, type: 2}
+    UrpMaterial: {fileID: 2100000, guid: 66083b4abef770341991fcbb6828db55, type: 2}
+    HdrpMaterial: {fileID: 0}
+  prefabs: []
+  autoProcessPrefabs: 1
+  confirmPrefabUpdates: 0

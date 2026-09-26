@@ -1,0 +1,53 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 1768009849, guid: af56af93b18e8464f9915f7a446a8088, type: 3}
+  m_Name: Hit
+  m_EditorClassIdentifier: 
+  _group: {fileID: 11400000, guid: c6fb0d919f6a8d34aa5bce7a533a86c6, type: 2}
+  TestData:
+    rid: 5348540586365550939
+  _event:
+    _type: 2
+    _name: Hit
+    _data:
+      rid: 5348540586365550938
+    _description: Sent to enemies hit by a weapon.
+    _icon: {fileID: 0}
+    _color:
+      serializedVersion: 2
+      rgba: 4286085240
+    _eventAsset: {fileID: 11400000}
+    AssetPath: Assets/Samples/PlayMaker/Games/ZombieSurvivor/Globals/Hit.asset
+  references:
+    version: 2
+    RefIds:
+    - rid: -2
+      type: {class: , ns: , asm: }
+    - rid: 5348540586365550938
+      type: {class: FloatVariable, ns: HutongGames.PlayMaker, asm: PlayMaker.Runtime}
+      data:
+        _debug: 0
+        _description: Amount of damage to inflict.
+        _name: Damage
+        _value: 0
+    - rid: 5348540586365550939
+      type: {class: FloatOverride, ns: HutongGames.PlayMaker, asm: PlayMaker.Runtime}
+      data:
+        _variable:
+          rid: 5348540586365550938
+        _managedReferenceId: -2
+        _override:
+          _variable:
+            rid: -2
+          _fieldName: Data
+          _value: 0
+          _isConstant: 1

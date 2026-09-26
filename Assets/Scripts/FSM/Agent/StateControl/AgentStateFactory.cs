@@ -1,7 +1,9 @@
+using System;
 using System.Collections.Generic;
 public class StateFactoryData
 {
     public AgentAnimator Animator { get; set; }
+    public AgentMotor2D Motor { get; set; }
     public AgentMovementHandler2D MovementHandler { get; set; }
     public IAgentMovementInput MovementInput { get; set; }
     public AgentCombatHandler CombatHandler { get; set; }
@@ -15,5 +17,5 @@ public abstract class AgentStateFactory
 {
     protected StateFactoryData stateFactoryData;
 
-    public abstract Dictionary<StateType, AgentStateBase> CreateStates(AgentController agentController);
+    public abstract Dictionary<Type, AgentStateBase> CreateStates(AgentController agentController);
 }

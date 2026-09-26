@@ -173,8 +173,8 @@ MonoBehaviour:
   - rid: 1276375357735306019
   - rid: 1276375358243078986
   - rid: 1276375358243079104
-  m_VersionTimestamp: 639131731322332839
-  m_SerializedVersion: 2
+  m_VersionTimestamp: 639257944590870040
+  m_SerializedVersion: 3
   m_DebugInfo: {fileID: -8144853958009387243}
   m_RuntimeGraph: {fileID: 4943524661650298754}
   AssetID:
@@ -187,8 +187,7 @@ MonoBehaviour:
   m_NodeModelsInfo:
   - Name: On Start
     Story: 
-    RuntimeTypeString: Unity.Behavior.Start, Unity.Behavior, Version=0.0.0.0, Culture=neutral,
-      PublicKeyToken=null
+    RuntimeTypeString: Unity.Behavior.Start, Unity.Behavior, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
     RuntimeTypeID:
       m_Value0: 3335272451348827663
       m_Value1: 11549843281177505721
@@ -197,78 +196,66 @@ MonoBehaviour:
     IsPlaceholder: 0
   - Name: AICheckTargetDistance
     Story: 'Update [Self] to [Target] [TargetDistance]'
-    RuntimeTypeString: AICheckTargetDistance, Assembly-CSharp, Version=0.0.0.0, Culture=neutral,
-      PublicKeyToken=null
+    RuntimeTypeString: AICheckTargetDistance, Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
     RuntimeTypeID:
       m_Value0: 5037838303262026405
       m_Value1: 9241389369718933993
     Variables:
     - Name: Self
       Type:
-        m_SerializableType: UnityEngine.Transform, UnityEngine.CoreModule, Version=0.0.0.0,
-          Culture=neutral, PublicKeyToken=null
+        m_SerializableType: UnityEngine.Transform, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
       Tooltip: 
     - Name: Target
       Type:
-        m_SerializableType: UnityEngine.Transform, UnityEngine.CoreModule, Version=0.0.0.0,
-          Culture=neutral, PublicKeyToken=null
+        m_SerializableType: UnityEngine.Transform, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
       Tooltip: 
     - Name: TargetDistance
       Type:
-        m_SerializableType: System.Single, mscorlib, Version=4.0.0.0, Culture=neutral,
-          PublicKeyToken=b77a5c561934e089
+        m_SerializableType: System.Single, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089
       Tooltip: 
     NamedChildren: []
     IsPlaceholder: 0
   - Name: PlayerMove2DAction
     Story: '[Input] RandomMove between [Min] ~ [Max].'
-    RuntimeTypeString: PlayerMove2DAction, Assembly-CSharp, Version=0.0.0.0, Culture=neutral,
-      PublicKeyToken=null
+    RuntimeTypeString: PlayerMove2DAction, Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
     RuntimeTypeID:
       m_Value0: 15965401121654910088
       m_Value1: 11989704006205944511
     Variables:
     - Name: Input
       Type:
-        m_SerializableType: AIPlayerInput, Assembly-CSharp, Version=0.0.0.0, Culture=neutral,
-          PublicKeyToken=null
+        m_SerializableType: AIPlayerInput, Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
       Tooltip: 
     - Name: Min
       Type:
-        m_SerializableType: System.Single, mscorlib, Version=4.0.0.0, Culture=neutral,
-          PublicKeyToken=b77a5c561934e089
+        m_SerializableType: System.Single, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089
       Tooltip: 
     - Name: Max
       Type:
-        m_SerializableType: System.Single, mscorlib, Version=4.0.0.0, Culture=neutral,
-          PublicKeyToken=b77a5c561934e089
+        m_SerializableType: System.Single, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089
       Tooltip: 
     - Name: WallDetector
       Type:
-        m_SerializableType: WallDetector, Assembly-CSharp, Version=0.0.0.0, Culture=neutral,
-          PublicKeyToken=null
+        m_SerializableType: WallDetector, Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
       Tooltip: 
     NamedChildren: []
     IsPlaceholder: 0
   - Name: Wait (Seconds)
     Story: Wait for [SecondsToWait] seconds
-    RuntimeTypeString: Unity.Behavior.WaitAction, Unity.Behavior, Version=0.0.0.0,
-      Culture=neutral, PublicKeyToken=null
+    RuntimeTypeString: Unity.Behavior.WaitAction, Unity.Behavior, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
     RuntimeTypeID:
       m_Value0: 7729581452106168333
       m_Value1: 8820302366443624372
     Variables:
     - Name: SecondsToWait
       Type:
-        m_SerializableType: System.Single, mscorlib, Version=4.0.0.0, Culture=neutral,
-          PublicKeyToken=b77a5c561934e089
+        m_SerializableType: System.Single, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089
       Tooltip: 
     NamedChildren: []
     IsPlaceholder: 0
   - Name: Try In Order
     Story: 
-    RuntimeTypeString: Unity.Behavior.SelectorComposite, Unity.Behavior, Version=0.0.0.0,
-      Culture=neutral, PublicKeyToken=null
+    RuntimeTypeString: Unity.Behavior.SelectorComposite, Unity.Behavior, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
     RuntimeTypeID:
       m_Value0: 11477120919463386923
       m_Value1: 7730102824742023565
@@ -277,8 +264,7 @@ MonoBehaviour:
     IsPlaceholder: 0
   - Name: Sequence
     Story: 
-    RuntimeTypeString: Unity.Behavior.SequenceComposite, Unity.Behavior, Version=0.0.0.0,
-      Culture=neutral, PublicKeyToken=null
+    RuntimeTypeString: Unity.Behavior.SequenceComposite, Unity.Behavior, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
     RuntimeTypeID:
       m_Value0: 10181448252506100447
       m_Value1: 8737116843063128493
@@ -287,38 +273,32 @@ MonoBehaviour:
     IsPlaceholder: 0
   - Name: PlayerJumpAction
     Story: '[Input] Jump [JumpFloor] [JumpChance]%'
-    RuntimeTypeString: PlayerJumpAction, Assembly-CSharp, Version=0.0.0.0, Culture=neutral,
-      PublicKeyToken=null
+    RuntimeTypeString: PlayerJumpAction, Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
     RuntimeTypeID:
       m_Value0: 9694845867462144183
       m_Value1: 16226605663029779083
     Variables:
     - Name: Self
       Type:
-        m_SerializableType: UnityEngine.Transform, UnityEngine.CoreModule, Version=0.0.0.0,
-          Culture=neutral, PublicKeyToken=null
+        m_SerializableType: UnityEngine.Transform, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
       Tooltip: 
     - Name: JumpFloor
       Type:
-        m_SerializableType: UnityEngine.Transform, UnityEngine.CoreModule, Version=0.0.0.0,
-          Culture=neutral, PublicKeyToken=null
+        m_SerializableType: UnityEngine.Transform, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
       Tooltip: 
     - Name: Input
       Type:
-        m_SerializableType: AIPlayerInput, Assembly-CSharp, Version=0.0.0.0, Culture=neutral,
-          PublicKeyToken=null
+        m_SerializableType: AIPlayerInput, Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
       Tooltip: 
     - Name: JumpChance
       Type:
-        m_SerializableType: System.Single, mscorlib, Version=4.0.0.0, Culture=neutral,
-          PublicKeyToken=b77a5c561934e089
+        m_SerializableType: System.Single, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089
       Tooltip: 
     NamedChildren: []
     IsPlaceholder: 0
   - Name: Random
     Story: 
-    RuntimeTypeString: Unity.Behavior.RandomComposite, Unity.Behavior, Version=0.0.0.0,
-      Culture=neutral, PublicKeyToken=null
+    RuntimeTypeString: Unity.Behavior.RandomComposite, Unity.Behavior, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
     RuntimeTypeID:
       m_Value0: 15586748977048568638
       m_Value1: 1886799870276249994
@@ -327,88 +307,73 @@ MonoBehaviour:
     IsPlaceholder: 0
   - Name: PlayerDodgeTargetAction
     Story: '[Input] Dodge from [target] [DodgeDistance]'
-    RuntimeTypeString: PlayerDodgeTargetAction, Assembly-CSharp, Version=0.0.0.0,
-      Culture=neutral, PublicKeyToken=null
+    RuntimeTypeString: PlayerDodgeTargetAction, Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
     RuntimeTypeID:
       m_Value0: 16389165273591252735
       m_Value1: 15792248658811620704
     Variables:
     - Name: Input
       Type:
-        m_SerializableType: AIPlayerInput, Assembly-CSharp, Version=0.0.0.0, Culture=neutral,
-          PublicKeyToken=null
+        m_SerializableType: AIPlayerInput, Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
       Tooltip: 
     - Name: Self
       Type:
-        m_SerializableType: UnityEngine.Transform, UnityEngine.CoreModule, Version=0.0.0.0,
-          Culture=neutral, PublicKeyToken=null
+        m_SerializableType: UnityEngine.Transform, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
       Tooltip: 
     - Name: Target
       Type:
-        m_SerializableType: UnityEngine.Transform, UnityEngine.CoreModule, Version=0.0.0.0,
-          Culture=neutral, PublicKeyToken=null
+        m_SerializableType: UnityEngine.Transform, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
       Tooltip: 
     - Name: DodgeDistance
       Type:
-        m_SerializableType: System.Single, mscorlib, Version=4.0.0.0, Culture=neutral,
-          PublicKeyToken=b77a5c561934e089
+        m_SerializableType: System.Single, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089
       Tooltip: 
     - Name: WallDetector
       Type:
-        m_SerializableType: WallDetector, Assembly-CSharp, Version=0.0.0.0, Culture=neutral,
-          PublicKeyToken=null
+        m_SerializableType: WallDetector, Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
       Tooltip: 
     NamedChildren: []
     IsPlaceholder: 0
   - Name: PlayerChaseTargetAction
     Story: '[Input] Move [Target] between [Min] ~ [Max].'
-    RuntimeTypeString: PlayerChaseTargetAction, Assembly-CSharp, Version=0.0.0.0,
-      Culture=neutral, PublicKeyToken=null
+    RuntimeTypeString: PlayerChaseTargetAction, Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
     RuntimeTypeID:
       m_Value0: 2170363816160120575
       m_Value1: 15526166343133416597
     Variables:
     - Name: Input
       Type:
-        m_SerializableType: AIPlayerInput, Assembly-CSharp, Version=0.0.0.0, Culture=neutral,
-          PublicKeyToken=null
+        m_SerializableType: AIPlayerInput, Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
       Tooltip: 
     - Name: CanChase
       Type:
-        m_SerializableType: System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral,
-          PublicKeyToken=b77a5c561934e089
+        m_SerializableType: System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089
       Tooltip: 
     - Name: Self
       Type:
-        m_SerializableType: UnityEngine.Transform, UnityEngine.CoreModule, Version=0.0.0.0,
-          Culture=neutral, PublicKeyToken=null
+        m_SerializableType: UnityEngine.Transform, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
       Tooltip: 
     - Name: Target
       Type:
-        m_SerializableType: UnityEngine.Transform, UnityEngine.CoreModule, Version=0.0.0.0,
-          Culture=neutral, PublicKeyToken=null
+        m_SerializableType: UnityEngine.Transform, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
       Tooltip: 
     - Name: Min
       Type:
-        m_SerializableType: System.Single, mscorlib, Version=4.0.0.0, Culture=neutral,
-          PublicKeyToken=b77a5c561934e089
+        m_SerializableType: System.Single, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089
       Tooltip: 
     - Name: Max
       Type:
-        m_SerializableType: System.Single, mscorlib, Version=4.0.0.0, Culture=neutral,
-          PublicKeyToken=b77a5c561934e089
+        m_SerializableType: System.Single, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089
       Tooltip: 
     - Name: IsGrounded
       Type:
-        m_SerializableType: System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral,
-          PublicKeyToken=b77a5c561934e089
+        m_SerializableType: System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089
       Tooltip: 
     NamedChildren: []
     IsPlaceholder: 0
   - Name: Conditional Guard (Modifier)
     Story: 
-    RuntimeTypeString: Unity.Behavior.ConditionalGuardModifier, Unity.Behavior, Version=0.0.0.0,
-      Culture=neutral, PublicKeyToken=null
+    RuntimeTypeString: Unity.Behavior.ConditionalGuardModifier, Unity.Behavior, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
     RuntimeTypeID:
       m_Value0: 3048858705937822632
       m_Value1: 3282115049331433116
@@ -417,48 +382,41 @@ MonoBehaviour:
     IsPlaceholder: 0
   - Name: Wait (Range) (Seconds)
     Story: Wait between [Min] and [Max] seconds
-    RuntimeTypeString: Unity.Behavior.WaitRangeAction, Unity.Behavior, Version=0.0.0.0,
-      Culture=neutral, PublicKeyToken=null
+    RuntimeTypeString: Unity.Behavior.WaitRangeAction, Unity.Behavior, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
     RuntimeTypeID:
       m_Value0: 1357124955953561018
       m_Value1: 15647026721769409965
     Variables:
     - Name: Min
       Type:
-        m_SerializableType: System.Single, mscorlib, Version=4.0.0.0, Culture=neutral,
-          PublicKeyToken=b77a5c561934e089
+        m_SerializableType: System.Single, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089
       Tooltip: 
     - Name: Max
       Type:
-        m_SerializableType: System.Single, mscorlib, Version=4.0.0.0, Culture=neutral,
-          PublicKeyToken=b77a5c561934e089
+        m_SerializableType: System.Single, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089
       Tooltip: 
     NamedChildren: []
     IsPlaceholder: 0
   - Name: AIUpdateCooldown
     Story: Update [CanValue] [Delay] delay
-    RuntimeTypeString: AIUpdateCooldown, Assembly-CSharp, Version=0.0.0.0, Culture=neutral,
-      PublicKeyToken=null
+    RuntimeTypeString: AIUpdateCooldown, Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
     RuntimeTypeID:
       m_Value0: 14804719427668178290
       m_Value1: 13469144785682595602
     Variables:
     - Name: CanValue
       Type:
-        m_SerializableType: System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral,
-          PublicKeyToken=b77a5c561934e089
+        m_SerializableType: System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089
       Tooltip: 
     - Name: Delay
       Type:
-        m_SerializableType: System.Single, mscorlib, Version=4.0.0.0, Culture=neutral,
-          PublicKeyToken=b77a5c561934e089
+        m_SerializableType: System.Single, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089
       Tooltip: 
     NamedChildren: []
     IsPlaceholder: 0
   - Name: Run In Parallel
     Story: 
-    RuntimeTypeString: Unity.Behavior.ParallelAllComposite, Unity.Behavior, Version=0.0.0.0,
-      Culture=neutral, PublicKeyToken=null
+    RuntimeTypeString: Unity.Behavior.ParallelAllComposite, Unity.Behavior, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
     RuntimeTypeID:
       m_Value0: 6216542881172158703
       m_Value1: 2191282456596108218
@@ -467,51 +425,43 @@ MonoBehaviour:
     IsPlaceholder: 0
   - Name: PlayerAttackAction
     Story: '[Input] Attack'
-    RuntimeTypeString: PlayerAttackAction, Assembly-CSharp, Version=0.0.0.0, Culture=neutral,
-      PublicKeyToken=null
+    RuntimeTypeString: PlayerAttackAction, Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
     RuntimeTypeID:
       m_Value0: 16277983991466583757
       m_Value1: 3029621094898423426
     Variables:
     - Name: Input
       Type:
-        m_SerializableType: AIPlayerInput, Assembly-CSharp, Version=0.0.0.0, Culture=neutral,
-          PublicKeyToken=null
+        m_SerializableType: AIPlayerInput, Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
       Tooltip: 
     - Name: AttackTypeCount
       Type:
-        m_SerializableType: System.Int32, mscorlib, Version=4.0.0.0, Culture=neutral,
-          PublicKeyToken=b77a5c561934e089
+        m_SerializableType: System.Int32, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089
       Tooltip: 
     - Name: CanAttack
       Type:
-        m_SerializableType: System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral,
-          PublicKeyToken=b77a5c561934e089
+        m_SerializableType: System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089
       Tooltip: 
     NamedChildren: []
     IsPlaceholder: 0
   - Name: PlayerTurnAction
     Story: Check [Self] [Target] Direction And Turn
-    RuntimeTypeString: PlayerTurnAction, Assembly-CSharp, Version=0.0.0.0, Culture=neutral,
-      PublicKeyToken=null
+    RuntimeTypeString: PlayerTurnAction, Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
     RuntimeTypeID:
       m_Value0: 5455870279979793628
       m_Value1: 14982126710970632964
     Variables:
     - Name: Input
       Type:
-        m_SerializableType: AIPlayerInput, Assembly-CSharp, Version=0.0.0.0, Culture=neutral,
-          PublicKeyToken=null
+        m_SerializableType: AIPlayerInput, Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
       Tooltip: 
     - Name: Self
       Type:
-        m_SerializableType: UnityEngine.Transform, UnityEngine.CoreModule, Version=0.0.0.0,
-          Culture=neutral, PublicKeyToken=null
+        m_SerializableType: UnityEngine.Transform, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
       Tooltip: 
     - Name: Target
       Type:
-        m_SerializableType: UnityEngine.Transform, UnityEngine.CoreModule, Version=0.0.0.0,
-          Culture=neutral, PublicKeyToken=null
+        m_SerializableType: UnityEngine.Transform, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
       Tooltip: 
     NamedChildren: []
     IsPlaceholder: 0
@@ -523,6 +473,8 @@ MonoBehaviour:
   m_BlackboardMissingManagedRef: 0
   m_GraphMissingManagedRef: 0
   m_HasMissingTypeInManagedRef: 0
+  m_EnumDependencyCache:
+    Entries: []
   references:
     version: 2
     RefIds:
@@ -539,8 +491,7 @@ MonoBehaviour:
         PortModels:
         - rid: 1276374926994964687
         NodeType:
-          m_SerializableType: Unity.Behavior.Start, Unity.Behavior, Version=0.0.0.0,
-            Culture=neutral, PublicKeyToken=null
+          m_SerializableType: Unity.Behavior.Start, Unity.Behavior, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
         NodeTypeID:
           m_Value0: 3335272451348827663
           m_Value1: 11549843281177505721
@@ -569,8 +520,7 @@ MonoBehaviour:
         - rid: 1276375015415087165
         - rid: 1276375015415087166
         NodeType:
-          m_SerializableType: AICheckTargetDistance, Assembly-CSharp, Version=0.0.0.0,
-            Culture=neutral, PublicKeyToken=null
+          m_SerializableType: AICheckTargetDistance, Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
         NodeTypeID:
           m_Value0: 5037838303262026405
           m_Value1: 9241389369718933993
@@ -602,8 +552,7 @@ MonoBehaviour:
       data:
         FieldName: Self
         Type:
-          m_SerializableType: UnityEngine.Transform, UnityEngine.CoreModule, Version=0.0.0.0,
-            Culture=neutral, PublicKeyToken=null
+          m_SerializableType: UnityEngine.Transform, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
         LocalValue:
           rid: 1276375015415087281
         LinkedVariable:
@@ -613,8 +562,7 @@ MonoBehaviour:
       data:
         FieldName: Target
         Type:
-          m_SerializableType: UnityEngine.Transform, UnityEngine.CoreModule, Version=0.0.0.0,
-            Culture=neutral, PublicKeyToken=null
+          m_SerializableType: UnityEngine.Transform, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
         LocalValue:
           rid: 1276375015415087282
         LinkedVariable:
@@ -660,8 +608,7 @@ MonoBehaviour:
       data:
         FieldName: TargetDistance
         Type:
-          m_SerializableType: System.Single, mscorlib, Version=4.0.0.0, Culture=neutral,
-            PublicKeyToken=b77a5c561934e089
+          m_SerializableType: System.Single, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089
         LocalValue:
           rid: 1276375016149877586
         LinkedVariable:
@@ -696,8 +643,7 @@ MonoBehaviour:
         - rid: 1276375061811167978
         - rid: 1276375061811167979
         NodeType:
-          m_SerializableType: PlayerMove2DAction, Assembly-CSharp, Version=0.0.0.0,
-            Culture=neutral, PublicKeyToken=null
+          m_SerializableType: PlayerMove2DAction, Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
         NodeTypeID:
           m_Value0: 15965401121654910088
           m_Value1: 11989704006205944511
@@ -718,8 +664,7 @@ MonoBehaviour:
         - rid: 1276375061811167984
         - rid: 1276375061811167985
         NodeType:
-          m_SerializableType: Unity.Behavior.WaitAction, Unity.Behavior, Version=0.0.0.0,
-            Culture=neutral, PublicKeyToken=null
+          m_SerializableType: Unity.Behavior.WaitAction, Unity.Behavior, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
         NodeTypeID:
           m_Value0: 7729581452106168333
           m_Value1: 8820302366443624372
@@ -737,8 +682,7 @@ MonoBehaviour:
         - rid: 1276375061811167987
         - rid: 1276375061811167988
         NodeType:
-          m_SerializableType: Unity.Behavior.SelectorComposite, Unity.Behavior, Version=0.0.0.0,
-            Culture=neutral, PublicKeyToken=null
+          m_SerializableType: Unity.Behavior.SelectorComposite, Unity.Behavior, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
         NodeTypeID:
           m_Value0: 11477120919463386923
           m_Value1: 7730102824742023565
@@ -755,8 +699,7 @@ MonoBehaviour:
         - rid: 1276375061811167989
         - rid: 1276375061811167990
         NodeType:
-          m_SerializableType: Unity.Behavior.SequenceComposite, Unity.Behavior, Version=0.0.0.0,
-            Culture=neutral, PublicKeyToken=null
+          m_SerializableType: Unity.Behavior.SequenceComposite, Unity.Behavior, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
         NodeTypeID:
           m_Value0: 10181448252506100447
           m_Value1: 8737116843063128493
@@ -773,8 +716,7 @@ MonoBehaviour:
         - rid: 1276375061811167991
         - rid: 1276375061811167992
         NodeType:
-          m_SerializableType: PlayerJumpAction, Assembly-CSharp, Version=0.0.0.0,
-            Culture=neutral, PublicKeyToken=null
+          m_SerializableType: PlayerJumpAction, Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
         NodeTypeID:
           m_Value0: 9694845867462144183
           m_Value1: 16226605663029779083
@@ -795,8 +737,7 @@ MonoBehaviour:
         - rid: 1276375061811168004
         - rid: 1276375061811168005
         NodeType:
-          m_SerializableType: Unity.Behavior.RandomComposite, Unity.Behavior, Version=0.0.0.0,
-            Culture=neutral, PublicKeyToken=null
+          m_SerializableType: Unity.Behavior.RandomComposite, Unity.Behavior, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
         NodeTypeID:
           m_Value0: 15586748977048568638
           m_Value1: 1886799870276249994
@@ -813,8 +754,7 @@ MonoBehaviour:
         - rid: 1276375061811168006
         - rid: 1276375061811168007
         NodeType:
-          m_SerializableType: PlayerDodgeTargetAction, Assembly-CSharp, Version=0.0.0.0,
-            Culture=neutral, PublicKeyToken=null
+          m_SerializableType: PlayerDodgeTargetAction, Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
         NodeTypeID:
           m_Value0: 16389165273591252735
           m_Value1: 15792248658811620704
@@ -836,8 +776,7 @@ MonoBehaviour:
         - rid: 1276375061811168035
         - rid: 1276375061811168036
         NodeType:
-          m_SerializableType: PlayerChaseTargetAction, Assembly-CSharp, Version=0.0.0.0,
-            Culture=neutral, PublicKeyToken=null
+          m_SerializableType: PlayerChaseTargetAction, Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
         NodeTypeID:
           m_Value0: 2170363816160120575
           m_Value1: 15526166343133416597
@@ -873,8 +812,7 @@ MonoBehaviour:
       data:
         FieldName: Input
         Type:
-          m_SerializableType: AIPlayerInput, Assembly-CSharp, Version=0.0.0.0, Culture=neutral,
-            PublicKeyToken=null
+          m_SerializableType: AIPlayerInput, Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
         LocalValue:
           rid: 1276375061811168044
         LinkedVariable:
@@ -884,8 +822,7 @@ MonoBehaviour:
       data:
         FieldName: Min
         Type:
-          m_SerializableType: System.Single, mscorlib, Version=4.0.0.0, Culture=neutral,
-            PublicKeyToken=b77a5c561934e089
+          m_SerializableType: System.Single, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089
         LocalValue:
           rid: 1276375061811168046
         LinkedVariable:
@@ -895,8 +832,7 @@ MonoBehaviour:
       data:
         FieldName: Max
         Type:
-          m_SerializableType: System.Single, mscorlib, Version=4.0.0.0, Culture=neutral,
-            PublicKeyToken=b77a5c561934e089
+          m_SerializableType: System.Single, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089
         LocalValue:
           rid: 1276375061811168047
         LinkedVariable:
@@ -906,8 +842,7 @@ MonoBehaviour:
       data:
         FieldName: WallDetector
         Type:
-          m_SerializableType: WallDetector, Assembly-CSharp, Version=0.0.0.0, Culture=neutral,
-            PublicKeyToken=null
+          m_SerializableType: WallDetector, Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
         LocalValue:
           rid: 1276375061811168048
         LinkedVariable:
@@ -936,8 +871,7 @@ MonoBehaviour:
       data:
         FieldName: SecondsToWait
         Type:
-          m_SerializableType: System.Single, mscorlib, Version=4.0.0.0, Culture=neutral,
-            PublicKeyToken=b77a5c561934e089
+          m_SerializableType: System.Single, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089
         LocalValue:
           rid: 1276375061811168050
         LinkedVariable:
@@ -1010,8 +944,7 @@ MonoBehaviour:
       data:
         FieldName: Self
         Type:
-          m_SerializableType: UnityEngine.Transform, UnityEngine.CoreModule, Version=0.0.0.0,
-            Culture=neutral, PublicKeyToken=null
+          m_SerializableType: UnityEngine.Transform, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
         LocalValue:
           rid: 1276375061811168051
         LinkedVariable:
@@ -1021,8 +954,7 @@ MonoBehaviour:
       data:
         FieldName: JumpFloor
         Type:
-          m_SerializableType: UnityEngine.Transform, UnityEngine.CoreModule, Version=0.0.0.0,
-            Culture=neutral, PublicKeyToken=null
+          m_SerializableType: UnityEngine.Transform, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
         LocalValue:
           rid: 1276375061811168053
         LinkedVariable:
@@ -1032,8 +964,7 @@ MonoBehaviour:
       data:
         FieldName: Input
         Type:
-          m_SerializableType: AIPlayerInput, Assembly-CSharp, Version=0.0.0.0, Culture=neutral,
-            PublicKeyToken=null
+          m_SerializableType: AIPlayerInput, Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
         LocalValue:
           rid: 1276375061811168055
         LinkedVariable:
@@ -1043,8 +974,7 @@ MonoBehaviour:
       data:
         FieldName: JumpChance
         Type:
-          m_SerializableType: System.Single, mscorlib, Version=4.0.0.0, Culture=neutral,
-            PublicKeyToken=b77a5c561934e089
+          m_SerializableType: System.Single, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089
         LocalValue:
           rid: 1276375061811168058
         LinkedVariable:
@@ -1094,8 +1024,7 @@ MonoBehaviour:
       data:
         FieldName: Input
         Type:
-          m_SerializableType: AIPlayerInput, Assembly-CSharp, Version=0.0.0.0, Culture=neutral,
-            PublicKeyToken=null
+          m_SerializableType: AIPlayerInput, Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
         LocalValue:
           rid: 1276375061811168066
         LinkedVariable:
@@ -1105,8 +1034,7 @@ MonoBehaviour:
       data:
         FieldName: Self
         Type:
-          m_SerializableType: UnityEngine.Transform, UnityEngine.CoreModule, Version=0.0.0.0,
-            Culture=neutral, PublicKeyToken=null
+          m_SerializableType: UnityEngine.Transform, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
         LocalValue:
           rid: 1276375061811168067
         LinkedVariable:
@@ -1116,8 +1044,7 @@ MonoBehaviour:
       data:
         FieldName: Target
         Type:
-          m_SerializableType: UnityEngine.Transform, UnityEngine.CoreModule, Version=0.0.0.0,
-            Culture=neutral, PublicKeyToken=null
+          m_SerializableType: UnityEngine.Transform, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
         LocalValue:
           rid: 1276375061811168068
         LinkedVariable:
@@ -1127,8 +1054,7 @@ MonoBehaviour:
       data:
         FieldName: DodgeDistance
         Type:
-          m_SerializableType: System.Single, mscorlib, Version=4.0.0.0, Culture=neutral,
-            PublicKeyToken=b77a5c561934e089
+          m_SerializableType: System.Single, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089
         LocalValue:
           rid: 1276375061811168070
         LinkedVariable:
@@ -1138,8 +1064,7 @@ MonoBehaviour:
       data:
         FieldName: WallDetector
         Type:
-          m_SerializableType: WallDetector, Assembly-CSharp, Version=0.0.0.0, Culture=neutral,
-            PublicKeyToken=null
+          m_SerializableType: WallDetector, Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
         LocalValue:
           rid: 1276375061811168071
         LinkedVariable:
@@ -1168,8 +1093,7 @@ MonoBehaviour:
       data:
         FieldName: Input
         Type:
-          m_SerializableType: AIPlayerInput, Assembly-CSharp, Version=0.0.0.0, Culture=neutral,
-            PublicKeyToken=null
+          m_SerializableType: AIPlayerInput, Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
         LocalValue:
           rid: 1276375061811168080
         LinkedVariable:
@@ -1179,8 +1103,7 @@ MonoBehaviour:
       data:
         FieldName: Self
         Type:
-          m_SerializableType: UnityEngine.Transform, UnityEngine.CoreModule, Version=0.0.0.0,
-            Culture=neutral, PublicKeyToken=null
+          m_SerializableType: UnityEngine.Transform, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
         LocalValue:
           rid: 1276375061811168081
         LinkedVariable:
@@ -1190,8 +1113,7 @@ MonoBehaviour:
       data:
         FieldName: Target
         Type:
-          m_SerializableType: UnityEngine.Transform, UnityEngine.CoreModule, Version=0.0.0.0,
-            Culture=neutral, PublicKeyToken=null
+          m_SerializableType: UnityEngine.Transform, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
         LocalValue:
           rid: 1276375061811168082
         LinkedVariable:
@@ -1201,8 +1123,7 @@ MonoBehaviour:
       data:
         FieldName: Min
         Type:
-          m_SerializableType: System.Single, mscorlib, Version=4.0.0.0, Culture=neutral,
-            PublicKeyToken=b77a5c561934e089
+          m_SerializableType: System.Single, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089
         LocalValue:
           rid: 1276375061811168083
         LinkedVariable:
@@ -1212,8 +1133,7 @@ MonoBehaviour:
       data:
         FieldName: Max
         Type:
-          m_SerializableType: System.Single, mscorlib, Version=4.0.0.0, Culture=neutral,
-            PublicKeyToken=b77a5c561934e089
+          m_SerializableType: System.Single, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089
         LocalValue:
           rid: 1276375061811168084
         LinkedVariable:
@@ -1442,8 +1362,7 @@ MonoBehaviour:
         - rid: 1276375063708304125
         - rid: 1276375063708304126
         NodeType:
-          m_SerializableType: Unity.Behavior.ConditionalGuardModifier, Unity.Behavior,
-            Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+          m_SerializableType: Unity.Behavior.ConditionalGuardModifier, Unity.Behavior, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
         NodeTypeID:
           m_Value0: 3048858705937822632
           m_Value1: 3282115049331433116
@@ -1479,8 +1398,7 @@ MonoBehaviour:
       type: {class: ConditionModel, ns: Unity.Behavior, asm: Unity.Behavior.Authoring}
       data:
         ConditionType:
-          m_SerializableType: Unity.Behavior.VariableComparisonCondition, Unity.Behavior,
-            Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+          m_SerializableType: Unity.Behavior.VariableComparisonCondition, Unity.Behavior, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
         ConditionTypeID:
           m_Value0: 4706153636540939941
           m_Value1: 1154942553909992356
@@ -1497,8 +1415,7 @@ MonoBehaviour:
       data:
         FieldName: Variable
         Type:
-          m_SerializableType: System.Object, mscorlib, Version=4.0.0.0, Culture=neutral,
-            PublicKeyToken=b77a5c561934e089
+          m_SerializableType: System.Object, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089
         LocalValue:
           rid: 1276375063708304298
         LinkedVariable:
@@ -1508,8 +1425,7 @@ MonoBehaviour:
       data:
         FieldName: Operator
         Type:
-          m_SerializableType: Unity.Behavior.ConditionOperator, Unity.Behavior, Version=0.0.0.0,
-            Culture=neutral, PublicKeyToken=null
+          m_SerializableType: Unity.Behavior.ConditionOperator, Unity.Behavior, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
         LocalValue:
           rid: 1276375063708304261
         LinkedVariable:
@@ -1537,8 +1453,7 @@ MonoBehaviour:
       data:
         FieldName: ComparisonValue
         Type:
-          m_SerializableType: System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral,
-            PublicKeyToken=b77a5c561934e089
+          m_SerializableType: System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089
         LocalValue:
           rid: 1276375063708304299
         LinkedVariable:
@@ -1571,8 +1486,7 @@ MonoBehaviour:
         - rid: 1276375063843832175
         - rid: 1276375063843832176
         NodeType:
-          m_SerializableType: Unity.Behavior.ConditionalGuardModifier, Unity.Behavior,
-            Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+          m_SerializableType: Unity.Behavior.ConditionalGuardModifier, Unity.Behavior, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
         NodeTypeID:
           m_Value0: 3048858705937822632
           m_Value1: 3282115049331433116
@@ -1609,8 +1523,7 @@ MonoBehaviour:
       type: {class: ConditionModel, ns: Unity.Behavior, asm: Unity.Behavior.Authoring}
       data:
         ConditionType:
-          m_SerializableType: Unity.Behavior.VariableComparisonCondition, Unity.Behavior,
-            Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+          m_SerializableType: Unity.Behavior.VariableComparisonCondition, Unity.Behavior, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
         ConditionTypeID:
           m_Value0: 4706153636540939941
           m_Value1: 1154942553909992356
@@ -1627,8 +1540,7 @@ MonoBehaviour:
       data:
         FieldName: Variable
         Type:
-          m_SerializableType: System.Object, mscorlib, Version=4.0.0.0, Culture=neutral,
-            PublicKeyToken=b77a5c561934e089
+          m_SerializableType: System.Object, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089
         LocalValue:
           rid: 1276375063843832277
         LinkedVariable:
@@ -1638,8 +1550,7 @@ MonoBehaviour:
       data:
         FieldName: Operator
         Type:
-          m_SerializableType: Unity.Behavior.ConditionOperator, Unity.Behavior, Version=0.0.0.0,
-            Culture=neutral, PublicKeyToken=null
+          m_SerializableType: Unity.Behavior.ConditionOperator, Unity.Behavior, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
         LocalValue:
           rid: 1276375063843832204
         LinkedVariable:
@@ -1656,8 +1567,7 @@ MonoBehaviour:
       type: {class: ConditionModel, ns: Unity.Behavior, asm: Unity.Behavior.Authoring}
       data:
         ConditionType:
-          m_SerializableType: Unity.Behavior.VariableComparisonCondition, Unity.Behavior,
-            Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+          m_SerializableType: Unity.Behavior.VariableComparisonCondition, Unity.Behavior, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
         ConditionTypeID:
           m_Value0: 4706153636540939941
           m_Value1: 1154942553909992356
@@ -1674,8 +1584,7 @@ MonoBehaviour:
       data:
         FieldName: Variable
         Type:
-          m_SerializableType: System.Object, mscorlib, Version=4.0.0.0, Culture=neutral,
-            PublicKeyToken=b77a5c561934e089
+          m_SerializableType: System.Object, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089
         LocalValue:
           rid: 1276375063843832346
         LinkedVariable:
@@ -1685,8 +1594,7 @@ MonoBehaviour:
       data:
         FieldName: Operator
         Type:
-          m_SerializableType: Unity.Behavior.ConditionOperator, Unity.Behavior, Version=0.0.0.0,
-            Culture=neutral, PublicKeyToken=null
+          m_SerializableType: Unity.Behavior.ConditionOperator, Unity.Behavior, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
         LocalValue:
           rid: 1276375063843832241
         LinkedVariable:
@@ -1704,8 +1612,7 @@ MonoBehaviour:
       data:
         FieldName: ComparisonValue
         Type:
-          m_SerializableType: System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral,
-            PublicKeyToken=b77a5c561934e089
+          m_SerializableType: System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089
         LocalValue:
           rid: 1276375063843832278
         LinkedVariable:
@@ -1731,8 +1638,7 @@ MonoBehaviour:
       data:
         FieldName: ComparisonValue
         Type:
-          m_SerializableType: System.Single, mscorlib, Version=4.0.0.0, Culture=neutral,
-            PublicKeyToken=b77a5c561934e089
+          m_SerializableType: System.Single, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089
         LocalValue:
           rid: 1276375063843832347
         LinkedVariable:
@@ -1765,8 +1671,7 @@ MonoBehaviour:
         - rid: 1276375063904387620
         - rid: 1276375063904387621
         NodeType:
-          m_SerializableType: Unity.Behavior.ConditionalGuardModifier, Unity.Behavior,
-            Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+          m_SerializableType: Unity.Behavior.ConditionalGuardModifier, Unity.Behavior, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
         NodeTypeID:
           m_Value0: 3048858705937822632
           m_Value1: 3282115049331433116
@@ -1801,8 +1706,7 @@ MonoBehaviour:
       type: {class: ConditionModel, ns: Unity.Behavior, asm: Unity.Behavior.Authoring}
       data:
         ConditionType:
-          m_SerializableType: Unity.Behavior.VariableComparisonCondition, Unity.Behavior,
-            Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+          m_SerializableType: Unity.Behavior.VariableComparisonCondition, Unity.Behavior, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
         ConditionTypeID:
           m_Value0: 4706153636540939941
           m_Value1: 1154942553909992356
@@ -1819,8 +1723,7 @@ MonoBehaviour:
       data:
         FieldName: Variable
         Type:
-          m_SerializableType: System.Object, mscorlib, Version=4.0.0.0, Culture=neutral,
-            PublicKeyToken=b77a5c561934e089
+          m_SerializableType: System.Object, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089
         LocalValue:
           rid: 1276375063904387660
         LinkedVariable:
@@ -1830,8 +1733,7 @@ MonoBehaviour:
       data:
         FieldName: Operator
         Type:
-          m_SerializableType: Unity.Behavior.ConditionOperator, Unity.Behavior, Version=0.0.0.0,
-            Culture=neutral, PublicKeyToken=null
+          m_SerializableType: Unity.Behavior.ConditionOperator, Unity.Behavior, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
         LocalValue:
           rid: 1276375063904387628
         LinkedVariable:
@@ -1841,8 +1743,7 @@ MonoBehaviour:
       data:
         FieldName: ComparisonValue
         Type:
-          m_SerializableType: System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral,
-            PublicKeyToken=b77a5c561934e089
+          m_SerializableType: System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089
         LocalValue:
           rid: 1276375063904387629
         LinkedVariable:
@@ -1893,8 +1794,7 @@ MonoBehaviour:
         - rid: 1276375063904387895
         - rid: 1276375063904387896
         NodeType:
-          m_SerializableType: Unity.Behavior.RandomComposite, Unity.Behavior, Version=0.0.0.0,
-            Culture=neutral, PublicKeyToken=null
+          m_SerializableType: Unity.Behavior.RandomComposite, Unity.Behavior, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
         NodeTypeID:
           m_Value0: 15586748977048568638
           m_Value1: 1886799870276249994
@@ -1931,8 +1831,7 @@ MonoBehaviour:
         PortModels:
         - rid: 1276375064119607838
         NodeType:
-          m_SerializableType: Unity.Behavior.Start, Unity.Behavior, Version=0.0.0.0,
-            Culture=neutral, PublicKeyToken=null
+          m_SerializableType: Unity.Behavior.Start, Unity.Behavior, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
         NodeTypeID:
           m_Value0: 3335272451348827663
           m_Value1: 11549843281177505721
@@ -1961,8 +1860,7 @@ MonoBehaviour:
         - rid: 1276375064119608121
         - rid: 1276375064119608122
         NodeType:
-          m_SerializableType: Unity.Behavior.WaitRangeAction, Unity.Behavior, Version=0.0.0.0,
-            Culture=neutral, PublicKeyToken=null
+          m_SerializableType: Unity.Behavior.WaitRangeAction, Unity.Behavior, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
         NodeTypeID:
           m_Value0: 1357124955953561018
           m_Value1: 15647026721769409965
@@ -1993,8 +1891,7 @@ MonoBehaviour:
       data:
         FieldName: Min
         Type:
-          m_SerializableType: System.Single, mscorlib, Version=4.0.0.0, Culture=neutral,
-            PublicKeyToken=b77a5c561934e089
+          m_SerializableType: System.Single, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089
         LocalValue:
           rid: 1276375064119608125
         LinkedVariable:
@@ -2004,8 +1901,7 @@ MonoBehaviour:
       data:
         FieldName: Max
         Type:
-          m_SerializableType: System.Single, mscorlib, Version=4.0.0.0, Culture=neutral,
-            PublicKeyToken=b77a5c561934e089
+          m_SerializableType: System.Single, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089
         LocalValue:
           rid: 1276375064119608126
         LinkedVariable:
@@ -2040,8 +1936,7 @@ MonoBehaviour:
       type: {class: ConditionModel, ns: Unity.Behavior, asm: Unity.Behavior.Authoring}
       data:
         ConditionType:
-          m_SerializableType: Unity.Behavior.VariableComparisonCondition, Unity.Behavior,
-            Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+          m_SerializableType: Unity.Behavior.VariableComparisonCondition, Unity.Behavior, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
         ConditionTypeID:
           m_Value0: 4706153636540939941
           m_Value1: 1154942553909992356
@@ -2058,8 +1953,7 @@ MonoBehaviour:
       data:
         FieldName: Variable
         Type:
-          m_SerializableType: System.Object, mscorlib, Version=4.0.0.0, Culture=neutral,
-            PublicKeyToken=b77a5c561934e089
+          m_SerializableType: System.Object, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089
         LocalValue:
           rid: 1276375064650973263
         LinkedVariable:
@@ -2069,8 +1963,7 @@ MonoBehaviour:
       data:
         FieldName: Operator
         Type:
-          m_SerializableType: Unity.Behavior.ConditionOperator, Unity.Behavior, Version=0.0.0.0,
-            Culture=neutral, PublicKeyToken=null
+          m_SerializableType: Unity.Behavior.ConditionOperator, Unity.Behavior, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
         LocalValue:
           rid: 1276375064650973223
         LinkedVariable:
@@ -2088,8 +1981,7 @@ MonoBehaviour:
       data:
         FieldName: ComparisonValue
         Type:
-          m_SerializableType: System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral,
-            PublicKeyToken=b77a5c561934e089
+          m_SerializableType: System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089
         LocalValue:
           rid: 1276375064650973264
         LinkedVariable:
@@ -2124,8 +2016,7 @@ MonoBehaviour:
       type: {class: ConditionModel, ns: Unity.Behavior, asm: Unity.Behavior.Authoring}
       data:
         ConditionType:
-          m_SerializableType: Unity.Behavior.VariableComparisonCondition, Unity.Behavior,
-            Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+          m_SerializableType: Unity.Behavior.VariableComparisonCondition, Unity.Behavior, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
         ConditionTypeID:
           m_Value0: 4706153636540939941
           m_Value1: 1154942553909992356
@@ -2142,8 +2033,7 @@ MonoBehaviour:
       data:
         FieldName: Variable
         Type:
-          m_SerializableType: System.Object, mscorlib, Version=4.0.0.0, Culture=neutral,
-            PublicKeyToken=b77a5c561934e089
+          m_SerializableType: System.Object, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089
         LocalValue:
           rid: 1276375338647290100
         LinkedVariable:
@@ -2153,8 +2043,7 @@ MonoBehaviour:
       data:
         FieldName: Operator
         Type:
-          m_SerializableType: Unity.Behavior.ConditionOperator, Unity.Behavior, Version=0.0.0.0,
-            Culture=neutral, PublicKeyToken=null
+          m_SerializableType: Unity.Behavior.ConditionOperator, Unity.Behavior, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
         LocalValue:
           rid: 1276375338647290056
         LinkedVariable:
@@ -2172,8 +2061,7 @@ MonoBehaviour:
       data:
         FieldName: ComparisonValue
         Type:
-          m_SerializableType: System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral,
-            PublicKeyToken=b77a5c561934e089
+          m_SerializableType: System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089
         LocalValue:
           rid: 1276375338647290101
         LinkedVariable:
@@ -2206,8 +2094,7 @@ MonoBehaviour:
         - rid: 1276375356357214990
         - rid: 1276375356357214991
         NodeType:
-          m_SerializableType: AIUpdateCooldown, Assembly-CSharp, Version=0.0.0.0,
-            Culture=neutral, PublicKeyToken=null
+          m_SerializableType: AIUpdateCooldown, Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
         NodeTypeID:
           m_Value0: 14804719427668178290
           m_Value1: 13469144785682595602
@@ -2238,8 +2125,7 @@ MonoBehaviour:
       data:
         FieldName: CanValue
         Type:
-          m_SerializableType: System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral,
-            PublicKeyToken=b77a5c561934e089
+          m_SerializableType: System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089
         LocalValue:
           rid: 1276375356357214994
         LinkedVariable:
@@ -2249,8 +2135,7 @@ MonoBehaviour:
       data:
         FieldName: Delay
         Type:
-          m_SerializableType: System.Single, mscorlib, Version=4.0.0.0, Culture=neutral,
-            PublicKeyToken=b77a5c561934e089
+          m_SerializableType: System.Single, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089
         LocalValue:
           rid: 1276375356357214995
         LinkedVariable:
@@ -2293,8 +2178,7 @@ MonoBehaviour:
         - rid: 1276375356357215120
         - rid: 1276375356357215121
         NodeType:
-          m_SerializableType: AIUpdateCooldown, Assembly-CSharp, Version=0.0.0.0,
-            Culture=neutral, PublicKeyToken=null
+          m_SerializableType: AIUpdateCooldown, Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
         NodeTypeID:
           m_Value0: 14804719427668178290
           m_Value1: 13469144785682595602
@@ -2325,8 +2209,7 @@ MonoBehaviour:
       data:
         FieldName: CanValue
         Type:
-          m_SerializableType: System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral,
-            PublicKeyToken=b77a5c561934e089
+          m_SerializableType: System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089
         LocalValue:
           rid: 1276375356357215124
         LinkedVariable:
@@ -2336,8 +2219,7 @@ MonoBehaviour:
       data:
         FieldName: Delay
         Type:
-          m_SerializableType: System.Single, mscorlib, Version=4.0.0.0, Culture=neutral,
-            PublicKeyToken=b77a5c561934e089
+          m_SerializableType: System.Single, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089
         LocalValue:
           rid: 1276375356357215125
         LinkedVariable:
@@ -2373,8 +2255,7 @@ MonoBehaviour:
       data:
         FieldName: CanChase
         Type:
-          m_SerializableType: System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral,
-            PublicKeyToken=b77a5c561934e089
+          m_SerializableType: System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089
         LocalValue:
           rid: 1276375356511879700
         LinkedVariable:
@@ -2409,8 +2290,7 @@ MonoBehaviour:
         - rid: 1276375356511879899
         - rid: 1276375356511879900
         NodeType:
-          m_SerializableType: Unity.Behavior.ParallelAllComposite, Unity.Behavior,
-            Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+          m_SerializableType: Unity.Behavior.ParallelAllComposite, Unity.Behavior, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
         NodeTypeID:
           m_Value0: 6216542881172158703
           m_Value1: 2191282456596108218
@@ -2443,8 +2323,7 @@ MonoBehaviour:
       data:
         FieldName: IsGrounded
         Type:
-          m_SerializableType: System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral,
-            PublicKeyToken=b77a5c561934e089
+          m_SerializableType: System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089
         LocalValue:
           rid: 1276375357735305359
         LinkedVariable:
@@ -2469,8 +2348,7 @@ MonoBehaviour:
         - rid: 1276375357735306020
         - rid: 1276375357735306021
         NodeType:
-          m_SerializableType: PlayerAttackAction, Assembly-CSharp, Version=0.0.0.0,
-            Culture=neutral, PublicKeyToken=null
+          m_SerializableType: PlayerAttackAction, Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
         NodeTypeID:
           m_Value0: 16277983991466583757
           m_Value1: 3029621094898423426
@@ -2502,8 +2380,7 @@ MonoBehaviour:
       data:
         FieldName: Input
         Type:
-          m_SerializableType: AIPlayerInput, Assembly-CSharp, Version=0.0.0.0, Culture=neutral,
-            PublicKeyToken=null
+          m_SerializableType: AIPlayerInput, Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
         LocalValue:
           rid: 1276375357735306025
         LinkedVariable:
@@ -2513,8 +2390,7 @@ MonoBehaviour:
       data:
         FieldName: CanAttack
         Type:
-          m_SerializableType: System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral,
-            PublicKeyToken=b77a5c561934e089
+          m_SerializableType: System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089
         LocalValue:
           rid: 1276375357735306028
         LinkedVariable:
@@ -2560,8 +2436,7 @@ MonoBehaviour:
       data:
         FieldName: AttackTypeCount
         Type:
-          m_SerializableType: System.Int32, mscorlib, Version=4.0.0.0, Culture=neutral,
-            PublicKeyToken=b77a5c561934e089
+          m_SerializableType: System.Int32, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089
         LocalValue:
           rid: 1276375358243078861
         LinkedVariable:
@@ -2596,8 +2471,7 @@ MonoBehaviour:
         - rid: 1276375358243078987
         - rid: 1276375358243078988
         NodeType:
-          m_SerializableType: PlayerTurnAction, Assembly-CSharp, Version=0.0.0.0,
-            Culture=neutral, PublicKeyToken=null
+          m_SerializableType: PlayerTurnAction, Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
         NodeTypeID:
           m_Value0: 5455870279979793628
           m_Value1: 14982126710970632964
@@ -2629,8 +2503,7 @@ MonoBehaviour:
       data:
         FieldName: Self
         Type:
-          m_SerializableType: UnityEngine.Transform, UnityEngine.CoreModule, Version=0.0.0.0,
-            Culture=neutral, PublicKeyToken=null
+          m_SerializableType: UnityEngine.Transform, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
         LocalValue:
           rid: 1276375358243078991
         LinkedVariable:
@@ -2640,8 +2513,7 @@ MonoBehaviour:
       data:
         FieldName: Target
         Type:
-          m_SerializableType: UnityEngine.Transform, UnityEngine.CoreModule, Version=0.0.0.0,
-            Culture=neutral, PublicKeyToken=null
+          m_SerializableType: UnityEngine.Transform, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
         LocalValue:
           rid: 1276375358243078992
         LinkedVariable:
@@ -2667,8 +2539,7 @@ MonoBehaviour:
       data:
         FieldName: Input
         Type:
-          m_SerializableType: AIPlayerInput, Assembly-CSharp, Version=0.0.0.0, Culture=neutral,
-            PublicKeyToken=null
+          m_SerializableType: AIPlayerInput, Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
         LocalValue:
           rid: 1276375358243079049
         LinkedVariable:
@@ -2693,8 +2564,7 @@ MonoBehaviour:
         - rid: 1276375358243079105
         - rid: 1276375358243079106
         NodeType:
-          m_SerializableType: Unity.Behavior.SequenceComposite, Unity.Behavior, Version=0.0.0.0,
-            Culture=neutral, PublicKeyToken=null
+          m_SerializableType: Unity.Behavior.SequenceComposite, Unity.Behavior, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
         NodeTypeID:
           m_Value0: 10181448252506100447
           m_Value1: 8737116843063128493
@@ -2782,8 +2652,8 @@ MonoBehaviour:
           rid: 1276374926994964689
         BlackboardGroupReferences: []
         Root:
-          rid: 1276375358798823939
-        m_VersionTimestamp: 639131731322332839
+          rid: 8845967401987604702
+        m_VersionTimestamp: 639257944590870040
     - rid: 1276374926994964689
       type: {class: BlackboardReference, ns: Unity.Behavior, asm: Unity.Behavior}
       data:
@@ -2893,199 +2763,7 @@ MonoBehaviour:
           m_Value1: 14526531765648856642
         Name: AttackTypeCount
         m_Value: 0
-    - rid: 1276375358798823860
-      type: {class: 'BlackboardVariable`1[[System.Single, mscorlib]]', ns: Unity.Behavior, asm: Unity.Behavior}
-      data:
-        GUID:
-          m_Value0: 0
-          m_Value1: 0
-        Name: 
-        m_Value: 1
-    - rid: 1276375358798823861
-      type: {class: 'BlackboardVariable`1[[System.Single, mscorlib]]', ns: Unity.Behavior, asm: Unity.Behavior}
-      data:
-        GUID:
-          m_Value0: 0
-          m_Value1: 0
-        Name: 
-        m_Value: 2
-    - rid: 1276375358798823875
-      type: {class: 'BlackboardVariable`1[[Unity.Behavior.ConditionOperator, Unity.Behavior]]', ns: Unity.Behavior, asm: Unity.Behavior}
-      data:
-        GUID:
-          m_Value0: 0
-          m_Value1: 0
-        Name: 
-        m_Value: 0
-    - rid: 1276375358798823876
-      type: {class: 'BlackboardVariable`1[[System.Boolean, mscorlib]]', ns: Unity.Behavior, asm: Unity.Behavior}
-      data:
-        GUID:
-          m_Value0: 0
-          m_Value1: 0
-        Name: 
-        m_Value: 1
-    - rid: 1276375358798823877
-      type: {class: 'BlackboardVariable`1[[Unity.Behavior.ConditionOperator, Unity.Behavior]]', ns: Unity.Behavior, asm: Unity.Behavior}
-      data:
-        GUID:
-          m_Value0: 0
-          m_Value1: 0
-        Name: 
-        m_Value: 5
-    - rid: 1276375358798823878
-      type: {class: 'BlackboardVariable`1[[System.Single, mscorlib]]', ns: Unity.Behavior, asm: Unity.Behavior}
-      data:
-        GUID:
-          m_Value0: 0
-          m_Value1: 0
-        Name: 
-        m_Value: 2
-    - rid: 1276375358798823879
-      type: {class: 'BlackboardVariable`1[[Unity.Behavior.ConditionOperator, Unity.Behavior]]', ns: Unity.Behavior, asm: Unity.Behavior}
-      data:
-        GUID:
-          m_Value0: 0
-          m_Value1: 0
-        Name: 
-        m_Value: 0
-    - rid: 1276375358798823880
-      type: {class: 'BlackboardVariable`1[[System.Boolean, mscorlib]]', ns: Unity.Behavior, asm: Unity.Behavior}
-      data:
-        GUID:
-          m_Value0: 0
-          m_Value1: 0
-        Name: 
-        m_Value: 1
-    - rid: 1276375358798823882
-      type: {class: 'BlackboardVariable`1[[System.Single, mscorlib]]', ns: Unity.Behavior, asm: Unity.Behavior}
-      data:
-        GUID:
-          m_Value0: 0
-          m_Value1: 0
-        Name: 
-        m_Value: 0.5
-    - rid: 1276375358798823883
-      type: {class: 'BlackboardVariable`1[[System.Single, mscorlib]]', ns: Unity.Behavior, asm: Unity.Behavior}
-      data:
-        GUID:
-          m_Value0: 0
-          m_Value1: 0
-        Name: 
-        m_Value: 3
-    - rid: 1276375358798823884
-      type: {class: 'BlackboardVariable`1[[System.Boolean, mscorlib]]', ns: Unity.Behavior, asm: Unity.Behavior}
-      data:
-        GUID:
-          m_Value0: 0
-          m_Value1: 0
-        Name: 
-        m_Value: 0
-    - rid: 1276375358798823885
-      type: {class: 'BlackboardVariable`1[[Unity.Behavior.ConditionOperator, Unity.Behavior]]', ns: Unity.Behavior, asm: Unity.Behavior}
-      data:
-        GUID:
-          m_Value0: 0
-          m_Value1: 0
-        Name: 
-        m_Value: 0
-    - rid: 1276375358798823886
-      type: {class: 'BlackboardVariable`1[[System.Boolean, mscorlib]]', ns: Unity.Behavior, asm: Unity.Behavior}
-      data:
-        GUID:
-          m_Value0: 0
-          m_Value1: 0
-        Name: 
-        m_Value: 1
-    - rid: 1276375358798823887
-      type: {class: 'BlackboardVariable`1[[Unity.Behavior.ConditionOperator, Unity.Behavior]]', ns: Unity.Behavior, asm: Unity.Behavior}
-      data:
-        GUID:
-          m_Value0: 0
-          m_Value1: 0
-        Name: 
-        m_Value: 0
-    - rid: 1276375358798823888
-      type: {class: 'BlackboardVariable`1[[System.Boolean, mscorlib]]', ns: Unity.Behavior, asm: Unity.Behavior}
-      data:
-        GUID:
-          m_Value0: 0
-          m_Value1: 0
-        Name: 
-        m_Value: 1
-    - rid: 1276375358798823891
-      type: {class: 'BlackboardVariable`1[[Unity.Behavior.ConditionOperator, Unity.Behavior]]', ns: Unity.Behavior, asm: Unity.Behavior}
-      data:
-        GUID:
-          m_Value0: 0
-          m_Value1: 0
-        Name: 
-        m_Value: 0
-    - rid: 1276375358798823892
-      type: {class: 'BlackboardVariable`1[[System.Boolean, mscorlib]]', ns: Unity.Behavior, asm: Unity.Behavior}
-      data:
-        GUID:
-          m_Value0: 0
-          m_Value1: 0
-        Name: 
-        m_Value: 1
-    - rid: 1276375358798823893
-      type: {class: 'BlackboardVariable`1[[System.Single, mscorlib]]', ns: Unity.Behavior, asm: Unity.Behavior}
-      data:
-        GUID:
-          m_Value0: 0
-          m_Value1: 0
-        Name: 
-        m_Value: 1
-    - rid: 1276375358798823894
-      type: {class: 'BlackboardVariable`1[[System.Single, mscorlib]]', ns: Unity.Behavior, asm: Unity.Behavior}
-      data:
-        GUID:
-          m_Value0: 0
-          m_Value1: 0
-        Name: 
-        m_Value: 3
-    - rid: 1276375358798823895
-      type: {class: 'BlackboardVariable`1[[System.Single, mscorlib]]', ns: Unity.Behavior, asm: Unity.Behavior}
-      data:
-        GUID:
-          m_Value0: 0
-          m_Value1: 0
-        Name: 
-        m_Value: 0.1
-    - rid: 1276375358798823896
-      type: {class: 'BlackboardVariable`1[[System.Single, mscorlib]]', ns: Unity.Behavior, asm: Unity.Behavior}
-      data:
-        GUID:
-          m_Value0: 0
-          m_Value1: 0
-        Name: 
-        m_Value: 1
-    - rid: 1276375358798823900
-      type: {class: 'BlackboardVariable`1[[System.Single, mscorlib]]', ns: Unity.Behavior, asm: Unity.Behavior}
-      data:
-        GUID:
-          m_Value0: 0
-          m_Value1: 0
-        Name: 
-        m_Value: 2
-    - rid: 1276375358798823902
-      type: {class: 'BlackboardVariable`1[[System.Single, mscorlib]]', ns: Unity.Behavior, asm: Unity.Behavior}
-      data:
-        GUID:
-          m_Value0: 0
-          m_Value1: 0
-        Name: 
-        m_Value: 70
-    - rid: 1276375358798823903
-      type: {class: 'BlackboardVariable`1[[System.Single, mscorlib]]', ns: Unity.Behavior, asm: Unity.Behavior}
-      data:
-        GUID:
-          m_Value0: 0
-          m_Value1: 0
-        Name: 
-        m_Value: 0.5
-    - rid: 1276375358798823939
+    - rid: 8845967401987604702
       type: {class: ParallelAllComposite, ns: Unity.Behavior, asm: Unity.Behavior}
       data:
         ID:
@@ -3096,10 +2774,10 @@ MonoBehaviour:
         m_Parent:
           rid: -2
         m_Children:
-        - rid: 1276375358798823940
-        - rid: 1276375358798823941
+        - rid: 8845967401987604703
+        - rid: 8845967401987604704
         m_RegisteredObservers: []
-    - rid: 1276375358798823940
+    - rid: 8845967401987604703
       type: {class: Start, ns: Unity.Behavior, asm: Unity.Behavior}
       data:
         ID:
@@ -3108,12 +2786,12 @@ MonoBehaviour:
         Graph:
           rid: 1276374926994964688
         m_Parent:
-          rid: 1276375358798823939
+          rid: 8845967401987604702
         m_Child:
-          rid: 1276375358798823942
+          rid: 8845967401987604705
         Repeat: 1
         AllowMultipleRepeatsPerTick: 0
-    - rid: 1276375358798823941
+    - rid: 8845967401987604704
       type: {class: Start, ns: Unity.Behavior, asm: Unity.Behavior}
       data:
         ID:
@@ -3122,12 +2800,12 @@ MonoBehaviour:
         Graph:
           rid: 1276374926994964688
         m_Parent:
-          rid: 1276375358798823939
+          rid: 8845967401987604702
         m_Child:
-          rid: 1276375358798823943
+          rid: 8845967401987604706
         Repeat: 1
         AllowMultipleRepeatsPerTick: 0
-    - rid: 1276375358798823942
+    - rid: 8845967401987604705
       type: {class: ParallelAllComposite, ns: Unity.Behavior, asm: Unity.Behavior}
       data:
         ID:
@@ -3136,13 +2814,13 @@ MonoBehaviour:
         Graph:
           rid: 1276374926994964688
         m_Parent:
-          rid: 1276375358798823940
+          rid: 8845967401987604703
         m_Children:
-        - rid: 1276375358798823944
-        - rid: 1276375358798823945
-        - rid: 1276375358798823946
+        - rid: 8845967401987604707
+        - rid: 8845967401987604708
+        - rid: 8845967401987604709
         m_RegisteredObservers: []
-    - rid: 1276375358798823943
+    - rid: 8845967401987604706
       type: {class: SelectorComposite, ns: Unity.Behavior, asm: Unity.Behavior}
       data:
         ID:
@@ -3151,18 +2829,18 @@ MonoBehaviour:
         Graph:
           rid: 1276374926994964688
         m_Parent:
-          rid: 1276375358798823941
+          rid: 8845967401987604704
         m_Children:
-        - rid: 1276375358798823947
-        - rid: 1276375358798823948
-        - rid: 1276375358798823949
-        - rid: 1276375358798823950
+        - rid: 8845967401987604710
+        - rid: 8845967401987604711
+        - rid: 8845967401987604712
+        - rid: 8845967401987604713
         m_RegisteredObservers:
         - Observer:
-            rid: 1276375358798823947
+            rid: 8845967401987604710
         - Observer:
-            rid: 1276375358798823948
-    - rid: 1276375358798823944
+            rid: 8845967401987604711
+    - rid: 8845967401987604707
       type: {class: AICheckTargetDistance, ns: , asm: Assembly-CSharp}
       data:
         ID:
@@ -3171,14 +2849,14 @@ MonoBehaviour:
         Graph:
           rid: 1276374926994964688
         m_Parent:
-          rid: 1276375358798823942
+          rid: 8845967401987604705
         Self:
-          rid: 1276375358798823951
+          rid: 8845967401987604714
         Target:
           rid: 1276375358798823842
         TargetDistance:
           rid: 1276375358798823848
-    - rid: 1276375358798823945
+    - rid: 8845967401987604708
       type: {class: AIUpdateCooldown, ns: , asm: Assembly-CSharp}
       data:
         ID:
@@ -3187,12 +2865,12 @@ MonoBehaviour:
         Graph:
           rid: 1276374926994964688
         m_Parent:
-          rid: 1276375358798823942
+          rid: 8845967401987604705
         CanValue:
           rid: 1276375358798823845
         Delay:
-          rid: 1276375358798823860
-    - rid: 1276375358798823946
+          rid: 8845967401987604715
+    - rid: 8845967401987604709
       type: {class: AIUpdateCooldown, ns: , asm: Assembly-CSharp}
       data:
         ID:
@@ -3201,12 +2879,12 @@ MonoBehaviour:
         Graph:
           rid: 1276374926994964688
         m_Parent:
-          rid: 1276375358798823942
+          rid: 8845967401987604705
         CanValue:
           rid: 1276375358798823846
         Delay:
-          rid: 1276375358798823861
-    - rid: 1276375358798823947
+          rid: 8845967401987604716
+    - rid: 8845967401987604710
       type: {class: ConditionalGuardModifier, ns: Unity.Behavior, asm: Unity.Behavior}
       data:
         ID:
@@ -3215,16 +2893,16 @@ MonoBehaviour:
         Graph:
           rid: 1276374926994964688
         m_Parent:
-          rid: 1276375358798823943
+          rid: 8845967401987604706
         m_Child:
-          rid: 1276375358798823952
+          rid: 8845967401987604717
         m_Conditions:
-        - rid: 1276375358798823953
-        - rid: 1276375358798823954
-        - rid: 1276375358798823955
+        - rid: 8845967401987604718
+        - rid: 8845967401987604719
+        - rid: 8845967401987604720
         m_RequiresAllConditions: 1
         m_ObserverType: 2
-    - rid: 1276375358798823948
+    - rid: 8845967401987604711
       type: {class: ConditionalGuardModifier, ns: Unity.Behavior, asm: Unity.Behavior}
       data:
         ID:
@@ -3233,15 +2911,15 @@ MonoBehaviour:
         Graph:
           rid: 1276374926994964688
         m_Parent:
-          rid: 1276375358798823943
+          rid: 8845967401987604706
         m_Child:
-          rid: 1276375358798823956
+          rid: 8845967401987604721
         m_Conditions:
-        - rid: 1276375358798823957
-        - rid: 1276375358798823958
+        - rid: 8845967401987604722
+        - rid: 8845967401987604723
         m_RequiresAllConditions: 1
         m_ObserverType: 2
-    - rid: 1276375358798823949
+    - rid: 8845967401987604712
       type: {class: ConditionalGuardModifier, ns: Unity.Behavior, asm: Unity.Behavior}
       data:
         ID:
@@ -3250,14 +2928,14 @@ MonoBehaviour:
         Graph:
           rid: 1276374926994964688
         m_Parent:
-          rid: 1276375358798823943
+          rid: 8845967401987604706
         m_Child:
-          rid: 1276375358798823959
+          rid: 8845967401987604724
         m_Conditions:
-        - rid: 1276375358798823960
+        - rid: 8845967401987604725
         m_RequiresAllConditions: 1
         m_ObserverType: 0
-    - rid: 1276375358798823950
+    - rid: 8845967401987604713
       type: {class: RandomComposite, ns: Unity.Behavior, asm: Unity.Behavior}
       data:
         ID:
@@ -3266,12 +2944,12 @@ MonoBehaviour:
         Graph:
           rid: 1276374926994964688
         m_Parent:
-          rid: 1276375358798823943
+          rid: 8845967401987604706
         m_Children:
-        - rid: 1276375358798823961
-        - rid: 1276375358798823962
+        - rid: 8845967401987604726
+        - rid: 8845967401987604727
         m_RegisteredObservers: []
-    - rid: 1276375358798823951
+    - rid: 8845967401987604714
       type: {class: 'GameObjectToComponentBlackboardVariable`1[[UnityEngine.Transform, UnityEngine.CoreModule]]', ns: Unity.Behavior, asm: Unity.Behavior}
       data:
         GUID:
@@ -3281,7 +2959,23 @@ MonoBehaviour:
         m_Value: {fileID: 0}
         m_LinkedVariable:
           rid: 1276375358798823840
-    - rid: 1276375358798823952
+    - rid: 8845967401987604715
+      type: {class: 'BlackboardVariable`1[[System.Single, mscorlib]]', ns: Unity.Behavior, asm: Unity.Behavior}
+      data:
+        GUID:
+          m_Value0: 0
+          m_Value1: 0
+        Name: 
+        m_Value: 1
+    - rid: 8845967401987604716
+      type: {class: 'BlackboardVariable`1[[System.Single, mscorlib]]', ns: Unity.Behavior, asm: Unity.Behavior}
+      data:
+        GUID:
+          m_Value0: 0
+          m_Value1: 0
+        Name: 
+        m_Value: 2
+    - rid: 8845967401987604717
       type: {class: RandomComposite, ns: Unity.Behavior, asm: Unity.Behavior}
       data:
         ID:
@@ -3290,12 +2984,12 @@ MonoBehaviour:
         Graph:
           rid: 1276374926994964688
         m_Parent:
-          rid: 1276375358798823947
+          rid: 8845967401987604710
         m_Children:
-        - rid: 1276375358798823963
-        - rid: 1276375358798823964
+        - rid: 8845967401987604728
+        - rid: 8845967401987604729
         m_RegisteredObservers: []
-    - rid: 1276375358798823953
+    - rid: 8845967401987604718
       type: {class: VariableComparisonCondition, ns: Unity.Behavior, asm: Unity.Behavior}
       data:
         Graph:
@@ -3303,10 +2997,10 @@ MonoBehaviour:
         Variable:
           rid: 1276375358798823843
         Operator:
-          rid: 1276375358798823875
+          rid: 8845967401987604730
         ComparisonValue:
-          rid: 1276375358798823876
-    - rid: 1276375358798823954
+          rid: 8845967401987604731
+    - rid: 8845967401987604719
       type: {class: VariableComparisonCondition, ns: Unity.Behavior, asm: Unity.Behavior}
       data:
         Graph:
@@ -3314,10 +3008,10 @@ MonoBehaviour:
         Variable:
           rid: 1276375358798823848
         Operator:
-          rid: 1276375358798823877
+          rid: 8845967401987604732
         ComparisonValue:
-          rid: 1276375358798823878
-    - rid: 1276375358798823955
+          rid: 8845967401987604733
+    - rid: 8845967401987604720
       type: {class: VariableComparisonCondition, ns: Unity.Behavior, asm: Unity.Behavior}
       data:
         Graph:
@@ -3325,10 +3019,10 @@ MonoBehaviour:
         Variable:
           rid: 1276375358798823845
         Operator:
-          rid: 1276375358798823879
+          rid: 8845967401987604734
         ComparisonValue:
-          rid: 1276375358798823880
-    - rid: 1276375358798823956
+          rid: 8845967401987604735
+    - rid: 8845967401987604721
       type: {class: PlayerChaseTargetAction, ns: , asm: Assembly-CSharp}
       data:
         ID:
@@ -3337,22 +3031,22 @@ MonoBehaviour:
         Graph:
           rid: 1276374926994964688
         m_Parent:
-          rid: 1276375358798823948
+          rid: 8845967401987604711
         Input:
           rid: 1276375358798823839
         CanChase:
           rid: 1276375358798823846
         Self:
-          rid: 1276375358798823965
+          rid: 8845967401987604736
         Target:
           rid: 1276375358798823842
         Min:
-          rid: 1276375358798823882
+          rid: 8845967401987604737
         Max:
-          rid: 1276375358798823883
+          rid: 8845967401987604738
         IsGrounded:
-          rid: 1276375358798823884
-    - rid: 1276375358798823957
+          rid: 8845967401987604739
+    - rid: 8845967401987604722
       type: {class: VariableComparisonCondition, ns: Unity.Behavior, asm: Unity.Behavior}
       data:
         Graph:
@@ -3360,10 +3054,10 @@ MonoBehaviour:
         Variable:
           rid: 1276375358798823843
         Operator:
-          rid: 1276375358798823885
+          rid: 8845967401987604740
         ComparisonValue:
-          rid: 1276375358798823886
-    - rid: 1276375358798823958
+          rid: 8845967401987604741
+    - rid: 8845967401987604723
       type: {class: VariableComparisonCondition, ns: Unity.Behavior, asm: Unity.Behavior}
       data:
         Graph:
@@ -3371,10 +3065,10 @@ MonoBehaviour:
         Variable:
           rid: 1276375358798823846
         Operator:
-          rid: 1276375358798823887
+          rid: 8845967401987604742
         ComparisonValue:
-          rid: 1276375358798823888
-    - rid: 1276375358798823959
+          rid: 8845967401987604743
+    - rid: 8845967401987604724
       type: {class: SequenceComposite, ns: Unity.Behavior, asm: Unity.Behavior}
       data:
         ID:
@@ -3383,12 +3077,12 @@ MonoBehaviour:
         Graph:
           rid: 1276374926994964688
         m_Parent:
-          rid: 1276375358798823949
+          rid: 8845967401987604712
         m_Children:
-        - rid: 1276375358798823966
-        - rid: 1276375358798823967
+        - rid: 8845967401987604744
+        - rid: 8845967401987604745
         m_RegisteredObservers: []
-    - rid: 1276375358798823960
+    - rid: 8845967401987604725
       type: {class: VariableComparisonCondition, ns: Unity.Behavior, asm: Unity.Behavior}
       data:
         Graph:
@@ -3396,10 +3090,10 @@ MonoBehaviour:
         Variable:
           rid: 1276375358798823844
         Operator:
-          rid: 1276375358798823891
+          rid: 8845967401987604746
         ComparisonValue:
-          rid: 1276375358798823892
-    - rid: 1276375358798823961
+          rid: 8845967401987604747
+    - rid: 8845967401987604726
       type: {class: PlayerMove2DAction, ns: , asm: Assembly-CSharp}
       data:
         ID:
@@ -3408,16 +3102,16 @@ MonoBehaviour:
         Graph:
           rid: 1276374926994964688
         m_Parent:
-          rid: 1276375358798823950
+          rid: 8845967401987604713
         Input:
           rid: 1276375358798823839
         Min:
-          rid: 1276375358798823893
+          rid: 8845967401987604748
         Max:
-          rid: 1276375358798823894
+          rid: 8845967401987604749
         WallDetector:
           rid: 1276375358798823847
-    - rid: 1276375358798823962
+    - rid: 8845967401987604727
       type: {class: WaitRangeAction, ns: Unity.Behavior, asm: Unity.Behavior}
       data:
         ID:
@@ -3426,12 +3120,12 @@ MonoBehaviour:
         Graph:
           rid: 1276374926994964688
         m_Parent:
-          rid: 1276375358798823950
+          rid: 8845967401987604713
         Min:
-          rid: 1276375358798823895
+          rid: 8845967401987604750
         Max:
-          rid: 1276375358798823896
-    - rid: 1276375358798823963
+          rid: 8845967401987604751
+    - rid: 8845967401987604728
       type: {class: SequenceComposite, ns: Unity.Behavior, asm: Unity.Behavior}
       data:
         ID:
@@ -3440,12 +3134,12 @@ MonoBehaviour:
         Graph:
           rid: 1276374926994964688
         m_Parent:
-          rid: 1276375358798823952
+          rid: 8845967401987604717
         m_Children:
-        - rid: 1276375358798823968
-        - rid: 1276375358798823969
+        - rid: 8845967401987604752
+        - rid: 8845967401987604753
         m_RegisteredObservers: []
-    - rid: 1276375358798823964
+    - rid: 8845967401987604729
       type: {class: PlayerDodgeTargetAction, ns: , asm: Assembly-CSharp}
       data:
         ID:
@@ -3454,18 +3148,66 @@ MonoBehaviour:
         Graph:
           rid: 1276374926994964688
         m_Parent:
-          rid: 1276375358798823952
+          rid: 8845967401987604717
         Input:
           rid: 1276375358798823839
         Self:
-          rid: 1276375358798823970
+          rid: 8845967401987604754
         Target:
           rid: 1276375358798823842
         DodgeDistance:
-          rid: 1276375358798823900
+          rid: 8845967401987604755
         WallDetector:
           rid: 1276375358798823847
-    - rid: 1276375358798823965
+    - rid: 8845967401987604730
+      type: {class: 'BlackboardVariable`1[[Unity.Behavior.ConditionOperator, Unity.Behavior]]', ns: Unity.Behavior, asm: Unity.Behavior}
+      data:
+        GUID:
+          m_Value0: 0
+          m_Value1: 0
+        Name: 
+        m_Value: 0
+    - rid: 8845967401987604731
+      type: {class: 'BlackboardVariable`1[[System.Boolean, mscorlib]]', ns: Unity.Behavior, asm: Unity.Behavior}
+      data:
+        GUID:
+          m_Value0: 0
+          m_Value1: 0
+        Name: 
+        m_Value: 1
+    - rid: 8845967401987604732
+      type: {class: 'BlackboardVariable`1[[Unity.Behavior.ConditionOperator, Unity.Behavior]]', ns: Unity.Behavior, asm: Unity.Behavior}
+      data:
+        GUID:
+          m_Value0: 0
+          m_Value1: 0
+        Name: 
+        m_Value: 5
+    - rid: 8845967401987604733
+      type: {class: 'BlackboardVariable`1[[System.Single, mscorlib]]', ns: Unity.Behavior, asm: Unity.Behavior}
+      data:
+        GUID:
+          m_Value0: 0
+          m_Value1: 0
+        Name: 
+        m_Value: 2
+    - rid: 8845967401987604734
+      type: {class: 'BlackboardVariable`1[[Unity.Behavior.ConditionOperator, Unity.Behavior]]', ns: Unity.Behavior, asm: Unity.Behavior}
+      data:
+        GUID:
+          m_Value0: 0
+          m_Value1: 0
+        Name: 
+        m_Value: 0
+    - rid: 8845967401987604735
+      type: {class: 'BlackboardVariable`1[[System.Boolean, mscorlib]]', ns: Unity.Behavior, asm: Unity.Behavior}
+      data:
+        GUID:
+          m_Value0: 0
+          m_Value1: 0
+        Name: 
+        m_Value: 1
+    - rid: 8845967401987604736
       type: {class: 'GameObjectToComponentBlackboardVariable`1[[UnityEngine.Transform, UnityEngine.CoreModule]]', ns: Unity.Behavior, asm: Unity.Behavior}
       data:
         GUID:
@@ -3475,7 +3217,63 @@ MonoBehaviour:
         m_Value: {fileID: 0}
         m_LinkedVariable:
           rid: 1276375358798823840
-    - rid: 1276375358798823966
+    - rid: 8845967401987604737
+      type: {class: 'BlackboardVariable`1[[System.Single, mscorlib]]', ns: Unity.Behavior, asm: Unity.Behavior}
+      data:
+        GUID:
+          m_Value0: 0
+          m_Value1: 0
+        Name: 
+        m_Value: 0.5
+    - rid: 8845967401987604738
+      type: {class: 'BlackboardVariable`1[[System.Single, mscorlib]]', ns: Unity.Behavior, asm: Unity.Behavior}
+      data:
+        GUID:
+          m_Value0: 0
+          m_Value1: 0
+        Name: 
+        m_Value: 3
+    - rid: 8845967401987604739
+      type: {class: 'BlackboardVariable`1[[System.Boolean, mscorlib]]', ns: Unity.Behavior, asm: Unity.Behavior}
+      data:
+        GUID:
+          m_Value0: 0
+          m_Value1: 0
+        Name: 
+        m_Value: 0
+    - rid: 8845967401987604740
+      type: {class: 'BlackboardVariable`1[[Unity.Behavior.ConditionOperator, Unity.Behavior]]', ns: Unity.Behavior, asm: Unity.Behavior}
+      data:
+        GUID:
+          m_Value0: 0
+          m_Value1: 0
+        Name: 
+        m_Value: 0
+    - rid: 8845967401987604741
+      type: {class: 'BlackboardVariable`1[[System.Boolean, mscorlib]]', ns: Unity.Behavior, asm: Unity.Behavior}
+      data:
+        GUID:
+          m_Value0: 0
+          m_Value1: 0
+        Name: 
+        m_Value: 1
+    - rid: 8845967401987604742
+      type: {class: 'BlackboardVariable`1[[Unity.Behavior.ConditionOperator, Unity.Behavior]]', ns: Unity.Behavior, asm: Unity.Behavior}
+      data:
+        GUID:
+          m_Value0: 0
+          m_Value1: 0
+        Name: 
+        m_Value: 0
+    - rid: 8845967401987604743
+      type: {class: 'BlackboardVariable`1[[System.Boolean, mscorlib]]', ns: Unity.Behavior, asm: Unity.Behavior}
+      data:
+        GUID:
+          m_Value0: 0
+          m_Value1: 0
+        Name: 
+        m_Value: 1
+    - rid: 8845967401987604744
       type: {class: PlayerJumpAction, ns: , asm: Assembly-CSharp}
       data:
         ID:
@@ -3484,16 +3282,16 @@ MonoBehaviour:
         Graph:
           rid: 1276374926994964688
         m_Parent:
-          rid: 1276375358798823959
+          rid: 8845967401987604724
         Self:
-          rid: 1276375358798823971
+          rid: 8845967401987604756
         JumpFloor:
           rid: 1276375358798823841
         Input:
           rid: 1276375358798823839
         JumpChance:
-          rid: 1276375358798823902
-    - rid: 1276375358798823967
+          rid: 8845967401987604757
+    - rid: 8845967401987604745
       type: {class: WaitAction, ns: Unity.Behavior, asm: Unity.Behavior}
       data:
         ID:
@@ -3502,10 +3300,58 @@ MonoBehaviour:
         Graph:
           rid: 1276374926994964688
         m_Parent:
-          rid: 1276375358798823959
+          rid: 8845967401987604724
         SecondsToWait:
-          rid: 1276375358798823903
-    - rid: 1276375358798823968
+          rid: 8845967401987604758
+    - rid: 8845967401987604746
+      type: {class: 'BlackboardVariable`1[[Unity.Behavior.ConditionOperator, Unity.Behavior]]', ns: Unity.Behavior, asm: Unity.Behavior}
+      data:
+        GUID:
+          m_Value0: 0
+          m_Value1: 0
+        Name: 
+        m_Value: 0
+    - rid: 8845967401987604747
+      type: {class: 'BlackboardVariable`1[[System.Boolean, mscorlib]]', ns: Unity.Behavior, asm: Unity.Behavior}
+      data:
+        GUID:
+          m_Value0: 0
+          m_Value1: 0
+        Name: 
+        m_Value: 1
+    - rid: 8845967401987604748
+      type: {class: 'BlackboardVariable`1[[System.Single, mscorlib]]', ns: Unity.Behavior, asm: Unity.Behavior}
+      data:
+        GUID:
+          m_Value0: 0
+          m_Value1: 0
+        Name: 
+        m_Value: 1
+    - rid: 8845967401987604749
+      type: {class: 'BlackboardVariable`1[[System.Single, mscorlib]]', ns: Unity.Behavior, asm: Unity.Behavior}
+      data:
+        GUID:
+          m_Value0: 0
+          m_Value1: 0
+        Name: 
+        m_Value: 3
+    - rid: 8845967401987604750
+      type: {class: 'BlackboardVariable`1[[System.Single, mscorlib]]', ns: Unity.Behavior, asm: Unity.Behavior}
+      data:
+        GUID:
+          m_Value0: 0
+          m_Value1: 0
+        Name: 
+        m_Value: 0.1
+    - rid: 8845967401987604751
+      type: {class: 'BlackboardVariable`1[[System.Single, mscorlib]]', ns: Unity.Behavior, asm: Unity.Behavior}
+      data:
+        GUID:
+          m_Value0: 0
+          m_Value1: 0
+        Name: 
+        m_Value: 1
+    - rid: 8845967401987604752
       type: {class: PlayerTurnAction, ns: , asm: Assembly-CSharp}
       data:
         ID:
@@ -3514,14 +3360,14 @@ MonoBehaviour:
         Graph:
           rid: 1276374926994964688
         m_Parent:
-          rid: 1276375358798823963
+          rid: 8845967401987604728
         Input:
           rid: 1276375358798823839
         Self:
-          rid: 1276375358798823972
+          rid: 8845967401987604759
         Target:
           rid: 1276375358798823842
-    - rid: 1276375358798823969
+    - rid: 8845967401987604753
       type: {class: PlayerAttackAction, ns: , asm: Assembly-CSharp}
       data:
         ID:
@@ -3530,14 +3376,14 @@ MonoBehaviour:
         Graph:
           rid: 1276374926994964688
         m_Parent:
-          rid: 1276375358798823963
+          rid: 8845967401987604728
         Input:
           rid: 1276375358798823839
         AttackTypeCount:
           rid: 1276375358798823849
         CanAttack:
           rid: 1276375358798823845
-    - rid: 1276375358798823970
+    - rid: 8845967401987604754
       type: {class: 'GameObjectToComponentBlackboardVariable`1[[UnityEngine.Transform, UnityEngine.CoreModule]]', ns: Unity.Behavior, asm: Unity.Behavior}
       data:
         GUID:
@@ -3547,7 +3393,15 @@ MonoBehaviour:
         m_Value: {fileID: 0}
         m_LinkedVariable:
           rid: 1276375358798823840
-    - rid: 1276375358798823971
+    - rid: 8845967401987604755
+      type: {class: 'BlackboardVariable`1[[System.Single, mscorlib]]', ns: Unity.Behavior, asm: Unity.Behavior}
+      data:
+        GUID:
+          m_Value0: 0
+          m_Value1: 0
+        Name: 
+        m_Value: 2
+    - rid: 8845967401987604756
       type: {class: 'GameObjectToComponentBlackboardVariable`1[[UnityEngine.Transform, UnityEngine.CoreModule]]', ns: Unity.Behavior, asm: Unity.Behavior}
       data:
         GUID:
@@ -3557,7 +3411,23 @@ MonoBehaviour:
         m_Value: {fileID: 0}
         m_LinkedVariable:
           rid: 1276375358798823840
-    - rid: 1276375358798823972
+    - rid: 8845967401987604757
+      type: {class: 'BlackboardVariable`1[[System.Single, mscorlib]]', ns: Unity.Behavior, asm: Unity.Behavior}
+      data:
+        GUID:
+          m_Value0: 0
+          m_Value1: 0
+        Name: 
+        m_Value: 70
+    - rid: 8845967401987604758
+      type: {class: 'BlackboardVariable`1[[System.Single, mscorlib]]', ns: Unity.Behavior, asm: Unity.Behavior}
+      data:
+        GUID:
+          m_Value0: 0
+          m_Value1: 0
+        Name: 
+        m_Value: 0.5
+    - rid: 8845967401987604759
       type: {class: 'GameObjectToComponentBlackboardVariable`1[[UnityEngine.Transform, UnityEngine.CoreModule]]', ns: Unity.Behavior, asm: Unity.Behavior}
       data:
         GUID:

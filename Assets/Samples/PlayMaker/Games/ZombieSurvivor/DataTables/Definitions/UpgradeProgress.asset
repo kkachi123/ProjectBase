@@ -1,0 +1,66 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: -143357391, guid: af56af93b18e8464f9915f7a446a8088, type: 3}
+  m_Name: UpgradeProgress
+  m_EditorClassIdentifier: 
+  _group: {fileID: 11400000, guid: c6fb0d919f6a8d34aa5bce7a533a86c6, type: 2}
+  _variables:
+    _list:
+    - rid: 5293901458521194900
+    - rid: 5293901458521194902
+    _ownerValue:
+      rid: -2
+    _owner: {fileID: 11400000}
+    Expanded: 1
+    _editorOnlyList:
+      _items:
+      - rid: 5293901458521194901
+      - rid: 5293901458521194903
+      _locked: 0
+  _description: Records the current progress for a given upgrade type
+  references:
+    version: 2
+    RefIds:
+    - rid: -2
+      type: {class: , ns: , asm: }
+    - rid: 5293901458521194900
+      type: {class: StringVariable, ns: HutongGames.PlayMaker, asm: PlayMaker.Runtime}
+      data:
+        _guid:
+          _value0: 15022819977594135587
+          _value1: 11597699618509664150
+        _debug: 0
+        _saveMode: 0
+        _description: 
+        _name: ID
+        _value: 
+    - rid: 5293901458521194901
+      type: {class: VariableItem, ns: HutongGames.PlayMaker, asm: PlayMaker.Runtime}
+      data:
+        _variable:
+          rid: 5293901458521194900
+    - rid: 5293901458521194902
+      type: {class: IntegerVariable, ns: HutongGames.PlayMaker, asm: PlayMaker.Runtime}
+      data:
+        _guid:
+          _value0: 13959737958908600700
+          _value1: 3713676125466906720
+        _debug: 0
+        _saveMode: 0
+        _description: 
+        _name: CurrentLevel
+        _value: 0
+    - rid: 5293901458521194903
+      type: {class: VariableItem, ns: HutongGames.PlayMaker, asm: PlayMaker.Runtime}
+      data:
+        _variable:
+          rid: 5293901458521194902

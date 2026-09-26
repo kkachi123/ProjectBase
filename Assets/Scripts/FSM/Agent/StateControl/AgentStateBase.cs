@@ -4,7 +4,7 @@ using System.Collections.Generic;
 public abstract class AgentStateBase
 {
     public List<ITransitionRule> _transitionRules = new();
-    public Action<StateType> OnTransition;
+    public Action<Type> OnTransition;
 
     public void Enter()
     {
@@ -42,7 +42,7 @@ public abstract class AgentStateBase
                 {
                     eventRule.Unsubscribe();
                 }
-                OnTransition?.Invoke(rule.NextState);
+                OnTransition?.Invoke(rule.NextStateType);
                 return true;
             }
         }

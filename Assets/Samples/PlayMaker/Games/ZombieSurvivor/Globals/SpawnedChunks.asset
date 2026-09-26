@@ -1,0 +1,38 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 1579423007, guid: af56af93b18e8464f9915f7a446a8088, type: 3}
+  m_Name: SpawnedChunks
+  m_EditorClassIdentifier: 
+  _group: {fileID: 11400000, guid: c6fb0d919f6a8d34aa5bce7a533a86c6, type: 2}
+  _variable:
+    rid: 5348540560613572609
+  _changedEvent: {fileID: 0}
+  _runtimeVariable:
+    rid: -2
+  references:
+    version: 2
+    RefIds:
+    - rid: -2
+      type: {class: , ns: , asm: }
+    - rid: 5348540560613572609
+      type: {class: IntegerListVariable, ns: HutongGames.PlayMaker, asm: PlayMaker.Runtime}
+      data:
+        _debug: 0
+        _description: 'Stores the Hashes for spawned terrain chunks. The hash is
+          created using the chunk''s position. So we can use this list to check if
+          a chunk has already been spawned for a location.
+
+
+          NOTE: We pre-record
+          the Hash for the tile that is already in the scene at (0,0).'
+        _name: SpawnedChunks
+        _value: 6101fa02

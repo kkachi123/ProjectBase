@@ -1,7 +1,8 @@
+using System;
 using UniRx;
 public class DeathTransition : IEventTransitionRule
 {
-    public StateType NextState => StateType.Death;
+    public Type NextStateType => typeof(DeathState);
     private IReadOnlyReactiveProperty<bool> IsDead;
     private bool m_shouldTransition = false;
 

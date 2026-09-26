@@ -1,18 +1,15 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
-using UniRx;
 
 public class PlayerInput : MonoBehaviour , IAgentMovementInput , IAgentJumpInput , IAgentCombatInput , IAgentInteractionInput
 {
     public PlayerInputCommands inputActions;
 
     public Vector2 Horizontal { get; private set; }
-    private readonly ReactiveProperty<bool> _jumpPressed = new ReactiveProperty<bool>(false);
-    private readonly ReactiveProperty<int> _attackPressed = new ReactiveProperty<int>(0);
-    private readonly ReactiveProperty<bool> _interactPressed = new(false);
-    public IReadOnlyReactiveProperty<bool> JumpPressed => _jumpPressed;
-    public IReadOnlyReactiveProperty<int> AttackPressed => _attackPressed;
-    public IReadOnlyReactiveProperty<bool> InteractPressed => _interactPressed;
+    private bool _jumpRequested;
+    public bool IsJumpHeld { get; private set; }
+    public int HeldAttackType { get; private set; }
+    public event System.Action OnInteractRequested;
 
     public bool IsInputBlocked { get; private set; }
 
@@ -22,9 +19,9 @@ public class PlayerInput : MonoBehaviour , IAgentMovementInput , IAgentJumpInput
         if (blocked)
         {
             Horizontal = Vector2.zero;
-            _jumpPressed.Value = false;
-            _attackPressed.Value = 0;
-            _interactPressed.Value = false;
+            IsJumpHeld = false;
+            _jumpRequested = false;
+            HeldAttackType = 0;
         }
     }
 
@@ -46,7 +43,7 @@ public class PlayerInput : MonoBehaviour , IAgentMovementInput , IAgentJumpInput
         inputActions.gamePlay.Attack2.performed += context => AttackInput(context, 2);
         inputActions.gamePlay.Attack2.canceled += AttackEnd;
 
-        inputActions.gamePlay.Interact.performed += _ => { _interactPressed.Value = true; _interactPressed.Value = false; };
+        inputActions.gamePlay.Interact.performed += InteractInput;
     }
 
     public Vector2 GetMovementInput()
@@ -69,22 +66,38 @@ public class PlayerInput : MonoBehaviour , IAgentMovementInput , IAgentJumpInput
     {
         if (IsInputBlocked) return;
         if (context.performed)
-            _jumpPressed.Value = true;
+        {
+            IsJumpHeld = true;
+            _jumpRequested = true;
+        }
         else if (context.canceled)
-            _jumpPressed.Value = false;
+            IsJumpHeld = false;
+    }
+
+    public bool TryConsumeJumpRequest()
+    {
+        bool requested = _jumpRequested;
+        _jumpRequested = false;
+        return requested;
     }
 
     public void AttackInput(InputAction.CallbackContext context, int value)
     {
         if (IsInputBlocked) return;
         if (context.performed)
-            _attackPressed.Value = value;
+            HeldAttackType = value;
     }
 
     public void AttackEnd(InputAction.CallbackContext context)
     {
         if (context.canceled)
-            _attackPressed.Value = 0;
+            HeldAttackType = 0;
+    }
+
+    private void InteractInput(InputAction.CallbackContext context)
+    {
+        if (!IsInputBlocked && context.performed)
+            OnInteractRequested?.Invoke();
     }
 
     private void OnDestroy()

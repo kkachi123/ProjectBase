@@ -1,0 +1,102 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: -143357391, guid: af56af93b18e8464f9915f7a446a8088, type: 3}
+  m_Name: EnemyWave
+  m_EditorClassIdentifier: 
+  _group: {fileID: 11400000, guid: c6fb0d919f6a8d34aa5bce7a533a86c6, type: 2}
+  _variables:
+    _list:
+    - rid: 5293901412426317934
+    - rid: 5293901412426317924
+    - rid: 5293901412426317926
+    - rid: 5293901418313024049
+    _ownerValue:
+      rid: -2
+    _owner: {fileID: 11400000}
+    Expanded: 1
+    _editorOnlyList:
+      _items:
+      - rid: 5293901412426317925
+      - rid: 5293901412426317922
+      - rid: 5293901412426317927
+      - rid: 5293901412426317929
+      _locked: 0
+  _description: Describes a wave of enemies
+  references:
+    version: 2
+    RefIds:
+    - rid: -2
+      type: {class: , ns: , asm: }
+    - rid: 5293901412426317922
+      type: {class: VariableItem, ns: HutongGames.PlayMaker, asm: PlayMaker.Runtime}
+      data:
+        _variable:
+          rid: 5293901412426317934
+    - rid: 5293901412426317924
+      type: {class: FloatVariable, ns: HutongGames.PlayMaker, asm: PlayMaker.Runtime}
+      data:
+        _guid:
+          _value0: 7759561374661004102
+          _value1: 8500015912623951036
+        _debug: 0
+        _saveMode: 0
+        _description: How long the wave lasts
+        _name: Duration
+        _value: 0
+    - rid: 5293901412426317925
+      type: {class: VariableItem, ns: HutongGames.PlayMaker, asm: PlayMaker.Runtime}
+      data:
+        _variable:
+          rid: 5293901412426317924
+    - rid: 5293901412426317926
+      type: {class: FloatVariable, ns: HutongGames.PlayMaker, asm: PlayMaker.Runtime}
+      data:
+        _guid:
+          _value0: 758848229212257580
+          _value1: 7835649087227132440
+        _debug: 0
+        _saveMode: 0
+        _description: Number to spawn per second
+        _name: SpawnRate
+        _value: 1
+    - rid: 5293901412426317927
+      type: {class: VariableItem, ns: HutongGames.PlayMaker, asm: PlayMaker.Runtime}
+      data:
+        _variable:
+          rid: 5293901412426317926
+    - rid: 5293901412426317929
+      type: {class: VariableItem, ns: HutongGames.PlayMaker, asm: PlayMaker.Runtime}
+      data:
+        _variable:
+          rid: 5293901418313024049
+    - rid: 5293901412426317934
+      type: {class: GameObjectVariable, ns: HutongGames.PlayMaker, asm: PlayMaker.Runtime}
+      data:
+        _guid:
+          _value0: 17600607126859439601
+          _value1: 6384111288184539839
+        _debug: 0
+        _saveMode: 0
+        _description: Enemy prefab to spawn
+        _name: Enemy
+        _value: {fileID: 0}
+    - rid: 5293901418313024049
+      type: {class: IntegerVariable, ns: HutongGames.PlayMaker, asm: PlayMaker.Runtime}
+      data:
+        _guid:
+          _value0: 1955623323568159055
+          _value1: 7994453070095760652
+        _debug: 0
+        _saveMode: 0
+        _description: Total number of prefabs to spawn
+        _name: TotalCount
+        _value: 10

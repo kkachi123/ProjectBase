@@ -4,7 +4,7 @@ public class AIMonsterInput : MonoBehaviour , IAgentMovementInput , IAgentCombat
 {
     public Vector2 Horizontal { get; private set; }
     private readonly ReactiveProperty<int> _attackPressed = new ReactiveProperty<int>(0);
-    public IReadOnlyReactiveProperty<int> AttackPressed => _attackPressed;
+    public int HeldAttackType => _attackPressed.Value;
 
     public Vector2 GetMovementInput()
     {
