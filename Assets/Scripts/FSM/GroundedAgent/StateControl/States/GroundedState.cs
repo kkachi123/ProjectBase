@@ -4,12 +4,12 @@ namespace ProjectRE
 
     public class GroundedState : AgentStateBase
     {
-        private readonly AgentAnimator _animator;
+        private readonly IGroundedAnimation _animator;
         private readonly AgentMovementHandler2D _movementHandler;
         private readonly IAgentMovementInput _movementInput;
 
         public GroundedState(
-            AgentAnimator animator,
+            IGroundedAnimation animator,
             AgentMovementHandler2D movementHandler,
             IAgentMovementInput movementInput)
         {
@@ -20,7 +20,7 @@ namespace ProjectRE
 
         protected override void OnEnter()
         {
-            _animator.SetBool(StateType.Grounded, true);
+            _animator.SetGrounded(true);
             UpdateMovement();
         }
 
@@ -31,15 +31,15 @@ namespace ProjectRE
 
         public override void Exit()
         {
-            _animator.SetBool(StateType.Grounded, false);
-            _animator.SetFloat(AnimationFloatType.Speed, 0f);
+            _animator.SetGrounded(false);
+            _animator.SetMoveSpeed(0f);
         }
 
         private void UpdateMovement()
         {
             Vector2 movement = _movementInput.GetMovementInput();
             _movementHandler.HandleMove(movement);
-            _animator.SetFloat(AnimationFloatType.Speed, movement.magnitude);
+            _animator.SetMoveSpeed(movement.magnitude);
         }
     }
 }

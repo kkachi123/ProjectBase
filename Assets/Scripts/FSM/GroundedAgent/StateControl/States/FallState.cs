@@ -2,20 +2,22 @@
 {
 public class FallState : AgentStateBase
 {
-    private AgentAnimator _animator;
+    private readonly IGroundedAnimation _groundedAnimation;
+    private readonly IAirborneAnimation _airborneAnimation;
     private AgentMovementHandler2D _movementHandler;
     private IAgentMovementInput _moveInput;
 
-    public FallState(AgentAnimator animator, AgentMovementHandler2D movementHandler, IAgentMovementInput moveInput)
+    public FallState(IGroundedAnimation groundedAnimation, IAirborneAnimation airborneAnimation, AgentMovementHandler2D movementHandler, IAgentMovementInput moveInput)
     {
-        _animator = animator;
+        _groundedAnimation = groundedAnimation;
+        _airborneAnimation = airborneAnimation;
         _movementHandler = movementHandler;
         _moveInput = moveInput;
     }
     protected override void OnEnter()
     {
-        _animator.SetBool(StateType.Grounded, false);
-        _animator.SetBool(StateType.Fall, true);
+        _groundedAnimation.SetGrounded(false);
+        _airborneAnimation.SetFall(true);
     }
 
     protected override void OnExecute(float deltaTime)
@@ -24,7 +26,7 @@ public class FallState : AgentStateBase
     }
     public override void Exit()
     {
-        _animator.SetBool(StateType.Fall, false);
+        _airborneAnimation.SetFall(false);
     }
 
 }

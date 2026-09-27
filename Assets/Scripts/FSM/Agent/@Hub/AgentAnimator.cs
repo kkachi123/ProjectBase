@@ -3,91 +3,66 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public enum AnimationIntType
+public class AgentAnimator : MonoBehaviour, IHitAnimation, IDeathAnimation
 {
-    AttackType,
-}
-
-public enum AnimationFloatType
-{
-    Speed,
-}
-
-[RequireComponent(typeof(Animator))]
-
-public class AgentAnimator : MonoBehaviour
-{
-    [SerializeField] Animator _anim;
-    [SerializeField] AnimationDataSO _animationData;
-    private Dictionary<AnimationIntType, int> _intParameters;
-    private Dictionary<AnimationFloatType, int> _floatParameters;
-    private Dictionary<StateType, int> _boolParameters;
-
-    public void Initialize()
+    protected enum AgentAnimationBoolType
     {
-        _intParameters = new Dictionary<AnimationIntType, int>();
-        _floatParameters = new Dictionary<AnimationFloatType, int>();
-        _boolParameters = new Dictionary<StateType, int>();
-
-        RegisterIntParam(AnimationIntType.AttackType, _animationData.AttackTypeInt);
-        
-        RegisterFloatParam(AnimationFloatType.Speed, _animationData.MoveSpeedFloat);
-
-        RegisterBoolParam(StateType.Grounded, _animationData.IsGroundedBool);
-        RegisterBoolParam(StateType.Jump, _animationData.IsJumpBool);
-        RegisterBoolParam(StateType.Fall, _animationData.IsFallBool);
-        RegisterBoolParam(StateType.Attack, _animationData.IsAttackBool);
-        RegisterBoolParam(StateType.Hit, _animationData.IsHitBool);
-        RegisterBoolParam(StateType.Death, _animationData.IsDeathBool);
+        Hit,
+        Death,
     }
 
-    private void RegisterIntParam(AnimationIntType type, string paramName)
+    [SerializeField] protected AgentAnimationDataSO _animationData;
+    [SerializeField] protected Animator _anim;
+    private readonly Dictionary<AgentAnimationBoolType, int> _boolParameters = new();
+
+    public virtual void Initialize()
     {
-        // Only register if the parameter name is valid (not null or empty)
-        if (!string.IsNullOrWhiteSpace(paramName))
-        {
-            _intParameters[type] = Animator.StringToHash(paramName);
-        }
+        if (_animationData == null)
+            return;
+
+        Register(_boolParameters, AgentAnimationBoolType.Hit, _animationData.IsHitBool);
+        Register(_boolParameters, AgentAnimationBoolType.Death, _animationData.IsDeathBool);
     }
 
-    private void RegisterFloatParam(AnimationFloatType type, string paramName)
+    public void SetHit(bool value) => SetBool(_boolParameters, AgentAnimationBoolType.Hit, value);
+    public void SetDeath(bool value) => SetBool(_boolParameters, AgentAnimationBoolType.Death, value);
+
+    protected void Register<T>(Dictionary<T, int> parameters, T type, string parameterName)
     {
-        if (!string.IsNullOrWhiteSpace(paramName))
-        {
-            _floatParameters[type] = Animator.StringToHash(paramName);
-        }
+        if (!string.IsNullOrWhiteSpace(parameterName))
+            parameters[type] = Animator.StringToHash(parameterName);
     }
 
-    private void RegisterBoolParam(StateType type, string paramName)
+    protected bool TryGetHash<T>(Dictionary<T, int> parameters, T type, out int hash) =>
+        parameters.TryGetValue(type, out hash);
+
+    protected void SetBool<T>(Dictionary<T, int> parameters, T type, bool value)
     {
-        if (!string.IsNullOrWhiteSpace(paramName))
+        if (!TryGetHash(parameters, type, out int hash))
         {
-            _boolParameters[type] = Animator.StringToHash(paramName);
+            Debug.LogError($"{GetType().Name}: Animator bool parameter '{type}' is not registered.", this);
+            return;
         }
+
+        if (_anim == null)
+        {
+            Debug.LogError($"{GetType().Name}: Animator reference is missing.", this);
+            return;
+        }
+
+        _anim.SetBool(hash, value);
     }
 
-    public void SetInteger(AnimationIntType type, int value)
+    protected void SetFloat<T>(Dictionary<T, int> parameters, T type, float value)
     {
-        if (_intParameters.TryGetValue(type, out int hash))
-        {
-            _anim.SetInteger(hash, value);
-        }
+        if (TryGetHash(parameters, type, out int hash))
+            _anim?.SetFloat(hash, value);
     }
 
-    public void SetFloat(AnimationFloatType type, float value)
+    protected void SetInteger<T>(Dictionary<T, int> parameters, T type, int value)
     {
-        if (_floatParameters.TryGetValue(type, out int hash))
-        {
-            _anim.SetFloat(hash, value);
-        }
-    }
-
-    public void SetBool(StateType type , bool value)
-    {
-        if (_boolParameters.TryGetValue(type, out int hash))
-        {
-            _anim.SetBool(hash, value);
-        }
+        if (TryGetHash(parameters, type, out int hash))
+            _anim?.SetInteger(hash, value);
     }
 }
 }

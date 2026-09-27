@@ -4,10 +4,10 @@ using UnityEngine;
 
 public class HitState : AgentStateBase
 {
-    private AgentAnimator _animator;
+    private IHitAnimation _animator;
     private AgentCombatHandler _combatHandler;
 
-    public HitState(AgentAnimator animator, AgentCombatHandler combatHandler)
+    public HitState(IHitAnimation animator, AgentCombatHandler combatHandler)
     {
         _animator = animator;
         _combatHandler = combatHandler;
@@ -15,7 +15,7 @@ public class HitState : AgentStateBase
     protected override void OnEnter()
     {
         _combatHandler.ResetAttackType();
-        _animator.SetBool(StateType.Hit, true);
+        _animator.SetHit(true);
     }
     protected override void OnExecute(float deltaTime)
     {
@@ -23,7 +23,7 @@ public class HitState : AgentStateBase
     }
     public override void Exit() 
     {
-        _animator.SetBool(StateType.Hit, false);
+        _animator.SetHit(false);
     }
 }
 }

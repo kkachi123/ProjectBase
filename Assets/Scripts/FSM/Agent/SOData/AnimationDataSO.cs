@@ -3,7 +3,7 @@
     using UnityEngine;
 
     [CreateAssetMenu(fileName = "AnimationData", menuName = "Agent/Animation Data")]
-    public class AnimationDataSO : ScriptableObject
+public class AnimationDataSO : AgentAnimationDataSO
     {
         [Header("Animation Int")]
         // 현재 실행할 공격 애니메이션 종류를 선택한다.
@@ -20,9 +20,5 @@
         public string IsFallBool = "IsFall";
         // 공격 상태를 알린다. AttackTypeInt와 함께 공격 모션을 선택한다.
         public string IsAttackBool = "IsAttack";
-        // 피격 상태를 알린다. 피격 모션 진입과 종료 후 지상 복귀에 사용한다.
-        public string IsHitBool = "IsHit";
-        // 사망 상태를 알린다. 사망 모션 진입 후 다른 상태 전이를 차단하는 데 사용한다.
-        public string IsDeathBool = "IsDeath";
     }
 }

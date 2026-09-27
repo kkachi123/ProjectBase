@@ -2,21 +2,23 @@
 {
 public class JumpState : AgentStateBase
 {
-    private AgentAnimator _animator;
+    private readonly IGroundedAnimation _groundedAnimation;
+    private readonly IAirborneAnimation _airborneAnimation;
     private AgentMovementHandler2D _movementHandler;
     private IAgentMovementInput _moveInput;
     
-    public JumpState(AgentAnimator animator, AgentMovementHandler2D movementHandler, IAgentMovementInput moveInput)
+    public JumpState(IGroundedAnimation groundedAnimation, IAirborneAnimation airborneAnimation, AgentMovementHandler2D movementHandler, IAgentMovementInput moveInput)
     {
-        _animator = animator;
+        _groundedAnimation = groundedAnimation;
+        _airborneAnimation = airborneAnimation;
         _movementHandler = movementHandler;
         _moveInput = moveInput;
     }
 
     protected override void OnEnter() 
     {
-        _animator.SetBool(StateType.Grounded, false);
-        _animator.SetBool(StateType.Jump, true);
+        _groundedAnimation.SetGrounded(false);
+        _airborneAnimation.SetJump(true);
         _movementHandler.HandleJump();
     }
 
@@ -27,7 +29,7 @@ public class JumpState : AgentStateBase
 
     public override void Exit() 
     {
-        _animator.SetBool(StateType.Jump, false);
+        _airborneAnimation.SetJump(false);
     }
 }
 }

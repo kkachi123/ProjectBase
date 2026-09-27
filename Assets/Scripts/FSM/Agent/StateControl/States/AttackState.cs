@@ -2,12 +2,12 @@
 {
 public class AttackState : AgentStateBase
 {
-    private AgentAnimator _animator;
+    private ICombatAnimation _animator;
     private AgentCombatHandler _combatHandler;
     private IAgentCombatInput _combatInput;
     private IAttackStarter _attackStarter;
 
-    public AttackState(AgentAnimator animator , AgentCombatHandler combatHandler , IAgentCombatInput combatInput, IAttackStarter attackStarter)
+    public AttackState(ICombatAnimation animator , AgentCombatHandler combatHandler , IAgentCombatInput combatInput, IAttackStarter attackStarter)
     {
         _animator = animator;
         _combatHandler = combatHandler;
@@ -21,8 +21,8 @@ public class AttackState : AgentStateBase
 
         if (!_attackStarter.TryStartAttack(requestedType))
             return;
-        _animator.SetBool(StateType.Attack, true);
-        _animator.SetInteger(AnimationIntType.AttackType, _combatHandler.CurrentAttackType);
+        _animator.SetAttack(true);
+        _animator.SetAttackType(_combatHandler.CurrentAttackType);
     }
     protected override void OnExecute(float deltatime)
     {
@@ -32,8 +32,8 @@ public class AttackState : AgentStateBase
     public override void Exit() 
     { 
         _combatHandler.ResetAttackType();
-        _animator.SetBool(StateType.Attack, false);
-        _animator.SetInteger(AnimationIntType.AttackType, 0);
+        _animator.SetAttack(false);
+        _animator.SetAttackType(0);
     }
 }
 }

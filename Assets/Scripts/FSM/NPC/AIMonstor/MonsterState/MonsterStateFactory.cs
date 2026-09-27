@@ -12,10 +12,10 @@ public class MonsterStateFactory
     {
         return new Dictionary<Type, AgentStateBase>
         {
-            { typeof(GroundedState), new GroundedState(data.Animator, data.MovementHandler, data.MovementInput) },
+            { typeof(GroundedState), new GroundedState((IGroundedAnimation)data.Animator, data.MovementHandler, data.MovementInput) },
             //{ typeof(AttackState), new AttackState(data.Animator, data.CombatHandler) },
-            { typeof(HitState), new HitState(data.Animator, data.CombatHandler) },
-            { typeof(DeathState), new DeathState(data.Animator, data.CombatHandler, data.MovementHandler) }
+            { typeof(HitState), new HitState((IHitAnimation)data.Animator, data.CombatHandler) },
+            { typeof(DeathState), new DeathState((IDeathAnimation)data.Animator, data.CombatHandler, data.MovementHandler) }
         };
     }
 }

@@ -2,8 +2,10 @@
 {
 using UnityEngine;
 [RequireComponent(typeof(AgentImpactHandler))]
+[RequireComponent(typeof(PlayerAnimator))]
 public class PlayerController : GroundedAgentController
 {
+    [SerializeField] private PlayerAnimator _playerAnimator;
     [SerializeField] private AgentImpactHandler _impactHandler;
 
     public Stamina Stamina { get; private set; }
@@ -13,6 +15,8 @@ public class PlayerController : GroundedAgentController
     protected override void Awake()
     {
         base.Awake();
+        _playerAnimator = GetComponent<PlayerAnimator>();
+        _playerAnimator.Initialize();
         Stamina = GetComponent<Stamina>();
         Stamina?.Initialize(_statData.maxStamina, _statData.staminaRegenRate);
 
@@ -24,7 +28,7 @@ public class PlayerController : GroundedAgentController
         _states = new PlayerStateFactory().CreateStates(
             new PlayerStateFactoryData
             {
-                Animator = _animator,
+                PlayerAnimator = _playerAnimator,
                 Motor = _motor,
                 MovementHandler = _movementHandler,
                 MovementInput = _moveInput,

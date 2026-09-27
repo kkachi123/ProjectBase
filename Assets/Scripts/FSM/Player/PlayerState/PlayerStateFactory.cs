@@ -5,6 +5,7 @@ using System.Collections.Generic;
 
 public class PlayerStateFactoryData : StateFactoryData
 {
+    public PlayerAnimator PlayerAnimator { get; set; }
     public GroundDetector GroundDetector { get; set; }
     public IAgentJumpInput JumpInput { get; set; }
 }
@@ -15,17 +16,17 @@ public class PlayerStateFactory
     {
         Dictionary<Type, AgentStateBase> states = new Dictionary<Type, AgentStateBase>
         {
-            { typeof(GroundedState), new GroundedState(data.Animator, data.MovementHandler, data.MovementInput) },
-            { typeof(JumpState), new JumpState(data.Animator, data.MovementHandler, data.MovementInput) },
-            { typeof(FallState), new FallState(data.Animator, data.MovementHandler, data.MovementInput) },
-            { typeof(AttackState), new AttackState(data.Animator, data.CombatHandler, data.CombatInput, data.AttackStarter) },
-            { typeof(HitState), new HitState(data.Animator, data.CombatHandler) },
-            { typeof(DeathState), new DeathState(data.Animator, data.CombatHandler, data.MovementHandler) }
+            { typeof(GroundedState), new GroundedState(data.PlayerAnimator, data.MovementHandler, data.MovementInput) },
+            { typeof(JumpState), new JumpState(data.PlayerAnimator, data.PlayerAnimator, data.MovementHandler, data.MovementInput) },
+            { typeof(FallState), new FallState(data.PlayerAnimator, data.PlayerAnimator, data.MovementHandler, data.MovementInput) },
+            { typeof(AttackState), new AttackState(data.PlayerAnimator, data.CombatHandler, data.CombatInput, data.AttackStarter) },
+            { typeof(HitState), new HitState(data.PlayerAnimator, data.CombatHandler) },
+            { typeof(DeathState), new DeathState(data.PlayerAnimator, data.CombatHandler, data.MovementHandler) }
         };
 
         states[typeof(GroundedState)].AddTransition(new GetHitTransition(data.Health.CurrentHealth));
         states[typeof(GroundedState)].AddTransition(new JumpTransition(data.JumpInput, data.GroundDetector));
-        states[typeof(GroundedState)].AddTransition(new GroundedFallTransition(data.GroundDetector));
+        states[typeof(GroundedState)].AddTransition(new GroundedFallTransition(data.GroundDetector, data.Motor));
         states[typeof(GroundedState)].AddTransition(new AttackTransition(data.CombatInput, data.AttackStarter));
 
         states[typeof(JumpState)].AddTransition(new GetHitTransition(data.Health.CurrentHealth));
