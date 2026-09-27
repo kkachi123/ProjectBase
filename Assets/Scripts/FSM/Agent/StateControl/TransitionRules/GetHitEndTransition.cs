@@ -7,7 +7,7 @@ public interface IAnimationEventSource
 }
 public class GetHitEndTransition : IEventTransitionRule
 {
-    public Type NextStateType => typeof(IdleState);
+    public Type NextStateType => typeof(GroundedState);
 
     private readonly IAnimationEventSource _eventSource;
     private bool _isSubscribed;

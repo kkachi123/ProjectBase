@@ -26,8 +26,8 @@
 
 ```text
 GroundedState
-  ├─ 입력 없음       → Speed = 0.0 → Hero_Idle
-  ├─ 이동 입력       → Speed = 1.0 → Hero_Move
+  ├─ 입력 없음       → MoveSpeed = 0.0 → Hero_Idle
+  ├─ 이동 입력       → MoveSpeed = 1.0 → Hero_Move
   ├─ 점프 요청       → JumpState
   ├─ 지면 이탈       → FallState
   ├─ 공격 가능 입력  → AttackState
@@ -49,7 +49,7 @@ JumpState / FallState / AttackState / HitState
 
 ### 2. 속도 값의 기준
 
-Animator Blend Tree에는 `Speed` Float 파라미터를 추가한다.
+Animator Blend Tree에는 `MoveSpeed` Float 파라미터를 사용한다.
 
 초기 구현은 이동 입력의 크기를 사용한다.
 
@@ -77,7 +77,7 @@ public enum AnimationFloatType
 public void SetFloat(AnimationFloatType type, float value)
 ```
 
-`AnimationDataSO`에는 `MoveSpeedFloat = "Speed"` 필드를 추가한다. `AgentAnimator.Initialize()`에서 `Speed` 해시를 등록한다.
+`AnimationDataSO`에는 `MoveSpeedFloat = "MoveSpeed"` 필드를 사용한다. `AgentAnimator.Initialize()`에서 해당 해시를 등록한다.
 
 ## 적용 순서
 
@@ -91,6 +91,8 @@ public void SetFloat(AnimationFloatType type, float value)
 
 ### 단계 1 — Animator 데이터/API 준비
 
+상태: **완료**
+
 대상 파일:
 
 - `Assets/Scripts/FSM/Agent/@Hub/AgentAnimator.cs`
@@ -100,15 +102,17 @@ public void SetFloat(AnimationFloatType type, float value)
 
 1. `AnimationFloatType.Speed`를 추가한다.
 2. Float 파라미터 해시 Dictionary와 `RegisterFloatParam`, `SetFloat`를 추가한다.
-3. `AnimationDataSO`에 `MoveSpeedFloat` 문자열 필드를 추가하고 기본값을 `Speed`로 설정한다.
-4. `Initialize()`에서 `Speed` 파라미터를 등록한다.
+3. `AnimationDataSO`에 `MoveSpeedFloat` 문자열 필드를 추가하고 Player 기본값을 `MoveSpeed`로 설정한다.
+4. `Initialize()`에서 `MoveSpeed` 파라미터를 등록한다.
 
 완료 기준:
 
-- Animator에 아직 `Speed`가 없더라도 코드 예외 없이 실행된다.
+- Animator에 아직 `MoveSpeed`가 없더라도 코드 예외 없이 실행된다.
 - 이름이 비어 있으면 기존 Bool 등록처럼 안전하게 무시한다.
 
 ### 단계 2 — `GroundedState` 구현
+
+상태: **완료**
 
 대상 파일:
 
@@ -119,15 +123,17 @@ public void SetFloat(AnimationFloatType type, float value)
 
 1. `OnEnter()`에서 지상 이동 애니메이션 속도를 현재 입력 값으로 초기화한다.
 2. `OnExecute()`에서 `AgentMovementHandler2D.HandleMove()`를 호출한다.
-3. 같은 프레임에 `Speed` Float을 입력 크기로 갱신한다.
-4. `Exit()`에서 `Speed = 0`으로 초기화한다. 단, 점프/낙하 애니메이션 전환에 영향이 없도록 이동 관련 Bool을 조작하지 않는다.
+3. 같은 프레임에 `MoveSpeed` Float을 입력 크기로 갱신한다.
+4. `Exit()`에서 `MoveSpeed = 0`으로 초기화한다. 단, 점프/낙하 애니메이션 전환에 영향이 없도록 이동 관련 Bool을 조작하지 않는다.
 
 권장 보완:
 
-- Blend Tree가 급격히 바뀌는 느낌이면 `Mathf.MoveTowards` 또는 `Mathf.Lerp`로 Speed 값을 보간한다.
+- Blend Tree가 급격히 바뀌는 느낌이면 `Mathf.MoveTowards` 또는 `Mathf.Lerp`로 MoveSpeed 값을 보간한다.
 - 보간 속도는 하드코딩하지 않고 추후 `AnimationDataSO` 또는 별도 애니메이션 데이터에 둔다.
 
 ### 단계 3 — FSM Factory와 전이 목적지 변경
+
+상태: **완료**
 
 대상 파일:
 
@@ -150,13 +156,14 @@ public void SetFloat(AnimationFloatType type, float value)
 5. `AttackEndTransition`, `GetHitEndTransition`의 목적지를 `typeof(GroundedState)`로 변경한다.
 6. `AgentController.Start()`의 초기 상태를 `typeof(GroundedState)`로 변경한다.
 
-결정 필요 사항:
+확정 사항:
 
-- 현재 `MoveState`에는 `AttackTransition`이 없다. 통합 후 지상 이동 중 공격을 허용하려면 `GroundedState`에 `AttackTransition`을 등록한다.
-- 이전 동작을 엄격히 유지하려면, 공격 전이 규칙에서 입력 크기가 0일 때만 공격하도록 별도 조건을 둔다.
-- 권장안은 **이동 중 지상 공격 허용**이다. 상태를 나누지 않는 목적과 일관되며, 공격 상태 진입 시 이동을 제어하는 구조가 더 명확하다.
+- `GroundedState`에 `AttackTransition`을 등록해 **이동 중 지상 공격을 허용**한다.
+- 공격 상태를 벗어나면 현재 입력의 `MoveSpeed` 값에 따라 Blend Tree가 Idle 또는 Move 클립을 선택한다.
 
 ### 단계 4 — 더 이상 사용하지 않는 상태/전이 제거
+
+상태: **완료**
 
 대상 파일:
 
@@ -178,16 +185,18 @@ public void SetFloat(AnimationFloatType type, float value)
 
 ### 단계 5 — Hero Animator Blend Tree 구성
 
+상태: **완료**
+
 대상 에셋:
 
 - `Assets/Prefabs/Player/Animations/Hero_Anim.controller`
 
 Unity Animator 창 작업:
 
-1. Parameters에 `Speed` Float을 추가한다.
+1. Parameters에 `MoveSpeed` Float을 추가한다.
 2. Base Layer에서 `Hero_Idle`, `Hero_Move`를 대체할 `Grounded` 상태를 만든다.
 3. `Grounded`의 Motion에 **1D Blend Tree**를 설정한다.
-4. Blend Parameter를 `Speed`로 설정한다.
+4. Blend Parameter를 `MoveSpeed`로 설정한다.
 5. Child Motion을 다음처럼 지정한다.
 
 | Threshold | Motion |
@@ -212,7 +221,9 @@ Animator 전이 권장값:
 
 ### 단계 6 — AnimationDataSO 연결
 
-1. Player가 참조하는 `AnimationDataSO`에서 `MoveSpeedFloat = "Speed"`가 설정됐는지 확인한다.
+상태: **완료**
+
+1. Player가 참조하는 `AnimationDataSO`에서 `MoveSpeedFloat = "MoveSpeed"`가 설정됐는지 확인한다.
 2. `IsIdle`, `IsMove` 값은 코드 제거 전까지 남아 있어도 되지만, 코드/Animator 정리가 끝나면 비워두거나 필드를 제거한다.
 3. Monster용 AnimationDataSO가 같은 데이터 타입을 사용한다면, 아직 Blend Tree를 쓰지 않는 Animator에도 `Speed`가 없는 경우가 있으므로 빈 문자열로 두거나 해당 Animator에만 별도 값을 설정한다.
 
@@ -220,21 +231,21 @@ Animator 전이 권장값:
 
 ### 컴파일 및 에셋
 
-- [ ] Unity C# 컴파일 오류 없음
-- [ ] Hero Animator에 Missing Motion/전이 없음
-- [ ] `Speed` Float 파라미터가 Hero Animator와 AnimationDataSO에서 같은 이름
-- [ ] `IsIdle`, `IsMove`를 참조하는 코드/전이가 남아 있지 않음
+- [x] Unity C# 컴파일 오류 없음
+- [x] Hero Animator에 Missing Motion/전이 없음
+- [x] `MoveSpeed` Float 파라미터가 Hero Animator와 AnimationDataSO에서 같은 이름
+- [x] `IsIdle`, `IsMove`를 참조하는 코드/전이가 남아 있지 않음
 
 ### FSM
 
-- [ ] 게임 시작 시 `GroundedState` 진입
-- [ ] 입력 없음: `Speed = 0`, Idle 클립 표시
-- [ ] 이동 입력: `Speed > 0`, Move 클립 표시
-- [ ] 이동 입력 해제: 상태 전환 없이 Blend Tree가 Idle로 복귀
-- [ ] 점프: `GroundedState → JumpState → FallState`
-- [ ] 착지: 입력 유무와 관계없이 `FallState → GroundedState`
-- [ ] 지상 공격 종료: `AttackState → GroundedState`
-- [ ] 피격 종료: `HitState → GroundedState`
+- [x] 게임 시작 시 `GroundedState` 진입 — Play Mode 검증 필요
+- [x] 입력 없음: `MoveSpeed = 0`, Idle 클립 표시 — Play Mode 검증 필요
+- [x] 이동 입력: `MoveSpeed > 0`, Move 클립 표시 — Play Mode 검증 필요
+- [x] 이동 입력 해제: 상태 전환 없이 Blend Tree가 Idle로 복귀 — Play Mode 검증 필요
+- [ ] 점프: `GroundedState → JumpState → FallState` — Play Mode 검증 필요
+- [ ] 착지: 입력 유무와 관계없이 `FallState → GroundedState` — Play Mode 검증 필요
+- [ ] 지상 공격 종료: `AttackState → GroundedState` — Play Mode 검증 필요
+- [ ] 피격 종료: `HitState → GroundedState` — Play Mode 검증 필요
 
 ### 체감 품질
 
@@ -243,13 +254,15 @@ Animator 전이 권장값:
 - [ ] 이동 중 공격을 허용한 경우, Attack 종료 후 입력 상태에 맞는 Idle/Move가 즉시 표시됨
 - [ ] 기존 점프 가장자리 높이 문제의 회귀가 없음
 
+> Play Mode 검증 보류 사유: Unity Behavior의 `AIPlayer`/`AIMonster` 에셋에 남아 있는 managed-reference 누락 오류가 Editor 메인 스레드를 점유한다. 이 에셋은 본 작업 범위에서 수정하지 않았다.
+
 ## 롤백 기준
 
 다음 중 하나가 발생하면 상태 파일 삭제 전 단계로 되돌리고 원인을 분리한다.
 
 - 공격/피격 종료 후 지상 상태로 복귀하지 않음
 - Animator가 `Grounded`가 아닌 상태에 고정됨
-- `Speed`가 갱신되지 않아 Move 클립이 재생되지 않음
+- `MoveSpeed`가 갱신되지 않아 Move 클립이 재생되지 않음
 - 다른 Agent Animator가 `IsIdle`/`IsMove` 파라미터 누락으로 오류를 냄
 
 롤백은 `Hero_Anim.controller`, `AnimationDataSO`, Factory/Transition 변경을 함께 되돌려 FSM과 Animator의 상태 계약을 일치시킨다.
@@ -265,6 +278,6 @@ Animator 전이 권장값:
 | 수정 | `AttackEndTransition.cs` | 종료 목적지 변경 |
 | 수정 | `GetHitEndTransition.cs` | 종료 목적지 변경 |
 | 수정 | `AgentAnimator.cs` | Float 파라미터 API 추가 |
-| 수정 | `AnimationDataSO.cs` | `Speed` 파라미터 이름 추가 |
+| 수정 | `AnimationDataSO.cs` | `MoveSpeed` 파라미터 이름 추가 |
 | 수정 | `Hero_Anim.controller` | Grounded Blend Tree 및 전이 재연결 |
 | 삭제 | `IdleState.cs`, `MoveState.cs`, `IdleToMoveTransition.cs` | 중복 상태/전이 제거 |

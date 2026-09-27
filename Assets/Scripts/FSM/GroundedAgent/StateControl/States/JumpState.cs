@@ -15,6 +15,7 @@ public class JumpState : AgentStateBase
 
     protected override void OnEnter() 
     {
+        _animator.SetBool(StateType.Grounded, false);
         _animator.SetBool(StateType.Jump, true);
         _movementHandler.HandleJump();
     }

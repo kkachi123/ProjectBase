@@ -14,10 +14,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   AttackTypeInt: AttackType
   MoveSpeedFloat: MoveSpeed
-  JumpTrigger: JumpTrigger
-  AttackTrigger: AttackTrigger
-  HitTrigger: HitTrigger
-  DeathTrigger: DeathTrigger
+  IsGroundedBool: IsGrounded
+  IsJumpBool: IsJump
   IsFallBool: IsFall
+  IsAttackBool: IsAttack
   IsHitBool: IsHit
-  IsDeadBool: IsDead
+  IsDeathBool: IsDeath

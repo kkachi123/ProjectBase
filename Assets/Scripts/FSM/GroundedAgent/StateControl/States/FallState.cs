@@ -14,6 +14,7 @@ public class FallState : AgentStateBase
     }
     protected override void OnEnter()
     {
+        _animator.SetBool(StateType.Grounded, false);
         _animator.SetBool(StateType.Fall, true);
     }
 

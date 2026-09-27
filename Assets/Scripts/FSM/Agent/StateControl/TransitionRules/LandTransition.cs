@@ -4,14 +4,12 @@ using System;
 
 public class LandTransition : ITransitionRule
 {
-    private IAgentMovementInput _moveInput;
-    public Type NextStateType => _moveInput.GetMovementInput().x != 0 ? typeof(MoveState) : typeof(IdleState);
+    public Type NextStateType => typeof(GroundedState);
     private GroundDetector _groundDetector;
     private AgentMotor2D _motor;
 
-    public LandTransition(IAgentMovementInput moveInput, GroundDetector groundDetector, AgentMotor2D motor)
+    public LandTransition(GroundDetector groundDetector, AgentMotor2D motor)
     {
-        _moveInput = moveInput;
         _groundDetector = groundDetector;
         _motor = motor;
     }

@@ -58,7 +58,7 @@ public abstract class AgentController : MonoBehaviour, IAgentAnimationListener ,
         {
             state.OnTransition += ChangeState;
         }
-        ChangeState(typeof(IdleState));
+        ChangeState(typeof(GroundedState));
     }
     protected virtual void Update()
     {
@@ -74,6 +74,7 @@ public abstract class AgentController : MonoBehaviour, IAgentAnimationListener ,
             _currentState = newState;
             _currentState?.Enter();
         }
+        Debug.Log($"State changed to: {stateType.Name}");
     }
     
     public virtual void OnAnimationEvent(AnimEventType type)

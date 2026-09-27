@@ -4,7 +4,7 @@ using System;
 
 public class AttackEndTransition : IEventTransitionRule
 {
-    public Type NextStateType => typeof(IdleState);
+    public Type NextStateType => typeof(GroundedState);
 
     private readonly IAnimationEventSource _eventSource;
     private readonly IAgentCombatInput _combatInput;

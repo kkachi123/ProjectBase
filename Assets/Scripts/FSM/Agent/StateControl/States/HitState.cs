@@ -23,7 +23,7 @@ public class HitState : AgentStateBase
     }
     public override void Exit() 
     {
-        return;
+        _animator.SetBool(StateType.Hit, false);
     }
 }
 }
