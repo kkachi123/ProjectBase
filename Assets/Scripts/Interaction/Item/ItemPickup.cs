@@ -1,4 +1,5 @@
 using UnityEngine;
+using ProjectRE;
 
 [RequireComponent(typeof(Collider2D))]
 public class ItemPickup : MonoBehaviour, IInteractable

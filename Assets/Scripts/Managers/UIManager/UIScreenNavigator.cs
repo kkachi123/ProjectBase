@@ -1,3 +1,5 @@
+﻿namespace ProjectRE
+{
 using System;
 using System.Collections.Generic;
 public class UIScreenNavigator
@@ -46,4 +48,5 @@ public class UIScreenNavigator
             screen.OnExit();
         }
     }
+}
 }

@@ -1,3 +1,5 @@
+﻿namespace ProjectRE
+{
 using System;
 using UnityEngine;
 using UnityEngine.UI;
@@ -37,4 +39,5 @@ public class EquipSlotButton : MonoBehaviour
         color.a = selected ? 1f : 0f;
         _highlight.color = color;
     }
+}
 }

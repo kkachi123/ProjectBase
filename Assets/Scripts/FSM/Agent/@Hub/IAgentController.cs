@@ -1,3 +1,5 @@
+﻿namespace ProjectRE
+{
 using UnityEngine;
 public interface IAgentAnimationListener
 {
@@ -8,4 +10,5 @@ public interface IAttackStarter
 {
     bool CanStartAttack(int requestedAttackType);
     bool TryStartAttack(int requestedAttackType);
+}
 }

@@ -1,3 +1,5 @@
+﻿namespace ProjectRE
+{
 using System;
 using System.Collections.Generic;
 
@@ -51,4 +53,5 @@ public class PlayerStateFactory
 
         return states;
     }
+}
 }

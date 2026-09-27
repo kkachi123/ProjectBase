@@ -1,3 +1,5 @@
+﻿namespace ProjectRE
+{
 using UnityEngine;
 
 public class MonsterController : AgentController
@@ -29,4 +31,5 @@ public class MonsterController : AgentController
         Destroy(gameObject);
     }
     #endregion
+}
 }

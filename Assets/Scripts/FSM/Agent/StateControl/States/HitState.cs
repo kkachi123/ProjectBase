@@ -1,3 +1,5 @@
+﻿namespace ProjectRE
+{
 using UnityEngine;
 
 public class HitState : AgentStateBase
@@ -23,4 +25,5 @@ public class HitState : AgentStateBase
     {
         return;
     }
+}
 }

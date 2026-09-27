@@ -1,3 +1,5 @@
+﻿namespace ProjectRE
+{
 using UnityEngine;
 
 [RequireComponent(typeof(Rigidbody2D))]
@@ -34,4 +36,5 @@ public class AgentMotor2D : MonoBehaviour
         _rb.linearVelocity = Vector2.zero;
         _rb.AddForce(horizontalInput * knockForce, ForceMode2D.Impulse);
     }
+}
 }

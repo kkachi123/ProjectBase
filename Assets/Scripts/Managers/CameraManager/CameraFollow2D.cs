@@ -1,3 +1,5 @@
+﻿namespace ProjectRE
+{
 using UnityEngine;
 
 public class CameraFollow2D : MonoBehaviour
@@ -25,4 +27,5 @@ public class CameraFollow2D : MonoBehaviour
         if (snap && _target != null)
             transform.position = _target.position + _offset;
     }
+}
 }

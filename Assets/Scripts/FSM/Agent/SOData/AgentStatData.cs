@@ -1,3 +1,5 @@
+﻿namespace ProjectRE
+{
 using System;
 using UnityEngine;
 using System.Collections.Generic;
@@ -19,4 +21,5 @@ public class AgentStatData : ScriptableObject
     public float maxStamina = 10f;
     public float staminaRegenRate = 1f;
     public List<AttackData> attackDatas = new List<AttackData>();
+}
 }

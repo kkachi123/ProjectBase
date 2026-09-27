@@ -1,3 +1,5 @@
+﻿namespace ProjectRE
+{
 using System;
 
 public class DialogueSequencePlayer
@@ -87,4 +89,5 @@ public class DialogueSequencePlayer
         _lineIndex = 0;
         IsPlaying = false;
     }
+}
 }

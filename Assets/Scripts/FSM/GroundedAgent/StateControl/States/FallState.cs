@@ -1,3 +1,5 @@
+﻿namespace ProjectRE
+{
 public class FallState : AgentStateBase
 {
     private AgentAnimator _animator;
@@ -24,4 +26,5 @@ public class FallState : AgentStateBase
         _animator.SetBool(StateType.Fall, false);
     }
 
+}
 }

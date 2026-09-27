@@ -1,3 +1,5 @@
+﻿namespace ProjectRE
+{
 using UnityEngine;
 using Unity.Behavior;
 using System;
@@ -63,4 +65,5 @@ public class AIPlayerBrain : MonoBehaviour
         _agent.SetVariableValue(_blackboardValue.IsPlayerInView, _playerDetector.IsTargetInView());
         _agent.SetVariableValue(_blackboardValue.IsGround, _groundDetector.IsGrounded);
     }
+}
 }

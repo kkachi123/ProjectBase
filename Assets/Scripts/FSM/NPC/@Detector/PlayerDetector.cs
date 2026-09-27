@@ -1,3 +1,5 @@
+﻿namespace ProjectRE
+{
 using UnityEngine;
 
 public class PlayerDetector : MonoBehaviour
@@ -32,4 +34,5 @@ public class PlayerDetector : MonoBehaviour
         Gizmos.color = IsTargetInView() ? Color.green : Color.red;
         Gizmos.DrawWireSphere(transform.position, viewRadius);
     }
+}
 }

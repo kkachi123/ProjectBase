@@ -1,5 +1,6 @@
-using System;
+﻿using System;
 using Unity.Behavior;
+using ProjectRE;
 using Unity.Properties;
 using UnityEngine;
 using Action = Unity.Behavior.Action;
@@ -40,5 +41,3 @@ public partial class PlayerJumpAction : Action
         Input.Value.Move(Vector2.zero);
     }
 }
-
-

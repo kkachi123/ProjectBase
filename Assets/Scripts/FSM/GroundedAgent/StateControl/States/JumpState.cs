@@ -1,3 +1,5 @@
+﻿namespace ProjectRE
+{
 public class JumpState : AgentStateBase
 {
     private AgentAnimator _animator;
@@ -26,4 +28,5 @@ public class JumpState : AgentStateBase
     {
         _animator.SetBool(StateType.Jump, false);
     }
+}
 }

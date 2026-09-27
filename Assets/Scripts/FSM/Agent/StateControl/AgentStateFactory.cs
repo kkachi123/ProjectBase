@@ -1,3 +1,5 @@
+﻿namespace ProjectRE
+{
 using System;
 using System.Collections.Generic;
 public class StateFactoryData
@@ -18,4 +20,5 @@ public abstract class AgentStateFactory
     protected StateFactoryData stateFactoryData;
 
     public abstract Dictionary<Type, AgentStateBase> CreateStates(AgentController agentController);
+}
 }

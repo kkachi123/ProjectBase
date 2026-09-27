@@ -1,3 +1,5 @@
+﻿namespace ProjectRE
+{
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -18,4 +20,5 @@ public class EquipDetail : MonoBehaviour
     }
 
     public void Hide() => _panel.SetActive(false);
+}
 }

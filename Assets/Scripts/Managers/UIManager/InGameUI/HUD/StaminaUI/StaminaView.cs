@@ -1,3 +1,5 @@
+﻿namespace ProjectRE
+{
 using DG.Tweening;
 using UniRx;
 using UnityEngine;
@@ -36,4 +38,5 @@ public class StaminaView : MonoBehaviour
         _currentTween?.Kill();
         _currentTween = _staminaBarImage.DOFillAmount(ratio, 0.2f).SetEase(Ease.OutCubic);
     }
+}
 }

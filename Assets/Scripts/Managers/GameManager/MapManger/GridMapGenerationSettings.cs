@@ -1,3 +1,5 @@
+﻿namespace ProjectRE
+{
 using UnityEngine;
 using GridMapSystem;
 
@@ -15,4 +17,5 @@ public class GridMapGenerationSettings : ScriptableObject
     {
         return useRandomSeed ? System.Environment.TickCount : randomSeed;
     }
+}
 }

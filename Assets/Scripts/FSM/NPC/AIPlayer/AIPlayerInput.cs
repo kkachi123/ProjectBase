@@ -1,3 +1,5 @@
+﻿namespace ProjectRE
+{
 using UniRx;
 using UnityEngine;
 public class AIPlayerInput : MonoBehaviour , IAgentMovementInput , IAgentJumpInput , IAgentCombatInput
@@ -34,4 +36,5 @@ public class AIPlayerInput : MonoBehaviour , IAgentMovementInput , IAgentJumpInp
         _attackPressed.Value = value;
         if(value != 0) _attackPressed.Value = 0; 
     }
+}
 }

@@ -1,3 +1,5 @@
+﻿namespace ProjectRE
+{
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -65,4 +67,5 @@ public class AgentAnimator : MonoBehaviour
             _anim.SetBool(hash, value);
         }
     }
+}
 }

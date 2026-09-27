@@ -1,6 +1,7 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using Unity.Behavior;
+using ProjectRE;
 using Unity.Properties;
 using UnityEngine;
 using Action = Unity.Behavior.Action;
@@ -24,5 +25,3 @@ public partial class AICheckTargetDistance : Action
         return Status.Success;
     }
 }
-
-

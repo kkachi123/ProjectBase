@@ -1,3 +1,5 @@
+﻿namespace ProjectRE
+{
 using UnityEngine;
 
 public class InGameUI : MonoBehaviour
@@ -37,4 +39,5 @@ public class InGameUI : MonoBehaviour
         _hud?.gameObject.SetActive(active);
     }
      
+}
 }

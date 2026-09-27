@@ -1,3 +1,5 @@
+﻿namespace ProjectRE
+{
 using UnityEngine;
 
 public class JumpFloorDetector : MonoBehaviour
@@ -100,4 +102,5 @@ public class JumpFloorDetector : MonoBehaviour
             }
         }
     }
+}
 }

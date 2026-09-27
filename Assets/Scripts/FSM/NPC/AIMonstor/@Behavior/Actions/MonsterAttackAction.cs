@@ -1,5 +1,6 @@
-using System;
+﻿using System;
 using Unity.Behavior;
+using ProjectRE;
 using UnityEngine;
 using Action = Unity.Behavior.Action;
 using Unity.Properties;
@@ -21,4 +22,3 @@ public partial class MonsterAttackAction : Action
         return Status.Success;
     }
 }
-

@@ -1,3 +1,5 @@
+﻿namespace ProjectRE
+{
 using DG.Tweening;
 using UniRx;
 using UnityEngine;
@@ -39,4 +41,5 @@ public class HealthView : MonoBehaviour
         _currentTween?.Kill();
         _currentTween = hpBarImage.DOFillAmount(newHpRatio, 0.5f).SetEase(Ease.OutCubic);
     }
+}
 }

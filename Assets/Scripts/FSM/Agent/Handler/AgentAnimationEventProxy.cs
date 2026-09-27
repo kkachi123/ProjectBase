@@ -1,3 +1,5 @@
+﻿namespace ProjectRE
+{
 using UnityEngine;
 
 public enum AnimEventType
@@ -17,4 +19,5 @@ public class AgentAnimationEventProxy : MonoBehaviour
     // Called by Animation Events
     public virtual void OnAnimationOnFrame() => _controller?.OnAnimationEvent(AnimEventType.OnFrame);
     public virtual void OnAnimationEnd() => _controller?.OnAnimationEvent(AnimEventType.End);
+}
 }

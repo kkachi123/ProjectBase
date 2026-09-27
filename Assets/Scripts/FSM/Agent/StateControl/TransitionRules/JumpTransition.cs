@@ -1,3 +1,5 @@
+﻿namespace ProjectRE
+{
 using System;
 
 public class JumpTransition : ITransitionRule
@@ -17,4 +19,5 @@ public class JumpTransition : ITransitionRule
         bool requested = _jumpInput.TryConsumeJumpRequest();
         return requested && _groundDetector.IsGrounded;
     }
+}
 }

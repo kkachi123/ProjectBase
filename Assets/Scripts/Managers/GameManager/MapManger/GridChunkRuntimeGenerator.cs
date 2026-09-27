@@ -1,3 +1,5 @@
+﻿namespace ProjectRE
+{
 using System.Collections.Generic;
 using UnityEngine;
 using GridMapSystem;
@@ -461,4 +463,5 @@ public static class GridChunkRuntimeGenerator
 
         return false;
     }
+}
 }

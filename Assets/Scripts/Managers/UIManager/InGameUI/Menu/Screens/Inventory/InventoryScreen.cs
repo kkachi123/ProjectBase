@@ -1,3 +1,5 @@
+﻿namespace ProjectRE
+{
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -42,4 +44,5 @@ public class InventoryScreen : UITab
         for (int i = 0; i < _slots.Length; i++)
             _slots[i].Set(i < items.Count ? items[i] : null);
     }
+}
 }

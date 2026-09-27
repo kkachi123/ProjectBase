@@ -1,3 +1,5 @@
+﻿namespace ProjectRE
+{
 using System;
 using System.Collections.Generic;
 
@@ -17,4 +19,5 @@ public class MonsterStateFactory
             { typeof(DeathState), new DeathState(data.Animator, data.CombatHandler, data.MovementHandler) }
         };
     }
+}
 }

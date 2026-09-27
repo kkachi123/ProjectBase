@@ -1,3 +1,5 @@
+﻿namespace ProjectRE
+{
 using UnityEngine;
 
 public class PlayerInteractionHandler : MonoBehaviour
@@ -61,4 +63,5 @@ public class PlayerInteractionHandler : MonoBehaviour
         Gizmos.color = Color.yellow;
         Gizmos.DrawWireSphere(transform.position, _interactRadius);
     }
+}
 }

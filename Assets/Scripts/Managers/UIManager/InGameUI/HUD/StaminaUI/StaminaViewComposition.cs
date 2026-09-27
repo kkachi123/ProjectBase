@@ -1,3 +1,5 @@
+﻿namespace ProjectRE
+{
 using UnityEngine;
 
 public class StaminaViewComposition : MonoBehaviour
@@ -33,4 +35,5 @@ public class StaminaViewComposition : MonoBehaviour
         model = player.Stamina;
         view.Bind(new StaminaViewModel(model));
     }
+}
 }

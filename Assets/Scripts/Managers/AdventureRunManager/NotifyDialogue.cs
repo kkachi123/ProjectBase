@@ -1,3 +1,5 @@
+﻿namespace ProjectRE
+{
 using System;
 using UnityEngine;
 
@@ -27,4 +29,5 @@ public class NotifyDialogue : MonoBehaviour
     {
         return _sequencePlayer.Play(_gameOverMessage, onFinished);
     }
+}
 }

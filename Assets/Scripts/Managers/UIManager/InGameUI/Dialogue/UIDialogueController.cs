@@ -1,3 +1,5 @@
+﻿namespace ProjectRE
+{
 using System;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -47,4 +49,5 @@ public class UIDialogueController : MonoBehaviour
 
     private void OnEnable() => _advanceAction.Enable();
     private void OnDisable() => _advanceAction.Disable();
+}
 }

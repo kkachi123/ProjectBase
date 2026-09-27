@@ -1,3 +1,5 @@
+﻿namespace ProjectRE
+{
 using UnityEngine;
 using UnityEngine.Pool;
 using System.Collections.Generic;
@@ -54,4 +56,5 @@ public class TrapBulletPoolManager : MonoBehaviour
         Rigidbody2D rb = bullet.GetComponent<Rigidbody2D>();
         rb.linearVelocity = direction.normalized * speed;
     }
+}
 }

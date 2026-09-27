@@ -1,3 +1,5 @@
+﻿namespace ProjectRE
+{
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -67,4 +69,5 @@ public class EquipmentScreen : UITab
     {
         _equipment.Equip(_selectedSlot, item);
     }
+}
 }

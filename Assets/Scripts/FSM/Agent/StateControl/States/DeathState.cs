@@ -1,3 +1,5 @@
+﻿namespace ProjectRE
+{
 using UnityEngine;
 public class DeathState : AgentStateBase
 {
@@ -24,4 +26,5 @@ public class DeathState : AgentStateBase
         return;
     }
     public override void Exit() { }
+}
 }

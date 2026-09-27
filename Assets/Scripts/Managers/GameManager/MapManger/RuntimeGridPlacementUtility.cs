@@ -1,3 +1,5 @@
+﻿namespace ProjectRE
+{
 using System.Collections.Generic;
 using UnityEngine;
 using GridMapSystem;
@@ -157,4 +159,5 @@ internal static class RuntimeGridPlacementUtility
         Shuffle(order, rng);
         return order;
     }
+}
 }

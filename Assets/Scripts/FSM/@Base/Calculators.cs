@@ -1,3 +1,5 @@
+﻿namespace ProjectRE
+{
 using UnityEngine;
 
 public static class Calculators
@@ -14,4 +16,5 @@ public static class Calculators
         // 오프셋의 해당 방향 투영값과 크기의 해당 방향 투영 절반값을 더함.
         return Vector2.Dot(offset, direction) + (size.x * Mathf.Abs(direction.x) + size.y * Mathf.Abs(direction.y)) / 2f;
     }
+}
 }

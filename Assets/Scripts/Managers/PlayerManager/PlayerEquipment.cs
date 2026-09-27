@@ -1,3 +1,5 @@
+﻿namespace ProjectRE
+{
 using System;
 using System.Collections.Generic;
 
@@ -34,4 +36,5 @@ public class PlayerEquipment
         if (_equipped.Remove(slot))
             OnChanged?.Invoke(_equipped);
     }
+}
 }

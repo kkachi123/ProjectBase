@@ -1,3 +1,5 @@
+﻿namespace ProjectRE
+{
 using UnityEngine;
 
 public class HealthViewComposition : MonoBehaviour
@@ -33,4 +35,5 @@ public class HealthViewComposition : MonoBehaviour
         model = player.Health;
         view.Bind(new HealthViewModel(model));
     }
+}
 }

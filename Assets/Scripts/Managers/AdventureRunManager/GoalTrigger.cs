@@ -1,3 +1,5 @@
+﻿namespace ProjectRE
+{
 using UnityEngine;
 
 [RequireComponent(typeof(Collider2D))]
@@ -48,4 +50,5 @@ public class GoalTrigger : MonoBehaviour, IInteractable
 
         Managers.Instance.AdventureRun.EndRun();
     }
+}
 }

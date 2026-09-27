@@ -1,3 +1,5 @@
+﻿namespace ProjectRE
+{
 using System;
 
 public class GroundedFallTransition : ITransitionRule
@@ -14,4 +16,5 @@ public class GroundedFallTransition : ITransitionRule
     {
         return !_groundDetector.IsGrounded;
     }
+}
 }

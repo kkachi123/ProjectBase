@@ -1,5 +1,6 @@
-using System;
+﻿using System;
 using Unity.Behavior;
+using ProjectRE;
 using Unity.Properties;
 using UnityEngine;
 using static UnityEngine.GraphicsBuffer;
@@ -55,6 +56,3 @@ public partial class PlayerChaseTargetAction : Action
 
     private float TargetDistanceX(Vector2 target) => Mathf.Abs(Self.Value.position.x - target.x);
 }
-
-
-

@@ -1,3 +1,5 @@
+﻿namespace ProjectRE
+{
 using UnityEngine;
 public class TitleScreen : UIScreen
 {
@@ -10,4 +12,5 @@ public class TitleScreen : UIScreen
     {
         Application.Quit();
     }
+}
 }

@@ -1,3 +1,5 @@
+﻿namespace ProjectRE
+{
 using System;
 
 public class JumpFallTransition : ITransitionRule
@@ -15,4 +17,5 @@ public class JumpFallTransition : ITransitionRule
     {
         return _motor.VerticalVelocity <= 0f;
     }
+}
 }

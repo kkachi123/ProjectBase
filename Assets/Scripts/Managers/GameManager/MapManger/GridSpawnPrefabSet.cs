@@ -1,3 +1,5 @@
+﻿namespace ProjectRE
+{
 using UnityEngine;
 using GridMapSystem;
 
@@ -28,4 +30,5 @@ public class GridSpawnPrefabSet
                 return null;
         }
     }
+}
 }

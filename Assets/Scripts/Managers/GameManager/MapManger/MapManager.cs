@@ -1,3 +1,5 @@
+﻿namespace ProjectRE
+{
 using UnityEngine;
 using GridMapSystem;
 
@@ -26,4 +28,5 @@ public class MapManager : MonoBehaviour
         GridChunkRuntimeGenerator.ClearGeneratedMap();
         CurrentMapInfo = null;
     }
+}
 }

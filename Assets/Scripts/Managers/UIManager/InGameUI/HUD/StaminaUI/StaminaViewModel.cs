@@ -1,3 +1,5 @@
+﻿namespace ProjectRE
+{
 using UniRx;
 
 public class StaminaViewModel
@@ -11,4 +13,5 @@ public class StaminaViewModel
             .DistinctUntilChanged()
             .ToReactiveProperty();
     }
+}
 }

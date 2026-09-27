@@ -1,3 +1,5 @@
+﻿namespace ProjectRE
+{
 public class StateMachine<T> where T : class , IState
 {
     protected T _currentState;
@@ -16,4 +18,5 @@ public class StateMachine<T> where T : class , IState
         _currentState?.Execute();
     }
     
+}
 }

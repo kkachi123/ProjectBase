@@ -1,6 +1,7 @@
 using System;
 using UnityEngine;
 using UnityEngine.Pool;
+using ProjectRE;
 
 public class PooledTrapBullet : MonoBehaviour
 {

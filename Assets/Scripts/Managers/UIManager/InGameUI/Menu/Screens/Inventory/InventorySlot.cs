@@ -1,3 +1,5 @@
+﻿namespace ProjectRE
+{
 using System;
 using UnityEngine;
 using UnityEngine.UI;
@@ -31,4 +33,5 @@ public class InventorySlot : MonoBehaviour
     }
 
     private void OnClick() => OnClicked?.Invoke(_item);
+}
 }

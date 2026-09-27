@@ -1,3 +1,5 @@
+﻿namespace ProjectRE
+{
 using System.Collections;
 using UnityEngine;
 
@@ -42,4 +44,5 @@ public class UIOverlayController : MonoBehaviour
     {
         yield return FadeRoutine(_damageFlash, 0.6f, 0f, 0.3f);
     }
+}
 }

@@ -1,3 +1,5 @@
+﻿namespace ProjectRE
+{
 using UniRx;
 using UnityEngine;
 
@@ -12,4 +14,5 @@ public class HealthViewModel
             .DistinctUntilChanged()             // 기능 : 이전 값과 다른 경우에만 업데이트하도록 함
             .ToReactiveProperty();                
     }
+}
 }

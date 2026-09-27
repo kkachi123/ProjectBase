@@ -1,3 +1,5 @@
+﻿namespace ProjectRE
+{
 using UnityEngine;
 using System.Collections.Generic;
 
@@ -56,4 +58,5 @@ public class AgentCombatHandler : MonoBehaviour
             Gizmos.DrawWireCube(areaPos, currentData.size);
         }
     }
+}
 }

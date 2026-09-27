@@ -1,3 +1,5 @@
+﻿namespace ProjectRE
+{
 using UnityEngine;
 
 [RequireComponent(typeof(GroundDetector))]
@@ -21,4 +23,5 @@ public abstract class GroundedAgentController : AgentController
     {
         _groundDetector.UpdateGroundedStatus();
     }
+}
 }

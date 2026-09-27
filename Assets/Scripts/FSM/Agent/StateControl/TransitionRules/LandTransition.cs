@@ -1,3 +1,5 @@
+﻿namespace ProjectRE
+{
 using System;
 
 public class LandTransition : ITransitionRule
@@ -18,4 +20,5 @@ public class LandTransition : ITransitionRule
     {
         return _groundDetector.IsGrounded && _motor.VerticalVelocity <= 0f;
     }
+}
 }

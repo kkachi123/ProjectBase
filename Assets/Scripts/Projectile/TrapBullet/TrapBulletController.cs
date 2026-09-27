@@ -1,7 +1,8 @@
-using Cysharp.Threading.Tasks;
+ï»¿using Cysharp.Threading.Tasks;
 using System;
 using System.Threading;
 using UnityEngine;
+using ProjectRE;
 
 public class TrapBulletController : MonoBehaviour
 {
@@ -14,8 +15,8 @@ public class TrapBulletController : MonoBehaviour
 
     private void Start()
     {
-        // ÀÌ °´Ã¼°¡ ÆÄ±«µÇ¸é ºñµ¿±â ·çÇÁµµ ÀÚµ¿À¸·Î ¸ØÃßµµ·Ï ÅäÅ« Àü´Ş
-        // ¾ÈÀüÇÑ ºñµ¿±â Ã³¸®
+        // ì´ ê°ì²´ê°€ íŒŒê´´ë˜ë©´ ë¹„ë™ê¸° ë£¨í”„ë„ ìë™ìœ¼ë¡œ ë©ˆì¶”ë„ë¡ í† í° ì „ë‹¬
+        // ì•ˆì „í•œ ë¹„ë™ê¸° ì²˜ë¦¬
         ShootingBullets(this.GetCancellationTokenOnDestroy()).Forget();
     }
     private async UniTask ShootingBullets(CancellationToken ct)

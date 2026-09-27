@@ -1,3 +1,5 @@
+﻿namespace ProjectRE
+{
 using System;
 using System.Collections.Generic;
 using UnityEngine;
@@ -43,4 +45,5 @@ public class UIEquipArea : MonoBehaviour
         Show();
         for (int i = 0; i < _slots.Length; i++) _slots[i].Set(i < items.Count ? items[i] : null);
     }
+}
 }

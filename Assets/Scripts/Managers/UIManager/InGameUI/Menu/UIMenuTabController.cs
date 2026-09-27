@@ -1,3 +1,5 @@
+﻿namespace ProjectRE
+{
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
@@ -73,4 +75,5 @@ public class UIMenuTabController : MonoBehaviour
         _screens[_activeIndex].OnShow();
         if (_tabImages[_activeIndex]) _tabImages[_activeIndex].sprite = TabActive;
     }
+}
 }

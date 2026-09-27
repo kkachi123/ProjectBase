@@ -1,3 +1,5 @@
+﻿namespace ProjectRE
+{
 using System;
 using System.Collections.Generic;
 using UnityEngine;
@@ -105,4 +107,5 @@ public abstract class AgentController : MonoBehaviour, IAgentAnimationListener ,
     public virtual void OnDeathFinished() { }
     public virtual bool CanStartAttack(int requestedAttackType) { return false; }
     public virtual bool TryStartAttack(int requestedAttackType) { return false; }
+}
 }

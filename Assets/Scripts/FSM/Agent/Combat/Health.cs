@@ -1,3 +1,5 @@
+﻿namespace ProjectRE
+{
 using System;
 using UnityEngine;
 using UniRx;
@@ -30,4 +32,5 @@ public class Health : MonoBehaviour, IDamageable
         _currentHealth.Value = Mathf.Max(_currentHealth.Value - damageAmount, 0);
         if (_currentHealth.Value <= 0) _isDead.Value = true;
     }
+}
 }

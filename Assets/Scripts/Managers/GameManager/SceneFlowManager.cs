@@ -1,3 +1,5 @@
+﻿namespace ProjectRE
+{
 using System.Collections;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -46,4 +48,5 @@ public class SceneFlowManager : MonoBehaviour
         overlay.ShowLoading(false);
         overlay.FadeOut(_fadeTime);
     }
+}
 }

@@ -1,3 +1,5 @@
+﻿namespace ProjectRE
+{
 using System;
 
 public interface ITransitionRule
@@ -10,4 +12,5 @@ public interface IEventTransitionRule : ITransitionRule
 {
     void Subscribe();
     void Unsubscribe();
+}
 }

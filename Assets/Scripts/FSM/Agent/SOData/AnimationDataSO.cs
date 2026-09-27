@@ -1,3 +1,5 @@
+﻿namespace ProjectRE
+{
 using UnityEngine;
 
 [CreateAssetMenu(fileName = "AnimationData", menuName = "Agent/Animation Data")]
@@ -15,4 +17,5 @@ public class AnimationDataSO : ScriptableObject
     public string IsDeathBool = "IsDeath";
     [Header("Animation Trigger")]
     public string AttackTrigger = "AttackTrigger";
+}
 }

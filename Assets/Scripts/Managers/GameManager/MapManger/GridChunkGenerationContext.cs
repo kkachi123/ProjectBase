@@ -1,3 +1,5 @@
+﻿namespace ProjectRE
+{
 using System;
 using UnityEngine;
 
@@ -37,4 +39,5 @@ public class GridChunkGenerationContext
         else
             UnityEngine.Object.DestroyImmediate(target);
     }
+}
 }

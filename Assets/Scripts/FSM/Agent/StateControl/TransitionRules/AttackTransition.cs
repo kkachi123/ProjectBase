@@ -1,3 +1,5 @@
+﻿namespace ProjectRE
+{
 using System;
 
 public class AttackTransition : ITransitionRule
@@ -19,4 +21,5 @@ public class AttackTransition : ITransitionRule
         return requestedType > 0
             && _attackStarter.CanStartAttack(requestedType);
     }
+}
 }

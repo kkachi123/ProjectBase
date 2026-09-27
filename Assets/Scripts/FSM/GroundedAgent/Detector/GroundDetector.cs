@@ -1,3 +1,5 @@
+﻿namespace ProjectRE
+{
 using UnityEngine;
 
 public class GroundDetector : MonoBehaviour
@@ -33,4 +35,5 @@ public class GroundDetector : MonoBehaviour
         // 5. Raycast 끝 위치 시각화
         Gizmos.DrawWireCube(endPos, new Vector3(rayBoxSize.x, rayBoxSize.y, 0.1f));
     }
+}
 }

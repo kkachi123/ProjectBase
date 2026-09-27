@@ -1,3 +1,5 @@
+﻿namespace ProjectRE
+{
 using UnityEngine;
 public class AgentMovementHandler2D 
 {
@@ -29,4 +31,5 @@ public class AgentMovementHandler2D
         Vector2 finalForce = (direction + Vector2.up * 0.5f).normalized;
         _motor.Knockback(finalForce, _data.knockbackForce);
     }
+}
 }

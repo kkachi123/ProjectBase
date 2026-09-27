@@ -1,3 +1,5 @@
+﻿namespace ProjectRE
+{
 using System;
 
 public class TestPlayerManager
@@ -25,4 +27,5 @@ public class TestPlayerManager
         CurrentPlayer = null;
         OnPlayerChanged?.Invoke(null);
     }
+}
 }

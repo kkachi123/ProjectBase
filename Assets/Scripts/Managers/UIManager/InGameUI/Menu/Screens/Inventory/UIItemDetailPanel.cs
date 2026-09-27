@@ -1,3 +1,5 @@
+﻿namespace ProjectRE
+{
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
@@ -21,4 +23,5 @@ public class UIItemDetailPanel : MonoBehaviour
     {
         _panel.SetActive(false);
     }
+}
 }

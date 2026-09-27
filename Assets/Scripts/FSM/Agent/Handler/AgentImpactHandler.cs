@@ -1,3 +1,5 @@
+﻿namespace ProjectRE
+{
 using UnityEngine;
 public interface IKnockbackListener
 {
@@ -20,4 +22,5 @@ public class AgentImpactHandler : MonoBehaviour, IKnockbackListener
          Vector2 finalForce = (direction + Vector2.up * 0.5f).normalized;
         _motor.Knockback(finalForce, _data.knockbackForce);
     }
+}
 }

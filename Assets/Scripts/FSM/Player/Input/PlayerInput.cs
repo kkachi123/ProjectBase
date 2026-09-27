@@ -1,3 +1,5 @@
+﻿namespace ProjectRE
+{
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -108,4 +110,5 @@ public class PlayerInput : MonoBehaviour , IAgentMovementInput , IAgentJumpInput
     private void OnEnable() => inputActions.Enable();
 
     private void OnDisable() => inputActions.Disable();
+}
 }

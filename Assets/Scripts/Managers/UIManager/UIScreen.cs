@@ -1,3 +1,5 @@
+﻿namespace ProjectRE
+{
 using UnityEngine;
 
 public abstract class UIScreen : MonoBehaviour
@@ -21,4 +23,5 @@ public abstract class UIScreen : MonoBehaviour
     {
         gameObject.SetActive(true);
     }
+}
 }

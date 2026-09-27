@@ -1,3 +1,5 @@
+﻿namespace ProjectRE
+{
 using UnityEngine;
 
 public class IdleState : AgentStateBase
@@ -26,4 +28,5 @@ public class IdleState : AgentStateBase
     {
         _animator.SetBool(StateType.Idle, false);
     }
+}
 }

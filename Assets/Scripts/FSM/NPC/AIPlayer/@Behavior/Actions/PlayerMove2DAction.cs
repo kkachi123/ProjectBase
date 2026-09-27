@@ -1,5 +1,6 @@
-using System;
+﻿using System;
 using Unity.Behavior;
+using ProjectRE;
 using UnityEngine;
 using Action = Unity.Behavior.Action;
 using Unity.Properties;
@@ -45,5 +46,3 @@ public partial class PlayerMove2DAction : Action
         Input.Value.Move(Vector2.zero);
     }
 }
-
-

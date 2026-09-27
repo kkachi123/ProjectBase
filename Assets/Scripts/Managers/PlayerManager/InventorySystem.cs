@@ -1,3 +1,5 @@
+﻿namespace ProjectRE
+{
 using System;
 using System.Collections.Generic;
 
@@ -23,4 +25,5 @@ public class InventorySystem
         if (removed) OnChanged?.Invoke(_items);
         return removed;
     }
+}
 }

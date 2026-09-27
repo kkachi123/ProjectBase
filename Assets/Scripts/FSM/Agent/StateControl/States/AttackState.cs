@@ -1,3 +1,5 @@
+﻿namespace ProjectRE
+{
 public class AttackState : AgentStateBase
 {
     private AgentAnimator _animator;
@@ -33,4 +35,5 @@ public class AttackState : AgentStateBase
         _animator.SetBool(StateType.Attack, false);
         _animator.SetInteger(AnimationIntType.AttackType, 0);
     }
+}
 }

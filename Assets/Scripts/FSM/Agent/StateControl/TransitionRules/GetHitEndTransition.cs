@@ -1,3 +1,5 @@
+﻿namespace ProjectRE
+{
 using System;
 public interface IAnimationEventSource
 {
@@ -50,4 +52,5 @@ public class GetHitEndTransition : IEventTransitionRule
         _shouldTransition = true;
     }
     
+}
 }

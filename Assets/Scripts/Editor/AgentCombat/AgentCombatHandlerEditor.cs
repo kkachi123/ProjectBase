@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEditor;
+using ProjectRE;
 
 [CustomEditor(typeof(AgentCombatHandler))]
 public class AgentCombatHandlerEditor : Editor

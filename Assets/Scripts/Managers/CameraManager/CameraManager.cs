@@ -1,3 +1,5 @@
+﻿namespace ProjectRE
+{
 using UnityEngine;
 
 public class CameraManager : MonoBehaviour
@@ -71,4 +73,5 @@ public class CameraManager : MonoBehaviour
 
         return CurrentFollow;
     }
+}
 }

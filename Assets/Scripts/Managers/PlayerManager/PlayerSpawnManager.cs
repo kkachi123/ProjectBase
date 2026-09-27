@@ -1,3 +1,5 @@
+﻿namespace ProjectRE
+{
 using UnityEngine;
 
 public class PlayerSpawnManager : MonoBehaviour
@@ -36,4 +38,5 @@ public class PlayerSpawnManager : MonoBehaviour
         Destroy(CurrentPlayer.gameObject);
         CurrentPlayer = null;
     }
+}
 }

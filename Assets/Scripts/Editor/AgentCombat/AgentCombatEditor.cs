@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEditor;
 using System.Collections.Generic;
+using ProjectRE;
 
 public class AgentCombatEditor : EditorWindow
 {

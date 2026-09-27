@@ -1,3 +1,5 @@
+﻿namespace ProjectRE
+{
 using UnityEngine;
 using UniRx;
 
@@ -33,4 +35,5 @@ public class Stamina : MonoBehaviour
         _currentStamina.Value -= amount;
         return true;
     }
+}
 }

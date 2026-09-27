@@ -1,3 +1,5 @@
+﻿namespace ProjectRE
+{
 using UnityEngine;
 
 public class FieldOfView2D : MonoBehaviour
@@ -62,4 +64,5 @@ public class FieldOfView2D : MonoBehaviour
 
         return new Vector3(Mathf.Cos(angleInDegrees * Mathf.Deg2Rad), Mathf.Sin(angleInDegrees * Mathf.Deg2Rad), 0);
     }
+}
 }

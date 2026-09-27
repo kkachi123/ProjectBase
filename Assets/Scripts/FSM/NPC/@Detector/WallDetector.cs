@@ -1,3 +1,5 @@
+﻿namespace ProjectRE
+{
 using UnityEngine;
 
 public class WallDetector : MonoBehaviour
@@ -20,4 +22,5 @@ public class WallDetector : MonoBehaviour
         Gizmos.DrawLine((Vector2)transform.position, (Vector2)transform.position + dir * viewRange);
     }
 
+}
 }

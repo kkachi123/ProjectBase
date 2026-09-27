@@ -1,3 +1,5 @@
+﻿namespace ProjectRE
+{
 using UnityEngine;
 
 public class UIManager : MonoBehaviour
@@ -10,4 +12,5 @@ public class UIManager : MonoBehaviour
 
     public void Register(InGameUI inGameUI)  => _inGameUI = inGameUI;
     public void Unregister()       => _inGameUI = null;
+}
 }

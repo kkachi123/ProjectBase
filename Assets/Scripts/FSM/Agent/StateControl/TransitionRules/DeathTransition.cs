@@ -1,3 +1,5 @@
+﻿namespace ProjectRE
+{
 using System;
 using UniRx;
 public class DeathTransition : IEventTransitionRule
@@ -34,4 +36,5 @@ public class DeathTransition : IEventTransitionRule
     {
         return m_shouldTransition;
     }
+}
 }

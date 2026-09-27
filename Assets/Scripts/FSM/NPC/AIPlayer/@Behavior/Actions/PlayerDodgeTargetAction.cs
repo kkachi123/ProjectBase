@@ -1,5 +1,6 @@
-using System;
+ï»¿using System;
 using Unity.Behavior;
+using ProjectRE;
 using UnityEngine;
 using Action = Unity.Behavior.Action;
 using Unity.Properties;
@@ -20,9 +21,9 @@ public partial class PlayerDodgeTargetAction : Action
     {
         if (Target.Value == null || Self.Value == null) return Status.Failure;
         Vector2 dirToTarget = (Target.Value.position - Self.Value.position).normalized;
-        inputDir = new Vector2(dirToTarget.x > 0 ? -1 : 1, 0); // Å¸°ÙÀÇ ¹İ´ë ¹æÇâÀ¸·Î È¸ÇÇ
+        inputDir = new Vector2(dirToTarget.x > 0 ? -1 : 1, 0); // íƒ€ê²Ÿì˜ ë°˜ëŒ€ ë°©í–¥ìœ¼ë¡œ íšŒí”¼
 
-        _targetPos = (Vector2)Self.Value.position + (inputDir * DodgeDistance.Value); // È¸ÇÇ ¸ñÇ¥ À§Ä¡ °è»ê
+        _targetPos = (Vector2)Self.Value.position + (inputDir * DodgeDistance.Value); // íšŒí”¼ ëª©í‘œ ìœ„ì¹˜ ê³„ì‚°
 
         return Status.Running;
     }
@@ -41,5 +42,3 @@ public partial class PlayerDodgeTargetAction : Action
         Input.Value.Move(Vector2.zero);
     }
 }
-
-

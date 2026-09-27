@@ -1,3 +1,5 @@
+﻿namespace ProjectRE
+{
 using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
@@ -31,4 +33,5 @@ public class UINotificationController : MonoBehaviour
         }
         _isPlaying = false;
     }
+}
 }

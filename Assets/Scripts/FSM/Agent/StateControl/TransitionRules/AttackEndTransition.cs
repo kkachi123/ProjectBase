@@ -1,3 +1,5 @@
+﻿namespace ProjectRE
+{
 using System;
 
 public class AttackEndTransition : IEventTransitionRule
@@ -51,4 +53,5 @@ public class AttackEndTransition : IEventTransitionRule
     {
         _shouldTransition = true;
     }
+}
 }

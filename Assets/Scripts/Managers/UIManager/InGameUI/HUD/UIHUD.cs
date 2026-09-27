@@ -1,3 +1,5 @@
+﻿namespace ProjectRE
+{
 using UnityEngine;
 
 public class UIHUD : MonoBehaviour
@@ -13,4 +15,5 @@ public class UIHUD : MonoBehaviour
     {
         Managers.Instance.UI.InGameUI.MenuTabController.ToggleMenu();
     }
+}
 }

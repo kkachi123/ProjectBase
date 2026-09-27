@@ -1,3 +1,5 @@
+﻿namespace ProjectRE
+{
 using UnityEngine;
 
 public class GameManager : MonoBehaviour
@@ -30,4 +32,5 @@ public class GameManager : MonoBehaviour
         State = GameState.GameOver;
         Time.timeScale = 0f;
     }
+}
 }

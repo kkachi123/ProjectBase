@@ -1,3 +1,5 @@
+﻿namespace ProjectRE
+{
 using UnityEngine;
 [RequireComponent(typeof(AgentImpactHandler))]
 public class PlayerController : GroundedAgentController
@@ -63,4 +65,5 @@ public class PlayerController : GroundedAgentController
         return _combatHandler.SetAttackType(attackType);
     }
     #endregion
+}
 }

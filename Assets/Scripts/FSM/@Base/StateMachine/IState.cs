@@ -1,3 +1,5 @@
+﻿namespace ProjectRE
+{
 public interface IState
 {
     public void Enter();
@@ -17,4 +19,5 @@ public enum StateType
     // Grounded States
     Jump,
     Fall,
+}
 }

@@ -1,3 +1,5 @@
+﻿namespace ProjectRE
+{
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -21,4 +23,5 @@ public class LoadingUI : MonoBehaviour
         if (_progressBar != null) _progressBar.value = value;
         if (_progressText != null) _progressText.text = $"{Mathf.RoundToInt(value * 100)}%";
     }
+}
 }

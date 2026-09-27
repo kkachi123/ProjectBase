@@ -1,3 +1,5 @@
+﻿namespace ProjectRE
+{
 using System;
 using UnityEngine;
 public interface IAgentCombatInput
@@ -19,4 +21,5 @@ public interface IAgentJumpInput
 public interface IAgentInteractionInput
 {
     event Action OnInteractRequested;
+}
 }

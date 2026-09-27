@@ -1,3 +1,5 @@
+﻿namespace ProjectRE
+{
 using System;
 
 public class IdleToMoveTransition : ITransitionRule
@@ -27,4 +29,5 @@ public class IdleToMoveTransition : ITransitionRule
         }
         return false;
     }
+}
 }

@@ -1,3 +1,5 @@
+﻿namespace ProjectRE
+{
 using UnityEngine;
 using UnityEngine.Serialization;
 
@@ -31,4 +33,5 @@ public class Managers : MonoBehaviour
 
         Player = new TestPlayerManager();
     }
+}
 }

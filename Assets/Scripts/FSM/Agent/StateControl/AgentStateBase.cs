@@ -1,3 +1,5 @@
+﻿namespace ProjectRE
+{
 using System;
 using System.Collections.Generic;
 
@@ -57,4 +59,5 @@ public abstract class AgentStateBase
             eventRule.Subscribe();
         }
     }
+}
 }

@@ -1,3 +1,5 @@
+﻿namespace ProjectRE
+{
 using UnityEngine;
 
 [CreateAssetMenu(fileName = "AgentStates", menuName = "Agent/States")]
@@ -8,4 +10,5 @@ public class AgentMotorData : ScriptableObject
     public float airMoveSpeed = 3f;
     public float jumpForce = 8f;
     public float knockbackForce = 3f;
+}
 }
