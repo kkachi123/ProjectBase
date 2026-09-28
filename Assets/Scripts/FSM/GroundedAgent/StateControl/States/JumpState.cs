@@ -28,7 +28,7 @@ public class JumpState : AgentStateBase
         _movementHandler.HandleMove(_moveInput.GetMovementInput());
     }
 
-    public override void Exit() 
+    protected override void OnExit()
     {
         _airborneAnimation.SetJump(false);
     }

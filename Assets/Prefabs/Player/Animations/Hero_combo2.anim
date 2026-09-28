@@ -7,7 +7,7 @@ AnimationClip:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: Hero_combo2
-  serializedVersion: 7
+  serializedVersion: 8
   m_Legacy: 0
   m_Compressed: 0
   m_UseHighQualityCurve: 1
@@ -51,6 +51,7 @@ AnimationClip:
       isPPtrCurve: 1
       isIntCurve: 0
       isSerializeReferenceCurve: 0
+      metaData: 0
     pptrCurveMapping:
     - {fileID: 6773909760351945656, guid: 844f90f8c4f770c4f93bfca543662bfb, type: 3}
     - {fileID: 9056663203623153789, guid: 844f90f8c4f770c4f93bfca543662bfb, type: 3}
@@ -84,6 +85,13 @@ AnimationClip:
   m_Events:
   - time: 0.25
     functionName: OnAnimationOnFrame
+    data: 
+    objectReferenceParameter: {fileID: 0}
+    floatParameter: 0
+    intParameter: 0
+    messageOptions: 0
+  - time: 0.4166667
+    functionName: OnAnimationEnd
     data: 
     objectReferenceParameter: {fileID: 0}
     floatParameter: 0

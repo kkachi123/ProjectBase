@@ -3,7 +3,7 @@
 using UnityEngine;
 [RequireComponent(typeof(AgentImpactHandler))]
 [RequireComponent(typeof(PlayerAnimator))]
-public class PlayerController : GroundedAgentController
+public class PlayerController : GroundedAgentController, IAttackComboStarter
 {
     [SerializeField] private PlayerAnimator _playerAnimator;
     [SerializeField] private AgentImpactHandler _impactHandler;
@@ -11,6 +11,7 @@ public class PlayerController : GroundedAgentController
     public Stamina Stamina { get; private set; }
 
     private PlayerInput _playerInput;
+    private readonly ComboAttackHandler _comboAttackHandler = new();
 
     protected override void Awake()
     {
@@ -22,6 +23,7 @@ public class PlayerController : GroundedAgentController
 
 
         _playerInput = GetComponent<PlayerInput>();
+        _playerInput.OnAttackRequestsCleared += _comboAttackHandler.ResetGroundCombo;
         _impactHandler = GetComponent<AgentImpactHandler>();
         _impactHandler.Initialize(_motor, _motorData);
 
@@ -38,7 +40,9 @@ public class PlayerController : GroundedAgentController
                 JumpInput = _playerInput,
                 CombatInput = CombatInput,
                 AnimationEventSource = this,
-                AttackStarter = this
+                AttackStarter = this,
+                ComboAttackHandler = _comboAttackHandler,
+                ComboAttackStarter = this
             }
         );
     }
@@ -51,22 +55,42 @@ public class PlayerController : GroundedAgentController
     #endregion
 
     #region State Input Event
-    public override bool CanStartAttack(int requestedAttackType)
-    {
-        int attackType = IsGrounded ? requestedAttackType : 3;
-
-        return _combatHandler.CurrentAttackType == 0
-            && Stamina.CanUse(_statData.attackDatas[attackType - 1].usedStamina);
-    }
-    
     public override bool TryStartAttack(int requestedAttackType)
     {
         int attackType = IsGrounded ? requestedAttackType : 3;
 
+        if (_combatHandler.CurrentAttackType != 0)
+            return false;
+
+        return TryApplyPlayerAttack(attackType);
+    }
+
+    public bool TryContinueAttack(int nextAttackType)
+    {
+        if (!IsGrounded
+            || _combatHandler.CurrentAttackType == 0
+            || nextAttackType != _combatHandler.CurrentAttackType + 1)
+            return false;
+
+        return TryApplyPlayerAttack(nextAttackType);
+    }
+
+    private bool TryApplyPlayerAttack(int attackType)
+    {
+        if (!_combatHandler.CanApplyAttackType(attackType))
+            return false;
+
         if (!Stamina.Use(_statData.attackDatas[attackType - 1].usedStamina))
             return false;
 
-        return _combatHandler.SetAttackType(attackType);
+        _combatHandler.ApplyAttackType(attackType);
+        return true;
+    }
+
+    private void OnDestroy()
+    {
+        if (_playerInput != null)
+            _playerInput.OnAttackRequestsCleared -= _comboAttackHandler.ResetGroundCombo;
     }
     #endregion
 }

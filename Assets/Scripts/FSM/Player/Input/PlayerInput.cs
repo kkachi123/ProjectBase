@@ -9,8 +9,10 @@ public class PlayerInput : MonoBehaviour , IAgentMovementInput , IAgentJumpInput
 
     public Vector2 Horizontal { get; private set; }
     private bool _jumpRequested;
+    private int _attackRequestCount;
     public bool IsJumpHeld { get; private set; }
-    public int HeldAttackType { get; private set; }
+    public bool HasAttackRequest => _attackRequestCount > 0;
+    public event System.Action OnAttackRequestsCleared;
     public event System.Action OnInteractRequested;
 
     public bool IsInputBlocked { get; private set; }
@@ -23,7 +25,7 @@ public class PlayerInput : MonoBehaviour , IAgentMovementInput , IAgentJumpInput
             Horizontal = Vector2.zero;
             IsJumpHeld = false;
             _jumpRequested = false;
-            HeldAttackType = 0;
+            ClearAttackRequests();
         }
     }
 
@@ -39,11 +41,7 @@ public class PlayerInput : MonoBehaviour , IAgentMovementInput , IAgentJumpInput
         inputActions.gamePlay.Jump.performed += JumpInput;
         inputActions.gamePlay.Jump.canceled += JumpInput;
 
-        inputActions.gamePlay.Attack1.performed += context => AttackInput(context, 1);
-        inputActions.gamePlay.Attack1.canceled += AttackEnd;
-
-        inputActions.gamePlay.Attack2.performed += context => AttackInput(context, 2);
-        inputActions.gamePlay.Attack2.canceled += AttackEnd;
+        inputActions.gamePlay.Attack.performed += AttackInput;
 
         inputActions.gamePlay.Interact.performed += InteractInput;
     }
@@ -83,17 +81,27 @@ public class PlayerInput : MonoBehaviour , IAgentMovementInput , IAgentJumpInput
         return requested;
     }
 
-    public void AttackInput(InputAction.CallbackContext context, int value)
+    private void AttackInput(InputAction.CallbackContext context)
     {
-        if (IsInputBlocked) return;
-        if (context.performed)
-            HeldAttackType = value;
+        if (!IsInputBlocked && context.performed)
+            _attackRequestCount++;
     }
 
-    public void AttackEnd(InputAction.CallbackContext context)
+    // _attackRequestCount를 1씩 감소
+    // 0보다 작다 = 공격 완료, 0보다 크다 = 공격 입력이 남아있음
+    public bool TryConsumeAttackRequest()
     {
-        if (context.canceled)
-            HeldAttackType = 0;
+        if (_attackRequestCount <= 0)
+            return false;
+
+        _attackRequestCount--;
+        return true;
+    }
+
+    public void ClearAttackRequests()
+    {
+        _attackRequestCount = 0;
+        OnAttackRequestsCleared?.Invoke();
     }
 
     private void InteractInput(InputAction.CallbackContext context)

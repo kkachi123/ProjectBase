@@ -6,7 +6,7 @@ public class AIMonsterInput : MonoBehaviour , IAgentMovementInput , IAgentCombat
 {
     public Vector2 Horizontal { get; private set; }
     private readonly ReactiveProperty<int> _attackPressed = new ReactiveProperty<int>(0);
-    public int HeldAttackType => _attackPressed.Value;
+    public bool HasAttackRequest => _attackPressed.Value > 0;
 
     public Vector2 GetMovementInput()
     {
@@ -20,7 +20,15 @@ public class AIMonsterInput : MonoBehaviour , IAgentMovementInput , IAgentCombat
     public void Attack(int value)
     {
         _attackPressed.Value = value;
-        if(value != 0) _attackPressed.Value = 0; 
     }
+
+    public bool TryConsumeAttackRequest()
+    {
+        if (!HasAttackRequest) return false;
+        _attackPressed.Value = 0;
+        return true;
+    }
+
+    public void ClearAttackRequests() => _attackPressed.Value = 0;
 }
 }

@@ -29,7 +29,7 @@ namespace ProjectRE
             UpdateMovement();
         }
 
-        public override void Exit()
+        protected override void OnExit()
         {
             _animator.SetGrounded(false);
             _animator.SetMoveSpeed(0f);

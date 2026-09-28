@@ -74,7 +74,7 @@ public abstract class AgentController : MonoBehaviour, IAgentAnimationListener ,
             _currentState = newState;
             _currentState?.Enter();
         }
-        Debug.Log($"State changed to: {stateType.Name}");
+        //Debug.Log($"State changed to: {stateType.Name}");
     }
     
     public virtual void OnAnimationEvent(AnimEventType type)
@@ -106,7 +106,6 @@ public abstract class AgentController : MonoBehaviour, IAgentAnimationListener ,
         }
     }
     public virtual void OnDeathFinished() { }
-    public virtual bool CanStartAttack(int requestedAttackType) { return false; }
     public virtual bool TryStartAttack(int requestedAttackType) { return false; }
 }
 }

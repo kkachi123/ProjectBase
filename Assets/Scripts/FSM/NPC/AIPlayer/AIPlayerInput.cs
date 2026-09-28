@@ -8,7 +8,7 @@ public class AIPlayerInput : MonoBehaviour , IAgentMovementInput , IAgentJumpInp
     private readonly ReactiveProperty<bool> _jumpPressed = new ReactiveProperty<bool>(false);
     private readonly ReactiveProperty<int> _attackPressed = new ReactiveProperty<int>(0);
     public bool IsJumpHeld => _jumpPressed.Value;
-    public int HeldAttackType => _attackPressed.Value;
+    public bool HasAttackRequest => _attackPressed.Value > 0;
 
     public Vector2 GetMovementInput()
     {
@@ -34,7 +34,15 @@ public class AIPlayerInput : MonoBehaviour , IAgentMovementInput , IAgentJumpInp
     public void Attack(int value)
     {
         _attackPressed.Value = value;
-        if(value != 0) _attackPressed.Value = 0; 
     }
+
+    public bool TryConsumeAttackRequest()
+    {
+        if (!HasAttackRequest) return false;
+        _attackPressed.Value = 0;
+        return true;
+    }
+
+    public void ClearAttackRequests() => _attackPressed.Value = 0;
 }
 }

@@ -21,7 +21,7 @@ public class HitState : AgentStateBase
     {
         return;
     }
-    public override void Exit() 
+    protected override void OnExit()
     {
         _animator.SetHit(false);
     }

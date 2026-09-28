@@ -14,11 +14,14 @@ public class AgentCombatHandler : MonoBehaviour
         _datas = data;
     }
 
-    public bool SetAttackType(int attackType)
+    public bool CanApplyAttackType(int attackType)
     {
-        if (CurrentAttackType != 0) return false;
+        return _datas != null && attackType > 0 && attackType <= _datas.Count;
+    }
+
+    public void ApplyAttackType(int attackType)
+    {
         CurrentAttackType = attackType;
-        return true;
     }
 
     public void ResetAttackType() => CurrentAttackType = 0;

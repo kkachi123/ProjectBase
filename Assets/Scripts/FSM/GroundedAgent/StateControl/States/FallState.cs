@@ -25,7 +25,7 @@ public class FallState : AgentStateBase
     {
         _movementHandler.HandleAirMove(_moveInput.GetMovementInput());
     }
-    public override void Exit()
+    protected override void OnExit()
     {
         _airborneAnimation.SetFall(false);
     }

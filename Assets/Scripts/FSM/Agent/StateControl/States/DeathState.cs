@@ -25,6 +25,6 @@ public class DeathState : AgentStateBase
     {
         return;
     }
-    public override void Exit() { }
+    protected override void OnExit() { }
 }
 }
