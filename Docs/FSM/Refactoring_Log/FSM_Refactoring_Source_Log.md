@@ -82,6 +82,19 @@ Controller -> StateFactory -> State(필요한 의존성만 주입)
 - `Hero_Anim.controller`의 `Grounded` 1D Blend Tree가 `MoveSpeed`로 Idle/Move 표현을 선택한다.
 - 점프, 낙하, 공격, 피격, 사망처럼 제어 규칙이 다른 행동만 별도 FSM State로 유지한다.
 
+### 공격 Sub State Machine 진입
+
+- 외부 상태(`Grounded`, `Hero_jump`, `Hero_fall_start`, `Hero_fall_loop`)는 개별 Combo State가 아닌 `Attack` Sub State Machine으로만 진입한다.
+- `Attack` Sub State Machine의 `Entry`가 `IsAttack`과 `AttackType` 조건을 함께 평가해 `Hero_combo1`, `Hero_combo2`, `Hero_combo3` 중 첫 공격 애니메이션을 결정한다.
+- `AttackState.OnEnter()`는 `AttackType`을 먼저 기록한 뒤 `IsAttack`을 활성화한다. Animator가 Sub State Machine에 진입하는 순간 올바른 분기 값이 준비되도록 순서를 보장한다.
+- FSM은 공격 상태 진입과 종료를, Animator는 공격 종류별 클립 선택을 담당한다. Combo 종류를 추가할 때 외부 상태 전이를 늘릴 필요가 없다.
+
+### 공중 Sub State Machine 진입
+
+- `Grounded`는 `Hero_jump`, `Hero_fall_start` 클립에 직접 전이하지 않고 `Hero_Jump` Sub State Machine으로만 진입한다.
+- `Hero_Jump`의 `Entry`가 `IsJump` 또는 `IsFall` 조건으로 각각 `Hero_jump`, `Hero_fall_start`를 선택한다.
+- `JumpState`와 `FallState`는 진입 시 반대 공중 Bool을 먼저 해제해 두 Entry 조건이 동시에 성립하지 않도록 한다.
+
 ### Input
 
 | 입력 | 현재 표현 | 이유 |
@@ -116,6 +129,8 @@ Controller -> StateFactory -> State(필요한 의존성만 주입)
 | 08 | 점프 경계 조건 보강 | 가장자리/재입력 시 비정상 재상승 | 점프 요청 소비와 하강 시 Fall 전이 조건 적용 |
 | 09 | Agent/Player Animator 분리 | 공통 Animator에 Player parameter가 누적 | 공통 기능과 Player 전용 capability·SO 분리 |
 | 10 | Prefab Animator 바인딩 수정 | Root Animator와 Hero child Animator가 이중 구성 | `PlayerAnimator`가 실제 Hero child Animator를 제어 |
+| 11 | Attack Sub State Machine Entry 분기 | 외부 상태가 `Hero_combo1/2/3`에 직접 전이해 FSM과 Animator의 공격 선택 책임이 분산 | 외부 상태는 `Attack`으로만 진입하고, Entry가 `IsAttack` + `AttackType`으로 첫 Combo를 선택 |
+| 12 | Hero_Jump Sub State Machine Entry 분기 | `Grounded`가 점프/낙하 시작 클립에 직접 전이 | 외부 상태는 `Hero_Jump`으로만 진입하고, Entry가 `IsJump` / `IsFall`로 시작 클립을 선택 |
 
 ## 5. 검증 상태
 
@@ -127,7 +142,9 @@ Controller -> StateFactory -> State(필요한 의존성만 주입)
 | Grounded Blend Tree 구성 | 완료 | `MoveSpeed`로 Idle/Move 표현 |
 | 점프 경계 코드 보강 | 완료 | 소비형 점프 요청 및 하강 시 Fall 조건 반영 |
 | 점프 경계 체감 검증 | 미완료 | 가장자리 접근·공중 재입력·홀드 조작을 수동 Play Mode로 반복 확인 |
-| 공격 홀드 상태/Animator 동기화 | 미완료 | Grounded/Fall 상태별 공격 반복과 종료 후 복귀를 수동 확인 |
+| Attack Sub State Machine 진입 분기 | 완료 | 외부 직접 Combo 전이 제거, `Attack` Entry의 `AttackType` 분기 구성 완료 |
+| 공격 홀드 상태/Animator 동기화 | 완료 | Grounded/Fall 공격 진입, 종료 후 Grounded 복귀, 홀드 반복 흐름을 수동 Play Mode에서 확인 |
+| Hero_Jump Sub State Machine 진입 분기 | 코드/구성 완료, 수동 검증 필요 | Jump/Fall Bool 상호 배제 및 Entry 분기 구성 완료. 점프와 낙하 시작 흐름을 Play Mode에서 확인 필요 |
 | 착지·피격 종료 복귀 | 미완료 | `GroundedState`와 `IsGrounded` 전환을 수동 확인 |
 
 ## 6. 보류 및 예정 사항

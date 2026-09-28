@@ -18,6 +18,7 @@ public class JumpState : AgentStateBase
     protected override void OnEnter() 
     {
         _groundedAnimation.SetGrounded(false);
+        _airborneAnimation.SetFall(false);
         _airborneAnimation.SetJump(true);
         _movementHandler.HandleJump();
     }

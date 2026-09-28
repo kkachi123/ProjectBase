@@ -19,7 +19,7 @@ public class PlayerStateFactory
             { typeof(GroundedState), new GroundedState(data.PlayerAnimator, data.MovementHandler, data.MovementInput) },
             { typeof(JumpState), new JumpState(data.PlayerAnimator, data.PlayerAnimator, data.MovementHandler, data.MovementInput) },
             { typeof(FallState), new FallState(data.PlayerAnimator, data.PlayerAnimator, data.MovementHandler, data.MovementInput) },
-            { typeof(AttackState), new AttackState(data.PlayerAnimator, data.CombatHandler, data.CombatInput, data.AttackStarter) },
+            { typeof(AttackState), new AttackState(data.Motor, data.PlayerAnimator, data.CombatHandler, data.CombatInput, data.AttackStarter) },
             { typeof(HitState), new HitState(data.PlayerAnimator, data.CombatHandler) },
             { typeof(DeathState), new DeathState(data.PlayerAnimator, data.CombatHandler, data.MovementHandler) }
         };

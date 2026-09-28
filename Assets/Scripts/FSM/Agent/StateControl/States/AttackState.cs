@@ -2,13 +2,15 @@
 {
 public class AttackState : AgentStateBase
 {
+    private AgentMotor2D _motor;
     private ICombatAnimation _animator;
     private AgentCombatHandler _combatHandler;
     private IAgentCombatInput _combatInput;
     private IAttackStarter _attackStarter;
 
-    public AttackState(ICombatAnimation animator , AgentCombatHandler combatHandler , IAgentCombatInput combatInput, IAttackStarter attackStarter)
+    public AttackState(AgentMotor2D motor, ICombatAnimation animator , AgentCombatHandler combatHandler , IAgentCombatInput combatInput, IAttackStarter attackStarter)
     {
+        _motor = motor;
         _animator = animator;
         _combatHandler = combatHandler;
         _combatInput = combatInput;
@@ -21,8 +23,12 @@ public class AttackState : AgentStateBase
 
         if (!_attackStarter.TryStartAttack(requestedType))
             return;
-        _animator.SetAttack(true);
         _animator.SetAttackType(_combatHandler.CurrentAttackType);
+        _animator.SetAttack(true);
+        if(_combatHandler.CurrentAttackType != 3)
+        {
+            _motor.StopHorizontal();
+        }
     }
     protected override void OnExecute(float deltatime)
     {

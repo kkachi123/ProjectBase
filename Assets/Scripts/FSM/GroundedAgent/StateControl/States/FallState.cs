@@ -17,6 +17,7 @@ public class FallState : AgentStateBase
     protected override void OnEnter()
     {
         _groundedAnimation.SetGrounded(false);
+        _airborneAnimation.SetJump(false);
         _airborneAnimation.SetFall(true);
     }
 
