@@ -29,7 +29,7 @@ namespace ProjectRE
 
         protected override void OnExecute(float deltaTime)
         {
-            _comboHandler.CaptureBufferedRequests(_combatInput);
+            _comboHandler.ProcessAttackRequests(_combatInput);
         }
 
         protected override void OnExit()
