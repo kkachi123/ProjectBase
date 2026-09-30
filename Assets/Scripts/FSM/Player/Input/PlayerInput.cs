@@ -8,8 +8,8 @@ public class PlayerInput : MonoBehaviour , IAgentMovementInput , IAgentJumpInput
     public PlayerInputCommands inputActions;
 
     public Vector2 Horizontal { get; private set; }
-    private bool _jumpRequested;
     public bool IsJumpHeld { get; private set; }
+    public event System.Action OnJumpRequested;
     public event System.Action OnAttackRequested;
     public event System.Action OnInteractRequested;
 
@@ -59,17 +59,10 @@ public class PlayerInput : MonoBehaviour , IAgentMovementInput , IAgentJumpInput
         if (context.performed)
         {
             IsJumpHeld = true;
-            _jumpRequested = true;
+            OnJumpRequested?.Invoke();
         }
         else if (context.canceled)
             IsJumpHeld = false;
-    }
-
-    public bool TryConsumeJumpRequest()
-    {
-        bool requested = _jumpRequested;
-        _jumpRequested = false;
-        return requested;
     }
 
     private void AttackInput(InputAction.CallbackContext context)
