@@ -71,6 +71,7 @@ Controller -> StateFactory -> State(필요한 의존성만 주입)
 ### State와 Factory
 
 - `AgentController`는 State Dictionary를 `Type` 키로 보관하고 현재 State 전환을 관리한다.
+- `AgentController`는 더 이상 구체 Animator 참조·초기화를 소유하지 않는다. Player와 이후 Monster Controller가 각 전용 Animator를 직접 초기화한다.
 - `PlayerStateFactory`는 `GroundedState`, `JumpState`, `FallState`, `AttackState`, `HitState`, `DeathState`를 구성한다.
 - State는 필요한 Handler, Input interface, Animator capability만 생성자로 받는다.
 - 전이 조건은 `ITransitionRule` 구현체를 Factory에서 조합한다.
@@ -91,12 +92,15 @@ Controller -> StateFactory -> State(필요한 의존성만 주입)
 
 ### Combo Attack 책임 분리
 
-- 기본 `AttackTransition`은 Combo 규칙이 없는 Agent가 사용할 공격 요청 감지 Rule로 유지한다.
-- `ComboAttackTransition`은 별도의 `ITransitionRule`이다. Player의 `ComboAttackHandler`, Ground 상태, `IAttackStarter`를 사용해 입력을 소비하고 지상 1타/공중 3타를 선택한 뒤 공격 시작까지 확정한다.
+- `IAgentCombatInput`은 `OnAttackRequested` 이벤트를 제공하는 공용 공격 입력 계약이다. PlayerInput도 이 계약을 구현하므로 `AgentController.CombatInput`은 Player에서 null이 아니다.
+- 기본 `AttackTransition`은 Combo 규칙이 없는 Agent가 사용할 이벤트 기반 공격 요청 전이다.
+- `ComboAttackTransition`은 별도의 `ITransitionRule`이다. Player의 `ComboAttackHandler`, Ground 상태, `IAttackStarter`를 사용해 최초 입력과 지상 1타/공중 공격 타입을 선택한 뒤 공격 시작까지 확정한다.
 - 공격 시작에 실패하면 Transition은 `false`를 반환한다. AttackState에 진입하지 않으므로, State가 직접 Grounded/Fall로 복구 전이를 호출하지 않는다.
 - `AttackState`는 공통 Animator 진입·정리(`AttackType`, `IsAttack`, 공격 타입 초기화)만 담당한다.
-- `PlayerAttackState`는 Player 전용 처리만 가진다. 진입 시 지상 공격의 수평 이동을 멈추고, 실행 중 버퍼 입력을 수집하며, 종료 시 Combo 버퍼를 정리한다.
-- `AttackEndTransition`은 Animation End Event에서 다음 Combo가 확정되면 FSM을 유지하고 Animator 내부 전이를 계속 사용한다. 다음 타격이 없을 때만 Grounded/Fall State로 전이한다.
+- `PlayerAttackState`는 Player 전용 처리만 가진다. 진입 시 지상 공격의 수평 이동을 멈추고 Combo Handler를 활성화하며, 종료 시 Combo 버퍼를 정리한다.
+- `ComboAttackHandler`는 `Initialize(IAgentCombatInput, int maxGroundComboStep)`에서 입력 이벤트와 최대 지상 Combo 단계를 주입받는다. 최초 공격 대기·다음 타격 예약·초과 입력 폐기의 유일한 소유자다.
+- `ComboAttackEndTransition`은 Animation End Event에서 다음 Combo가 확정되면 FSM을 유지하고 Animator 내부 전이를 계속 사용한다. 다음 타격이 없을 때만 Grounded/Fall State로 전이한다.
+- `AttackEndTransition`은 Combo 의존성이 없는 공용 종료 전이다. Animation End Event 후 Grounded/Fall 복귀만 담당한다.
 
 ### 공중 Sub State Machine 진입
 
@@ -108,8 +112,8 @@ Controller -> StateFactory -> State(필요한 의존성만 주입)
 
 | 입력 | 현재 표현 | 이유 |
 | --- | --- | --- |
-| Jump | `TryConsumeJumpRequest()` | 한 입력을 한 번만 처리하고 홀드와 단발 요청을 구분 |
-| Attack | `HasAttackRequest()` / `TryConsumeAttackRequest()` | 입력을 한 번만 소비해 최초 공격과 Combo 버퍼에 명확히 할당 |
+| Jump | `OnJumpRequested` 이벤트 + `IsJumpHeld`(현재 미사용) | GroundedState의 JumpTransition이 구독 중일 때만 점프 요청을 수신해 공중 입력이 착지 뒤 재사용되지 않음. `IsJumpHeld`는 가변 점프 요구가 생길 때 사용 여부를 재검토 |
+| Attack | `OnAttackRequested` 이벤트 | Input은 요청만 발행하고, 최초 공격·Combo 예약·입력 폐기는 ComboAttackHandler가 단일 관리 |
 | Interact | `OnInteractRequested` 이벤트 | 상태 보관보다 단발 명령 전달이 명확 |
 | Health / Stamina | UniRx 유지 | UI 등 여러 시스템이 값 변화를 구독할 수 있음 |
 
@@ -144,22 +148,27 @@ Controller -> StateFactory -> State(필요한 의존성만 주입)
 | 14 | Combo Attack 입력·상태 책임 분리 | AttackState 진입 뒤 Player State가 시작 가능 여부를 판단하고 실패 시 직접 상태 전이를 호출 | `ComboAttackTransition`이 진입 전 입력 소비·타입 선택·공격 시작을 확정하고, 실패하면 현재 State를 유지 |
 | 15 | 공용 Combo Handler 명칭 정리 | Player 전용 이름이 입력 버퍼/Combo 규칙의 재사용 가능성을 숨김 | `PlayerComboAttackHandler`를 `ComboAttackHandler`로 변경. 현재는 Player 규칙을 사용하며, 다른 Combo Agent 요구가 생길 때 확장 방식을 판단 |
 | 16 | Combo Animator 내부 전이 정리 | 외부 State 전이와 Combo 클립 전이가 혼재 | Entry는 1타/공중 3타만 선택하고, 1→2→3은 End Event와 Animator 내부 전이로 진행 |
+| 17 | 공용 입력 요청 이벤트화 | Player만 공격 입력 계약에서 빠져 `AgentController.CombatInput`이 null이고, Jump 요청은 공중에서 저장돼 착지 뒤 재사용됨 | `IAgentCombatInput`과 `IAgentJumpInput`을 요청 이벤트 계약으로 전환. 전이가 활성 State에서만 구독해 공중 Jump 요청을 즉시 무시 |
+| 18 | Combo 입력 소유권 단일화 | PlayerInput 요청 큐와 Combo Handler 버퍼가 공존하고, Controller가 Action 4개로 구독 방식을 조립 | Handler가 `IAgentCombatInput`을 직접 구독·해제하고 bool 기반 최초/다음 타격 예약을 단일 관리 |
+| 19 | Combo 단계 설정 주입 | 최대 지상 Combo 단계가 상수여서 단발 공격 Agent 등 재사용 구성이 어려움 | `ComboAttackHandler.Initialize(..., maxGroundComboStep)`에서 단계 수를 주입. Player는 3, 단발 공격 Agent는 1을 전달 가능 |
+| 20 | 공격 종료 전이 분리 | 기존 `AttackEndTransition`이 Combo Handler에 의존해 공용 이름과 실제 책임이 불일치 | Combo 규칙은 `ComboAttackEndTransition`으로 이동하고, 공용 `AttackEndTransition`은 Animation End 후 Grounded/Fall 복귀만 담당 |
+| 21 | Controller Animator 책임 분리 | `AgentController`가 전용 Animator 참조와 초기화를 보유 | PlayerController가 PlayerAnimator를 직접 초기화. Base Controller는 전용 Animator 구현을 알지 않음 |
 
 ## 5. 검증 상태
 
 | 항목 | 상태 | 근거 / 남은 확인 |
 | --- | --- | --- |
-| C# 컴파일 | 완료 | 최종 구조 변경 후 컴파일 실패 없음 |
+| C# 컴파일 | 재검증 필요 | 입력 이벤트화·점프 이벤트화·공격 종료 전이 분리 이후 Unity Pipeline 서버 재연결 실패로 Console 결과 미확인 |
 | Hero Animator parameter 계약 | 완료 | `PlayerAnimationDataSO`와 Animator parameter 이름을 기준으로 등록 |
 | Prefab Animator 바인딩 | 완료 | `Player`, `ProjectRE_Player Variant` 모두 Hero child Animator 연결 |
 | Grounded Blend Tree 구성 | 완료 | `MoveSpeed`로 Idle/Move 표현 |
-| 점프 경계 코드 보강 | 완료 | 소비형 점프 요청 및 하강 시 Fall 조건 반영 |
-| 점프 경계 체감 검증 | 미완료 | 가장자리 접근·공중 재입력·홀드 조작을 수동 Play Mode로 반복 확인 |
+| 점프 요청 이벤트 전환 | 코드 완료, 수동 검증 필요 | GroundedState의 JumpTransition 구독 중에만 요청을 수신하도록 변경. 공중 Jump 입력 뒤 착지 재점프 여부 확인 필요 |
 | Attack Sub State Machine 진입 분기 | 완료 | 외부 직접 Combo 전이 제거, `Attack` Entry의 `AttackType` 분기 구성 완료 |
 | 공격 홀드 상태/Animator 동기화 | 완료 | Grounded/Fall 공격 진입, 종료 후 Grounded 복귀, 홀드 반복 흐름을 수동 Play Mode에서 확인 |
-| Combo Attack 코드 구조 | 완료 | `ComboAttackTransition`, `ComboAttackHandler`, `PlayerAttackState` 책임 분리 후 컴파일 실패 없음 |
+| Combo Attack 코드 구조 | 코드 완료, 재컴파일·수동 검증 필요 | 공용 공격 이벤트 계약, Handler 직접 구독, 최대 Combo 단계 주입, Combo 종료 전이 분리 적용 |
 | Combo 1→2→3 진행 | 코드/구성 완료, 수동 검증 필요 | End Event 전 입력 버퍼와 Animator 내부 전이로 다음 Combo를 진행 |
-| Combo 종료 뒤 입력 초기화 | 미완료 | 수동 조작에서 종료 뒤 남은 Attack 요청으로 자동 Combo가 다시 시작되는 현상 확인. 다음 작업에서 입력 요청/버퍼 정리 시점을 수정 예정 |
+| Combo 종료 뒤 입력 초기화 | 코드 변경, 수동 검증 필요 | Handler가 마지막 타격·공중 공격 중 입력을 저장하지 않도록 변경. 종료 뒤 자동 1타 재시작 여부 확인 필요 |
+| AttackEndTransition 분리 | 코드 완료, 재컴파일 필요 | Player는 ComboAttackEndTransition을 사용하고 공용 AttackEndTransition은 단발 공격 종료 전이로 분리 |
 | Hero_Jump Sub State Machine 진입 분기 | 코드/구성 완료, 수동 검증 필요 | Jump/Fall Bool 상호 배제 및 Entry 분기 구성 완료. 점프와 낙하 시작 흐름을 Play Mode에서 확인 필요 |
 | 착지·피격 종료 복귀 | 미완료 | `GroundedState`와 `IsGrounded` 전환을 수동 확인 |
 
@@ -170,11 +179,11 @@ Controller -> StateFactory -> State(필요한 의존성만 주입)
 - Monster Animator / MonsterStateFactory 분리 및 capability 기반 이행
 - Legacy `AnimationDataSO` 제거: 기존 ScriptableObject 및 Prefab 직렬화 참조를 확인한 뒤 마이그레이션
 - 모든 Monster에 Type 기반 상태 구성을 일괄 적용하는 작업
-- Combo 종료 뒤 남은 Attack 요청 제거: `ComboAttackHandler.ResetGroundCombo()`과 `PlayerInput` 요청 큐의 정리 시점을 분리해, 종료된 Combo의 입력이 다음 Attack으로 자동 재사용되지 않도록 보완
+- 입력 이벤트화 이후 AI의 실제 공격 전이·입력 정책 통합: 현재는 새 `IAgentCombatInput` 계약에 맞춘 최소 호환 상태
 
 ### 다음 권장 순서
 
-1. Combo 종료 시 남은 Attack 요청이 자동 재시작으로 이어지는 문제를 수정하고, 1→2→3·공중 3타·스태미나 부족을 수동 검증한다.
+1. 최신 입력 이벤트화 이후 C# 컴파일을 확인하고, 공중 Jump 입력 뒤 착지 재점프·1→2→3·공중 3타·스태미나 부족을 수동 검증한다.
 2. AgentAnimator 확장과 같이 base 및 확장이 필요한 Class를 확인하고 정리한다.
 3. Player 수동 Play Mode 검증을 완료하고 위 표의 상태를 갱신한다.
 4. Profiler를 통해 FSM 관리 방식이 Dictionary 기반으로 전환되면서 GC 부담이 줄었는지 확인한다.

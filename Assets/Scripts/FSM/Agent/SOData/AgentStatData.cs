@@ -20,6 +20,7 @@ public class AgentStatData : ScriptableObject
     public float maxHealth = 10f;
     public float maxStamina = 10f;
     public float staminaRegenRate = 1f;
+    public int maxComboCount = 1;
     public List<AttackData> attackDatas = new List<AttackData>();
 }
 }

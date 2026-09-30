@@ -9,7 +9,6 @@ public class PlayerController : GroundedAgentController, IAttackComboStarter
     [SerializeField] private PlayerAnimator _playerAnimator;
     [SerializeField] private AgentImpactHandler _impactHandler;
 
-    private const int attackComboCount = 3;
     public Stamina Stamina { get; private set; }
 
     private PlayerInput _playerInput;
@@ -18,6 +17,7 @@ public class PlayerController : GroundedAgentController, IAttackComboStarter
     protected override void Awake()
     {
         base.Awake();
+
         _playerAnimator = GetComponent<PlayerAnimator>();
         _playerAnimator.Initialize();
         Stamina = GetComponent<Stamina>();
@@ -25,7 +25,7 @@ public class PlayerController : GroundedAgentController, IAttackComboStarter
 
 
         _playerInput = GetComponent<PlayerInput>();
-        _comboAttackHandler.Initialize(CombatInput, attackComboCount);
+        _comboAttackHandler.Initialize(CombatInput, _statData.maxComboCount);
         _impactHandler = GetComponent<AgentImpactHandler>();
         _impactHandler.Initialize(_motor, _motorData);
 
