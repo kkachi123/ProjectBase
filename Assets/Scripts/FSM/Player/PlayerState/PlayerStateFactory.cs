@@ -41,7 +41,7 @@ public class PlayerStateFactory
         states[typeof(FallState)].AddTransition(new ComboAttackTransition(data.ComboAttackHandler, data.GroundDetector, data.AttackStarter));
 
         states[typeof(AttackState)].AddTransition(new GetHitTransition(data.Health.CurrentHealth));
-        states[typeof(AttackState)].AddTransition(new AttackEndTransition(data.AnimationEventSource, data.GroundDetector, data.ComboAttackStarter, data.PlayerAnimator, data.ComboAttackHandler));
+        states[typeof(AttackState)].AddTransition(new ComboAttackEndTransition(data.AnimationEventSource, data.GroundDetector, data.ComboAttackStarter, data.PlayerAnimator, data.ComboAttackHandler));
 
         states[typeof(HitState)].AddTransition(new DeathTransition(data.Health.IsDead));
         states[typeof(HitState)].AddTransition(new GetHitEndTransition(data.AnimationEventSource));

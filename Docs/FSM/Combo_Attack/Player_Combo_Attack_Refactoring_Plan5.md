@@ -61,7 +61,7 @@ ComboAttackHandler
   ├─ 최초 공격 대기 입력
   ├─ 지상 Combo 예약 입력
   ├─ 공중·마지막 타격 입력 폐기
-  └─ ComboAttackTransition / AttackEndTransition에 판단 결과 제공
+  └─ ComboAttackTransition / ComboAttackEndTransition에 판단 결과 제공
 ```
 
 ## Combo 입력 정책
@@ -91,7 +91,7 @@ ComboAttackTransition
   → PlayerController.TryStartAttack()
   → AttackState 진입
 
-AttackEndTransition
+ComboAttackEndTransition
   → Handler의 다음 Combo 예약 확인
   → PlayerController.TryContinueAttack()
   → 성공: Animator 내부 1 → 2 → 3 전이
@@ -110,7 +110,8 @@ AttackEndTransition
 | `Assets/Scripts/FSM/Player/@Hub/PlayerController.cs` | `ComboAttackHandler.Initialize(CombatInput)`만 호출한다. 이벤트 등록 람다와 Input Block 관련 코드를 제거한다. |
 | `Assets/Scripts/FSM/Agent/StateControl/TransitionRules/ComboAttackTransition.cs` | Handler가 보유한 최초 공격 대기 상태로만 전이 여부를 판단하도록 유지·정리한다. |
 | `Assets/Scripts/FSM/Player/PlayerState/States/PlayerAttackState.cs` | AttackState 진입/종료에 맞춰 Handler의 Combo 생명주기를 알린다. |
-| `Assets/Scripts/FSM/Agent/StateControl/TransitionRules/AttackEndTransition.cs` | 이벤트 기반 Handler의 예약 상태를 확인해 다음 Combo 또는 상태 이탈을 결정한다. |
+| `Assets/Scripts/FSM/Agent/StateControl/TransitionRules/ComboAttackEndTransition.cs` | 이벤트 기반 Handler의 예약 상태를 확인해 다음 Combo 또는 상태 이탈을 결정한다. |
+| `Assets/Scripts/FSM/Agent/StateControl/TransitionRules/AttackEndTransition.cs` | Combo 의존성 없이 Animation End Event 후 GroundedState 또는 FallState로 복귀하는 공용 종료 전이를 제공한다. |
 | `Assets/Scripts/FSM/Agent/StateControl/TransitionRules/AttackTransition.cs` | `IAgentCombatInput` 계약 변경에 맞춰 후속 이벤트 전이 전환 대상으로 표시한다. |
 | `Assets/Scripts/FSM/NPC/AIPlayer/AIPlayerInput.cs` | 새 인터페이스 계약을 만족하도록 최소 호환 변경만 적용한다. 세부 AI 공격 정책은 후속 작업으로 미룬다. |
 | `Assets/Scripts/FSM/NPC/AIMonstor/Input/AIMonsterInput.cs` | 새 인터페이스 계약을 만족하도록 최소 호환 변경만 적용한다. 세부 AI 공격 정책은 후속 작업으로 미룬다. |
@@ -123,7 +124,7 @@ AttackEndTransition
 | `ComboAttackHandler.Initialize()` | `public` | PlayerController가 Handler의 의존성을 조립한다. |
 | `ComboAttackHandler.Deinitialize()` | `public` | PlayerController의 Destroy 생명주기에서 구독을 해제한다. |
 | `ComboAttackHandler.TryBeginAttack()` | `public` | ComboAttackTransition이 최초 공격 전이를 판단한다. |
-| `ComboAttackHandler.TryAdvanceGroundCombo()` | `public` | AttackEndTransition이 다음 타격을 판단한다. |
+| `ComboAttackHandler.TryAdvanceGroundCombo()` | `public` | ComboAttackEndTransition이 다음 타격을 판단한다. |
 | `ComboAttackHandler.Reset()` | `public` | PlayerAttackState Exit 및 공격 시작 실패 경로가 호출한다. |
 
 `ComboAttackHandler` 클래스는 Factory, State, Transition 사이에서 전달되는 구성 요소이므로 현재 `public`을 유지한다. 외부에서 불필요하게 호출되는 이벤트 수신 함수만 `private`으로 축소한다.
@@ -150,7 +151,7 @@ AttackEndTransition
 - [x] 4. Player FSM 조립 갱신
   - PlayerController에서 `ComboAttackHandler.Initialize(CombatInput, maxGroundComboStep)`만 호출한다.
   - 기존 Action 4개 주입과 Input Block 구독을 제거한다.
-  - ComboAttackTransition, PlayerAttackState, AttackEndTransition의 Handler API 호출을 새 상태 모델에 맞춘다.
+  - ComboAttackTransition, PlayerAttackState, ComboAttackEndTransition의 Handler API 호출을 새 상태 모델에 맞춘다.
 
 - [x] 5. 공용/AI 컴파일 호환 정리
   - `AttackTransition`과 AI Input 구현체가 변경된 `IAgentCombatInput` 계약을 만족하도록 최소 수정한다.

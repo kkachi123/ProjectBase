@@ -115,6 +115,16 @@ namespace ProjectRE
                     ""priority"": 0
                 },
                 {
+                    ""name"": ""Dash"",
+                    ""type"": ""Button"",
+                    ""id"": ""977a5347-ed2f-4c3c-a0d5-b03dc2d6fd01"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false,
+                    ""priority"": 0
+                },
+                {
                     ""name"": ""Attack"",
                     ""type"": ""Button"",
                     ""id"": ""adec5c97-50bd-422a-af23-a6dda79fdab2"",
@@ -159,28 +169,6 @@ namespace ProjectRE
                     ""isPartOfComposite"": true
                 },
                 {
-                    ""name"": ""Up"",
-                    ""id"": ""7dfca1a5-52bd-4c5d-9785-57a491806c07"",
-                    ""path"": ""<Keyboard>/upArrow"",
-                    ""interactions"": """",
-                    ""processors"": """",
-                    ""groups"": "";PC"",
-                    ""action"": ""Move"",
-                    ""isComposite"": false,
-                    ""isPartOfComposite"": true
-                },
-                {
-                    ""name"": ""Down"",
-                    ""id"": ""c5e1c427-54af-44b9-b33a-7e0d5eef13a6"",
-                    ""path"": ""<Keyboard>/downArrow"",
-                    ""interactions"": """",
-                    ""processors"": """",
-                    ""groups"": "";PC"",
-                    ""action"": ""Move"",
-                    ""isComposite"": false,
-                    ""isPartOfComposite"": true
-                },
-                {
                     ""name"": ""right"",
                     ""id"": ""40aec535-49cc-42d8-b1af-49884e5646ae"",
                     ""path"": ""<Keyboard>/rightArrow"",
@@ -199,6 +187,17 @@ namespace ProjectRE
                     ""processors"": """",
                     ""groups"": "";PC"",
                     ""action"": ""Jump"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""d762f5fc-edda-46c9-a735-72ea9779d419"",
+                    ""path"": ""<Keyboard>/leftShift"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": "";PC"",
+                    ""action"": ""Dash"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 },
@@ -239,6 +238,7 @@ namespace ProjectRE
             m_gamePlay = asset.FindActionMap("gamePlay", throwIfNotFound: true);
             m_gamePlay_Move = m_gamePlay.FindAction("Move", throwIfNotFound: true);
             m_gamePlay_Jump = m_gamePlay.FindAction("Jump", throwIfNotFound: true);
+            m_gamePlay_Dash = m_gamePlay.FindAction("Dash", throwIfNotFound: true);
             m_gamePlay_Attack = m_gamePlay.FindAction("Attack", throwIfNotFound: true);
             m_gamePlay_Interact = m_gamePlay.FindAction("Interact", throwIfNotFound: true);
         }
@@ -323,6 +323,7 @@ namespace ProjectRE
         private List<IGamePlayActions> m_GamePlayActionsCallbackInterfaces = new List<IGamePlayActions>();
         private readonly InputAction m_gamePlay_Move;
         private readonly InputAction m_gamePlay_Jump;
+        private readonly InputAction m_gamePlay_Dash;
         private readonly InputAction m_gamePlay_Attack;
         private readonly InputAction m_gamePlay_Interact;
         /// <summary>
@@ -344,6 +345,10 @@ namespace ProjectRE
             /// Provides access to the underlying input action "gamePlay/Jump".
             /// </summary>
             public InputAction @Jump => m_Wrapper.m_gamePlay_Jump;
+            /// <summary>
+            /// Provides access to the underlying input action "gamePlay/Dash".
+            /// </summary>
+            public InputAction @Dash => m_Wrapper.m_gamePlay_Dash;
             /// <summary>
             /// Provides access to the underlying input action "gamePlay/Attack".
             /// </summary>
@@ -384,6 +389,9 @@ namespace ProjectRE
                 @Jump.started += instance.OnJump;
                 @Jump.performed += instance.OnJump;
                 @Jump.canceled += instance.OnJump;
+                @Dash.started += instance.OnDash;
+                @Dash.performed += instance.OnDash;
+                @Dash.canceled += instance.OnDash;
                 @Attack.started += instance.OnAttack;
                 @Attack.performed += instance.OnAttack;
                 @Attack.canceled += instance.OnAttack;
@@ -407,6 +415,9 @@ namespace ProjectRE
                 @Jump.started -= instance.OnJump;
                 @Jump.performed -= instance.OnJump;
                 @Jump.canceled -= instance.OnJump;
+                @Dash.started -= instance.OnDash;
+                @Dash.performed -= instance.OnDash;
+                @Dash.canceled -= instance.OnDash;
                 @Attack.started -= instance.OnAttack;
                 @Attack.performed -= instance.OnAttack;
                 @Attack.canceled -= instance.OnAttack;
@@ -480,6 +491,13 @@ namespace ProjectRE
             /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
             /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
             void OnJump(InputAction.CallbackContext context);
+            /// <summary>
+            /// Method invoked when associated input action "Dash" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+            /// </summary>
+            /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+            /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+            /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+            void OnDash(InputAction.CallbackContext context);
             /// <summary>
             /// Method invoked when associated input action "Attack" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
             /// </summary>

@@ -2,31 +2,31 @@ namespace ProjectRE
 {
 using System;
 
+/// <summary>
+/// 콤보 규칙이 없는 Agent가 공격 Animation 종료 후 GroundedState 또는 FallState로 복귀하는 전이다.
+/// </summary>
 public class AttackEndTransition : IEventTransitionRule
 {
     public Type NextStateType => _groundDetector.IsGrounded ? typeof(GroundedState) : typeof(FallState);
 
     private readonly IAnimationEventSource _eventSource;
     private readonly GroundDetector _groundDetector;
-    private readonly IAttackComboStarter _attackStarter;
-    private readonly ICombatAnimation _animator;
-    private readonly ComboAttackHandler _comboHandler;
-
     private bool _isSubscribed;
-    private bool _shouldProcessEnd;
+    private bool _shouldTransition;
 
-    public AttackEndTransition(
-        IAnimationEventSource eventSource,
-        GroundDetector groundDetector,
-        IAttackComboStarter attackStarter,
-        ICombatAnimation animator,
-        ComboAttackHandler comboHandler)
+    public AttackEndTransition(IAnimationEventSource eventSource, GroundDetector groundDetector)
     {
         _eventSource = eventSource;
         _groundDetector = groundDetector;
-        _attackStarter = attackStarter;
-        _animator = animator;
-        _comboHandler = comboHandler;
+    }
+
+    public bool ShouldTransition(float deltaTime)
+    {
+        if (!_shouldTransition)
+            return false;
+
+        _shouldTransition = false;
+        return true;
     }
 
     public void Subscribe()
@@ -46,21 +46,12 @@ public class AttackEndTransition : IEventTransitionRule
             _isSubscribed = false;
         }
 
-        _shouldProcessEnd = false;
-    }
-
-    public bool ShouldTransition(float deltaTime)
-    {
-        if (!_shouldProcessEnd)
-            return false;
-
-        _shouldProcessEnd = false;
-        return !_comboHandler.TryAdvanceGroundCombo(_attackStarter, _animator);
+        _shouldTransition = false;
     }
 
     private void TriggerTransition()
     {
-        _shouldProcessEnd = true;
+        _shouldTransition = true;
     }
 }
 }
