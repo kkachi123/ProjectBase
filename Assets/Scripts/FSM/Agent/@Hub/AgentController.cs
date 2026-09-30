@@ -12,7 +12,6 @@ public abstract class AgentController : MonoBehaviour, IAgentAnimationListener ,
     [SerializeField] protected AgentStatData _statData;
     public AgentStatData StatData => _statData;
     [SerializeField] protected AgentMotorData _motorData;
-    public AgentMotorData MotorData => _motorData;
 
     [Header("Input Components")]
     protected IAgentMovementInput _moveInput;
@@ -20,7 +19,6 @@ public abstract class AgentController : MonoBehaviour, IAgentAnimationListener ,
 
     [Header("Core Components")]
     protected AgentMotor2D _motor;
-    [SerializeField] protected AgentAnimator _animator;
     [SerializeField] protected AgentAnimationEventProxy _animationEventProxy;
     public Health Health { get; private set; }
     public event Action OnAnimationEnded;
@@ -44,7 +42,6 @@ public abstract class AgentController : MonoBehaviour, IAgentAnimationListener ,
         Health?.Initialize(_statData.maxHealth);
 
         // Handler Initialization
-        _animator?.Initialize();
         _animationEventProxy?.Initialize(this);
         _combatHandler = GetComponent<AgentCombatHandler>();
         _combatHandler?.Initialize(_statData.attackDatas);

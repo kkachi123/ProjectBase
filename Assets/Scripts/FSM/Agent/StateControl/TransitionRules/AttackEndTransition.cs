@@ -8,7 +8,6 @@ public class AttackEndTransition : IEventTransitionRule
 
     private readonly IAnimationEventSource _eventSource;
     private readonly GroundDetector _groundDetector;
-    private readonly IAgentCombatInput _combatInput;
     private readonly IAttackComboStarter _attackStarter;
     private readonly ICombatAnimation _animator;
     private readonly ComboAttackHandler _comboHandler;
@@ -19,14 +18,12 @@ public class AttackEndTransition : IEventTransitionRule
     public AttackEndTransition(
         IAnimationEventSource eventSource,
         GroundDetector groundDetector,
-        IAgentCombatInput combatInput,
         IAttackComboStarter attackStarter,
         ICombatAnimation animator,
         ComboAttackHandler comboHandler)
     {
         _eventSource = eventSource;
         _groundDetector = groundDetector;
-        _combatInput = combatInput;
         _attackStarter = attackStarter;
         _animator = animator;
         _comboHandler = comboHandler;
@@ -58,7 +55,7 @@ public class AttackEndTransition : IEventTransitionRule
             return false;
 
         _shouldProcessEnd = false;
-        return !_comboHandler.TryAdvanceGroundCombo(_combatInput, _attackStarter, _animator);
+        return !_comboHandler.TryAdvanceGroundCombo(_attackStarter, _animator);
     }
 
     private void TriggerTransition()

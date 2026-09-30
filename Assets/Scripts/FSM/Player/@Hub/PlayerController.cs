@@ -5,9 +5,11 @@ using UnityEngine;
 [RequireComponent(typeof(PlayerAnimator))]
 public class PlayerController : GroundedAgentController, IAttackComboStarter
 {
+
     [SerializeField] private PlayerAnimator _playerAnimator;
     [SerializeField] private AgentImpactHandler _impactHandler;
 
+    private const int attackComboCount = 3;
     public Stamina Stamina { get; private set; }
 
     private PlayerInput _playerInput;
@@ -23,7 +25,7 @@ public class PlayerController : GroundedAgentController, IAttackComboStarter
 
 
         _playerInput = GetComponent<PlayerInput>();
-        _playerInput.OnAttackRequestsCleared += _comboAttackHandler.ResetGroundCombo;
+        _comboAttackHandler.Initialize(CombatInput, attackComboCount);
         _impactHandler = GetComponent<AgentImpactHandler>();
         _impactHandler.Initialize(_motor, _motorData);
 
@@ -38,7 +40,6 @@ public class PlayerController : GroundedAgentController, IAttackComboStarter
                 Health = this.Health,
                 GroundDetector = _groundDetector,
                 JumpInput = _playerInput,
-                CombatInput = CombatInput,
                 AnimationEventSource = this,
                 AttackStarter = this,
                 ComboAttackHandler = _comboAttackHandler,
@@ -89,8 +90,7 @@ public class PlayerController : GroundedAgentController, IAttackComboStarter
 
     private void OnDestroy()
     {
-        if (_playerInput != null)
-            _playerInput.OnAttackRequestsCleared -= _comboAttackHandler.ResetGroundCombo;
+        _comboAttackHandler.Deinitialize();
     }
     #endregion
 }

@@ -4,9 +4,7 @@ using System;
 using UnityEngine;
 public interface IAgentCombatInput
 {
-    bool HasAttackRequest { get; }
-    bool TryConsumeAttackRequest();
-    void ClearAttackRequests();
+    event Action OnAttackRequested;
 }
 
 public interface IAgentMovementInput

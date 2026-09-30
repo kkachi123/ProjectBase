@@ -9,10 +9,8 @@ public class PlayerInput : MonoBehaviour , IAgentMovementInput , IAgentJumpInput
 
     public Vector2 Horizontal { get; private set; }
     private bool _jumpRequested;
-    private int _attackRequestCount;
     public bool IsJumpHeld { get; private set; }
-    public bool HasAttackRequest => _attackRequestCount > 0;
-    public event System.Action OnAttackRequestsCleared;
+    public event System.Action OnAttackRequested;
     public event System.Action OnInteractRequested;
 
     public bool IsInputBlocked { get; private set; }
@@ -20,13 +18,6 @@ public class PlayerInput : MonoBehaviour , IAgentMovementInput , IAgentJumpInput
     public void SetInputBlocked(bool blocked)
     {
         IsInputBlocked = blocked;
-        if (blocked)
-        {
-            Horizontal = Vector2.zero;
-            IsJumpHeld = false;
-            _jumpRequested = false;
-            ClearAttackRequests();
-        }
     }
 
     private void Awake()
@@ -84,24 +75,7 @@ public class PlayerInput : MonoBehaviour , IAgentMovementInput , IAgentJumpInput
     private void AttackInput(InputAction.CallbackContext context)
     {
         if (!IsInputBlocked && context.performed)
-            _attackRequestCount++;
-    }
-
-    // _attackRequestCount를 1씩 감소
-    // 0보다 작다 = 공격 완료, 0보다 크다 = 공격 입력이 남아있음
-    public bool TryConsumeAttackRequest()
-    {
-        if (_attackRequestCount <= 0)
-            return false;
-
-        _attackRequestCount--;
-        return true;
-    }
-
-    public void ClearAttackRequests()
-    {
-        _attackRequestCount = 0;
-        OnAttackRequestsCleared?.Invoke();
+            OnAttackRequested?.Invoke();
     }
 
     private void InteractInput(InputAction.CallbackContext context)

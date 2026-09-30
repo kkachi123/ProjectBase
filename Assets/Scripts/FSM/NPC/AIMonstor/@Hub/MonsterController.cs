@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class MonsterController : AgentController
 {
+    [SerializeField] private AgentAnimator _animator;
     [SerializeField] private Collider2D _collider;
 
     protected override void Awake()
