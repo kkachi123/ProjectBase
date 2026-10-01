@@ -41,8 +41,8 @@
                     Health = this.Health,
                     GroundDetector = _groundDetector,
                     JumpInput = _playerInput,
-                Stamina = Stamina,
-                StatData = _statData,
+                    Stamina = Stamina,
+                    StatData = _statData,
                     AnimationEventSource = this,
                     AttackStarter = this,
                     ComboAttackHandler = _comboAttackHandler,
@@ -73,7 +73,7 @@
         public bool TryContinueAttack(int nextAttackType)
         {
             int attackType = IsGrounded ? nextAttackType : 3;
-            if(CheckCanPlayerAttack(attackType))
+            if (CheckCanPlayerAttack(attackType))
             {
                 _combatHandler.ApplyAttackType(attackType);
                 return true;

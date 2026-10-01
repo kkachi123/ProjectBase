@@ -27,17 +27,24 @@ Player의 기존 `Dash` Input Action을 FSM의 별도 `DashState`로 연결한�
 
 ### 2.2 선행 확인 사항
 
-`AgentController.OnAnimationEvent()`는 현재 Attack/Hit/Death에 대해서만 End Event를 분기한다. Dash가 Animation End Event로 종료되려면 DashState도 `OnAnimationEnded` 신호를 받을 수 있도록 종료 Event 전달을 일반화해야 한다.
+현재 `AgentController.OnAnimationEvent()`는 Attack의 End Event에서 `AttackState.TryHandleAttackFinished()`를 먼저 호출한다. Player Combo가 이어지면 이 함수는 `true`를 반환하고 `OnAnimationEnded`를 발행하지 않는다. Combo가 끝났을 때만 `false`를 반환해 공용 `AttackEndTransition`이 종료를 처리한다.
 
-권장 변경:
+Dash가 Animation End Event로 종료되려면 이 Attack 전용 정책을 유지한 채, Dash를 포함한 일반 종료 State에도 `OnAnimationEnded`를 전달하도록 분기해야 한다.
 
 ```text
-OnAnimationEnd
+OnAnimationEvent(OnFrame)
+  └─ AttackState → PerformAttack()
+
+OnAnimationEvent(End)
+  ├─ AttackState → TryHandleAttackFinished()
+  │    ├─ true  : 다음 Combo 시작, 종료 Event 미발행
+  │    └─ false : OnAnimationEnded 발행
   ├─ DeathState → OnDeathFinished()
-  └─ 그 외 종료 Event를 사용하는 State → OnAnimationEnded 발행
+  └─ HitState / PlayerDashState 등
+       → OnAnimationEnded 발행
 ```
 
-Attack/Hit/Dash의 Event Transition은 해당 State에서만 구독하므로, 일반화된 `OnAnimationEnded` 이벤트를 받아도 서로 간섭하지 않는다.
+`DashEndTransition`은 기존 `IAnimationEventSource.OnAnimationEnded`를 구독한다. DashState에서만 이 Rule이 활성화되므로 Attack·Hit의 End Event와 직접 간섭하지 않는다.
 
 ## 3. 설계 결정
 
@@ -130,7 +137,7 @@ Animator는 Dash 종료를 스스로 판단하지 않는다. Dash clip의 End An
 | 수정 | `Agent/@Hub/IAgentAnimator.cs` | IDashAnimation 추가 |
 | 수정 | `Player/@Hub/PlayerAnimator.cs` | Dash parameter Dictionary/API 구현 |
 | 수정 | `Player/SOData/PlayerAnimationDataSO.cs` | IsDash Bool 이름 추가 |
-| 수정 | `Agent/@Hub/AgentController.cs` | Dash End Event도 OnAnimationEnded로 전달되도록 종료 Event routing 일반화 |
+| 수정 | `Agent/@Hub/AgentController.cs` | Attack의 `TryHandleAttackFinished()` 우선 흐름은 유지하고, PlayerDashState의 End Event에는 `OnAnimationEnded`를 전달하도록 종료 routing 일반화 |
 | 수정 | `Hero_Anim.controller` | Dash parameter, State, 전이, End Event 구성 |
 
 `PlayerInputCommands.cs`는 자동 생성 파일이므로 직접 수정하지 않는다.
@@ -144,7 +151,7 @@ GroundedState의 Rule 등록 순서는 아래를 기본으로 한다.
 2. GetHitTransition         : 피격이 Player 입력보다 우선
 3. DashTransition           : Dash 요청
 4. JumpTransition           : Jump 요청
-5. ComboAttackTransition    : Attack 요청
+5. AttackTransition         : Attack 요청
 6. GroundedFallTransition   : 지면 이탈
 ```
 
@@ -178,7 +185,9 @@ Attack/Jump 입력은 DashState에 등록하지 않는다. 이번 단계의 Dash
   - OnExit: `SetDash(false)`
 - [ ] DashTransition을 Event Rule로 만든다.
 - [ ] DashEndTransition을 Event Rule로 만들고 GroundDetector로 복귀 목적지를 선택한다.
-- [ ] AgentController의 Animation End routing을 DashState에도 전달되도록 일반화한다.
+- [ ] AgentController의 Animation End routing을 갱신한다.
+  - AttackState의 `TryHandleAttackFinished()`가 `true`이면 종료 Event를 발행하지 않는다.
+  - Attack Combo가 끝났을 때, HitState, PlayerDashState에서는 `OnAnimationEnded`를 발행한다.
 
 완료 기준: DashState는 Player Input과 Animator End Event만으로 진입·종료된다.
 
