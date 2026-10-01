@@ -76,15 +76,16 @@ public abstract class AgentController : MonoBehaviour, IAgentAnimationListener ,
     
     public virtual void OnAnimationEvent(AnimEventType type)
     {
-        if(_currentState is AttackState)
+        if(_currentState is AttackState attackState)
         {
             if(type == AnimEventType.OnFrame)
             {
                 _combatHandler.PerformAttack();
             }
-            else if(type == AnimEventType.End)
+            if(type == AnimEventType.End)
             {
-                OnAnimationEnded?.Invoke();
+                if (!attackState.TryHandleAttackFinished())
+                    OnAnimationEnded?.Invoke();
             }
         }
         else if(_currentState is HitState)
@@ -103,6 +104,6 @@ public abstract class AgentController : MonoBehaviour, IAgentAnimationListener ,
         }
     }
     public virtual void OnDeathFinished() { }
-    public virtual bool TryStartAttack(int requestedAttackType) { return false; }
+    public virtual bool TryStartAttack() { return false; }
 }
 }

@@ -13,8 +13,7 @@ namespace ProjectRE
 
         protected override void OnEnter()
         {
-            Animator.SetAttackType(CombatHandler.CurrentAttackType);
-            Animator.SetAttack(true);
+            Attack();
         }
 
         protected override void OnExecute(float deltaTime) { }
@@ -25,6 +24,16 @@ namespace ProjectRE
             Animator.SetAttack(false);
             Animator.SetAttackType(0);
         }
+
+        protected virtual void Attack()
+        {
+            int attackType = CombatHandler.CurrentAttackType;
+            Animator.SetAttack(true);
+            Animator.SetAttackType(attackType);
+            CombatHandler.ApplyAttackType(attackType);
+        }
+
+        public virtual bool TryHandleAttackFinished() => false;
 
     }
 }
