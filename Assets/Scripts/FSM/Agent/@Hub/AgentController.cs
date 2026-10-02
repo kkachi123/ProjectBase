@@ -86,19 +86,13 @@ public abstract class AgentController : MonoBehaviour, IAgentAnimationListener ,
         if (type != AnimEventType.End)
             return;
 
-        if (_currentState is AttackState attackState)
-        {
-            OnAnimationEnded?.Invoke();
-            return;
-        }
-
         if (_currentState is DeathState)
         {
             OnDeathFinished();
             return;
         }
 
-        // HitState와 PlayerDashState 등 Animation End로 종료되는 State가 공용 종료 Event를 사용한다.
+        //Attack, HitState와 DashState 등 Animation End로 종료되는 State가 공용 종료 Event를 사용한다.
         OnAnimationEnded?.Invoke();
     }
     public virtual void OnDeathFinished() { }

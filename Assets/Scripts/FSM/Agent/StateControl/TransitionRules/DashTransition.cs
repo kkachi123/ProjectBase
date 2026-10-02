@@ -3,21 +3,19 @@ namespace ProjectRE
     using System;
 
     /// <summary>
-    /// GroundedState에서만 Dash 요청을 수신하는 이벤트 전이다.
+    /// Dash를 허용하는 상태에서 요청을 수신하는 이벤트 전이다.
     /// </summary>
     public class DashTransition : IEventTransitionRule
     {
-        public Type NextStateType => typeof(PlayerDashState);
+        public Type NextStateType => typeof(DashState);
 
         private readonly IAgentDashInput _dashInput;
-        private readonly GroundDetector _groundDetector;
         private bool _isSubscribed;
         private bool _shouldTransition;
 
-        public DashTransition(IAgentDashInput dashInput, GroundDetector groundDetector)
+        public DashTransition(IAgentDashInput dashInput)
         {
             _dashInput = dashInput;
-            _groundDetector = groundDetector;
         }
 
         public bool ShouldTransition(float deltaTime)
@@ -26,7 +24,7 @@ namespace ProjectRE
                 return false;
 
             _shouldTransition = false;
-            return _groundDetector.IsGrounded;
+            return true;
         }
 
         public void Subscribe()

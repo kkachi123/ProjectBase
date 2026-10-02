@@ -1,15 +1,15 @@
 namespace ProjectRE
 {
     /// <summary>
-    /// Dash의 Animation 수명만 관리하는 Player 전용 State다.
-    /// 이동 거리·속도·쿨다운은 후속 Dash 실행 정책에서 추가한다.
+    /// 공통 Dash Animation 수명을 관리하는 State다.
+    /// Agent별 이동 거리·속도·쿨다운 규칙은 파생 State에서 확장한다.
     /// </summary>
-    public class PlayerDashState : AgentStateBase
+    public class DashState : AgentStateBase
     {
         private readonly IDashAnimation _animator;
         private readonly AgentMotor2D _motor;
 
-        public PlayerDashState(IDashAnimation animator, AgentMotor2D motor)
+        public DashState(IDashAnimation animator, AgentMotor2D motor)
         {
             _animator = animator;
             _motor = motor;
