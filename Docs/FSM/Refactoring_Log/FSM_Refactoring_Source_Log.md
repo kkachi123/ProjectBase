@@ -89,7 +89,8 @@ Controller -> StateFactory -> State(필요한 의존성만 주입)
 - `Attack` Sub State Machine의 `Entry`는 최초 지상 공격인 `Hero_combo1`과 공중 공격인 `Hero_combo3`만 선택한다. Combo 2·3은 Animator 내부 전이로만 이어진다.
 - 공용 `AttackTransition`이 최초 공격 입력을 받고 `TryStartAttack()` 성공 시에만 AttackState에 진입한다. Player는 이 시점에 지상 1타 또는 공중 3타를 `CombatHandler`에 준비한다.
 - `AttackState.OnEnter()`는 준비된 `CurrentAttackType`으로 Animator 공격 진입을 적용한다.
-- `PlayerAttackState.TryHandleAttackFinished()`가 현재 Combo Clip의 End Event에서 예약 입력을 소비한다. 다음 공격을 시작하면 AttackState를 유지하고, 실패하거나 예약이 없을 때만 공용 종료 전이가 실행된다.
+- `AttackType`은 최초 공격 진입점만 결정한다. 지상 Combo는 `1`, 공중 단일 공격은 `3`을 사용한다.
+- 지상 Combo의 1→2→3 순서는 Animator 내부의 `ComboTrigger` 전이로만 진행하며, AttackState는 Combo 중 재진입하지 않는다.
 
 ### Combo Attack 책임 분리
 
@@ -97,9 +98,9 @@ Controller -> StateFactory -> State(필요한 의존성만 주입)
 - 기본 `AttackTransition`은 최초 공격 요청을 구독하고 `TryStartAttack()` 성공 시에만 AttackState로 진입하는 공용 이벤트 전이다.
 - `ComboAttackTransition`, `ComboAttackEndTransition`은 제거했다. TransitionRule은 다시 State 진입·종료 판단만 담당한다.
 - `AttackState`는 준비된 공격 타입을 Animator에 적용하고 공통 정리를 담당한다.
-- `PlayerAttackState`는 진입 시 지상 공격의 수평 이동을 멈추고 Combo Handler를 활성화한다. 현재 Clip의 End Event에서 다음 Combo를 시작할 수 있는지 판단하며, 종료 시 Combo 버퍼를 정리한다.
-- `ComboAttackHandler`는 `Initialize(IAgentCombatInput, int maxGroundComboStep)`에서 입력 이벤트와 최대 지상 Combo 단계를 주입받아 AttackState 중 다음 입력 1회만 예약한다.
-- `AttackEndTransition`은 Combo를 이어가지 못할 때만 Animation End Event를 받아 Grounded/Fall로 복귀한다.
+- `PlayerAttackState`는 진입 시 지상 공격의 수평 이동을 멈추고, AttackState 동안의 공격 입력을 `IComboAnimation.SetComboTrigger()`로 전달한다.
+- Animator는 각 Combo 전이의 `Has Exit Time`, Exit Time, Duration으로 입력 수락 시점과 연결 타이밍을 제어한다.
+- `AttackEndTransition`은 마지막 Combo Clip의 Animation End Event를 받아 Grounded/Fall로 복귀한다.
 
 ### 공중 Sub State Machine 진입
 
@@ -112,7 +113,7 @@ Controller -> StateFactory -> State(필요한 의존성만 주입)
 | 입력 | 현재 표현 | 이유 |
 | --- | --- | --- |
 | Jump | `OnJumpRequested` 이벤트 + `IsJumpHeld`(현재 미사용) | GroundedState의 JumpTransition이 구독 중일 때만 점프 요청을 수신해 공중 입력이 착지 뒤 재사용되지 않음. `IsJumpHeld`는 가변 점프 요구가 생길 때 사용 여부를 재검토 |
-| Attack | `OnAttackRequested` 이벤트 | Input은 요청만 발행하고, 최초 공격·Combo 예약·입력 폐기는 ComboAttackHandler가 단일 관리 |
+| Attack | `OnAttackRequested` 이벤트 | Input은 요청만 발행한다. 비공격 State는 `AttackTransition`이 최초 공격을 처리하고, AttackState는 `ComboTrigger`로 Animator 내부 Combo 전이를 요청한다. |
 | Interact | `OnInteractRequested` 이벤트 | 상태 보관보다 단발 명령 전달이 명확 |
 | Health / Stamina | UniRx 유지 | UI 등 여러 시스템이 값 변화를 구독할 수 있음 |
 
@@ -153,6 +154,7 @@ Controller -> StateFactory -> State(필요한 의존성만 주입)
 | 20 | 공격 종료 전이 분리 | 기존 `AttackEndTransition`이 Combo Handler에 의존해 공용 이름과 실제 책임이 불일치 | Combo 규칙은 `ComboAttackEndTransition`으로 이동하고, 공용 `AttackEndTransition`은 Animation End 후 Grounded/Fall 복귀만 담당 |
 | 21 | Controller Animator 책임 분리 | `AgentController`가 전용 Animator 참조와 초기화를 보유 | PlayerController가 PlayerAnimator를 직접 초기화. Base Controller는 전용 Animator 구현을 알지 않음 |
 | 22 | Combo 전이 단순화와 Animation End 단일 소비 | Combo 전용 TransitionRule이 최초 공격 준비와 다음 타격 실행까지 맡았고, `OnExecute()`에서 Animator 전이 전에 AttackType이 앞서 바뀌어 1→3타 건너뜀이 발생할 수 있었음 | `ComboAttackTransition`·`ComboAttackEndTransition`을 제거. 공용 `AttackTransition`이 최초 공격 시작만 판단하고, `PlayerAttackState.TryHandleAttackFinished()`가 End Event에서 예약 입력을 한 번 소비해 다음 공격을 시작. Combo가 이어지면 공용 종료 Event를 발행하지 않아 AttackState 유지 |
+| 23 | Animator Exit Time 기반 Combo 전이 | End Event 판단·입력 버퍼·Combo Handler가 Combo 순서와 FSM 종료를 함께 관리해 구조가 복잡했고, 연속 Trigger가 즉시 소비되면 1→3타를 건너뛸 수 있었음 | `ComboAttackHandler`, `TryHandleAttackFinished()` 흐름을 제거. AttackType은 최초 진입점(지상 1 / 공중 3)만 선택하고, `ComboTrigger`는 AttackState에서 직접 전달한다. Animator 전이의 Has Exit Time·Exit Time·Duration이 Combo 연결 시점을 결정하며, State Exit에서 미소비 Trigger를 초기화한다. |
 
 ## 5. 검증 상태
 
@@ -165,10 +167,10 @@ Controller -> StateFactory -> State(필요한 의존성만 주입)
 | 점프 요청 이벤트 전환 | 코드 완료, 수동 검증 필요 | GroundedState의 JumpTransition 구독 중에만 요청을 수신하도록 변경. 공중 Jump 입력 뒤 착지 재점프 여부 확인 필요 |
 | Attack Sub State Machine 진입 분기 | 완료 | 외부 직접 Combo 전이 제거, `Attack` Entry의 `AttackType` 분기 구성 완료 |
 | 공격 홀드 상태/Animator 동기화 | 완료 | Grounded/Fall 공격 진입, 종료 후 Grounded 복귀, 홀드 반복 흐름을 수동 Play Mode에서 확인 |
-| Combo Attack 코드 구조 | 코드 완료, 수동 검증 필요 | 공용 AttackTransition/AttackEndTransition, Handler 직접 구독, 최대 Combo 단계 주입, PlayerAttackState의 End Event 처리로 단순화 |
-| Combo 1→2→3 진행 | 코드/구성 완료, 수동 검증 필요 | 공격 중 입력을 예약하고 현재 Clip의 End Event에서 한 번만 소비해 다음 Combo를 진행 |
-| Combo 종료 뒤 입력 초기화 | 코드 변경, 수동 검증 필요 | Handler가 마지막 타격·공중 공격 중 입력을 저장하지 않도록 변경. 종료 뒤 자동 1타 재시작 여부 확인 필요 |
-| AttackEndTransition 분리 | 코드 완료, 수동 검증 필요 | Player도 공용 AttackEndTransition을 사용. PlayerAttackState가 Combo 지속에 성공했을 때만 종료 Event를 막음 |
+| Combo Attack 코드 구조 | 완료 | Combo Handler·입력 버퍼·End Event 기반 다음 타격 시작을 제거. 최초 Attack은 AttackTransition, Combo 연결은 Animator 내부 전이로 분리 |
+| Combo 1→2→3 진행 | 수동 검증 완료 | `ComboTrigger`와 각 전이의 Has Exit Time / Exit Time / Duration을 사용해 1→3 건너뜀 없이 진행 확인 |
+| Combo 종료 뒤 입력 초기화 | 완료 | 별도 입력 버퍼를 제거했으므로 Combo 종료 후 저장된 요청이 남지 않음 |
+| AttackEndTransition 분리 | 완료 | 마지막 Combo의 Animation End Event가 공용 AttackEndTransition을 통해 Grounded/Fall 복귀를 처리 |
 | Hero_Jump Sub State Machine 진입 분기 | 코드/구성 완료, 수동 검증 필요 | Jump/Fall Bool 상호 배제 및 Entry 분기 구성 완료. 점프와 낙하 시작 흐름을 Play Mode에서 확인 필요 |
 | 착지·피격 종료 복귀 | 미완료 | `GroundedState`와 `IsGrounded` 전환을 수동 확인 |
 

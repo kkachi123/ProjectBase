@@ -11,8 +11,6 @@
         public IAgentDashInput DashInput { get; set; }
         public Stamina Stamina { get; set; }
         public AgentStatData StatData { get; set; }
-        public ComboAttackHandler ComboAttackHandler { get; set; }
-        public IAttackComboStarter ComboAttackStarter { get; set; }
     }
 
     public class PlayerStateFactory
@@ -25,7 +23,7 @@
             { typeof(JumpState), new JumpState(data.PlayerAnimator, data.PlayerAnimator, data.MovementHandler, data.MovementInput) },
             { typeof(FallState), new FallState(data.PlayerAnimator, data.PlayerAnimator, data.MovementHandler, data.MovementInput) },
             { typeof(PlayerDashState), new PlayerDashState(data.PlayerAnimator, data.Motor) },
-            { typeof(AttackState), new PlayerAttackState(data.PlayerAnimator, data.CombatHandler,data.Motor,  data.Stamina, data.StatData, data.ComboAttackHandler, data.ComboAttackStarter) },
+            { typeof(AttackState), new PlayerAttackState(data.PlayerAnimator, data.CombatHandler,data.Motor,  data.Stamina, data.StatData, data.CombatInput) },
             { typeof(HitState), new HitState(data.PlayerAnimator, data.CombatHandler) },
             { typeof(DeathState), new DeathState(data.PlayerAnimator, data.CombatHandler, data.MovementHandler) }
         };

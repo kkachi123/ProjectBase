@@ -3,7 +3,7 @@
     using UnityEngine;
     [RequireComponent(typeof(AgentImpactHandler))]
     [RequireComponent(typeof(PlayerAnimator))]
-    public class PlayerController : GroundedAgentController, IAttackComboStarter
+    public class PlayerController : GroundedAgentController
     {
 
         [SerializeField] private PlayerAnimator _playerAnimator;
@@ -12,7 +12,6 @@
         public Stamina Stamina { get; private set; }
 
         private PlayerInput _playerInput;
-        private readonly ComboAttackHandler _comboAttackHandler = new();
 
         protected override void Awake()
         {
@@ -25,7 +24,6 @@
 
 
             _playerInput = GetComponent<PlayerInput>();
-            _comboAttackHandler.Initialize(CombatInput, _statData.maxComboCount);
             _impactHandler = GetComponent<AgentImpactHandler>();
             _impactHandler.Initialize(_motor, _motorData);
 
@@ -46,8 +44,6 @@
                     StatData = _statData,
                     AnimationEventSource = this,
                     AttackStarter = this,
-                    ComboAttackHandler = _comboAttackHandler,
-                    ComboAttackStarter = this
                 }
             );
         }
@@ -71,17 +67,6 @@
             return false;
         }
 
-        public bool TryContinueAttack(int nextAttackType)
-        {
-            int attackType = IsGrounded ? nextAttackType : 3;
-            if (CheckCanPlayerAttack(attackType))
-            {
-                _combatHandler.ApplyAttackType(attackType);
-                return true;
-            }
-            return false;
-        }
-
         private bool CheckCanPlayerAttack(int attackType)
         {
             // 공격 타입이 설정한 범위를 벗어나면 공격을 시작하지 않는다.
@@ -94,10 +79,6 @@
             return true;
         }
 
-        private void OnDestroy()
-        {
-            _comboAttackHandler.Deinitialize();
-        }
         #endregion
     }
 }

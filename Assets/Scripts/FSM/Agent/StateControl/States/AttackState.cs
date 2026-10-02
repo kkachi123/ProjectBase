@@ -32,8 +32,5 @@ namespace ProjectRE
             Animator.SetAttackType(attackType);
             CombatHandler.ApplyAttackType(attackType);
         }
-
-        public virtual bool TryHandleAttackFinished() => false;
-
     }
 }

@@ -5,6 +5,9 @@ using UnityEngine;
 [CreateAssetMenu(fileName = "PlayerAnimationData", menuName = "ProjectRE/Player/Animation Data")]
 public class PlayerAnimationDataSO : AgentAnimationDataSO
 {
+    [Header("Player Animation Trigger")]
+    // Player 공격 모션을 Combo로 연결할 때 사용한다.
+    public string ComboTrigger = "ComboTrigger";
     [Header("Player Animation Int")]
     // 현재 실행할 Player 공격 애니메이션 종류를 선택한다.
     public string AttackTypeInt = "AttackType";

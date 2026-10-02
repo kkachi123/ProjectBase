@@ -71,7 +71,7 @@ public abstract class AgentController : MonoBehaviour, IAgentAnimationListener ,
             _currentState = newState;
             _currentState?.Enter();
         }
-        //Debug.Log($"State changed to: {stateType.Name}");
+        Debug.Log($"State changed to: {stateType.Name}");
     }
     
     public virtual void OnAnimationEvent(AnimEventType type)
@@ -88,8 +88,7 @@ public abstract class AgentController : MonoBehaviour, IAgentAnimationListener ,
 
         if (_currentState is AttackState attackState)
         {
-            if (!attackState.TryHandleAttackFinished())
-                OnAnimationEnded?.Invoke();
+            OnAnimationEnded?.Invoke();
             return;
         }
 

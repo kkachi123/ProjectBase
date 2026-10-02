@@ -64,5 +64,17 @@ public class AgentAnimator : MonoBehaviour, IHitAnimation, IDeathAnimation
         if (TryGetHash(parameters, type, out int hash))
             _anim?.SetInteger(hash, value);
     }
+
+    protected void Trigger<T>(Dictionary<T, int> parameters, T type)
+    {
+        if (TryGetHash(parameters, type, out int hash))
+            _anim?.SetTrigger(hash);
+    }
+
+    protected void ResetTrigger<T>(Dictionary<T, int> parameters, T type)
+    {
+        if (TryGetHash(parameters, type, out int hash))
+            _anim?.ResetTrigger(hash);
+    }
 }
 }

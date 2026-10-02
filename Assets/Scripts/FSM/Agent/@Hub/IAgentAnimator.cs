@@ -28,6 +28,12 @@ namespace ProjectRE
         void SetAttackType(int attackType);
     }
 
+    public interface IComboAnimation : ICombatAnimation
+    {
+        void SetComboTrigger();
+        void ResetComboTrigger();
+    }
+
     public interface IDashAnimation
     {
         void SetDash(bool value);
