@@ -9,6 +9,7 @@ public enum PlayerAnimationBoolType
     Jump,
     Fall,
     Attack,
+    Dash,
 }
 
 public enum PlayerAnimationFloatType
@@ -21,7 +22,7 @@ public enum PlayerAnimationIntType
     AttackType,
 }
 
-public class PlayerAnimator : AgentAnimator, IGroundedAnimation, IAirborneAnimation, ICombatAnimation
+public class PlayerAnimator : AgentAnimator, IGroundedAnimation, IAirborneAnimation, ICombatAnimation, IDashAnimation
 {
     private readonly Dictionary<PlayerAnimationBoolType, int> _boolParameters = new();
     private readonly Dictionary<PlayerAnimationFloatType, int> _floatParameters = new();
@@ -45,6 +46,7 @@ public class PlayerAnimator : AgentAnimator, IGroundedAnimation, IAirborneAnimat
         Register(_boolParameters, PlayerAnimationBoolType.Jump, playerData.IsJumpBool);
         Register(_boolParameters, PlayerAnimationBoolType.Fall, playerData.IsFallBool);
         Register(_boolParameters, PlayerAnimationBoolType.Attack, playerData.IsAttackBool);
+        Register(_boolParameters, PlayerAnimationBoolType.Dash, playerData.IsDashBool);
         Register(_floatParameters, PlayerAnimationFloatType.MoveSpeed, playerData.MoveSpeedFloat);
         Register(_intParameters, PlayerAnimationIntType.AttackType, playerData.AttackTypeInt);
     }
@@ -55,5 +57,6 @@ public class PlayerAnimator : AgentAnimator, IGroundedAnimation, IAirborneAnimat
     public void SetFall(bool value) => SetBool(_boolParameters, PlayerAnimationBoolType.Fall, value);
     public void SetAttack(bool value) => SetBool(_boolParameters, PlayerAnimationBoolType.Attack, value);
     public void SetAttackType(int attackType) => SetInteger(_intParameters, PlayerAnimationIntType.AttackType, attackType);
+    public void SetDash(bool value) => SetBool(_boolParameters, PlayerAnimationBoolType.Dash, value);
 }
 }

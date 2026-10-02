@@ -20,6 +20,11 @@ public interface IAgentJumpInput
     event Action OnJumpRequested;
 }
 
+public interface IAgentDashInput
+{
+    event Action OnDashRequested;
+}
+
 public interface IAgentInteractionInput
 {
     event Action OnInteractRequested;

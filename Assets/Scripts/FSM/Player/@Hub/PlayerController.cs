@@ -41,6 +41,7 @@
                     Health = this.Health,
                     GroundDetector = _groundDetector,
                     JumpInput = _playerInput,
+                    DashInput = _playerInput,
                     Stamina = Stamina,
                     StatData = _statData,
                     AnimationEventSource = this,

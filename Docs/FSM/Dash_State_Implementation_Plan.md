@@ -170,22 +170,22 @@ Attack/Jump 입력은 DashState에 등록하지 않는다. 이번 단계의 Dash
 
 ### Phase 1 — 입력과 Animator capability
 
-- [ ] `IAgentDashInput`을 추가한다.
-- [ ] PlayerInput에 `OnDashRequested`와 Dash callback 등록을 추가한다.
-- [ ] PlayerAnimator capability, enum, SO parameter 이름을 추가한다.
+- [x] `IAgentDashInput`을 추가한다.
+- [x] PlayerInput에 `OnDashRequested`와 Dash callback 등록을 추가한다.
+- [x] PlayerAnimator capability, enum, SO parameter 이름을 추가한다.
 - [ ] Hero Animator에 `IsDash` parameter와 Dash State를 구성한다.
 
 완료 기준: Grounded 상태에서 Dash 입력이 이벤트로 발행되고, PlayerAnimator가 Dash parameter를 안전하게 설정할 수 있다.
 
 ### Phase 2 — Dash State와 전이
 
-- [ ] PlayerDashState를 만든다.
+- [x] PlayerDashState를 만든다.
   - OnEnter: 일반 수평 이동 정지, `SetDash(true)`
   - OnExecute: 이번 단계에서는 속도·거리 처리 없음
   - OnExit: `SetDash(false)`
-- [ ] DashTransition을 Event Rule로 만든다.
-- [ ] DashEndTransition을 Event Rule로 만들고 GroundDetector로 복귀 목적지를 선택한다.
-- [ ] AgentController의 Animation End routing을 갱신한다.
+- [x] DashTransition을 Event Rule로 만든다.
+- [x] DashEndTransition을 Event Rule로 만들고 GroundDetector로 복귀 목적지를 선택한다.
+- [x] AgentController의 Animation End routing을 갱신한다.
   - AttackState의 `TryHandleAttackFinished()`가 `true`이면 종료 Event를 발행하지 않는다.
   - Attack Combo가 끝났을 때, HitState, PlayerDashState에서는 `OnAnimationEnded`를 발행한다.
 
@@ -193,9 +193,9 @@ Attack/Jump 입력은 DashState에 등록하지 않는다. 이번 단계의 Dash
 
 ### Phase 3 — Player Factory와 Animator 연결
 
-- [ ] PlayerStateFactory에 `typeof(PlayerDashState)` 키로 State를 등록한다.
-- [ ] GroundedState에 DashTransition을 등록한다.
-- [ ] PlayerDashState에 GetHitTransition과 DashEndTransition을 등록한다.
+- [x] PlayerStateFactory에 `typeof(PlayerDashState)` 키로 State를 등록한다.
+- [x] GroundedState에 DashTransition을 등록한다.
+- [x] PlayerDashState에 GetHitTransition과 DashEndTransition을 등록한다.
 - [ ] Hero Animator의 Dash clip 마지막에 `AgentAnimationEventProxy.OnAnimationEnd` Event를 추가한다.
 - [ ] Dash Animator 전이가 FSM parameter 설정과 같은 방향으로 동작하는지 확인한다.
 
@@ -212,6 +212,13 @@ Attack/Jump 입력은 DashState에 등록하지 않는다. 이번 단계의 Dash
 - [ ] Animator Console에 Dash parameter 누락 오류 없음
 
 ## 7. 보류 항목
+
+### 현재 Editor 연결 보류
+
+- [ ] Unity Pipeline 서버가 현재 도달 불가하므로 `Hero_Anim.controller`의 `IsDash` parameter, Dash State, 전이를 아직 생성하지 않았다.
+- [x] Dash Clip은 `Assets/Prefabs/Player/Animations/Hero_Dash.anim`으로 확정했다.
+
+Pipeline 재연결 후 Unity Editor에서 `Hero_Dash.anim`을 Dash State의 Motion으로 연결하고 마지막 프레임에 `AgentAnimationEventProxy.OnAnimationEnd` Event를 추가한다. 이후 Phase 3의 Animator 항목과 Phase 4 수동 검증을 진행한다. 실행 중인 Editor의 Animator YAML은 직접 수정하지 않는다.
 
 다음은 이번 구현에 넣지 않는다.
 

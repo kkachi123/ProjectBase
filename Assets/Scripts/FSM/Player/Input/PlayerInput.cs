@@ -3,13 +3,14 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-public class PlayerInput : MonoBehaviour , IAgentMovementInput , IAgentJumpInput , IAgentCombatInput , IAgentInteractionInput
+public class PlayerInput : MonoBehaviour , IAgentMovementInput , IAgentJumpInput , IAgentDashInput , IAgentCombatInput , IAgentInteractionInput
 {
     public PlayerInputCommands inputActions;
 
     public Vector2 Horizontal { get; private set; }
     public bool IsJumpHeld { get; private set; }
     public event System.Action OnJumpRequested;
+    public event System.Action OnDashRequested;
     public event System.Action OnAttackRequested;
     public event System.Action OnInteractRequested;
 
@@ -31,6 +32,8 @@ public class PlayerInput : MonoBehaviour , IAgentMovementInput , IAgentJumpInput
 
         inputActions.gamePlay.Jump.performed += JumpInput;
         inputActions.gamePlay.Jump.canceled += JumpInput;
+
+        inputActions.gamePlay.Dash.performed += DashInput;
 
         inputActions.gamePlay.Attack.performed += AttackInput;
 
@@ -69,6 +72,12 @@ public class PlayerInput : MonoBehaviour , IAgentMovementInput , IAgentJumpInput
     {
         if (!IsInputBlocked && context.performed)
             OnAttackRequested?.Invoke();
+    }
+
+    private void DashInput(InputAction.CallbackContext context)
+    {
+        if (!IsInputBlocked && context.performed)
+            OnDashRequested?.Invoke();
     }
 
     private void InteractInput(InputAction.CallbackContext context)

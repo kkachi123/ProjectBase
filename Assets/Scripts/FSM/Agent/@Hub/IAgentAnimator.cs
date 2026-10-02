@@ -27,4 +27,9 @@ namespace ProjectRE
         void SetAttack(bool value);
         void SetAttackType(int attackType);
     }
+
+    public interface IDashAnimation
+    {
+        void SetDash(bool value);
+    }
 }

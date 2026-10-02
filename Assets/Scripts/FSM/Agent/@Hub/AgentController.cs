@@ -76,32 +76,31 @@ public abstract class AgentController : MonoBehaviour, IAgentAnimationListener ,
     
     public virtual void OnAnimationEvent(AnimEventType type)
     {
-        if(_currentState is AttackState attackState)
+        if (type == AnimEventType.OnFrame)
         {
-            if(type == AnimEventType.OnFrame)
-            {
+            if (_currentState is AttackState)
                 _combatHandler.PerformAttack();
-            }
-            if(type == AnimEventType.End)
-            {
-                if (!attackState.TryHandleAttackFinished())
-                    OnAnimationEnded?.Invoke();
-            }
+            return;
         }
-        else if(_currentState is HitState)
+
+        if (type != AnimEventType.End)
+            return;
+
+        if (_currentState is AttackState attackState)
         {
-            if(type == AnimEventType.End)
-            {
+            if (!attackState.TryHandleAttackFinished())
                 OnAnimationEnded?.Invoke();
-            }
+            return;
         }
-        else if(_currentState is DeathState)
+
+        if (_currentState is DeathState)
         {
-            if(type == AnimEventType.End)
-            {
-                OnDeathFinished();
-            }
+            OnDeathFinished();
+            return;
         }
+
+        // HitState와 PlayerDashState 등 Animation End로 종료되는 State가 공용 종료 Event를 사용한다.
+        OnAnimationEnded?.Invoke();
     }
     public virtual void OnDeathFinished() { }
     public virtual bool TryStartAttack() { return false; }

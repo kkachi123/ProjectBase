@@ -22,5 +22,7 @@ public class PlayerAnimationDataSO : AgentAnimationDataSO
     public string IsFallBool = "IsFall";
     // AttackTypeInt와 함께 Player 공격 모션을 선택한다.
     public string IsAttackBool = "IsAttack";
+    // Grounded 상태에서 Dash 모션으로 진입·종료할 때 사용한다.
+    public string IsDashBool = "IsDash";
 }
 }

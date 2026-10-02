@@ -8,6 +8,7 @@
         public PlayerAnimator PlayerAnimator { get; set; }
         public GroundDetector GroundDetector { get; set; }
         public IAgentJumpInput JumpInput { get; set; }
+        public IAgentDashInput DashInput { get; set; }
         public Stamina Stamina { get; set; }
         public AgentStatData StatData { get; set; }
         public ComboAttackHandler ComboAttackHandler { get; set; }
@@ -23,15 +24,17 @@
             { typeof(GroundedState), new GroundedState(data.PlayerAnimator, data.MovementHandler, data.MovementInput) },
             { typeof(JumpState), new JumpState(data.PlayerAnimator, data.PlayerAnimator, data.MovementHandler, data.MovementInput) },
             { typeof(FallState), new FallState(data.PlayerAnimator, data.PlayerAnimator, data.MovementHandler, data.MovementInput) },
+            { typeof(PlayerDashState), new PlayerDashState(data.PlayerAnimator, data.Motor) },
             { typeof(AttackState), new PlayerAttackState(data.PlayerAnimator, data.CombatHandler,data.Motor,  data.Stamina, data.StatData, data.ComboAttackHandler, data.ComboAttackStarter) },
             { typeof(HitState), new HitState(data.PlayerAnimator, data.CombatHandler) },
             { typeof(DeathState), new DeathState(data.PlayerAnimator, data.CombatHandler, data.MovementHandler) }
         };
 
             states[typeof(GroundedState)].AddTransition(new GetHitTransition(data.Health.CurrentHealth));
+            states[typeof(GroundedState)].AddTransition(new DashTransition(data.DashInput, data.GroundDetector));
             states[typeof(GroundedState)].AddTransition(new JumpTransition(data.JumpInput, data.GroundDetector));
-            states[typeof(GroundedState)].AddTransition(new GroundedFallTransition(data.GroundDetector, data.Motor));
             states[typeof(GroundedState)].AddTransition(new AttackTransition(data.CombatInput, data.AttackStarter));
+            states[typeof(GroundedState)].AddTransition(new GroundedFallTransition(data.GroundDetector, data.Motor));
 
             states[typeof(JumpState)].AddTransition(new GetHitTransition(data.Health.CurrentHealth));
             states[typeof(JumpState)].AddTransition(new JumpFallTransition(data.Motor));
@@ -44,6 +47,9 @@
 
             states[typeof(AttackState)].AddTransition(new GetHitTransition(data.Health.CurrentHealth));
             states[typeof(AttackState)].AddTransition(new AttackEndTransition(data.AnimationEventSource, data.GroundDetector));
+
+            states[typeof(PlayerDashState)].AddTransition(new GetHitTransition(data.Health.CurrentHealth));
+            states[typeof(PlayerDashState)].AddTransition(new DashEndTransition(data.AnimationEventSource, data.GroundDetector));
 
             states[typeof(HitState)].AddTransition(new DeathTransition(data.Health.IsDead));
             states[typeof(HitState)].AddTransition(new GetHitEndTransition(data.AnimationEventSource));
