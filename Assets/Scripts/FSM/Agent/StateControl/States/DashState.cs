@@ -7,24 +7,28 @@ namespace ProjectRE
     public class DashState : AgentStateBase
     {
         private readonly IDashAnimation _animator;
-        private readonly AgentMotor2D _motor;
+        private readonly AgentDashHandler2D _dashHandler;
 
-        public DashState(IDashAnimation animator, AgentMotor2D motor)
+        public DashState(IDashAnimation animator, AgentDashHandler2D dashHandler)
         {
             _animator = animator;
-            _motor = motor;
+            _dashHandler = dashHandler;
         }
 
         protected override void OnEnter()
         {
-            _motor.StopHorizontal();
+            _dashHandler.BeginDash();
             _animator.SetDash(true);
         }
 
-        protected override void OnExecute(float deltaTime) { }
+        protected override void OnExecute(float deltaTime)
+        {
+            _dashHandler.ExecuteDash();
+        }
 
         protected override void OnExit()
         {
+            _dashHandler.EndDash();
             _animator.SetDash(false);
         }
     }

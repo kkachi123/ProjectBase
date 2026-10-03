@@ -10,12 +10,14 @@ namespace ProjectRE
         public Type NextStateType => typeof(DashState);
 
         private readonly IAgentDashInput _dashInput;
+        private readonly AgentDashHandler2D _dashHandler;
         private bool _isSubscribed;
         private bool _shouldTransition;
 
-        public DashTransition(IAgentDashInput dashInput)
+        public DashTransition(IAgentDashInput dashInput, AgentDashHandler2D dashHandler)
         {
             _dashInput = dashInput;
+            _dashHandler = dashHandler;
         }
 
         public bool ShouldTransition(float deltaTime)
@@ -24,7 +26,7 @@ namespace ProjectRE
                 return false;
 
             _shouldTransition = false;
-            return true;
+            return _dashHandler.CanStartDash();
         }
 
         public void Subscribe()

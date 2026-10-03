@@ -12,6 +12,8 @@
         public Stamina Stamina { get; private set; }
 
         private PlayerInput _playerInput;
+        private AgentDashHandler2D _dashHandler;
+        private WallDetector _wallDetector;
 
         protected override void Awake()
         {
@@ -24,6 +26,10 @@
 
 
             _playerInput = GetComponent<PlayerInput>();
+            _dashHandler = GetComponent<AgentDashHandler2D>();
+            _wallDetector = GetComponent<WallDetector>();
+            if (_motorData is PlayerMotorData playerMotorData)
+                _dashHandler.Initialize(playerMotorData, _groundDetector, _wallDetector);
             _impactHandler = GetComponent<AgentImpactHandler>();
             _impactHandler.Initialize(_motor, _motorData);
 
@@ -40,6 +46,7 @@
                     GroundDetector = _groundDetector,
                     JumpInput = _playerInput,
                     DashInput = _playerInput,
+                    DashHandler = _dashHandler,
                     Stamina = Stamina,
                     StatData = _statData,
                     AnimationEventSource = this,

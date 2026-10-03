@@ -72,7 +72,7 @@ Controller -> StateFactory -> State(필요한 의존성만 주입)
 
 - `AgentController`는 State Dictionary를 `Type` 키로 보관하고 현재 State 전환을 관리한다.
 - `AgentController`는 더 이상 구체 Animator 참조·초기화를 소유하지 않는다. Player와 이후 Monster Controller가 각 전용 Animator를 직접 초기화한다.
-- `PlayerStateFactory`는 `GroundedState`, `JumpState`, `FallState`, `AttackState`, `HitState`, `DeathState`를 구성한다.
+- `PlayerStateFactory`는 `GroundedState`, `JumpState`, `FallState`, `DashState`, `AttackState`, `HitState`, `DeathState`를 구성한다.
 - State는 필요한 Handler, Input interface, Animator capability만 생성자로 받는다.
 - 전이 조건은 `ITransitionRule` 구현체를 Factory에서 조합한다.
 
@@ -108,6 +108,14 @@ Controller -> StateFactory -> State(필요한 의존성만 주입)
 - `Hero_Jump`의 `Entry`가 `IsJump` 또는 `IsFall` 조건으로 각각 `Hero_jump`, `Hero_fall_start`를 선택한다.
 - `JumpState`와 `FallState`는 진입 시 반대 공중 Bool을 먼저 해제해 두 Entry 조건이 동시에 성립하지 않도록 한다.
 
+### Animator 공통 전이 구조
+
+- 기존에는 `Hero_jump`, `Hero_fall_start`, `Hero_fall_loop` 등 각 Animation State에 Grounded·Attack·Dash 전이를 개별로 등록했다. 새 외부 행동을 추가할 때마다 공중 Animation State 전체에 전이를 반복해야 했다.
+- `Hero_Jump` 내부 State는 공통 종료 조건인 `IsJump == false AND IsFall == false`만 만족하면 `Exit`로 이동하도록 변경했다.
+- 상위 Base Layer의 `Hero_Jump` State Machine Transition이 Exit 뒤의 목적지를 결정한다. `IsGrounded → Grounded`, `IsAttack → Attack`, `IsDash → Dash`로 한 곳에서 라우팅한다.
+- Attack도 외부 State가 개별 Combo Clip을 직접 목적지로 지정하지 않고 `Attack` Sub State Machine을 거쳐 Entry와 상위 전이에서 진입·종료 흐름을 처리한다.
+- 이 구조로 공중/공격 내부 Animation State는 자체 Animation 흐름만 관리하고, 행동 State를 벗어나는 공통 전이 규칙은 상위 State Machine에 집중됐다.
+
 ### Input
 
 | 입력 | 현재 표현 | 이유 |
@@ -122,45 +130,72 @@ Controller -> StateFactory -> State(필요한 의존성만 주입)
 | 클래스 | 책임 |
 | --- | --- |
 | `AgentAnimator` | Animator 참조, parameter hash 등록, 안전한 `SetBool` / `SetFloat` / `SetInteger`, 공통 Hit·Death 표현 |
-| `PlayerAnimator` | Player 전용 Dictionary 및 Grounded·Jump·Fall·Attack·MoveSpeed·AttackType API |
+| `PlayerAnimator` | Player 전용 Dictionary 및 Grounded·Jump·Fall·Dash·Attack·MoveSpeed·AttackType API |
 | `AgentAnimationDataSO` | 공통 `IsHit`, `IsDeath` parameter 이름 |
 | `PlayerAnimationDataSO` | Player 전용 parameter 이름 |
 
 모든 Animator capability interface는 `IAgentAnimator.cs`에 둔다. State는 구체 Animator가 아닌 필요한 capability interface에 의존한다.
 
-## 4. 변경 이력
+## 4. 주제별 리팩토링 이력
 
-| 단계 | 변경 | 문제 / 이유 | 결과 |
-| --- | --- | --- | --- |
-| 01 | State 기반·상태 머신 단순화 | `AgentStateBase<T>`, `GroundedAgentStateBase`, `AgentStateMachine<IAgentState>`가 역할을 나눔 | 비제네릭 `AgentStateBase`와 Controller의 `_currentState` 직접 관리로 구조를 단순화 |
-| 02 | StateFactory 기반 의존성 주입 | `AgentController`가 모든 State용 기능을 제공 | State별 책임과 의존성이 생성자에 드러남 |
-| 03 | `ITransitionRule` 도입 | State 내부의 `_agent.ChangeState` 호출에 전이 조건·이벤트 처리가 결합 | Factory에서 전이 규칙을 조합하고 `OnTransition`으로 전환 요청. Player 기준 부분 적용 |
-| 04 | Type 기반 State 관리 | 공용 `StateType` enum에 Player/Monster 상태가 누적 | 캐릭터별 상태 확장 간 충돌 부담 완화 |
-| 05 | PlayerInput UniRx 정리 | 구독되지 않는 입력까지 ReactiveProperty 사용 | 입력을 홀드·소비형 요청·이벤트로 구분 |
-| 06 | `GroundedState` 통합 | Idle/Move가 입력마다 FSM을 왕복 | 지상 이동 전이 수 감소, 표현은 Blend Tree로 이관 |
-| 07 | Animator 전이 계약 정리 | FSM과 Animator가 서로 다른 상태를 표현 | 종료 목적지를 Grounded로 단일화, `IsGrounded` 도입 |
-| 08 | 점프 경계 조건 보강 | 가장자리/재입력 시 비정상 재상승 | 점프 요청 소비와 하강 시 Fall 전이 조건 적용 |
-| 09 | Agent/Player Animator 분리 | 공통 Animator에 Player parameter가 누적 | 공통 기능과 Player 전용 capability·SO 분리 |
-| 10 | Prefab Animator 바인딩 수정 | Root Animator와 Hero child Animator가 이중 구성 | `PlayerAnimator`가 실제 Hero child Animator를 제어 |
-| 11 | Attack Sub State Machine Entry 분기 | 외부 상태가 `Hero_combo1/2/3`에 직접 전이해 FSM과 Animator의 공격 선택 책임이 분산 | 외부 상태는 `Attack`으로만 진입하고, Entry가 `IsAttack` + `AttackType`으로 첫 Combo를 선택 |
-| 12 | Hero_Jump Sub State Machine Entry 분기 | `Grounded`가 점프/낙하 시작 클립에 직접 전이 | 외부 상태는 `Hero_Jump`으로만 진입하고, Entry가 `IsJump` / `IsFall`로 시작 클립을 선택 |
-| 13 | Event Rule 종료 처리 통합 | Controller와 State에 Event Rule 구독 해제 책임이 분산 | `AgentStateBase.Exit()`가 Event Rule 전체 해제 후 `OnExit()`를 호출하도록 통합 |
-| 14 | Combo Attack 입력·상태 책임 분리 | AttackState 진입 뒤 Player State가 시작 가능 여부를 판단하고 실패 시 직접 상태 전이를 호출 | `ComboAttackTransition`이 진입 전 입력 소비·타입 선택·공격 시작을 확정하고, 실패하면 현재 State를 유지 |
-| 15 | 공용 Combo Handler 명칭 정리 | Player 전용 이름이 입력 버퍼/Combo 규칙의 재사용 가능성을 숨김 | `PlayerComboAttackHandler`를 `ComboAttackHandler`로 변경. 현재는 Player 규칙을 사용하며, 다른 Combo Agent 요구가 생길 때 확장 방식을 판단 |
-| 16 | Combo Animator 내부 전이 정리 | 외부 State 전이와 Combo 클립 전이가 혼재 | Entry는 1타/공중 3타만 선택하고, 1→2→3은 End Event와 Animator 내부 전이로 진행 |
-| 17 | 공용 입력 요청 이벤트화 | Player만 공격 입력 계약에서 빠져 `AgentController.CombatInput`이 null이고, Jump 요청은 공중에서 저장돼 착지 뒤 재사용됨 | `IAgentCombatInput`과 `IAgentJumpInput`을 요청 이벤트 계약으로 전환. 전이가 활성 State에서만 구독해 공중 Jump 요청을 즉시 무시 |
-| 18 | Combo 입력 소유권 단일화 | PlayerInput 요청 큐와 Combo Handler 버퍼가 공존하고, Controller가 Action 4개로 구독 방식을 조립 | Handler가 `IAgentCombatInput`을 직접 구독·해제하고 bool 기반 최초/다음 타격 예약을 단일 관리 |
-| 19 | Combo 단계 설정 주입 | 최대 지상 Combo 단계가 상수여서 단발 공격 Agent 등 재사용 구성이 어려움 | `ComboAttackHandler.Initialize(..., maxGroundComboStep)`에서 단계 수를 주입. Player는 3, 단발 공격 Agent는 1을 전달 가능 |
-| 20 | 공격 종료 전이 분리 | 기존 `AttackEndTransition`이 Combo Handler에 의존해 공용 이름과 실제 책임이 불일치 | Combo 규칙은 `ComboAttackEndTransition`으로 이동하고, 공용 `AttackEndTransition`은 Animation End 후 Grounded/Fall 복귀만 담당 |
-| 21 | Controller Animator 책임 분리 | `AgentController`가 전용 Animator 참조와 초기화를 보유 | PlayerController가 PlayerAnimator를 직접 초기화. Base Controller는 전용 Animator 구현을 알지 않음 |
-| 22 | Combo 전이 단순화와 Animation End 단일 소비 | Combo 전용 TransitionRule이 최초 공격 준비와 다음 타격 실행까지 맡았고, `OnExecute()`에서 Animator 전이 전에 AttackType이 앞서 바뀌어 1→3타 건너뜀이 발생할 수 있었음 | `ComboAttackTransition`·`ComboAttackEndTransition`을 제거. 공용 `AttackTransition`이 최초 공격 시작만 판단하고, `PlayerAttackState.TryHandleAttackFinished()`가 End Event에서 예약 입력을 한 번 소비해 다음 공격을 시작. Combo가 이어지면 공용 종료 Event를 발행하지 않아 AttackState 유지 |
-| 23 | Animator Exit Time 기반 Combo 전이 | End Event 판단·입력 버퍼·Combo Handler가 Combo 순서와 FSM 종료를 함께 관리해 구조가 복잡했고, 연속 Trigger가 즉시 소비되면 1→3타를 건너뛸 수 있었음 | `ComboAttackHandler`, `TryHandleAttackFinished()` 흐름을 제거. AttackType은 최초 진입점(지상 1 / 공중 3)만 선택하고, `ComboTrigger`는 AttackState에서 직접 전달한다. Animator 전이의 Has Exit Time·Exit Time·Duration이 Combo 연결 시점을 결정하며, State Exit에서 미소비 Trigger를 초기화한다. |
+### 4.1 State Machine 기반과 의존성 주입
+
+| 변경 | 이전 문제 | 적용 결과 |
+| --- | --- | --- |
+| State 기반 단순화 | `AgentStateBase<T>`, `GroundedAgentStateBase`, `AgentStateMachine<IAgentState>`의 역할이 분산 | 비제네릭 `AgentStateBase`와 `AgentController._currentState` 직접 관리로 수명 구조 단순화 |
+| Factory 의존성 주입 | `AgentController`가 모든 State 기능을 제공해 God Object화 | Factory가 State별 최소 Handler·Input·Animator capability를 생성자로 주입 |
+| Type 기반 State 식별 | 하나의 `StateType` enum에 Player/Monster 상태가 누적 | `Dictionary<Type, AgentStateBase>`로 Agent별 State 확장 충돌 완화 |
+| Event Rule 수명 통합 | Controller와 State에 구독 해제 책임이 분산 | `AgentStateBase.Exit()`가 Event Rule 해제 후 `OnExit()`를 호출 |
+
+### 4.2 입력 요청과 상태 전이
+
+| 변경 | 이전 문제 | 적용 결과 |
+| --- | --- | --- |
+| `ITransitionRule` 도입 | State가 `_agent.ChangeState(...)`를 직접 호출해 조건·전환 실행이 결합 | Factory가 Rule을 조합하고 State가 `OnTransition(Type)`만 발행 |
+| 입력 이벤트화 | 변화 구독이 없는 입력도 UniRx 값으로 보관하고, 공중 입력이 착지 뒤 재사용될 수 있음 | Jump·Attack·Interact·Dash 요청을 Event로 발행하고 활성 State의 Rule만 구독 |
+| 전이 우선순위 명시 | 동일 프레임의 입력·물리 전이 결과가 등록 순서에 의존 | Factory의 Rule 등록 순서를 행동 우선순위로 관리 |
+| 점프 경계 조건 보강 | 가장자리 및 재입력에서 비정상 재상승 | 점프 요청 소비와 모터 수직 속도 기반 Fall 전이 적용 |
+
+### 4.3 이동·지상 상태 통합
+
+| 변경 | 이전 문제 | 적용 결과 |
+| --- | --- | --- |
+| `GroundedState` 통합 | Idle/Move가 입력마다 FSM을 왕복 | 지상 정지·이동은 하나의 State에서 처리하고 Animator Blend Tree로 표현 |
+| `IsGrounded` 계약 도입 | 지상 복귀 Animation 전이가 일관되지 않음 | Grounded 진입/종료 책임과 Animator 전이 조건을 명확히 분리 |
+
+### 4.4 Animator 구조와 전이 조건 리팩토링
+
+| 변경 | 이전 문제 | 적용 결과 |
+| --- | --- | --- |
+| Agent/Player Animator 분리 | 공용 Animator에 Player parameter가 누적 | 공통 Hit·Death와 Player 전용 capability·SO·Dictionary를 분리 |
+| 실제 Animator 바인딩 수정 | Root와 Hero child Animator가 이중으로 존재 | `PlayerAnimator`가 실제 Hero child Animator를 제어 |
+| Attack Sub-State Machine 진입 | 외부 State가 `Hero_combo1/2/3`을 직접 목적지로 지정 | 외부 State는 `Attack`만 진입하고 Entry가 `IsAttack` + `AttackType`으로 최초 Clip 선택 |
+| Jump Sub-State Machine 진입 | Grounded가 Jump/Fall 시작 Clip에 직접 전이 | 외부 State는 `Hero_Jump`만 진입하고 Entry가 `IsJump` / `IsFall`로 시작 Clip 선택 |
+| **공통 Exit 전이 집중** | Jump/Fall/Combo 내부 State마다 Grounded·Attack·Dash 전이를 반복 | 내부 State는 공통 Bool 해제 조건으로 Exit, 상위 Sub-State Machine이 Grounded·Attack·Dash 목적지를 한 번만 라우팅 |
+| Combo timing을 Animator로 이관 | End Event·입력 버퍼·Handler가 Combo 순서를 중복 관리 | `ComboTrigger`와 Has Exit Time·Exit Time·Duration이 1→2→3 수락 시점과 전이 타이밍을 관리 |
+
+### 4.5 공격과 Combo 책임 단순화
+
+| 변경 | 이전 문제 | 적용 결과 |
+| --- | --- | --- |
+| 최초 공격 진입 공용화 | Player State가 진입 가능 여부를 판단하고 직접 상태 전이를 호출 | 공용 `AttackTransition`이 `TryStartAttack()` 성공 시에만 AttackState 진입 |
+| Combo Handler·End 흐름 제거 | Combo 전용 Transition/Handler가 다음 공격 실행까지 담당해 구조가 복잡 | AttackType은 최초 진입점만 선택하고, Combo는 PlayerAttackState 입력 → Animator 내부 전이로 진행 |
+| Animation End 종료 단일화 | Combo 진행과 State 종료의 End Event 책임이 혼재 | 마지막 Combo Clip만 `AttackEndTransition`으로 Grounded/Fall 복귀 |
+| Trigger 정리 | 마지막 타격에서 미소비 ComboTrigger가 다음 공격에 누수될 수 있음 | `PlayerAttackState.Exit()`에서 ComboTrigger 초기화 |
+
+### 4.6 Dash State 확장 기반
+
+| 변경 | 이전 문제 | 적용 결과 |
+| --- | --- | --- |
+| Dash를 별도 State로 분리 | 일반 지상 이동 State에 Dash 규칙이 섞일 위험 | `DashState`가 Dash Animation 수명과 기존 수평 속도 정리를 담당 |
+| 공중 Dash 전이 허용 | GroundDetector 조건 때문에 지상에서만 Dash 가능 | Grounded·Jump·Fall에서 `DashTransition`을 구독하고, 종료 시 Grounded/Fall을 판정 |
+| 공용 기반 타입 승격 | `PlayerDashState`가 공용 전이의 목적지여서 다른 Agent 확장이 어려움 | Agent 영역의 `DashState`를 `typeof(DashState)` key와 전이 목적지로 사용. Agent별 파생 State로 확장 가능 |
 
 ## 5. 검증 상태
 
 | 항목 | 상태 | 근거 / 남은 확인 |
 | --- | --- | --- |
-| C# 컴파일 | 코드 변경 후 완료 | Combo 전이 단순화와 Animation End 단일 소비 적용 뒤 Unity 재컴파일 오류 없음 |
+| C# 컴파일 | 코드 변경 후 완료 | Combo·Dash 구조 변경 뒤 Unity 재컴파일 오류 없음 |
 | Hero Animator parameter 계약 | 완료 | `PlayerAnimationDataSO`와 Animator parameter 이름을 기준으로 등록 |
 | Prefab Animator 바인딩 | 완료 | `Player`, `ProjectRE_Player Variant` 모두 Hero child Animator 연결 |
 | Grounded Blend Tree 구성 | 완료 | `MoveSpeed`로 Idle/Move 표현 |
@@ -172,6 +207,8 @@ Controller -> StateFactory -> State(필요한 의존성만 주입)
 | Combo 종료 뒤 입력 초기화 | 완료 | 별도 입력 버퍼를 제거했으므로 Combo 종료 후 저장된 요청이 남지 않음 |
 | AttackEndTransition 분리 | 완료 | 마지막 Combo의 Animation End Event가 공용 AttackEndTransition을 통해 Grounded/Fall 복귀를 처리 |
 | Hero_Jump Sub State Machine 진입 분기 | 코드/구성 완료, 수동 검증 필요 | Jump/Fall Bool 상호 배제 및 Entry 분기 구성 완료. 점프와 낙하 시작 흐름을 Play Mode에서 확인 필요 |
+| Animator 공통 Exit 전이 | 수동 검증 완료 | 공중 내부 State의 `IsJump == false AND IsFall == false → Exit`와 상위 `Hero_Jump → Grounded / Attack / Dash` 라우팅 동작 확인 |
+| DashState 공용화 | 코드·지상 수동 검증 완료 | `DashState` 공용 기반 State로 이동, Grounded/Jump/Fall Dash 진입과 Animation End 복귀 흐름 구성. 실제 Dash 거리·속도 정책은 보류 |
 | 착지·피격 종료 복귀 | 미완료 | `GroundedState`와 `IsGrounded` 전환을 수동 확인 |
 
 ## 6. 보류 및 예정 사항
