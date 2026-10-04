@@ -4,7 +4,7 @@
 
 현재 `AgentController` 기반 FSM을 확장하여 **기본 단발 공격 몬스터의 공용 실행 구조**를 만든다. 첫 제작 대상은 Goblin이며, 같은 행동을 사용하는 다른 몬스터는 공용 코드와 Animator Controller를 유지하고 몬스터별 에셋을 교체하여 제작한다.
 
-이 문서는 다른 AI Agent가 현재 코드와 함께 읽고, 구현·에셋 연결·검증을 순서대로 수행할 수 있는 계획서다. 문서 작성 시점에는 구현하지 않은 상태다.
+이 문서는 다른 AI Agent가 현재 코드와 함께 읽고, 구현·에셋 연결·검증을 순서대로 수행할 수 있는 계획서다. 최초 계획과 구현 전 점검 결과는 아래에 유지하며, 현재 구현·검증 결과와 남은 수동 작업은 12절에 기록한다.
 
 ### 확정 범위
 
@@ -495,90 +495,90 @@ Assets/Scripts/FSM/NPC/AIMonstor/
 
 - [x] 현재 Agent·Player·AIMonstor 코드와 Goblin 임포트 상태 확인.
 - [x] 네 상태·단발 공격·Behavior 제외 범위 정리.
-- [ ] 작업 시작 시 git 변경사항과 적용 대상 instruction 파일 재확인.
-- [ ] 변경·삭제 대상의 C#·GUID·prefab·scene·Graph 참조 목록 확보.
-- [ ] 기존 Monster 폴더 파일의 유지·삭제 목록과 8.1의 신규 배치 경로 확인.
-- [ ] 기존 Orc Scene 인스턴스·맵 등록 항목 제거 후 OrcAI.prefab 삭제.
-- [ ] 신규 구현에 이관할 Orc 구조·에셋·호환 API가 없음을 확인.
-- [ ] 사용할 검증 Scene 확정. 기존 활성 Scene을 임의 저장하거나 교체하지 않음.
+- [x] 작업 시작 시 git 변경사항과 적용 대상 instruction 파일 재확인.
+- [x] 변경·삭제 대상의 C#·GUID·prefab·scene·Graph 참조 목록 확보.
+- [x] 기존 Monster 폴더 파일의 유지·삭제 목록과 8.1의 신규 배치 경로 확인.
+- [x] 기존 Orc Scene 인스턴스·맵 등록 항목 제거 후 OrcAI.prefab 삭제.
+- [x] 신규 구현에 이관할 Orc 구조·에셋·호환 API가 없음을 확인.
+- [x] 사용할 검증 Scene 확정. 기존 활성 Scene을 임의 저장하거나 교체하지 않음.
 
 ### Phase 1 — 공용 전이와 수명 안정화
 
-- [ ] GetHitTransition 구독 Dispose·중복 구독·flag 초기화 구현.
-- [ ] DeathTransition을 현재 값 판정형 ITransitionRule로 정리.
-- [ ] AttackEndTransition에 고정 Type 복귀 지원. 기존 Player 생성자 유지.
-- [ ] Controller 파괴 시 현재 State 및 OnTransition 연결 정리.
-- [ ] Unity 컴파일 및 Player의 Attack 종료·피격·사망 회귀 확인.
+- [x] GetHitTransition 구독 Dispose·중복 구독·flag 초기화 구현.
+- [x] DeathTransition을 현재 값 판정형 ITransitionRule로 정리.
+- [x] AttackEndTransition에 고정 Type 복귀 지원. 기존 Player 생성자 유지.
+- [x] Controller 파괴 시 현재 State 및 OnTransition 연결 정리.
+- [x] Unity 컴파일 및 Player의 Attack 종료·피격·사망 회귀 확인.
 
 ### Phase 2 — Monster Input·Animator 계약
 
-- [ ] Orc 전용 Brain·Action 코드와 참조 정리. Input 교체와 같은 단계에서 컴파일 단절 방지.
-- [ ] MonsterInput 외부 이동·공격 요청 API 구현.
-- [ ] MonsterAnimationDataSO 작성.
-- [ ] MonsterAnimator 구현, 부모의 parameter 설정 함수 재사용.
-- [ ] Jump/Fall/Dash/Combo·Behavior 의존성 없는지 확인.
-- [ ] 기존 AIMonsterInput 변경에 따른 참조 처리와 컴파일 확인.
-- [ ] Monster 스크립트가 AIMonstor 기준의 @Hub/Input/SOData 분류에 배치되었는지 확인.
+- [x] Orc 전용 Brain·Action 코드와 참조 정리. Input 교체와 같은 단계에서 컴파일 단절 방지.
+- [x] MonsterInput 외부 이동·공격 요청 API 구현.
+- [x] MonsterAnimationDataSO 작성.
+- [x] MonsterAnimator 구현, 부모의 parameter 설정 함수 재사용.
+- [x] Jump/Fall/Dash/Combo·Behavior 의존성 없는지 확인.
+- [x] 기존 AIMonsterInput 변경에 따른 참조 처리와 컴파일 확인.
+- [x] Monster 스크립트가 AIMonstor 기준의 @Hub/Input/SOData 분류에 배치되었는지 확인.
 
 ### Phase 3 — State·Factory·Controller
 
-- [ ] MonsterAttackState·MonsterHitState 구현.
-- [ ] MonsterStateFactoryData에서 공통·전용 Animator 참조 연결.
-- [ ] MonsterStateFactory 상속 적용, 정확히 네 Type key 등록.
-- [ ] Death·Hit·일반 행동 순서로 전이 연결.
-- [ ] MonsterController 의존성 초기화·TryStartAttack·OnDeathFinished 구현.
-- [ ] 필수 참조 누락 검사, 모든 목적 State key 등록 검사.
-- [ ] 컴파일 및 이벤트 구독·해제 수명 확인.
-- [ ] Factory·FactoryData·State가 AIMonstor/MonsterState 아래 역할별로 배치되었는지 확인.
+- [x] MonsterAttackState·MonsterHitState 구현.
+- [x] MonsterStateFactoryData에서 공통·전용 Animator 참조 연결.
+- [x] MonsterStateFactory 상속 적용, 정확히 네 Type key 등록.
+- [x] Death·Hit·일반 행동 순서로 전이 연결.
+- [x] MonsterController 의존성 초기화·TryStartAttack·OnDeathFinished 구현.
+- [x] 필수 참조 누락 검사, 모든 목적 State key 등록 검사.
+- [x] 컴파일 및 이벤트 구독·해제 수명 확인.
+- [x] Factory·FactoryData·State가 AIMonstor/MonsterState 아래 역할별로 배치되었는지 확인.
 
 ### Phase 4 — Goblin Sprite·Animation Clip
 
-- [ ] Goblin/Sprites에 다섯 시트 작업용 복사본 생성·분할·공통 pivot 적용.
-- [ ] Point·Uncompressed·PPU 설정 확인.
-- [ ] Goblin/Animations에 Idle/Move/Attack/Hit/Death Clip 제작.
-- [ ] Loop 설정과 SpriteRenderer binding path 확인.
-- [ ] Attack OnFrame 및 Attack/Hit/Death End Event 배치.
+- [x] Goblin/Sprites에 다섯 시트 작업용 복사본 생성·분할·공통 pivot 적용.
+- [x] Point·Uncompressed·PPU 설정 확인.
+- [x] Goblin/Animations에 Idle/Move/Attack/Hit/Death Clip 제작.
+- [x] Loop 설정과 SpriteRenderer binding path 확인.
+- [x] Attack OnFrame 및 Attack/Hit/Death End Event 배치.
 - [ ] 프레임별 발 위치·이펙트·공격 타이밍 수동 확인.
 
 ### Phase 5 — 공용 Animator·Override
 
-- [ ] Monster/Animations에 공용 BasicMonster_Anim Controller와 다섯 slot 구성.
-- [ ] Grounded Blend Tree와 네 Animation State 연결.
-- [ ] parameter 이름·타입·기본값·Transition 우선순위 확인.
-- [ ] Goblin/Animations에 Animator Override Controller 제작 후 모든 slot 연결.
-- [ ] 교체 Clip 이벤트가 실제로 수신되는지 확인.
+- [x] Monster/Animations에 공용 BasicMonster_Anim Controller와 다섯 slot 구성.
+- [x] Grounded Blend Tree와 네 Animation State 연결.
+- [x] parameter 이름·타입·기본값·Transition 우선순위 확인.
+- [x] Goblin/Animations에 Animator Override Controller 제작 후 모든 slot 연결.
+- [x] 교체 Clip 이벤트가 실제로 수신되는지 확인.
 
 ### Phase 6 — prefab·데이터 연결
 
-- [ ] Monster 루트에 BasicMonster.prefab과 완성 Goblin.prefab variant 제작.
-- [ ] Visual Animator·Proxy와 Root MonsterAnimator 참조 연결.
-- [ ] Monster/ScriptableObjects에 공용 AnimationData, Goblin/ScriptableObjects에 StatData·MotorData 생성. AttackData 1개 이상 연결.
-- [ ] Collider·공격 box·LayerMask·sorting·크기 확인.
-- [ ] Brain·BehaviorGraphAgent·불필요 Detector 없는지 확인.
+- [x] Monster 루트에 BasicMonster.prefab과 완성 Goblin.prefab variant 제작.
+- [x] Visual Animator·Proxy와 Root MonsterAnimator 참조 연결.
+- [x] Monster/ScriptableObjects에 공용 AnimationData, Goblin/ScriptableObjects에 StatData·MotorData 생성. AttackData 1개 이상 연결.
+- [x] Collider·공격 box·LayerMask·sorting·크기 확인.
+- [x] Brain·BehaviorGraphAgent·불필요 Detector 없는지 확인.
 
 ### Phase 7 — 동작 검증
 
-- [ ] 외부 명령으로 좌·우 이동과 정지 확인.
-- [ ] 이동 중 공격 요청 → 수평 이동 정지 → Grounded 복귀 확인.
-- [ ] 요청 한 번으로 공격 한 번, 추가 요청 없이 자동 반복하지 않음 확인.
-- [ ] 공격 중 추가 요청이 종료 후 공격으로 예약되지 않음 확인.
-- [ ] OnFrame에서만 피해 발생, 자신·같은 팀 제외 확인.
-- [ ] Grounded/Attack의 피격 → Hit → Grounded 확인.
-- [ ] Grounded/Attack/Hit의 치명타 → Death 직접 전환 확인.
-- [ ] Death End 이후 오브젝트 제거·구독 정리 확인.
-- [ ] 반복 State 진입과 생성·제거 시 중복 구독·이전 flag 잔류 없음 확인.
-- [ ] FSM과 Animator 상태 일치, parameter·Event·Missing Script 경고 없음 확인.
-- [ ] 공용 파일 수정에 대한 Player 회귀 결과 기록.
+- [x] 외부 명령으로 좌·우 이동과 정지 확인.
+- [x] 이동 중 공격 요청 → 수평 이동 정지 → Grounded 복귀 확인.
+- [x] 요청 한 번으로 공격 한 번, 추가 요청 없이 자동 반복하지 않음 확인.
+- [x] 공격 중 추가 요청이 종료 후 공격으로 예약되지 않음 확인.
+- [x] OnFrame에서만 피해 발생, 자신·같은 팀 제외 확인.
+- [x] Grounded/Attack의 피격 → Hit → Grounded 확인.
+- [x] Grounded/Attack/Hit의 치명타 → Death 직접 전환 확인.
+- [x] Death End 이후 오브젝트 제거·구독 정리 확인.
+- [x] 반복 State 진입과 생성·제거 시 중복 구독·이전 flag 잔류 없음 확인.
+- [x] FSM과 Animator 상태 일치, parameter·Event·Missing Script 경고 없음 확인.
+- [x] 공용 파일 수정에 대한 Player 회귀 결과 기록.
 
 ### Phase 8 — 삭제 잔여물 확인·인수인계
 
-- [ ] 기존 Orc prefab·전용 Input·Brain·Actions가 남지 않았는지 확인.
-- [ ] Monster 폴더의 기존 파일 중 불필요한 Orc Clip·데이터·Controller 등을 참조 정리 후 삭제.
-- [ ] 완성 prefab·공용 에셋·Goblin 전용 에셋·Monster 스크립트가 8.1의 분류 경로에 배치되었는지 확인.
-- [ ] 기존 Orc를 위한 호환 함수·이관 코드가 신규 Monster에 포함되지 않았는지 확인.
-- [ ] 컴파일·prefab·scene·Graph 참조 재검증.
-- [ ] 완료 작업·수동 검증·미완료 항목을 이 문서에 기록.
-- [ ] 사용자가 요청한 경우에만 Refactoring_Log 최신화·git commit 수행.
+- [x] 기존 Orc prefab·전용 Input·Brain·Actions가 남지 않았는지 확인.
+- [x] Monster 폴더의 기존 파일 중 불필요한 Orc Clip·데이터·Controller 등을 참조 정리 후 삭제.
+- [x] 완성 prefab·공용 에셋·Goblin 전용 에셋·Monster 스크립트가 8.1의 분류 경로에 배치되었는지 확인.
+- [x] 기존 Orc를 위한 호환 함수·이관 코드가 신규 Monster에 포함되지 않았는지 확인.
+- [x] 컴파일·prefab·scene·Graph 참조 재검증.
+- [x] 완료 작업·수동 검증·미완료 항목을 이 문서에 기록.
+- [x] 사용자 요청에 따라 Refactoring_Log 원본 MD 최신화·Monster 제작 범위 git commit 수행.
 
 ## 10. AI Agent 실행 지침과 제작 명령
 
@@ -643,3 +643,81 @@ Assets/Scripts/FSM/NPC/AIMonstor/
 - 기존 Orc와 무관한 Graph·에셋에도 변경이 필요한 경우 해당 범위 판단.
 
 수동 검증을 AI가 확인하지 못한 경우 완료로 표시하지 않고, 재현 방법과 확인 항목을 전달한다.
+
+## 12. 구현 결과와 인수인계 — 2026-10-04
+
+### 12.1 제작 완료
+
+- MonsterController·Input·Animator·AnimationDataSO·상속형 Factory·FactoryData 구성.
+- 공용 Type key의 Grounded / MonsterAttack / MonsterHit / Death 네 상태 등록.
+- 공용 피격 구독 Dispose, 현재 사망 값 판정, 공격 종료 고정 복귀 생성자, Controller 파괴 시 구독 정리 적용.
+- BasicMonster prefab, 네 상태 공용 Animator와 다섯 Clip slot, 공용 parameter 이름 데이터 제작.
+- Goblin prefab variant, 다섯 Sprite 시트 작업본·Clip·Override·Stat/Motor 데이터 제작.
+- Sprite 작업본은 150 × 150, Point, Uncompressed, Mipmap off, PPU 100. 공통 pivot은 실제 Idle 발의 최소 y 좌표를 확인한 `(75, 49)` pixel 기준.
+- 최초 제작 단계에서 원본 Goblin 아트 패키지, Player 코드·prefab·InGame 씬 파일은 변경하지 않음. 픽셀 아트 스킬은 Goblin 작업본의 임포트 설정에만 적용하고 카메라·전역 렌더 설정은 유지.
+- 기존 Orc prefab·전용 Clip/SO·기존 Monster_Anim Controller·Orc Brain/Action 5개·기존 AIMonsterInput 삭제. Git 기록으로 복구 가능.
+- SampleScene의 Orc 인스턴스 1개 제거. 맵 설정의 `monsterPrefab`, `spikeTrapPrefab` 두 필드에 들어 있던 Orc 참조를 비움. 신규 Goblin을 자동으로 등록하지 않음.
+- 후속 사용자 요청에 따라 `Docs/FSM/Refactoring_Log/FSM_Refactoring_Source_Log.md`를 주제별로 최신화하고 이번 Monster 제작 범위를 커밋. PDF 산출물은 이번 요청에서 재생성하지 않음.
+
+### 12.2 검증용 초기값
+
+다음 값은 최종 밸런스가 아니라 동작 검증을 위한 초기값이다. 기존 Orc 값을 이관하지 않았다.
+
+| 항목 | 현재 값·설정 |
+| --- | --- |
+| 체력 / 이동 속도 / 공격 피해 | 10 / 2 / 2 |
+| 공격 타입 | 1번 단발 공격 |
+| 공격 box offset / size | `(0.8, 0.55)` / `(1.2, 1)` |
+| Collider size / offset | `(0.72, 1.05)` / `(0, 0.525)` |
+| Root scale / Goblin Visual scale | `(1, 1, 1)` / `(3, 3, 1)` |
+| Clip FPS | 다섯 Clip 모두 12, 수동 재생 속도 조정 대상 |
+| Idle / Move | 4 / 8 frame, Loop |
+| Attack | 8 frame, non-loop. OnFrame 0.5초, End 0.625초 |
+| Hit / Death | 4 frame, non-loop. End 약 0.2917초 |
+| Animator Transition | Duration 0, Has Exit Time off. 실제 End Event로 FSM 종료 |
+
+`BasicMonster.prefab`은 템플릿이다. 종별 Stat/Motor·Sprite·Override를 연결한 `Goblin.prefab`을 배치·검증 대상으로 사용한다. 템플릿 자체에는 종별 Stat/Motor 데이터를 할당하지 않았다.
+
+### 12.3 실제 검증 결과
+
+컴파일 오류와 prefab Missing Script는 없다. 원래 InGame 씬을 보존한 임시 빈 씬에서 Play Mode 검증 후 원래 씬을 복원했다.
+
+| 검증 | 결과 |
+| --- | --- |
+| 네 Type key·파생 인스턴스·모든 목적 State 등록 | 통과 |
+| 좌·우 이동, 방향 전환, 정지, y 입력 제외 | 통과 |
+| 이동 중 공격 진입 시 수평 속도 정지 | 통과 |
+| 실제 Clip OnFrame 피해 / End 복귀 | 통과. 대상 체력 10 → 8, 진입 시 피해 없음 |
+| 공격 중 추가 요청·종료 후 자동 반복 차단 | 통과 |
+| 자기 자신·Enemy 피해 제외, Player Layer 대상 피해 | 통과 |
+| Grounded/Attack → Hit → Grounded | 통과. 중단된 공격의 OnFrame 피해 없음 |
+| 12회 반복 공격·피격 후 이전 flag 잔류 확인 | 통과 |
+| Grounded/Attack/Hit → Death 및 실제 End 후 제거 | 세 경로 모두 통과 |
+| 오브젝트 제거 시 입력·State 전환 연결 해제 | 통과 |
+| GetHit 중복 Subscribe·Dispose·재진입, 이미 true인 Death 값 | 통과 |
+| Player 지상·공중 AttackEnd 목적지·피격 복귀·기존 Hit 우선 사망 순서 | 통과. 아래 검증 조건 참고 |
+| 기존 Orc C#·GUID 참조 잔여 검색 | 없음 |
+| 원래 InGame 씬 복원 | 완료. 비-Play 상태, dirty false |
+
+Player 회귀 테스트에서 저장된 `ProjectRE_Player Variant.prefab`에 AgentDashHandler2D가 없는 기존 설정이 확인되어 `PlayerController.Awake():35` 오류가 발생했다. 현재 InGame의 Player 인스턴스에는 해당 컴포넌트가 있다. 원본 prefab·코드를 수정하지 않고 **회귀 테스트 객체에만 DashHandler를 보완**하여 공용 전이 동작을 확인했다. 따라서 prefab을 그대로 새로 배치하는 경로의 정상 초기화까지 통과했다고 해석하지 않는다.
+
+Play Mode 진입 중 첫 검증 요청은 Pipeline 메인 스레드 5초 제한으로 실행되지 않았다. 진입 완료 후 다시 실행한 Monster 검증은 성공했다. Monster 검증에서 새 런타임 오류·Animator parameter/Event/Missing Script 경고는 발생하지 않았다. 전체 Console의 기존 로그까지 삭제하거나 모두 정상으로 판정한 것은 아니다.
+
+### 12.4 남은 수동 확인과 사용 방식
+
+- [ ] Goblin 크기·발 위치·Move/Attack/Hit/Death 모션을 실제 게임 화면에서 확인.
+- [ ] Clip FPS·공격 유효 프레임·종료 타이밍 조정.
+- [ ] Collider·공격 box를 실제 몸체·무기에 맞춰 조정. 체력·속도·피해 최종 값 확정.
+- [ ] 필요할 경우 새 Goblin의 씬 배치·맵 `monsterPrefab` 등록 별도 지시. 현재 자동 치환하지 않은 상태.
+- [ ] Player prefab의 기존 DashHandler 누락 처리 여부 별도 확인. Monster 구현과 무관한 변경이므로 보류.
+
+Goblin은 Behavior·Brain이 없으므로 배치만으로 순찰·추적·자동 공격하지 않는다. Play Mode에서 외부 명령으로 `MonsterInput.SetMovement(Vector2)`와 `RequestAttack()`을 호출한다. 연속 요청을 공격 종료 후 자동 예약하지 않으며, 이동은 마지막 명령을 유지하므로 정지하려면 `Vector2.zero`를 전달한다.
+
+수동 확인은 `Assets/Prefabs/Monster/Goblin.prefab`을 원하는 테스트 위치에 배치하고 진행한다. 실제 Animator는 Visual의 한 개이며, 종별 변경은 Goblin 하위 Clip·Override·데이터와 prefab variant의 Collider·Visual 설정으로 수행한다.
+
+### 12.5 로그·커밋 범위
+
+- 원본 로그의 현재 구조, Factory 확장, 기본 Monster 제작, 공용 전이·구독 수명, 제작 단계 검증과 남은 수동 작업을 반영.
+- Monster 코드·공용 Rule 수정·신규 prefab/Animator/Clip/Override/데이터·Orc 삭제와 SampleScene/맵 참조 정리·계획/로그 문서를 커밋 대상으로 한정.
+- 제작 이후 별도로 변경된 `PlayerStatsData.asset`과 `Assets/Scenes/Build/InGame.unity`는 이번 커밋에서 제외하고 작업 트리에 보존.
+- int attackType 입력 전달·다중 공격 Animator Entry 계획은 아직 코드에 적용하지 않음. 현재 단발 1번 공격 구조를 기준으로 기록.

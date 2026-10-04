@@ -3,20 +3,37 @@
 using System;
 using System.Collections.Generic;
 
-public class MonsterStateFactoryData : StateFactoryData
+/// <summary>기본 Monster 네 State 생성 및 사망·피격·행동 순서의 전이 구성.</summary>
+public class MonsterStateFactory : AgentStateFactory<MonsterStateFactoryData>
 {
-}
-public class MonsterStateFactory
-{
-    public Dictionary<Type, AgentStateBase> CreateStates(MonsterStateFactoryData data)
+    protected override void AddAgentStates(MonsterStateFactoryData data, Dictionary<Type, AgentStateBase> states)
     {
-        return new Dictionary<Type, AgentStateBase>
+        states.Add(typeof(GroundedState), new GroundedState(data.MonsterAnimator, data.MovementHandler, data.MovementInput));
+        states.Add(typeof(AttackState), new MonsterAttackState(data.MonsterAnimator, data.CombatHandler, data.Motor));
+        states[typeof(HitState)] = new MonsterHitState(data.MonsterAnimator, data.CombatHandler, data.Motor);
+    }
+
+    protected override void ConfigureTransitions(MonsterStateFactoryData data, Dictionary<Type, AgentStateBase> states)
+    {
+        states[typeof(GroundedState)].AddTransition(new DeathTransition(data.Health.IsDead));
+        states[typeof(GroundedState)].AddTransition(new GetHitTransition(data.Health.CurrentHealth));
+        states[typeof(GroundedState)].AddTransition(new AttackTransition(data.CombatInput, data.AttackStarter));
+
+        states[typeof(AttackState)].AddTransition(new DeathTransition(data.Health.IsDead));
+        states[typeof(AttackState)].AddTransition(new GetHitTransition(data.Health.CurrentHealth));
+        states[typeof(AttackState)].AddTransition(new AttackEndTransition(data.AnimationEventSource, typeof(GroundedState)));
+
+        states[typeof(HitState)].AddTransition(new DeathTransition(data.Health.IsDead));
+        states[typeof(HitState)].AddTransition(new GetHitEndTransition(data.AnimationEventSource));
+
+        foreach (AgentStateBase state in states.Values)
         {
-            { typeof(GroundedState), new GroundedState((IGroundedAnimation)data.Animator, data.MovementHandler, data.MovementInput) },
-            //{ typeof(AttackState), new AttackState(data.Animator, data.CombatHandler) },
-            { typeof(HitState), new HitState((IHitAnimation)data.Animator, data.CombatHandler) },
-            { typeof(DeathState), new DeathState((IDeathAnimation)data.Animator, data.CombatHandler, data.MovementHandler) }
-        };
+            foreach (ITransitionRule rule in state._transitionRules)
+            {
+                if (!states.ContainsKey(rule.NextStateType))
+                    throw new InvalidOperationException($"Monster transition destination is not registered: {rule.NextStateType.Name}");
+            }
+        }
     }
 }
 }

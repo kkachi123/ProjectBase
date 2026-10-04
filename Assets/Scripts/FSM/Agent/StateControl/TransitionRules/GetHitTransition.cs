@@ -5,7 +5,8 @@ using UniRx;
 public class GetHitTransition : IEventTransitionRule
 {
     public Type NextStateType => typeof(HitState);
-    private IReadOnlyReactiveProperty<float> CurrentHealth;
+    private readonly IReadOnlyReactiveProperty<float> CurrentHealth;
+    private IDisposable _subscription;
     private bool m_shouldTransition = false;
 
     public GetHitTransition(IReadOnlyReactiveProperty<float> currentHealth)
@@ -15,8 +16,10 @@ public class GetHitTransition : IEventTransitionRule
 
     public void Subscribe()
     {
-        if(CurrentHealth == null) return;
-        CurrentHealth
+        if (CurrentHealth == null || _subscription != null)
+            return;
+
+        _subscription = CurrentHealth
             .Pairwise()
             .Where(pair => pair.Current < pair.Previous)
             .Subscribe(_ => TriggerTransition());
@@ -24,6 +27,8 @@ public class GetHitTransition : IEventTransitionRule
 
     public void Unsubscribe()
     {
+        _subscription?.Dispose();
+        _subscription = null;
         m_shouldTransition = false;
     }
 

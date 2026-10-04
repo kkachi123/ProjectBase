@@ -66,6 +66,23 @@ public abstract class AgentController : MonoBehaviour, IAgentAnimationListener ,
     }
     protected abstract void FixedUpdate();
 
+    /// <summary>오브젝트 파괴 시 현재 State 구독과 상태 전환 연결 해제.</summary>
+    protected virtual void OnDestroy()
+    {
+        AgentStateBase exitingState = _currentState;
+        _currentState = null;
+
+        try
+        {
+            exitingState?.Exit();
+        }
+        finally
+        {
+            foreach (AgentStateBase state in _states.Values)
+                state.OnTransition -= ChangeState;
+        }
+    }
+
     /// <summary>등록된 상태 타입으로 전환. 이전 State 종료 후 새 State 진입.</summary>
     public virtual void ChangeState(Type stateType)
     {

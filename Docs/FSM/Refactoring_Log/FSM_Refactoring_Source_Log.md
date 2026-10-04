@@ -2,7 +2,7 @@
 
 > PDF 갱신을 위한 단일 원본 문서다. 코드 구조가 바뀌면 먼저 이 문서의 **변경 이력**, **현재 구조**, **검증 상태**를 갱신한다.
 >
-> 대상 범위: Player 직접 입력 기반 FSM. Monster Animator/Factory 이행은 별도 후속 작업이며, 현재 구현 완료로 간주하지 않는다.
+> 대상 범위: Player 직접 입력 기반 FSM과 기본 네 상태 Monster 실행 구조. Goblin 기준 Controller·Input·Animator·Factory·prefab 제작을 완료했다. Behavior 의사결정과 다중 공격 타입 입력은 아직 구현하지 않았다.
 
 ## 1. 리팩토링 이전 구조
 
@@ -48,7 +48,7 @@ State -> AgentController -> Input / Movement / Combat / Animator
 
 `AgentStateBase` 통합으로 State의 공통 생명주기와 전이 규칙 등록 방식을 한 곳에 모았다. `AgentStateMachine<IAgentState>`를 제거한 뒤에는 `AgentController`가 State Dictionary와 `_currentState`를 직접 관리하여, 현재 State의 소유자와 전환 실행 지점을 명확하게 했다.
 
-전환은 State가 Controller를 직접 호출하는 방식에서 `ITransitionRule`을 평가하고 `OnTransition`을 발행하는 방식으로 옮겼다. Factory가 이 이벤트를 Controller의 전환 처리와 연결하고, 각 State에는 필요한 Rule만 조합한다. 단, 이 방식은 Player FSM을 중심으로 적용 중이며 Monster와 남아 있는 기존 State까지 전부 이행된 상태는 아니므로 **부분 적용**으로 기록한다.
+전환은 State가 Controller를 직접 호출하는 방식에서 `ITransitionRule`을 평가하고 `OnTransition`을 발행하는 방식으로 옮겼다. Factory는 각 State에 필요한 Rule을 조합하고, Controller가 State의 전환 이벤트를 `ChangeState`에 연결한다. 위 표의 **부분 적용**은 1차 변경 당시의 상태다. 이후 Player에 이어 기본 Monster 네 상태도 이 방식으로 이행했으며, 모든 NPC·AI 계열까지 일괄 이행했다고 해석하지 않는다.
 
 Handler를 분리한 뒤에는 필요한 Handler를 interface로 묶어 주입하는 방식도 사용했다. 그러나 기능이 늘수록 interface가 과도하게 생기고, State별로 실제 필요한 Handler 조합을 명확히 구분하기 어려웠다.
 
@@ -71,10 +71,13 @@ Controller -> StateFactory -> State(필요한 의존성만 주입)
 ### State와 Factory
 
 - `AgentController`는 State Dictionary를 `Type` 키로 보관하고 현재 State 전환을 관리한다.
-- `AgentController`는 더 이상 구체 Animator 참조·초기화를 소유하지 않는다. Player와 이후 Monster Controller가 각 전용 Animator를 직접 초기화한다.
+- `AgentController`는 더 이상 구체 Animator 참조·초기화를 소유하지 않는다. PlayerController와 MonsterController가 각 전용 Animator를 직접 초기화한다.
+- `AgentStateFactory<TData>`가 공통 State 생성 → Agent별 State 추가·교체 → 전이 연결 순서를 관리한다. PlayerStateFactory와 MonsterStateFactory가 이를 상속한다.
 - `PlayerStateFactory`는 `GroundedState`, `JumpState`, `FallState`, `DashState`, `AttackState`, `HitState`, `DeathState`를 구성한다.
+- `MonsterStateFactory`는 `GroundedState`, `AttackState`, `HitState`, `DeathState` 네 Type key를 구성한다. Attack·Hit의 값은 각각 MonsterAttackState·MonsterHitState로 확장하되 공용 key를 유지한다.
 - State는 필요한 Handler, Input interface, Animator capability만 생성자로 받는다.
 - 전이 조건은 `ITransitionRule` 구현체를 Factory에서 조합한다.
+- State Exit에서 활성 Event Rule을 해제하고, Controller 파괴 시 현재 State Exit와 모든 `OnTransition` 연결을 정리한다.
 
 ### 지상 행동과 Animator
 
@@ -125,14 +128,36 @@ Controller -> StateFactory -> State(필요한 의존성만 주입)
 | Interact | `OnInteractRequested` 이벤트 | 상태 보관보다 단발 명령 전달이 명확 |
 | Health / Stamina | UniRx 유지 | UI 등 여러 시스템이 값 변화를 구독할 수 있음 |
 
+### Dash 실행과 착지 초기화
+
+- `DashState`의 Enter / Execute / Exit가 Handler의 BeginDash / ExecuteDash / EndDash를 호출한다. Handler 자체의 Update·FixedUpdate로 별도 실행하지 않는다.
+- `PlayerMotorData : AgentMotorData`에 Dash 속도·거리·공중 횟수를 분리한다. 현재 Handler 데이터 의존성은 PlayerMotorData이며, 모든 Agent용 데이터로 일반화한 상태는 아니다.
+- Dash 진입 시 시선 방향을 확정하고 수직 속도·중력을 정지한다. 실행 중 목표 거리 또는 WallDetector 감지로 완료하고, Exit에서 속도와 중력을 정리한다.
+- `DashEndTransition`은 Handler의 완료 값만 확인하고 지면 상태에 따라 Grounded/Fall을 선택한다. Animation End Event가 종료 조건은 아니다.
+- GroundDetector의 `OnGroundedChanged`가 true로 바뀌면 Handler가 공중 Dash 횟수를 초기화한다. 지상 Dash 재진입이 초기화 조건이 아니다.
+- Dash 남은 거리 `<= 0.001f`, LandTransition 수직 속도 `<= 0.01f`처럼 용도별 허용 오차를 둔다. 정확한 float 0 도달을 완료 조건으로 요구하지 않는다.
+
+### 기본 Monster 실행 구조
+
+- `MonsterController : AgentController`는 공통 초기화와 MonsterAnimator 초기화, Factory 주입, 단발 공격 시작 판정을 담당한다. 기본 공격 타입은 현재 1번으로 고정한다.
+- `MonsterInput`은 마지막 x축 이동 명령을 보관하고 `RequestAttack()`으로 매개변수 없는 `OnAttackRequested`를 발행한다. Behavior·타깃 선택·공격 버퍼·자동 반복은 포함하지 않는다.
+- MonsterAttackState와 MonsterHitState는 공용 State를 상속해 진입 시 수평 이동만 정지한다. 공용 GroundedState와 DeathState는 그대로 사용한다.
+- Monster 전이는 등록 순서로 사망 → 피격 → 일반 행동을 평가한다. 공격·피격 종료는 등록된 GroundedState로 복귀하며, FallState는 구성하지 않는다.
+- `BasicMonster_Anim.controller`는 Grounded Idle/Move Blend Tree와 단일 Attack·Hit·Death로 구성한다. 현재 AttackType parameter는 존재하지만 다중 공격 Entry 분기는 없다.
+- `BasicMonster.prefab`은 종별 데이터를 비워 둔 템플릿이고, `Goblin.prefab`은 Clip Override와 Stat/Motor 데이터를 연결한 완성 variant다.
+- Root의 MonsterAnimator가 Visual의 실제 Animator 한 개를 제어한다. Visual의 AgentAnimationEventProxy가 공격 유효 프레임·종료 이벤트를 Controller에 전달한다.
+- 같은 네 상태·단발 공격을 사용하는 다른 몬스터는 Clip·Override·데이터·prefab variant를 교체한다. 다른 행동이나 다중 공격은 별도 확장 대상이다.
+
 ### Animator capability
 
 | 클래스 | 책임 |
 | --- | --- |
 | `AgentAnimator` | Animator 참조, parameter hash 등록, 안전한 `SetBool` / `SetFloat` / `SetInteger`, 공통 Hit·Death 표현 |
 | `PlayerAnimator` | Player 전용 Dictionary 및 Grounded·Jump·Fall·Dash·Attack·MoveSpeed·AttackType API |
+| `MonsterAnimator` | Monster 전용 Grounded·Attack·MoveSpeed·AttackType Dictionary와 API, 실제 parameter 이름·타입 검증 |
 | `AgentAnimationDataSO` | 공통 `IsHit`, `IsDeath` parameter 이름 |
 | `PlayerAnimationDataSO` | Player 전용 parameter 이름 |
+| `MonsterAnimationDataSO` | Monster 전용 Grounded·Attack·MoveSpeed·AttackType parameter 이름 |
 
 모든 Animator capability interface는 `IAgentAnimator.cs`에 둔다. State는 구체 Animator가 아닌 필요한 capability interface에 의존한다.
 
@@ -144,6 +169,7 @@ Controller -> StateFactory -> State(필요한 의존성만 주입)
 | --- | --- | --- |
 | State 기반 단순화 | `AgentStateBase<T>`, `GroundedAgentStateBase`, `AgentStateMachine<IAgentState>`의 역할이 분산 | 비제네릭 `AgentStateBase`와 `AgentController._currentState` 직접 관리로 수명 구조 단순화 |
 | Factory 의존성 주입 | `AgentController`가 모든 State 기능을 제공해 God Object화 | Factory가 State별 최소 Handler·Input·Animator capability를 생성자로 주입 |
+| Factory 생성 순서 공용화 | 개별 Factory마다 공통 State 생성과 전이 연결을 중복할 수 있음 | AgentStateFactory<TData> 상속으로 공통 생성 → 전용 추가·교체 → 최종 객체 전이 연결 순서를 고정 |
 | Type 기반 State 식별 | 하나의 `StateType` enum에 Player/Monster 상태가 누적 | `Dictionary<Type, AgentStateBase>`로 Agent별 State 확장 충돌 완화 |
 | Event Rule 수명 통합 | Controller와 State에 구독 해제 책임이 분산 | `AgentStateBase.Exit()`가 Event Rule 해제 후 `OnExit()`를 호출 |
 
@@ -155,6 +181,7 @@ Controller -> StateFactory -> State(필요한 의존성만 주입)
 | 입력 이벤트화 | 변화 구독이 없는 입력도 UniRx 값으로 보관하고, 공중 입력이 착지 뒤 재사용될 수 있음 | Jump·Attack·Interact·Dash 요청을 Event로 발행하고 활성 State의 Rule만 구독 |
 | 전이 우선순위 명시 | 동일 프레임의 입력·물리 전이 결과가 등록 순서에 의존 | Factory의 Rule 등록 순서를 행동 우선순위로 관리 |
 | 점프 경계 조건 보강 | 가장자리 및 재입력에서 비정상 재상승 | 점프 요청 소비와 모터 수직 속도 기반 Fall 전이 적용 |
+| float 완료 판정 허용 오차 | 착지·Dash 종료에서 정확한 0 조건 때문에 전환이 누락될 수 있음 | LandTransition의 0.01f 수직 속도, Dash의 0.001f 남은 거리처럼 물리량별 허용 오차 사용 |
 
 ### 4.3 이동·지상 상태 통합
 
@@ -187,15 +214,66 @@ Controller -> StateFactory -> State(필요한 의존성만 주입)
 
 | 변경 | 이전 문제 | 적용 결과 |
 | --- | --- | --- |
-| Dash를 별도 State로 분리 | 일반 지상 이동 State에 Dash 규칙이 섞일 위험 | `DashState`가 Dash Animation 수명과 기존 수평 속도 정리를 담당 |
+| Dash를 별도 State로 분리 | 일반 지상 이동 State에 Dash 규칙이 섞일 위험 | `DashState`가 Dash 실행·Animation·속도·중력 복구 수명을 담당 |
 | 공중 Dash 전이 허용 | GroundDetector 조건 때문에 지상에서만 Dash 가능 | Grounded·Jump·Fall에서 `DashTransition`을 구독하고, 종료 시 Grounded/Fall을 판정 |
 | 공용 기반 타입 승격 | `PlayerDashState`가 공용 전이의 목적지여서 다른 Agent 확장이 어려움 | Agent 영역의 `DashState`를 `typeof(DashState)` key와 전이 목적지로 사용. Agent별 파생 State로 확장 가능 |
+| 이동·완료 판단 분리 | Animation 종료 이벤트와 실제 이동 완료를 혼동할 수 있음 | Handler가 거리·벽 감지와 완료 값 관리, DashEndTransition은 완료 여부와 복귀 목적지만 판정 |
+| 실행 주체 통일 | Handler의 Unity 파이프라인과 State 실행 수명이 분리 | DashState.OnExecute에서만 ExecuteDash 호출. 불필요한 지속 실행 flag 제거 |
+| 데이터 확장 | Agent 공통 이동 데이터에 Player Dash 수치가 누적될 수 있음 | PlayerMotorData에 Dash 속도·거리·공중 횟수 배치 |
+| 착지 이벤트 초기화 | 공중 Dash 사용 횟수가 지상 Dash 진입 때만 초기화 | GroundDetector 상태 변경 이벤트 구독으로 실제 착지 시 초기화, 재초기화·파괴 시 구독 해제 |
+
+### 4.7 기본 Monster 확장과 Goblin 제작
+
+Player를 중심으로 정리한 FSM·Animator·Factory 구조를 기본 네 상태 Monster에 실제 적용했다. 기존 Orc를 신규 구조로 이관하지 않고, 전용 코드와 에셋을 제거한 뒤 Goblin을 처음부터 제작했다. 목적은 AI 의사결정이 아니라 **기본 행동 실행과 종별 에셋 교체의 기준 구현**을 만드는 것이다.
+
+| 클래스·구성 | 이전 구조·문제 | 현재 구조·변경 결과 |
+| --- | --- | --- |
+| MonsterController | Animator 초기화·공격 시작 판정 누락, Factory 의존성 전달 불완전 | AgentController 기반 초기화, MonsterAnimator.Initialize, 필요한 의존성 주입, 타입 1 단발 공격 판정 |
+| AIMonsterInput → MonsterInput | Behavior용 Move·Attack API와 타입 인자가 있었지만 공격 선택에 사용하지 않음 | 외부 SetMovement·RequestAttack으로 교체. 이동 명령 보관과 단발 이벤트 전달만 수행 |
+| MonsterStateFactory | 독립 클래스, Attack 등록 주석 처리, 전이 미구성 | AgentStateFactory<MonsterStateFactoryData> 상속, 네 상태 생성·교체·전이 조립과 목적지 key 검증 |
+| MonsterStateFactoryData | Factory 파일 내부의 빈 파생 데이터 | 별도 파일로 분리. 부모 Animator와 동일 객체인 MonsterAnimator 접근·주입 속성 추가 |
+| MonsterAnimator | 공용 AgentAnimator만으로 Grounded capability를 제공할 수 없음 | Agent 공통 Hit·Death를 상속하고 Monster Grounded·Attack capability와 전용 Dictionary 구현 |
+| MonsterAnimationDataSO | 신규 Monster 전용 parameter 계약 없음 | AgentAnimationDataSO 상속. Grounded·Attack·MoveSpeed·AttackType 이름과 역할 주석 추가 |
+| MonsterAttackState | 추상 AttackState를 직접 생성할 수 없고 이동 속도가 남을 수 있음 | AttackState 상속, OnEnter에서 공용 공격 진입 후 StopHorizontal 수행 |
+| MonsterHitState | 공용 HitState만으로 잔여 수평 속도 정지 보장 불가 | HitState 상속, 피격 진입 후 StopHorizontal 수행 |
+| GroundedState·DeathState | 별도 Monster 복제를 만들 위험 | 공용 State 재사용. Attack·Hit 파생 인스턴스도 공용 Type key로 등록 |
+| Monster 전이 | 행동·피격·사망 목적지 연결 없음 | Grounded: Death→Hit→Attack, Attack: Death→Hit→AttackEnd, Hit: Death→HitEnd, Death: 전이 없음 |
+| 공용 Animator·prefab | 기존 Orc 전용 구성과 결합 | 네 상태 BasicMonster Controller·다섯 Clip slot·BasicMonster 템플릿 제작 |
+| Goblin 에셋 | 신규 실행 구조 없음 | 다섯 Sprite 시트·Clip·Override·Stat/Motor 데이터와 Goblin prefab variant 제작 |
+
+추가 State는 새로운 행동 종류가 아니라 공용 Attack·Hit의 실행 정책을 확장한 두 파생 클래스다. 새로운 Transition 클래스나 IMonsterAnimator 인터페이스는 추가하지 않았다.
+
+#### 에셋 교체 기준과 삭제 정리
+
+- 공용 Controller·Clip slot·AnimationData와 완성 prefab은 `Assets/Prefabs/Monster/` 아래 배치한다. Goblin Sprite·Clip·Override·Stat/Motor 지원 에셋은 `Assets/Prefabs/Monster/Goblin/`에 배치한다.
+- Monster 스크립트는 `Assets/Scripts/FSM/NPC/AIMonstor/`의 @Hub·Input·SOData·MonsterState 역할별 경로에 둔다. 공용 Agent State·Rule은 기존 Agent 경로를 유지한다.
+- 원본 Goblin 아트는 보존하고 작업용 시트만 분할·설정한다. Point·Uncompressed·PPU 100·공통 발 pivot을 적용했다. Clip FPS·Collider·공격 범위는 최종 밸런스가 아니라 검증 초기값이다.
+- 기존 OrcAI prefab, Orc 전용 Clip·SO, 이전 Monster_Anim Controller, OrcBrain·Monster Actions 4개·AIMonsterInput과 해당 meta를 삭제했다. AIPlayer·NPC 공용 Action·Unity Behavior 패키지는 유지했다.
+- SampleScene의 Orc 인스턴스와 연결 참조를 제거했다. 맵 설정의 monsterPrefab·spikeTrapPrefab에 들어 있던 Orc 참조를 비웠으며 Goblin으로 자동 치환하지 않았다. SampleScene 저장에 따른 Editor 직렬화 갱신도 변경 파일에 포함된다.
+- BasicMonster 템플릿에 종별 Stat/Motor 데이터가 없다는 점과, Behavior가 없어 자동 이동·공격하지 않는다는 점을 인수인계에 명시했다.
+
+#### 이번에 적용하지 않은 공격 확장안
+
+현재 `IAgentCombatInput.OnAttackRequested`는 매개변수 없는 Action이고 MonsterController는 공격 타입 1만 준비한다. `RequestAttack(int)`·`Action<int>`·`TryStartAttack(int)` 및 Attack Sub State Machine의 다중 Entry 분기는 논의된 **후속 설계**이며 이 구현·커밋의 완료 항목이 아니다. Player의 최초 공격 타입 선택과 ComboTrigger 구조도 이번 Monster 제작으로 변경하지 않았다.
+
+### 4.8 공용 전이와 구독 수명 안정화
+
+Monster 제작 과정에서 공용 Rule의 기존 수명 문제를 함께 정리했다. Player와 Monster가 같은 Rule을 사용하므로 기존 Player 생성자·전이 순서는 유지하고 회귀 동작을 별도로 확인했다.
+
+| 변경 파일 | 이전 문제 | 적용 결과 |
+| --- | --- | --- |
+| GetHitTransition | Subscribe 반환값 미보관, Unsubscribe가 flag만 초기화하여 구독 누적 가능 | IDisposable 보관, 중복 Subscribe 방지, 자신의 구독만 Dispose하고 참조·flag 초기화 |
+| DeathTransition | 정상 참조를 차단하는 구독 조건과 Pairwise 기반 flag로 이미 사망한 값 누락 가능 | ITransitionRule로 단순화, 현재 IsDead.Value를 직접 판정. 구독·flag 제거 |
+| AttackEndTransition | GroundDetector 기준 복귀만 제공해 FallState가 없는 Monster에 부적합 | 기존 Player용 생성자 유지, 명시적인 Type 고정 복귀 생성자 추가. End 구독·해제 재사용 |
+| AgentController | 오브젝트 파괴 시 활성 State와 State 전환 연결 정리 없음 | OnDestroy에서 현재 State 참조 해제·Exit 후 finally에서 모든 OnTransition 연결 해제 |
+
+GetHitTransition의 Dispose는 해당 Rule이 만든 구독만 종료한다. Health ReactiveProperty 자체나 UI 등 다른 소비자의 구독을 해제하지 않는다. Disable/Enable 풀링 수명 정책은 추가하지 않았다.
 
 ## 5. 검증 상태
 
 | 항목 | 상태 | 근거 / 남은 확인 |
 | --- | --- | --- |
-| C# 컴파일 | 코드 변경 후 완료 | Combo·Dash 구조 변경 뒤 Unity 재컴파일 오류 없음 |
+| C# 컴파일 | Monster 제작 단계 완료 | 공용 Rule·Monster 코드 추가 후 Unity 컴파일 오류 없음. 아래 Player prefab 초기화 문제는 별도 런타임 설정 문제 |
 | Hero Animator parameter 계약 | 완료 | `PlayerAnimationDataSO`와 Animator parameter 이름을 기준으로 등록 |
 | Prefab Animator 바인딩 | 완료 | `Player`, `ProjectRE_Player Variant` 모두 Hero child Animator 연결 |
 | Grounded Blend Tree 구성 | 완료 | `MoveSpeed`로 Idle/Move 표현 |
@@ -208,28 +286,44 @@ Controller -> StateFactory -> State(필요한 의존성만 주입)
 | AttackEndTransition 분리 | 완료 | 마지막 Combo의 Animation End Event가 공용 AttackEndTransition을 통해 Grounded/Fall 복귀를 처리 |
 | Hero_Jump Sub State Machine 진입 분기 | 코드/구성 완료, 수동 검증 필요 | Jump/Fall Bool 상호 배제 및 Entry 분기 구성 완료. 점프와 낙하 시작 흐름을 Play Mode에서 확인 필요 |
 | Animator 공통 Exit 전이 | 수동 검증 완료 | 공중 내부 State의 `IsJump == false AND IsFall == false → Exit`와 상위 `Hero_Jump → Grounded / Attack / Dash` 라우팅 동작 확인 |
-| DashState 공용화 | 코드·지상 수동 검증 완료 | `DashState` 공용 기반 State로 이동, Grounded/Jump/Fall Dash 진입과 Animation End 복귀 흐름 구성. 실제 Dash 거리·속도 정책은 보류 |
-| 착지·피격 종료 복귀 | 미완료 | `GroundedState`와 `IsGrounded` 전환을 수동 확인 |
+| DashState 공용화·실행 로직 | 코드 구현 완료, 기존 상태 전이 수동 확인 | Handler의 거리·벽 기반 완료, State 실행 호출, 착지 이벤트 횟수 초기화 구현. 최신 Player 연속 Dash·착지 수동 검증은 별도 확인 |
+| 착지·피격 종료 복귀 | Player 전체 수동 흐름 미완료 | 공용 Rule 회귀 검사와 전체 게임 조작 검증을 구분. Grounded·IsGrounded의 전체 수동 흐름 재확인 필요 |
+| Monster 네 상태·전이 등록 | 제작 단계 검증 완료 | 정확히 네 Type key와 파생 Attack·Hit 인스턴스, 모든 전이 목적지 등록 확인 |
+| Goblin 이동·단발 공격 | 제작 단계 Play Mode 검증 완료 | 좌·우 이동·정지·방향 전환·y 입력 제외, 공격 진입 시 수평 정지, 실제 Clip OnFrame에서 대상 체력 10→8 및 End 후 Grounded 복귀 확인 |
+| 공격 요청 누수·피격 반복 | 제작 단계 검증 완료 | 공격 중 추가 요청이 다음 공격으로 예약되지 않음. 12회 반복 공격·피격에서 이전 flag 잔류 없음 |
+| Monster 피격·사망 | 제작 단계 Play Mode 검증 완료 | Grounded/Attack→Hit→Grounded, Grounded/Attack/Hit의 치명타→Death 직접 전환, 실제 Death End 후 제거 확인 |
+| Action·UniRx 구독 수명 | 제작 단계 검증 완료 | GetHit 중복 구독·Dispose·재진입, 이미 true인 사망 값, 파괴된 객체의 입력·State 전환 연결 해제 확인 |
+| Goblin prefab·Override | 제작 단계 연결 검증 완료 | Missing Script 없음, 실제 Animator 1개, 다섯 Override slot·Clip Animation Event 연결 확인 |
+| 공용 Rule의 Player 회귀 | 조건부 검증 완료 | 테스트 객체에만 누락된 DashHandler 보완 후 지상/공중 AttackEnd·Hit 복귀·기존 Hit 우선 사망 순서 확인. 원본 Player prefab의 정상 초기화까지 보장하지 않음 |
+| 기존 Orc 잔여 참조 | 제작 단계 검사 완료 | 삭제 대상 C# 이름·Orc prefab GUID 잔여 참조 없음. 원본 아트·관련 없는 Agent 에셋 보존 |
+| Goblin 시각·밸런스 | 수동 검증 필요 | 발 위치·크기·Clip FPS·공격 프레임·Collider·공격 범위·체력·피해 조정 필요 |
+
+Monster 실행 검증은 원래 InGame 씬을 보존한 임시 Play Mode 씬에서 외부 명령과 실제 Animator Clip 이벤트로 수행했다. 제작 후 원래 씬을 복원했다. 수동 화면 검증까지 통과한 것으로 기록하지 않는다. 이 표는 제작 단계에서 확보한 결과이며 로그 갱신만으로 테스트를 재실행한 것은 아니다.
+
+Player 회귀 검사에서는 저장된 `ProjectRE_Player Variant.prefab`에 AgentDashHandler2D가 없어 PlayerController.Awake의 초기화 오류가 발생했다. 당시 InGame 인스턴스에는 해당 컴포넌트가 있었으며, 원본 prefab은 수정하지 않고 테스트 객체에만 보완했다. 기존 설정 문제는 Monster 구현과 분리해 보류한다. Play Mode 진입 중 Pipeline 요청 한 번은 메인 스레드 시간 제한으로 실행되지 않았고, 진입 완료 후 재실행한 Monster 검증은 성공했다.
 
 ## 6. 보류 및 예정 사항
 
 ### 보류
 
-- Monster Animator / MonsterStateFactory 분리 및 capability 기반 이행
-- Legacy `AnimationDataSO` 제거: 기존 ScriptableObject 및 Prefab 직렬화 참조를 확인한 뒤 마이그레이션
-- 모든 Monster에 Type 기반 상태 구성을 일괄 적용하는 작업
-- 입력 이벤트화 이후 AI의 실제 공격 전이·입력 정책 통합: 현재는 새 `IAgentCombatInput` 계약에 맞춘 최소 호환 상태
+- Goblin 시각·공격 타이밍·밸런스 수동 검증과 필요한 수치 조정
+- 기본 Monster의 다중 공격 요청·Animator 분기: int attackType을 입력부터 실행까지 전달하는 후속 확장안. 현재 미적용
+- Monster의 Behavior·Brain·타깃 선택·순찰·추적 등 의사결정 계층
+- 비행·낙하·공중 공격·콤보 등 다른 행동 프로필과 다른 Monster 계열의 이행
+- Player prefab의 기존 AgentDashHandler2D 누락과 전체 수동 회귀 확인
+- 풀링·리스폰의 Disable/Enable 수명 정책
+- PDF 산출물 재생성: 이번 최신화는 원본 MD 기준이며 기존 두 PDF는 갱신하지 않음
 
 ### 다음 권장 순서
 
-1. 최신 입력 이벤트화 이후 C# 컴파일을 확인하고, 공중 Jump 입력 뒤 착지 재점프·1→2→3·공중 3타·스태미나 부족을 수동 검증한다.
-2. AgentAnimator 확장과 같이 base 및 확장이 필요한 Class를 확인하고 정리한다.
-3. Player 수동 Play Mode 검증을 완료하고 위 표의 상태를 갱신한다.
-4. Profiler를 통해 FSM 관리 방식이 Dictionary 기반으로 전환되면서 GC 부담이 줄었는지 확인한다.
-5. 가장 단순한 Monster 하나를 선택한다.
-6. 해당 Monster가 실제로 사용하는 행동 capability와 Animator parameter를 표로 정리한다.
-7. 전용 Animator, AnimationDataSO, Factory를 함께 이행한다.
-8. 기준 구현이 안정된 뒤 다른 Monster 계열로 확장한다.
+1. 현재 단발 Goblin 기준 구현과 로그를 먼저 확정한다. 다중 공격 계획을 이미 적용한 것으로 기록하지 않는다.
+2. 후속 공격 확장 시 요청 타입·실행 타입의 책임, Player 타입 선택 정책, AttackData와 Animator 공격 분기 대응을 계획으로 확정한다.
+3. 확정된 계획에 따라 IAgentCombatInput·AttackTransition·공격 시작 판정·Monster Animator를 함께 변경하고 Player 회귀를 확인한다.
+4. Goblin 크기·모션·타격 프레임·Collider와 밸런스를 수동 검증한다.
+5. Player prefab 설정 문제와 최신 Jump·Combo·Dash 전체 수동 검증을 별도 작업으로 진행한다.
+6. 같은 행동 프로필의 다음 몬스터는 공용 코드 복제 없이 에셋·Override·variant·데이터로 제작한다. 다른 프로필은 먼저 확장 범위를 정한다.
+7. Behavior 의사결정은 별도 요청 이후 설계한다. 현재 명령 실행 구조에 자동 행동을 임의 추가하지 않는다.
+8. 성능·GC 개선 수치는 Profiler 측정 이후에만 문서에 기록한다.
 
 ## 7. PDF 갱신 규칙
 
@@ -238,7 +332,7 @@ Controller -> StateFactory -> State(필요한 의존성만 주입)
 `FSM_Refactoring_Change_Log.pdf`에는 다음을 반영한다.
 
 1. 리팩토링 이전 구조와 Factory 기반 의존성 주입 전환
-2. 변경 이력을 실제 적용 순서대로 기록
+2. 변경 이력을 State·입력·Animator·공격·Dash·Monster·구독 수명 등 주제별로 기록하고 각 주제 안에서 변경 전후와 적용 과정을 설명
 3. 이전 구조와 현재 구조의 역할 비교
 4. 검증 완료/미완료와 보류 항목
 
@@ -251,10 +345,11 @@ Controller -> StateFactory -> State(필요한 의존성만 주입)
 3. GroundedState, Animator 계약, capability 분리의 핵심 개선
 4. Prefab Animator 바인딩 디버깅 사례
 5. 검증 근거와 다음 검증 항목
+6. Goblin 제작으로 확인한 공용 Factory·State·Animator 확장과 코드 복제 없는 에셋 교체 기준
 
 ### 업데이트 시 작성 원칙
 
-- 구현되지 않은 Monster 확장 내용은 완료로 표현하지 않는다.
+- 기본 단발 Monster 제작과 아직 구현하지 않은 다중 공격·Behavior·다른 행동 프로필을 구분한다.
 - 성능 수치나 체감 개선 정도는 측정값이 없으면 추정하지 않는다.
 - 수동 테스트 전에는 ‘완료’ 대신 ‘코드/구성 완료, 수동 검증 필요’로 기록한다.
 - 코드 변경이 발생하면 먼저 이 문서의 변경 이력과 검증 상태를 갱신한 뒤 PDF를 갱신한다.

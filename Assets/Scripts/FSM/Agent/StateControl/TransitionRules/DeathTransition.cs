@@ -2,39 +2,20 @@
 {
 using System;
 using UniRx;
-public class DeathTransition : IEventTransitionRule
+/// <summary>현재 사망 값에 따른 DeathState 전이 판정.</summary>
+public class DeathTransition : ITransitionRule
 {
     public Type NextStateType => typeof(DeathState);
-    private IReadOnlyReactiveProperty<bool> IsDead;
-    private bool m_shouldTransition = false;
+    private readonly IReadOnlyReactiveProperty<bool> IsDead;
 
     public DeathTransition(IReadOnlyReactiveProperty<bool> isDead)
     {
-        IsDead = isDead;
-    }
-
-    public void Subscribe()
-    {
-        if(IsDead != null) return;
-        IsDead
-            .Pairwise() 
-            .Where(pair => pair.Current != pair.Previous)
-            .Subscribe(_ => TriggerTransition());
-    }
-
-    public void Unsubscribe()
-    {
-        m_shouldTransition = false;
-    }
-
-    private void TriggerTransition()
-    {
-        m_shouldTransition = true;
+        IsDead = isDead ?? throw new ArgumentNullException(nameof(isDead));
     }
 
     public bool ShouldTransition(float deltatime)
     {
-        return m_shouldTransition;
+        return IsDead.Value;
     }
 }
 }
