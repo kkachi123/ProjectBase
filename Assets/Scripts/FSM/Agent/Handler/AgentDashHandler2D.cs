@@ -28,11 +28,15 @@ namespace ProjectRE
         /// <summary>거리 도달 또는 WallDetector 감지로 Dash를 종료할 수 있는 상태인지 나타낸다.</summary>
         public bool IsCompleted => _isCompleted;
 
+        /// <summary>Dash 실행에 필요한 데이터와 감지기를 주입하고 착지 이벤트를 구독합니다.</summary>
         public void Initialize(
             PlayerMotorData motorData,
             GroundDetector groundDetector,
             WallDetector wallDetector)
         {
+            if (_groundDetector != null)
+                _groundDetector.OnGroundedChanged -= HandleGroundedChanged;
+
             _rigidbody = GetComponent<Rigidbody2D>();
             _motorData = motorData;
             _groundDetector = groundDetector;
@@ -40,8 +44,18 @@ namespace ProjectRE
             bool _isInitialized = _rigidbody != null && _motorData != null && _groundDetector != null && _wallDetector != null;
 
             if (!_isInitialized)
+            {
                 Debug.LogError("AgentDashHandler2D 초기화에 필요한 참조가 없습니다.", this);
+                return;
+            }
+
+            _groundDetector.OnGroundedChanged += HandleGroundedChanged;
+
+            // 초기화 시점에 이미 지상이라면, 이전에 남아 있을 수 있는 공중 Dash 횟수를 정리한다.
+            if (_groundDetector.IsGrounded)
+                ResetAirDashCount();
         }
+        /// <summary>현재 지면 상태와 남은 공중 Dash 횟수를 기준으로 Dash 시작 가능 여부를 반환합니다.</summary>
         public bool CanStartDash()
         {
             // 지상에 있거나 공중 Dash 횟수가 남아있으면 DashState 진입을 허용한다.
@@ -53,10 +67,8 @@ namespace ProjectRE
         /// </summary>
         public void BeginDash()
         {
-            // 지상 Dash를 시작하면 공중 Dash 횟수를 초기화하고, 공중 Dash를 시작하면 사용한 횟수를 증가시킨다.
-            if (_groundDetector.IsGrounded)
-                _usedAirDashCount = 0;
-            else
+            // 착지 시점의 초기화는 GroundDetector 이벤트가 담당한다.
+            if (!_groundDetector.IsGrounded)
                 _usedAirDashCount++;
 
             _isCompleted = false;
@@ -70,24 +82,11 @@ namespace ProjectRE
         }
 
         /// <summary>
-        /// DashState 종료 시 항상 호출해 물리 설정을 원래 상태로 복구한다.
-        /// </summary>
-        public void EndDash()
-        {
-            _rigidbody.linearVelocity = Vector2.zero;
-            _rigidbody.gravityScale = _savedGravityScale;
-        }
-
-        /// <summary>
         /// DashState가 실행 중인 프레임에만 호출해 Dash 이동 및 종료 조건을 갱신한다.
         /// Handler는 MonoBehaviour 생명주기에서 독립적으로 Dash를 진행하지 않는다.
         /// </summary>
         public void ExecuteDash()
         {
-            // 착지한 뒤 다음 공중 Dash를 정상적으로 허용한다.
-            if (_groundDetector.IsGrounded)
-                _usedAirDashCount = 0;
-
             if ( _isCompleted)
                 return;
 
@@ -109,19 +108,43 @@ namespace ProjectRE
             }
 
             // 설정한 dashSpeed로 이동한다. 
-            // 목표 거리까지 남은 거리를 고려해 마지막 프레임에서는 속도를 보정한다.
-            // 호출은 State가 담당하지만 Rigidbody의 실제 이동 단위는 물리 틱이므로
-            // 마지막 속도 보정에는 fixedDeltaTime을 사용한다.
             float maxStepSpeed = remainingDistance / Time.fixedDeltaTime;
             float dashSpeed = Mathf.Min(_motorData.dashSpeed, maxStepSpeed);
             _rigidbody.linearVelocity = new Vector2(_dashDirection * dashSpeed, 0f);
         }
+        
+        /// <summary>
+        /// DashState 종료 시 항상 호출해 물리 설정을 원래 상태로 복구한다.
+        /// </summary>
+        public void EndDash()
+        {
+            _rigidbody.linearVelocity = Vector2.zero;
+            _rigidbody.gravityScale = _savedGravityScale;
+        }
+
 
         // Dash State가 종료 조건을 만족했음을 나타내고, Rigidbody를 정지시킨다.
         private void CompleteDash()
         {
             _rigidbody.linearVelocity = Vector2.zero;
             _isCompleted = true;
+        }
+
+        private void HandleGroundedChanged(bool isGrounded)
+        {
+            if (isGrounded)
+                ResetAirDashCount();
+        }
+
+        private void ResetAirDashCount()
+        {
+            _usedAirDashCount = 0;
+        }
+
+        private void OnDestroy()
+        {
+            if (_groundDetector != null)
+                _groundDetector.OnGroundedChanged -= HandleGroundedChanged;
         }
     }
 }

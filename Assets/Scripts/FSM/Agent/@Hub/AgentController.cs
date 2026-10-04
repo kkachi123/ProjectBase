@@ -6,6 +6,9 @@ using UnityEngine;
 
 [RequireComponent(typeof(AgentMotor2D), typeof(Health), typeof(AgentCombatHandler))]
 
+/// <summary>
+/// Agent 공통 컴포넌트를 초기화하고 Type 기반 FSM의 현재 상태 전환을 관리합니다.
+/// </summary>
 public abstract class AgentController : MonoBehaviour, IAgentAnimationListener , IAnimationEventSource , IAttackStarter
 {
     [Header("Data Assets")]
@@ -63,6 +66,7 @@ public abstract class AgentController : MonoBehaviour, IAgentAnimationListener ,
     }
     protected abstract void FixedUpdate();
 
+    /// <summary>등록된 상태 타입으로 전환하며, 이전 상태를 종료한 뒤 새 상태를 진입시킵니다.</summary>
     public virtual void ChangeState(Type stateType)
     {
         if (_states.TryGetValue(stateType, out AgentStateBase newState))
@@ -74,6 +78,7 @@ public abstract class AgentController : MonoBehaviour, IAgentAnimationListener ,
         Debug.Log($"State changed to: {stateType.Name}");
     }
     
+    /// <summary>Animation Event를 현재 State 또는 공용 애니메이션 종료 이벤트로 전달합니다.</summary>
     public virtual void OnAnimationEvent(AnimEventType type)
     {
         if (type == AnimEventType.OnFrame)

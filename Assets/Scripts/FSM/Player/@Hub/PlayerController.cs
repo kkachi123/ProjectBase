@@ -3,6 +3,9 @@
     using UnityEngine;
     [RequireComponent(typeof(AgentImpactHandler))]
     [RequireComponent(typeof(PlayerAnimator))]
+    /// <summary>
+    /// Player 전용 컴포넌트와 State Factory를 초기화하고, Player 공격 시작 조건을 판정합니다.
+    /// </summary>
     public class PlayerController : GroundedAgentController
     {
 
@@ -63,6 +66,7 @@
         #endregion
 
         #region State Input Event
+        /// <summary>현재 지상 여부에 맞는 공격 타입을 적용할 수 있으면 공격 시작을 허용합니다.</summary>
         public override bool TryStartAttack()
         {
             int attackType = IsGrounded ? 1 : 3;

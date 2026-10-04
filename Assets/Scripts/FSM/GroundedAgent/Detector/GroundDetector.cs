@@ -1,19 +1,33 @@
 ﻿namespace ProjectRE
 {
 using UnityEngine;
+using System;
 
+/// <summary>
+/// BoxCast로 Agent의 지면 접촉 여부를 갱신하고, 상태 변화 이벤트를 발행합니다.
+/// </summary>
 public class GroundDetector : MonoBehaviour
 {
     [SerializeField] private LayerMask groundLayers;
     [SerializeField] Vector2 rayBoxSize = new Vector2(0.5f, 0.1f);
     [SerializeField] Vector3 playerFootPos = new Vector3(0f, 0.6f, 0f);
 
+    /// <summary>마지막 지면 감지 결과입니다.</summary>
     public bool IsGrounded { get; private set; }
-    // public bool StairsGrounded { get; private set; }
+
+    /// <summary>지면 접촉 상태가 변경될 때 새 상태를 전달합니다.</summary>
+    public event Action<bool> OnGroundedChanged;
+
+    /// <summary>현재 위치를 기준으로 지면 감지를 수행하고 변경 여부를 알립니다.</summary>
     public void UpdateGroundedStatus()
     {
         RaycastHit2D hit = Physics2D.BoxCast(transform.position - playerFootPos, rayBoxSize, 0f, Vector2.down, 0.1f, groundLayers);
-        IsGrounded = hit.collider != null;
+        bool nextIsGrounded = hit.collider != null;
+        if (nextIsGrounded != IsGrounded)
+        {
+            IsGrounded = nextIsGrounded;
+            OnGroundedChanged?.Invoke(IsGrounded);
+        }
     }
 
     private void OnDrawGizmos()
