@@ -92,7 +92,7 @@ public abstract class AgentController : MonoBehaviour, IAgentAnimationListener ,
             _currentState = newState;
             _currentState?.Enter();
         }
-        Debug.Log($"State changed to: {stateType.Name}");
+        //Debug.Log($"State changed to: {stateType.Name}");
     }
     
     /// <summary>Animation Event를 현재 State 동작 또는 공용 종료 이벤트로 전달.</summary>

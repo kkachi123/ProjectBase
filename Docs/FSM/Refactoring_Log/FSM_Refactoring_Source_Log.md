@@ -89,7 +89,7 @@ Controller -> StateFactory -> State(필요한 의존성만 주입)
 ### 공격 Sub State Machine 진입
 
 - 외부 상태(`Grounded`, `Hero_jump`, `Hero_fall_start`, `Hero_fall_loop`)는 개별 Combo State가 아닌 `Attack` Sub State Machine으로만 진입한다.
-- `Attack` Sub State Machine의 `Entry`는 최초 지상 공격인 `Hero_combo1`과 공중 공격인 `Hero_combo3`만 선택한다. Combo 2·3은 Animator 내부 전이로만 이어진다.
+- `Attack` Sub State Machine의 `Entry`는 `Hero_Combo1` 내부의 지상 `Hero_Attack1`과 Attack 바로 아래의 공중 `Hero_Attack3`만 선택한다. 지상 2·3타는 Animator 내부 전이로만 이어진다.
 - 공용 `AttackTransition`이 최초 공격 입력을 받고 `TryStartAttack()` 성공 시에만 AttackState에 진입한다. Player는 이 시점에 지상 1타 또는 공중 3타를 `CombatHandler`에 준비한다.
 - `AttackState.OnEnter()`는 준비된 `CurrentAttackType`으로 Animator 공격 진입을 적용한다.
 - `AttackType`은 최초 공격 진입점만 결정한다. 지상 Combo는 `1`, 공중 단일 공격은 `3`을 사용한다.
@@ -103,7 +103,10 @@ Controller -> StateFactory -> State(필요한 의존성만 주입)
 - `AttackState`는 준비된 공격 타입을 Animator에 적용하고 공통 정리를 담당한다.
 - `PlayerAttackState`는 진입 시 지상 공격의 수평 이동을 멈추고, AttackState 동안의 공격 입력을 `IComboAnimation.SetComboTrigger()`로 전달한다.
 - Animator는 각 Combo 전이의 `Has Exit Time`, Exit Time, Duration으로 입력 수락 시점과 연결 타이밍을 제어한다.
-- `AttackEndTransition`은 마지막 Combo Clip의 Animation End Event를 받아 Grounded/Fall로 복귀한다.
+- 공격 실행 클립과 종료 클립을 분리했다. 지상 1·2타에서 콤보 입력이 있으면 다음 공격으로 연결하고, 입력이 없거나 최종타·공중 공격이면 대응하는 `Hero_AttackN_End` State로 진행한다.
+- 공격 실행 클립에는 타격 이벤트만, 대응 `_end` 클립에는 `OnAnimationEnd` 1개만 둔다. `AttackEndTransition`은 해당 End 클립의 이벤트를 받아 현재 지면 상태에 따라 Grounded/Fall로 복귀한다.
+- 공격 실행·콤보·End 모션 동안 같은 `PlayerAttackState`를 유지한다. 종료 이벤트 후 FSM Exit에서 잔여 ComboTrigger·IsAttack·AttackType을 정리한다.
+- 지상·공중 공격의 기존 직접 `Attack → Exit` 전이 4개를 제거했다. 정상 종료는 `Attack → End → Exit`로 통일하고, 피격·사망은 기존 Any State 경로를 유지한다.
 
 ### 공중 Sub State Machine 진입
 
@@ -116,7 +119,7 @@ Controller -> StateFactory -> State(필요한 의존성만 주입)
 - 기존에는 `Hero_jump`, `Hero_fall_start`, `Hero_fall_loop` 등 각 Animation State에 Grounded·Attack·Dash 전이를 개별로 등록했다. 새 외부 행동을 추가할 때마다 공중 Animation State 전체에 전이를 반복해야 했다.
 - `Hero_Jump` 내부 State는 공통 종료 조건인 `IsJump == false AND IsFall == false`만 만족하면 `Exit`로 이동하도록 변경했다.
 - 상위 Base Layer의 `Hero_Jump` State Machine Transition이 Exit 뒤의 목적지를 결정한다. `IsGrounded → Grounded`, `IsAttack → Attack`, `IsDash → Dash`로 한 곳에서 라우팅한다.
-- Attack도 외부 State가 개별 Combo Clip을 직접 목적지로 지정하지 않고 `Attack` Sub State Machine을 거쳐 Entry와 상위 전이에서 진입·종료 흐름을 처리한다.
+- Attack도 외부 State가 개별 Combo Clip을 직접 목적지로 지정하지 않고 `Attack` Sub State Machine을 거쳐 Entry와 상위 전이에서 진입·종료 흐름을 처리한다. 내부의 공격 실행 State는 콤보 또는 End로 진행하고, End State만 `IsAttack == false → Exit`로 정상 종료한다.
 - 이 구조로 공중/공격 내부 Animation State는 자체 Animation 흐름만 관리하고, 행동 State를 벗어나는 공통 전이 규칙은 상위 State Machine에 집중됐다.
 
 ### Input
@@ -198,8 +201,9 @@ Controller -> StateFactory -> State(필요한 의존성만 주입)
 | 실제 Animator 바인딩 수정 | Root와 Hero child Animator가 이중으로 존재 | `PlayerAnimator`가 실제 Hero child Animator를 제어 |
 | Attack Sub-State Machine 진입 | 외부 State가 `Hero_combo1/2/3`을 직접 목적지로 지정 | 외부 State는 `Attack`만 진입하고 Entry가 `IsAttack` + `AttackType`으로 최초 Clip 선택 |
 | Jump Sub-State Machine 진입 | Grounded가 Jump/Fall 시작 Clip에 직접 전이 | 외부 State는 `Hero_Jump`만 진입하고 Entry가 `IsJump` / `IsFall`로 시작 Clip 선택 |
-| **공통 Exit 전이 집중** | Jump/Fall/Combo 내부 State마다 Grounded·Attack·Dash 전이를 반복 | 내부 State는 공통 Bool 해제 조건으로 Exit, 상위 Sub-State Machine이 Grounded·Attack·Dash 목적지를 한 번만 라우팅 |
+| **공통 Exit 전이 집중** | Jump/Fall/Combo 내부 State마다 외부 행동의 전이를 반복 | Jump 내부 State와 Attack의 End State가 공통 Bool 해제 조건으로 Exit하고, 상위 Sub-State Machine이 외부 목적지를 한 번만 라우팅 |
 | Combo timing을 Animator로 이관 | End Event·입력 버퍼·Handler가 Combo 순서를 중복 관리 | `ComboTrigger`와 Has Exit Time·Exit Time·Duration이 1→2→3 수락 시점과 전이 타이밍을 관리 |
+| 공격·End 모션 분리 | 공격 클립에 종료 포즈·종료 이벤트가 섞이거나 콤보 실패 시 종료 표현이 없음 | 콤보 성공 시 다음 공격, 실패·최종타·공중 공격은 대응 End 클립을 거쳐 종료 |
 
 ### 4.5 공격과 Combo 책임 단순화
 
@@ -207,8 +211,30 @@ Controller -> StateFactory -> State(필요한 의존성만 주입)
 | --- | --- | --- |
 | 최초 공격 진입 공용화 | Player State가 진입 가능 여부를 판단하고 직접 상태 전이를 호출 | 공용 `AttackTransition`이 `TryStartAttack()` 성공 시에만 AttackState 진입 |
 | Combo Handler·End 흐름 제거 | Combo 전용 Transition/Handler가 다음 공격 실행까지 담당해 구조가 복잡 | AttackType은 최초 진입점만 선택하고, Combo는 PlayerAttackState 입력 → Animator 내부 전이로 진행 |
-| Animation End 종료 단일화 | Combo 진행과 State 종료의 End Event 책임이 혼재 | 마지막 Combo Clip만 `AttackEndTransition`으로 Grounded/Fall 복귀 |
+| Animation End 종료 단일화 | Combo 진행과 State 종료의 End Event 책임이 혼재 | 먼저 공격 Clip의 End Event를 State 종료에만 사용하도록 단순화. 이후 End 클립 분리로 각 종료 모션의 이벤트만 `AttackEndTransition`에 전달 |
 | Trigger 정리 | 마지막 타격에서 미소비 ComboTrigger가 다음 공격에 누수될 수 있음 | `PlayerAttackState.Exit()`에서 ComboTrigger 초기화 |
+
+#### 공격 실행과 종료 모션 분리: 후속 개선
+
+Animator가 콤보 순서를 관리하도록 단순화한 구조를 유지하면서, 공격 실행과 콤보를 이어가지 않을 때의 종료 표현을 분리했다. 별도 Combo Handler·버퍼·Recovery FSM State를 다시 추가하지 않고 **AnimationClip과 Animator 전이만으로 종료 모션을 구성**했다.
+
+| 구성 | 변경 전 | 변경 후 |
+| --- | --- | --- |
+| `Hero_Attack1.anim` | 공격 3프레임 + End 3프레임, 0.5초, 타격·종료 이벤트 혼합 | 공격 3프레임만 유지, 0.25초, 기존 0초 타격 이벤트 유지·종료 이벤트 제거 |
+| `Hero_Attack1_end.anim` | 독립 종료 클립 없음 | 신규 생성. 원본 End 시트의 `_0`, `_1`, `_2`, `_4` 4프레임, 약 0.3333초, 0.25초 종료 이벤트 1개 |
+| `Hero_Attack2.anim`·`Hero_Attack3.anim` | 공격 시트만 사용하지만 각 클립에 종료 이벤트 존재 | 기존 공격 프레임·길이·타격 이벤트 유지, 종료 이벤트만 제거 |
+| 기존 End2·End3 클립 | 에셋은 존재하지만 Hero Animator에서 재생하지 않음 | 파일 변경 없이 재사용. 지상 End 3개·공중 End 1개 State에 연결하고 End3 클립은 지상·공중이 공유 |
+| 지상 1·2타의 분기 | ComboTrigger 조건의 다음 공격 전이와 직접 Exit 전이 | 다음 공격 전이를 먼저 평가하고, 미충족 시 무조건 Has Exit Time 전이로 대응 End 진입 |
+| 정상 종료·직접 Exit | 공격 실행 State에 `IsAttack == false → Exit` 전이 존재 | 사용자가 지상 1·2·3타·공중 3타의 직접 Exit 4개 제거. 각 End의 `IsAttack == false → Exit` 및 상위 복귀 경로 유지 |
+| Combo 분기 시점 | 기존 클립 길이에 맞춘 서로 다른 Exit Time·Duration·Offset | 이번 적용 값: Exit Time 1.0, Duration 0, Offset 0, Interruption None. 콤보와 End의 분기 시점 일치 |
+
+정상 흐름은 `Attack1 → Attack2 → Attack3` 또는 각 공격의 `End → OnAnimationEnd → AttackEndTransition → Grounded/Fall`이다. End 재생 중에도 같은 PlayerAttackState를 유지하며, End에서 콤보를 다시 여는 전이는 없다. 종료 시 기존 PlayerAttackState.OnExit가 잔여 Trigger를 정리한다. AttackType은 계속 지상 1·공중 3의 진입점 선택 용도이며, 시각적인 2·3타에 맞춘 공격 데이터·Stamina 정책 변경은 포함하지 않는다.
+
+초기 에셋 구현에서는 외부 FSM 종료 대응용 직접 Exit를 보존했다. 독립 Animator 평가 이후 사용자가 불필요함을 확인해 제거했으며, 현재 구조는 제거 후의 에셋을 기준으로 기록한다. 사용자의 `Hero_Combo1` 그래프 배치 조정도 함께 보존했다.
+
+공격 동작의 C# 구현은 변경하지 않았다. 별도로 사용자가 `AgentController.ChangeState()`의 `Debug.Log`를 주석 처리한 변경은 이번 커밋에 포함한다. 상태 전환 실행 로직은 그대로다.
+
+클립별 최종 값·구현 체크리스트·상세 테스트 항목은 [Plan7](../Combo_Attack/Player_Combo_Attack_Refactoring_Plan7.md)에 기록한다. End2·End3를 실제로 재생하게 되어 이동·점프가 다시 가능한 시점은 해당 종료 이벤트까지 늦어진다. 종료 포즈와 콤보 타이밍은 수동 검증 대상으로 남긴다.
 
 ### 4.6 Dash State 확장 기반
 
@@ -279,11 +305,13 @@ GetHitTransition의 Dispose는 해당 Rule이 만든 구독만 종료한다. Hea
 | Grounded Blend Tree 구성 | 완료 | `MoveSpeed`로 Idle/Move 표현 |
 | 점프 요청 이벤트 전환 | 코드 완료, 수동 검증 필요 | GroundedState의 JumpTransition 구독 중에만 요청을 수신하도록 변경. 공중 Jump 입력 뒤 착지 재점프 여부 확인 필요 |
 | Attack Sub State Machine 진입 분기 | 완료 | 외부 직접 Combo 전이 제거, `Attack` Entry의 `AttackType` 분기 구성 완료 |
-| 공격 홀드 상태/Animator 동기화 | 완료 | Grounded/Fall 공격 진입, 종료 후 Grounded 복귀, 홀드 반복 흐름을 수동 Play Mode에서 확인 |
+| 공격 홀드 상태/Animator 동기화 | 이전 구조 수동 확인, End 분리 후 재확인 필요 | 기존 Grounded/Fall 공격 진입·홀드 반복 검증 이력은 유지. 이번 End 모션 추가 후 실제 입력·이벤트 동기화는 별도 수동 확인 |
 | Combo Attack 코드 구조 | 완료 | Combo Handler·입력 버퍼·End Event 기반 다음 타격 시작을 제거. 최초 Attack은 AttackTransition, Combo 연결은 Animator 내부 전이로 분리 |
-| Combo 1→2→3 진행 | 수동 검증 완료 | `ComboTrigger`와 각 전이의 Has Exit Time / Exit Time / Duration을 사용해 1→3 건너뜀 없이 진행 확인 |
-| Combo 종료 뒤 입력 초기화 | 완료 | 별도 입력 버퍼를 제거했으므로 Combo 종료 후 저장된 요청이 남지 않음 |
-| AttackEndTransition 분리 | 완료 | 마지막 Combo의 Animation End Event가 공용 AttackEndTransition을 통해 Grounded/Fall 복귀를 처리 |
+| Combo 1→2→3 진행 | 이전 구조 수동 확인, End 분리 후 재확인 필요 | 기존 건너뜀 해결 이력 유지. 이번 분리 구성의 독립 Animator 빠른 Trigger 평가 통과. 실제 조작감·분기 직전/직후 입력은 수동 확인 |
+| Combo 종료 뒤 입력 초기화 | 구조 유지, 새 End 흐름 수동 확인 필요 | 별도 버퍼 없음, 기존 OnExit의 Trigger 초기화 유지. 독립 평가의 End 중 추가 Trigger 시나리오는 통과했지만 실제 입력 누수 확인과 구분 |
+| AttackEndTransition·End 클립 분리 | 에셋 구현·정적 검증 완료, Play 모드 확인 필요 | 공격 클립 End 이벤트 0개, 대응 End마다 종료 이벤트 1개. 기존 공용 Rule로 Grounded/Fall 복귀하며 실제 게임 이벤트 발생은 아직 확인하지 않음 |
+| Plan7 독립 Animator 평가 | 직접 Exit 제거 전 8개 시나리오 통과 | 단발·2타·3타·빠른 연타·End 중 입력·공중 Grounded/Fall 복귀·Hit 중단. Edit 모드에서 End 신호를 수동 호출한 평가이며 실제 Player 테스트가 아님 |
+| 기존 Attack → Exit 4개 제거 | 사용자 확인·현재 에셋 검사 완료 | 사용자가 제거해도 문제없다고 확인. End → Exit와 상위 복귀·Any State Hit/Death는 유지. 제거 후 자동 평가를 다시 실행한 결과로 기록하지 않음 |
 | Hero_Jump Sub State Machine 진입 분기 | 코드/구성 완료, 수동 검증 필요 | Jump/Fall Bool 상호 배제 및 Entry 분기 구성 완료. 점프와 낙하 시작 흐름을 Play Mode에서 확인 필요 |
 | Animator 공통 Exit 전이 | 수동 검증 완료 | 공중 내부 State의 `IsJump == false AND IsFall == false → Exit`와 상위 `Hero_Jump → Grounded / Attack / Dash` 라우팅 동작 확인 |
 | DashState 공용화·실행 로직 | 코드 구현 완료, 기존 상태 전이 수동 확인 | Handler의 거리·벽 기반 완료, State 실행 호출, 착지 이벤트 횟수 초기화 구현. 최신 Player 연속 Dash·착지 수동 검증은 별도 확인 |
@@ -300,6 +328,8 @@ GetHitTransition의 Dispose는 해당 Rule이 만든 구독만 종료한다. Hea
 
 Monster 실행 검증은 원래 InGame 씬을 보존한 임시 Play Mode 씬에서 외부 명령과 실제 Animator Clip 이벤트로 수행했다. 제작 후 원래 씬을 복원했다. 수동 화면 검증까지 통과한 것으로 기록하지 않는다. 이 표는 제작 단계에서 확보한 결과이며 로그 갱신만으로 테스트를 재실행한 것은 아니다.
 
+Plan7의 독립 Animator 평가는 Preview Scene에서 저장된 Controller를 재생했다. Edit 모드에서는 Animation Event가 자동 발행되지 않아 클립 이벤트 시점에 기존 Proxy의 OnAnimationEnd를 수동 호출하고 AttackEndTransition을 평가한 뒤 FSM 종료 파라미터를 모의 적용했다. 결과는 경로·종료 규칙 연결 확인으로 한정한다. 임시 `Codex_ComboPlan7Verification` 파일·오브젝트는 제거했고 생산 코드·에셋에 포함하지 않았다. 사용자의 직접 Exit 삭제 후 이번 로그 최신화에서는 저장된 에셋만 정적으로 점검했다.
+
 Player 회귀 검사에서는 저장된 `ProjectRE_Player Variant.prefab`에 AgentDashHandler2D가 없어 PlayerController.Awake의 초기화 오류가 발생했다. 당시 InGame 인스턴스에는 해당 컴포넌트가 있었으며, 원본 prefab은 수정하지 않고 테스트 객체에만 보완했다. 기존 설정 문제는 Monster 구현과 분리해 보류한다. Play Mode 진입 중 Pipeline 요청 한 번은 메인 스레드 시간 제한으로 실행되지 않았고, 진입 완료 후 재실행한 Monster 검증은 성공했다.
 
 ## 6. 보류 및 예정 사항
@@ -311,6 +341,7 @@ Player 회귀 검사에서는 저장된 `ProjectRE_Player Variant.prefab`에 Age
 - Monster의 Behavior·Brain·타깃 선택·순찰·추적 등 의사결정 계층
 - 비행·낙하·공중 공격·콤보 등 다른 행동 프로필과 다른 Monster 계열의 이행
 - Player prefab의 기존 AgentDashHandler2D 누락과 전체 수동 회귀 확인
+- Player 공격·End 클립 분리 후 실제 종료 이벤트·콤보 분기·잔여 Trigger·피격 중단·공중 복귀 및 종료 포즈 수동 확인. End 추가에 따른 이동·점프 재개 타이밍 조정
 - 풀링·리스폰의 Disable/Enable 수명 정책
 - PDF 산출물 재생성: 이번 최신화는 원본 MD 기준이며 기존 두 PDF는 갱신하지 않음
 
