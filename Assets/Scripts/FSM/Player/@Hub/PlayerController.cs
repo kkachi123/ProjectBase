@@ -4,7 +4,7 @@
     [RequireComponent(typeof(AgentImpactHandler))]
     [RequireComponent(typeof(PlayerAnimator))]
     /// <summary>
-    /// Player 전용 컴포넌트와 State Factory를 초기화하고, Player 공격 시작 조건을 판정합니다.
+    /// Player 전용 컴포넌트·FSM 초기화 및 공격 시작 조건 판정.
     /// </summary>
     public class PlayerController : GroundedAgentController
     {
@@ -66,7 +66,7 @@
         #endregion
 
         #region State Input Event
-        /// <summary>현재 지상 여부에 맞는 공격 타입을 적용할 수 있으면 공격 시작을 허용합니다.</summary>
+        /// <summary>지상 여부에 따른 공격 타입 적용 및 공격 시작 가능 여부 반환.</summary>
         public override bool TryStartAttack()
         {
             int attackType = IsGrounded ? 1 : 3;
@@ -80,11 +80,11 @@
 
         private bool CheckCanPlayerAttack(int attackType)
         {
-            // 공격 타입이 설정한 범위를 벗어나면 공격을 시작하지 않는다.
+            // 설정 범위를 벗어난 공격 타입 차단.
             if (!_combatHandler.CanApplyAttackType(attackType))
                 return false;
 
-            // Stamina가 부족하면 공격을 시작하지 않는다.
+            // Stamina 부족 시 공격 시작 차단.
             if (!Stamina.CanUse(_statData.attackDatas[attackType - 1].usedStamina))
                 return false;
             return true;

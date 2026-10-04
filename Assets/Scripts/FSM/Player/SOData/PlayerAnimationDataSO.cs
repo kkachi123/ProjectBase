@@ -6,26 +6,26 @@ using UnityEngine;
 public class PlayerAnimationDataSO : AgentAnimationDataSO
 {
     [Header("Player Animation Trigger")]
-    // Player 공격 모션을 Combo로 연결할 때 사용한다.
+    // Player 공격 모션의 다음 Combo 연결 요청.
     public string ComboTrigger = "ComboTrigger";
     [Header("Player Animation Int")]
-    // 현재 실행할 Player 공격 애니메이션 종류를 선택한다.
+    // 현재 실행할 Player 공격 애니메이션 종류 선택.
     public string AttackTypeInt = "AttackType";
 
     [Header("Player Animation Float")]
-    // 이동 입력 크기를 Grounded Blend Tree에 전달해 Idle/Move를 보간한다.
+    // Grounded Blend Tree의 Idle·Move 보간에 사용할 이동 입력 크기.
     public string MoveSpeedFloat = "MoveSpeed";
 
     [Header("Player Animation Bool")]
-    // 지상 기본 Blend Tree로 복귀할 수 있음을 알린다.
+    // 지상 기본 Blend Tree 복귀 조건.
     public string IsGroundedBool = "IsGrounded";
-    // Grounded에서 점프 모션으로 진입할 때 사용한다.
+    // 점프 모션 진입·종료 제어.
     public string IsJumpBool = "IsJump";
-    // Grounded에서 낙하 모션으로 진입할 때 사용한다.
+    // 낙하 모션 진입·종료 제어.
     public string IsFallBool = "IsFall";
-    // AttackTypeInt와 함께 Player 공격 모션을 선택한다.
+    // 공격 모션 진입·종료 제어. 종류 선택은 AttackTypeInt 사용.
     public string IsAttackBool = "IsAttack";
-    // Grounded 상태에서 Dash 모션으로 진입·종료할 때 사용한다.
+    // Dash 모션 진입·종료 제어.
     public string IsDashBool = "IsDash";
 }
 }

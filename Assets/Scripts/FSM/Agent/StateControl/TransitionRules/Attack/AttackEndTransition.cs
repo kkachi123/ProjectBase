@@ -3,7 +3,7 @@ namespace ProjectRE
 using System;
 
 /// <summary>
-/// 콤보 규칙이 없는 Agent가 공격 Animation 종료 후 GroundedState 또는 FallState로 복귀하는 전이다.
+/// 공격 Animation 종료 후 지상 여부에 따라 GroundedState·FallState로 복귀.
 /// </summary>
 public class AttackEndTransition : IEventTransitionRule
 {

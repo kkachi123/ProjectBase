@@ -7,7 +7,7 @@
 
     public interface IAttackStarter
     {
-        // 최초 공격 요청을 수신하고 실제 공격 시작이 가능한 경우 AttackState로 진입한다.
+        // 최초 공격 요청의 시작 가능 여부 확인.
         bool TryStartAttack();
     }
 }

@@ -3,7 +3,7 @@ namespace ProjectRE
     using System;
 
     /// <summary>
-    /// Dash를 허용하는 상태에서 요청을 수신하는 이벤트 전이다.
+    /// Dash 허용 상태에서 요청 수신 및 시작 조건 확인 후 DashState 진입.
     /// </summary>
     public class DashTransition : IEventTransitionRule
     {

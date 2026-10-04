@@ -3,7 +3,7 @@ namespace ProjectRE
     using System;
 
     /// <summary>
-    /// Dash 실행 완료 이후 지상 여부에 따라 GroundedState 또는 FallState로 복귀한다.
+    /// Dash 완료 후 지상 여부에 따라 GroundedState·FallState로 복귀.
     /// </summary>
     public class DashEndTransition : ITransitionRule
     {

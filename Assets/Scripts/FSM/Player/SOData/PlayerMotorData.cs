@@ -3,8 +3,8 @@ namespace ProjectRE
     using UnityEngine;
 
     /// <summary>
-    /// Player 전용 이동 수치를 정의한다.
-    /// AgentMotorData의 일반 이동·점프 값에 Dash 수치를 추가한다.
+    /// Player 전용 이동 수치 정의.
+    /// AgentMotorData의 일반 이동·점프 값에 Dash 수치 추가.
     /// </summary>
     [CreateAssetMenu(fileName = "PlayerMotorData", menuName = "Player/Motor Data")]
     public class PlayerMotorData : AgentMotorData

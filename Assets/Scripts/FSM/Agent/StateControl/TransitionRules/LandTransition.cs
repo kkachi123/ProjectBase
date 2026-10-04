@@ -3,7 +3,7 @@
 using System;
 
 /// <summary>
-/// 지면 감지와 하강 속도를 함께 확인해 공중 State를 GroundedState로 전환합니다.
+/// 지면 감지·수직 속도 확인 후 공중 State에서 GroundedState로 전환.
 /// </summary>
 public class LandTransition : ITransitionRule
 {

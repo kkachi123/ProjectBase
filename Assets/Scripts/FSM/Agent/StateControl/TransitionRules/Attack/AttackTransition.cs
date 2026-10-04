@@ -3,7 +3,7 @@ namespace ProjectRE
     using System;
 
     /// <summary>
-    /// 공격 요청을 수신하고 실제 공격 시작이 가능한 경우 AttackState로 진입하는 공용 전이다.
+    /// 공격 요청 수신 및 시작 조건 확인 후 AttackState 진입.
     /// </summary>
     public class AttackTransition : IEventTransitionRule
     {

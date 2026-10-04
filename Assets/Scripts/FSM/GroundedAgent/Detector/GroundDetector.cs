@@ -4,7 +4,7 @@ using UnityEngine;
 using System;
 
 /// <summary>
-/// BoxCast로 Agent의 지면 접촉 여부를 갱신하고, 상태 변화 이벤트를 발행합니다.
+/// BoxCast 기반 지면 접촉 여부 갱신 및 상태 변화 이벤트 발행.
 /// </summary>
 public class GroundDetector : MonoBehaviour
 {
@@ -12,13 +12,13 @@ public class GroundDetector : MonoBehaviour
     [SerializeField] Vector2 rayBoxSize = new Vector2(0.5f, 0.1f);
     [SerializeField] Vector3 playerFootPos = new Vector3(0f, 0.6f, 0f);
 
-    /// <summary>마지막 지면 감지 결과입니다.</summary>
+    /// <summary>마지막 지면 감지 결과.</summary>
     public bool IsGrounded { get; private set; }
 
-    /// <summary>지면 접촉 상태가 변경될 때 새 상태를 전달합니다.</summary>
+    /// <summary>지면 접촉 상태 변경 시 새 상태 전달.</summary>
     public event Action<bool> OnGroundedChanged;
 
-    /// <summary>현재 위치를 기준으로 지면 감지를 수행하고 변경 여부를 알립니다.</summary>
+    /// <summary>현재 위치의 지면 감지 및 상태 변경 통지.</summary>
     public void UpdateGroundedStatus()
     {
         RaycastHit2D hit = Physics2D.BoxCast(transform.position - playerFootPos, rayBoxSize, 0f, Vector2.down, 0.1f, groundLayers);

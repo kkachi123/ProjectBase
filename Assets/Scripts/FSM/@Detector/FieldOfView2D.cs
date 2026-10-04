@@ -41,7 +41,7 @@ public class FieldOfView2D : MonoBehaviour
         return false;
     }
 
-    //에디터에서 시야 범위를 시각적으로 확인하기 위한 기즈모
+    // 에디터 시야 범위 시각화.
     private void OnDrawGizmos()
     {
         Gizmos.color = Color.white;
@@ -56,7 +56,7 @@ public class FieldOfView2D : MonoBehaviour
     private Vector3 DirFromAngle(float angleInDegrees)
     {
         // 1. 에이전트의 현재 스케일이나 로직상의 방향을 확인
-        // x scale이 -1이면 기본 방향(오른쪽)에 180도를 더해줍니다.
+        // X축 Scale이 음수면 기본 방향(오른쪽)에 180도 가산.
         float facingRotation = transform.localScale.x < 0 ? 180f : 0f;
 
         // 2. 전체 회전값에 facingRotation을 더함

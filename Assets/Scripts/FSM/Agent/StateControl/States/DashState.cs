@@ -1,8 +1,8 @@
 namespace ProjectRE
 {
     /// <summary>
-    /// 공통 Dash Animation 수명을 관리하는 State다.
-    /// Agent별 이동 거리·속도·쿨다운 규칙은 파생 State에서 확장한다.
+    /// 공통 Dash 이동·애니메이션 수명 관리.
+    /// Agent별 규칙은 파생 State에서 확장 가능.
     /// </summary>
     public class DashState : AgentStateBase
     {

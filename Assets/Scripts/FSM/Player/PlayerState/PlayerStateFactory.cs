@@ -3,9 +3,15 @@
     using System;
     using System.Collections.Generic;
 
+    /// <summary>Player 전용 State 구성에 필요한 공통·전용 의존성 전달.</summary>
     public class PlayerStateFactoryData : StateFactoryData
     {
-        public PlayerAnimator PlayerAnimator { get; set; }
+        /// <summary>공통 Animator 참조의 PlayerAnimator 타입 접근·주입.</summary>
+        public PlayerAnimator PlayerAnimator
+        {
+            get => (PlayerAnimator)Animator;
+            set => Animator = value;
+        }
         public GroundDetector GroundDetector { get; set; }
         public IAgentJumpInput JumpInput { get; set; }
         public IAgentDashInput DashInput { get; set; }
@@ -14,21 +20,20 @@
         public AgentStatData StatData { get; set; }
     }
 
-    public class PlayerStateFactory
+    /// <summary>공통 Hit·Death 기반 Player 행동 State 및 전이 순서 구성.</summary>
+    public class PlayerStateFactory : AgentStateFactory<PlayerStateFactoryData>
     {
-        public Dictionary<Type, AgentStateBase> CreateStates(PlayerStateFactoryData data)
+        protected override void AddAgentStates(PlayerStateFactoryData data, Dictionary<Type, AgentStateBase> states)
         {
-            Dictionary<Type, AgentStateBase> states = new Dictionary<Type, AgentStateBase>
-        {
-            { typeof(GroundedState), new GroundedState(data.PlayerAnimator, data.MovementHandler, data.MovementInput) },
-            { typeof(JumpState), new JumpState(data.PlayerAnimator, data.PlayerAnimator, data.MovementHandler, data.MovementInput) },
-            { typeof(FallState), new FallState(data.PlayerAnimator, data.PlayerAnimator, data.MovementHandler, data.MovementInput) },
-            { typeof(DashState), new DashState(data.PlayerAnimator, data.DashHandler) },
-            { typeof(AttackState), new PlayerAttackState(data.PlayerAnimator, data.CombatHandler,data.Motor,  data.Stamina, data.StatData, data.CombatInput) },
-            { typeof(HitState), new HitState(data.PlayerAnimator, data.CombatHandler) },
-            { typeof(DeathState), new DeathState(data.PlayerAnimator, data.CombatHandler, data.MovementHandler) }
-        };
+            states.Add(typeof(GroundedState), new GroundedState(data.PlayerAnimator, data.MovementHandler, data.MovementInput));
+            states.Add(typeof(JumpState), new JumpState(data.PlayerAnimator, data.PlayerAnimator, data.MovementHandler, data.MovementInput));
+            states.Add(typeof(FallState), new FallState(data.PlayerAnimator, data.PlayerAnimator, data.MovementHandler, data.MovementInput));
+            states.Add(typeof(DashState), new DashState(data.PlayerAnimator, data.DashHandler));
+            states.Add(typeof(AttackState), new PlayerAttackState(data.PlayerAnimator, data.CombatHandler, data.Motor, data.Stamina, data.StatData, data.CombatInput));
+        }
 
+        protected override void ConfigureTransitions(PlayerStateFactoryData data, Dictionary<Type, AgentStateBase> states)
+        {
             states[typeof(GroundedState)].AddTransition(new GetHitTransition(data.Health.CurrentHealth));
             states[typeof(GroundedState)].AddTransition(new DashTransition(data.DashInput, data.DashHandler));
             states[typeof(GroundedState)].AddTransition(new JumpTransition(data.JumpInput, data.GroundDetector));
@@ -54,9 +59,6 @@
 
             states[typeof(HitState)].AddTransition(new DeathTransition(data.Health.IsDead));
             states[typeof(HitState)].AddTransition(new GetHitEndTransition(data.AnimationEventSource));
-
-
-            return states;
         }
     }
 }

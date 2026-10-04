@@ -7,7 +7,7 @@ using UnityEngine;
 [RequireComponent(typeof(AgentMotor2D), typeof(Health), typeof(AgentCombatHandler))]
 
 /// <summary>
-/// Agent 공통 컴포넌트를 초기화하고 Type 기반 FSM의 현재 상태 전환을 관리합니다.
+/// Agent 공통 컴포넌트 초기화 및 Type 기반 FSM 상태 전환 관리.
 /// </summary>
 public abstract class AgentController : MonoBehaviour, IAgentAnimationListener , IAnimationEventSource , IAttackStarter
 {
@@ -66,7 +66,7 @@ public abstract class AgentController : MonoBehaviour, IAgentAnimationListener ,
     }
     protected abstract void FixedUpdate();
 
-    /// <summary>등록된 상태 타입으로 전환하며, 이전 상태를 종료한 뒤 새 상태를 진입시킵니다.</summary>
+    /// <summary>등록된 상태 타입으로 전환. 이전 State 종료 후 새 State 진입.</summary>
     public virtual void ChangeState(Type stateType)
     {
         if (_states.TryGetValue(stateType, out AgentStateBase newState))
@@ -78,7 +78,7 @@ public abstract class AgentController : MonoBehaviour, IAgentAnimationListener ,
         Debug.Log($"State changed to: {stateType.Name}");
     }
     
-    /// <summary>Animation Event를 현재 State 또는 공용 애니메이션 종료 이벤트로 전달합니다.</summary>
+    /// <summary>Animation Event를 현재 State 동작 또는 공용 종료 이벤트로 전달.</summary>
     public virtual void OnAnimationEvent(AnimEventType type)
     {
         if (type == AnimEventType.OnFrame)
@@ -97,7 +97,7 @@ public abstract class AgentController : MonoBehaviour, IAgentAnimationListener ,
             return;
         }
 
-        //Attack, HitState와 DashState 등 Animation End로 종료되는 State가 공용 종료 Event를 사용한다.
+        // Animation End 수신 시 공용 종료 이벤트 발행.
         OnAnimationEnded?.Invoke();
     }
     public virtual void OnDeathFinished() { }
