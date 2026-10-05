@@ -20,13 +20,25 @@ PrefabInstance:
       propertyPath: m_Name
       value: Goblin
       objectReference: {fileID: 0}
+    - target: {fileID: 3004176759045309049, guid: 2897a090a2c82d040be9a58cdee0a5d0, type: 3}
+      propertyPath: m_Size.x
+      value: 1.46
+      objectReference: {fileID: 0}
+    - target: {fileID: 3004176759045309049, guid: 2897a090a2c82d040be9a58cdee0a5d0, type: 3}
+      propertyPath: m_Size.y
+      value: 2.3
+      objectReference: {fileID: 0}
+    - target: {fileID: 3004176759045309049, guid: 2897a090a2c82d040be9a58cdee0a5d0, type: 3}
+      propertyPath: m_Offset.y
+      value: 1.1
+      objectReference: {fileID: 0}
     - target: {fileID: 3272162078263403340, guid: 2897a090a2c82d040be9a58cdee0a5d0, type: 3}
       propertyPath: m_LocalScale.x
-      value: 3
+      value: 6
       objectReference: {fileID: 0}
     - target: {fileID: 3272162078263403340, guid: 2897a090a2c82d040be9a58cdee0a5d0, type: 3}
       propertyPath: m_LocalScale.y
-      value: 3
+      value: 6
       objectReference: {fileID: 0}
     - target: {fileID: 4301408341181955096, guid: 2897a090a2c82d040be9a58cdee0a5d0, type: 3}
       propertyPath: m_Size.x
@@ -50,23 +62,23 @@ PrefabInstance:
       objectReference: {fileID: 22100000, guid: ac2a8c55482df8a4e9c84372d50aec70, type: 2}
     - target: {fileID: 7725694964129040142, guid: 2897a090a2c82d040be9a58cdee0a5d0, type: 3}
       propertyPath: m_LocalScale.x
-      value: 2
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 7725694964129040142, guid: 2897a090a2c82d040be9a58cdee0a5d0, type: 3}
       propertyPath: m_LocalScale.y
-      value: 2
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 7725694964129040142, guid: 2897a090a2c82d040be9a58cdee0a5d0, type: 3}
       propertyPath: m_LocalScale.z
-      value: 2
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 7725694964129040142, guid: 2897a090a2c82d040be9a58cdee0a5d0, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 0
+      value: -0.39
       objectReference: {fileID: 0}
     - target: {fileID: 7725694964129040142, guid: 2897a090a2c82d040be9a58cdee0a5d0, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0
+      value: -4.0509024
       objectReference: {fileID: 0}
     - target: {fileID: 7725694964129040142, guid: 2897a090a2c82d040be9a58cdee0a5d0, type: 3}
       propertyPath: m_LocalPosition.z
@@ -113,7 +125,10 @@ PrefabInstance:
       addedObject: {fileID: 3640948814562112618}
     - targetCorrespondingSourceObject: {fileID: 2968562680067613100, guid: 2897a090a2c82d040be9a58cdee0a5d0, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 5999034543030102801}
+      addedObject: {fileID: 8084120596978150384}
+    - targetCorrespondingSourceObject: {fileID: 2968562680067613100, guid: 2897a090a2c82d040be9a58cdee0a5d0, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 2199120178860219675}
   m_SourcePrefab: {fileID: 100100000, guid: 2897a090a2c82d040be9a58cdee0a5d0, type: 3}
 --- !u!1 &5718515402252523039 stripped
 GameObject:
@@ -138,8 +153,9 @@ MonoBehaviour:
   obstacleMask:
     serializedVersion: 2
     m_Bits: 192
+  offset: {x: 0, y: 1, z: 0}
   viewRadius: 6
---- !u!114 &5999034543030102801
+--- !u!114 &8084120596978150384
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -148,11 +164,45 @@ MonoBehaviour:
   m_GameObject: {fileID: 5718515402252523039}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 013cdc70278c78b458816f5d479fe31b, type: 3}
+  m_Script: {fileID: 11500000, guid: f0038c16c34866b4f9e25c9c0dc0f7e6, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::ProjectRE.MonsterBrain
+  m_EditorClassIdentifier: Unity.Behavior::Unity.Behavior.BehaviorGraphAgent
+  m_Graph: {fileID: 666988855325060194, guid: c58dfb80780ff8641a71a732a04f3e16, type: 2}
+  m_BlackboardVariableOverridesList:
+  - rid: 2900184142808613407
+  m_OriginalGraph: {fileID: 666988855325060194, guid: c58dfb80780ff8641a71a732a04f3e16, type: 2}
+  m_IsInitialised: 0
+  m_IsStarted: 0
+  references:
+    version: 2
+    RefIds:
+    - rid: 2900184142808613407
+      type: {class: 'BlackboardVariable`1[[UnityEngine.GameObject, UnityEngine.CoreModule]]', ns: Unity.Behavior, asm: Unity.Behavior}
+      data:
+        GUID:
+          m_Value0: 1
+          m_Value1: 0
+        Name: Self
+        m_Value: {fileID: 5718515402252523039}
+--- !u!114 &2199120178860219675
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5718515402252523039}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 03d6f65349fb8104b9707eb2efc06bb0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ProjectRE.MonsterBehaviorContext
   _attackDistance: 1.8
-  _maxAttackHeightDifference: 0.75
+  _maxAttackHeightDifference: 1
   _attackRequestInterval: 1
   _maxChaseDistance: 8
   _returnArrivalDistance: 0.15
+  _lostTargetWait: 2
+  _patrolRadius: 2
+  _patrolWaitMin: 1
+  _patrolWaitMax: 2
+  _rearApproachTimeout: 1.5

@@ -1,5 +1,64 @@
 # MonsterBrain Behavior 구현 계획
 
+## 현재 진행: Unity BehaviorGraph 전환
+
+기존 1~10절은 독립 MonsterBrain 제작 기록. 이번 작업은 해당 Component를 BehaviorGraph로 교체한다. 이전 단계의 BehaviorTree·순찰 제외 조건은 이번 작업에 적용하지 않는다.
+
+### 구현 범위와 책임
+
+- `MonsterBehaviorContext`: 자기 참조 Awake 캐시, 대상 변경 시 Health·Collider 캐시, 감지·높이·추적 제한 결과와 초기 위치를 Blackboard에 전달. 이동·공격 판단은 그래프 담당.
+- `BehaviorGraphAgent`: 개체별 Blackboard와 그래프 실행. Context(-100) → GraphAgent(-50) → 기존 Controller(0) 순서.
+- Behavior Action/Condition 노드: 전역 namespace. 이동은 `MonsterInput.SetMovement`, 공격은 `RequestAttack`만 사용. 이동 노드 종료·중단 시 입력 초기화.
+- Controller·Motor·Factory·State·Transition·Animator·전투 SO·PlayerDetector 유지. 새 FSM 상태·인터페이스·Turn 공개·Controller 양방향 참조 제외.
+- 공용 그래프는 `Assets/Prefabs/Monster/BasicMonsterBehavior.asset`, 노드는 `Assets/Scripts/FSM/NPC/AIMonstor/@Behavior/`에 배치.
+- 기존 Goblin 설정과 씬의 높이 차이 override 보존. 그래프 전환·검증 후 기존 MonsterBrain Component와 소스 삭제.
+
+### 행동 흐름
+
+```text
+반복 Start → Try In Order
+  1. 사망: 이동 중단
+  2. 복귀: 초기 X까지 이동, 도착 전 재추적 금지
+  3. 대상 상실: 이동·공격 중단 → 2초 대기 → 복귀
+  4. 유효 대상: 추적 → Random(정면 공격 / 배후 접근 후 공격) → 요청 간격 대기
+  5. 순찰: 초기 X ± 반경의 랜덤 목적지 이동 → 정지 → 랜덤 시간 대기
+```
+
+- 일반 순찰 중 대상 없음은 상실 대기가 아니다. 교전 후 상실할 때만 대기.
+- 대기 중 재감지 시 대기 취소, 재추적. 자기 추적 제한 초과 또는 교전 중 대상 추적 제한 초과·높이 불일치 시 즉시 복귀.
+- 정면/배후는 공격 접근마다 50:50으로 1회 추첨. 배후 접근 시작 시 대상 방향 저장, 목적지는 대상 X - 저장 방향 × 공격 거리 × 0.8.
+- 배후 접근 1.5초 초과 시 일반 추적·공격으로 fallback. 벽·낭떠러지 회피·Jump·경로 탐색 제외, 동일 높이의 이동 가능한 지형 전제.
+- 공격 전 기존 이동 입력으로 방향 정렬. 요청 간격은 실제 FSM 공격 시작/완료 시각이 아닌 입력 발행 간격.
+- 거리 비교는 0.01 허용 오차 유지. 입력 버퍼·FSM 상태 복제 제외.
+- 순찰 반경 기본 2, 정지 시간 기본 1~2초, 상실 대기 기본 2초. Context Inspector 설정을 Blackboard에 전달.
+- Behavior 1.0.16의 Conditional Guard는 LowerPriority만 지원. 우선순위 분기로 순찰·전투 중단, 상실 대기 노드는 재감지 시 직접 종료.
+
+### 제작 및 검증 체크리스트
+
+- [x] 패키지 authoring API 조사 및 CLI 최소 그래프 생성·저장·재로드 검증
+- [x] Context 및 독립 행동 노드 구현, 컴파일 확인
+- [x] 공용 BehaviorGraph·Blackboard·우선순위 감시·랜덤 분기 자동 생성
+- [x] Goblin Prefab/기존 씬 연결 및 설정 보존
+- [x] 순찰·정지·추적·상실 2초 대기·재감지·복귀·배후·요청 간격·중단/개체 격리 검증
+- [x] 검증 후 기존 MonsterBrain 제거, 재컴파일·누락 참조 확인
+- [ ] 실제 스테이지 수동 이동/지형/전투 밸런스 검증(사용자)
+
+자동 생성은 설치된 패키지 internal authoring API를 Editor 전용 빌더에서만 reflection으로 사용한다. 런타임 reflection·패키지 수정·업그레이드 없이 실행 그래프와 저장된 authoring 그래프를 함께 제작한다.
+
+### 검증 결과와 수동 확인
+
+- 저장·재로드된 실행 Blackboard 16개(Self 포함), Conditional Guard 4개의 LowerPriority 설정, Random 분기 2개 확인.
+- 격리된 Play 검증: 순찰 반경, 일반 순찰과 상실 구분, 순찰→추적 중단, 상실 중 정지, 2초 대기, 재감지 취소, 복귀 중 재추적 금지, 거리·Collider 바닥 높이 제한, 사망 정지, 두 개체의 Blackboard/Input 격리 통과.
+- 행동 노드 검증: 배후 방향 스냅샷·도착·시간 초과 Failure, 이동 OnEnd 초기화, 공격 전 이동 입력으로 방향 정렬, 요청 간격 통과.
+- 실제 Goblin Prefab 검증: 기존 Motor 이동, `AttackTransition → MonsterAttackState`, 실제 Clip 피해 이벤트 및 종료 이벤트의 Grounded 복귀 통과. Animation Event 수동 호출 없이 확인.
+- 기본 추적/공격 허용 높이는 Prefab 0.75, InGame 씬 override 1.0 보존.
+- 기존 MonsterBrain Component·소스·meta 제거 완료. 삭제 후 재컴파일 성공, Prefab·씬 누락 스크립트 0개, 실제 Goblin 공격 이벤트 재검증 통과. 최소 생성용 임시 그래프 제거, Play 종료 후 기존 InGame 씬 유지.
+- `MonsterBehaviorContext`의 Inspector 수치 조절 후 Play 재시작. 실행 중 Inspector 변경의 Blackboard 동기화는 이번 범위에 포함하지 않는다.
+- 사용자 수동 확인: 실제 배치 지형의 순찰 범위, 배후 이동의 충돌/벽/낭떠러지, 추적 거리·대기 시간·공격 빈도 밸런스. 경로 탐색·벽 회피는 미구현.
+- 기존 `InGameUI.Awake()` 21행 NullReferenceException은 작업 범위 밖이며 그대로 보존. 이번 몬스터 코드의 신규 예외와 구분.
+
+---
+
 ## 1. 범위
 
 Goblin에 독립 판단 Component를 추가해 대기·추적·단발 공격·추적 제한·초기 위치 복귀를 구현한다. 기존 Grounded·Attack·Hit·Death FSM은 유지한다.
