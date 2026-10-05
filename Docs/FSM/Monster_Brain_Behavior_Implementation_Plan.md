@@ -1,423 +1,261 @@
-# MonsterBrain 기반 Behavior 구현 계획
+# MonsterBrain Behavior 구현 계획
 
-## 1. 목적과 현재 단계
+## 1. 범위
 
-기존 `Goblin.prefab`의 네 State FSM을 유지하고, 작은 C# `MonsterBrain`을 추가해 대상 감지 → 추적 → 단발 공격을 자동 수행한다.
+Goblin에 독립 판단 Component를 추가해 대기·추적·단발 공격·추적 제한·초기 위치 복귀를 구현한다. 기존 Grounded·Attack·Hit·Death FSM은 유지한다.
 
-이번 요청의 결과물은 **계획 문서**다. 아래 코드·Prefab 변경과 테스트는 아직 수행하지 않았다. 구현·검증한 항목만 이후 완료 체크한다.
-
-- 기준 프로젝트: `E:/Unity/Project/ProjectBase`
-- 대상 Prefab: `Assets/Prefabs/Monster/Goblin.prefab`
-- 기본 Monster 제작 문서: `Docs/FSM/Agent_Extenstion_Monster.md`
+- 대상: `Assets/Prefabs/Monster/Goblin.prefab`
 - 제작 기준: `Docs/FSM/ProjectSkill/FSM_Agent_Creation_Guide.md`
-- 기준 확인일: 2026-10-05
+- 현재 단계: 구현·컴파일·Goblin Play 및 입력 판단 경계 검증 완료. 실제 스테이지 밸런스와 AIPlayer BehaviorGraph Play는 미검증.
+- 제외: BehaviorTree 실제 제작, 순찰·도주·대상 기억, 다중 공격·콤보, 새 State·Transition, Jump·Fall·경로 탐색, 풀링.
+- 기존 Controller·Input·Motor·Factory·State·Transition은 수정하지 않는다.
+- 기존 Scene·아트·Clip·Animator·전투 SO·BasicMonster·AIPlayer 전용 코드와 사용자 변경을 보존한다. 로그·PDF·커밋은 별도 요청 시 진행한다.
 
-기존 Monster 제작 문서의 Behavior 제외 항목은 **기본 FSM 제작 당시의 범위**다. 이번 계획은 완성된 기본 Monster 위에 판단 계층을 추가하는 후속 작업이며, 이전 제작 결과를 수정하거나 Behavior가 이미 구현된 것으로 기록하지 않는다. `Agent_Extension_Plan.md`의 과거 클래스·계약 제안보다 현재 소스와 본 계획을 우선한다.
-
-## 2. 구현 범위와 결정사항
-
-### 이번에 구현할 기능
-
-- 장애물에 가려지지 않은 생존 Player 감지.
-- 대상이 없으면 대기, 같은 높이의 대상이 멀면 x축 추적.
-- 공격 거리 안에서는 정지하고 대상 방향으로 단발 공격 요청.
-- 실제 Attack 진입을 기준으로 공격 간격 관리.
-- Attack·Hit·Death 중 새로운 이동·공격 의사결정 중지.
-- 대상 이탈·사망·Brain 비활성화 시 이전 이동 명령 정리.
-- 기존 `AttackTransition`·`AttackEndTransition`·공격 Animation Event 재사용.
-
-### 이번에 구현하지 않을 기능
-
-- Unity Behavior Graph, Blackboard, 커스텀 Action 노드.
-- 순찰, 도주, 마지막 위치 기억, 경계 상태, 복수 공격 선택.
-- 새로운 FSM State·Transition, 콤보, 공격 입력 버퍼.
-- Jump·Fall·Dash·낭떠러지 회피·플랫폼 간 경로 탐색.
-- 새 Brain 인터페이스, AI 전용 공용 Controller 계층, 전용 설정 SO.
-- AIPlayer·기존 Behavior Graph 리팩토링과 패키지 변경.
-- Goblin Sprite·Clip·Animator·Override·전투 수치 변경.
-- 기존 Scene 저장·맵 등록, 리팩토링 로그·PDF 갱신, Git 커밋·푸시.
-
-### 설계 결정
-
-| 항목 | 선택 | 이유 |
-| --- | --- | --- |
-| 판단 구현 | `MonsterBrain : MonoBehaviour` 한 클래스 | Inspector 설정·비활성화를 지원하면서 작은 정책 유지 |
-| 실제 실행 루프 | MonsterController가 `Tick(deltaTime)` 호출 | Brain과 FSM의 Update 실행 순서 고정 |
-| 의존성 | `Initialize(...)`로 구체 컴포넌트 주입 | 기존 프로젝트 초기화 방식과 통일, 불필요한 Action·인터페이스 제외 |
-| 판단 결과 | MonsterInput의 기존 이동·공격 API | 입력과 State 실행의 책임 유지 |
-| 추적·대기 | 기존 GroundedState에서 실행 | 별도 Chase·Idle FSM State 불필요 |
-| 공격 타입 | 기존 1번 공격 유지 | 다중 공격 입력 계약 변경 제외 |
-| 쿨다운 기준 | 실제 AttackState 진입 시점 | 거절된 요청에 공격 간격이 소비되지 않음 |
-| 설정 위치 | Brain·Detector의 private SerializeField | 초기에는 별도 데이터 계층 불필요 |
-| Prefab 적용 | Goblin Variant에 Brain·PlayerDetector 추가 | BasicMonster는 외부 명령 기반 템플릿으로 유지 |
-
-## 3. 실제 코드베이스 확인 결과
-
-| 파일 | 현재 역할·제약 | 이번 계획 |
-| --- | --- | --- |
-| `Assets/Scripts/FSM/NPC/AIMonstor/@Hub/MonsterController.cs` | AgentController 직접 상속, 네 State 구성. TryStartAttack은 생존·1번 데이터 판정과 타입 설정 | 선택적 Brain 초기화·Tick 연결·실제 공격 진입 통보 |
-| `Assets/Scripts/FSM/NPC/AIMonstor/Input/MonsterInput.cs` | SetMovement는 x 입력만 보관, RequestAttack은 인자 없는 Action 발행 | 그대로 재사용 |
-| `Assets/Scripts/FSM/NPC/AIMonstor/MonsterState/MonsterStateFactory.cs` | Grounded: Death → Hit → Attack. Attack: Death → Hit → End. Hit: Death → End | State·Rule·등록 순서 유지 |
-| `Assets/Scripts/FSM/Agent/@Hub/AgentController.cs` | 현재 State는 protected. Update가 Execute 호출. ChangeState가 Exit·Enter 수행 | 읽기 전용 `IsState<TState>()` 추가 |
-| `Assets/Scripts/FSM/Agent/Move/2D/AgentMotor2D.cs` | Move 내부에서 private Turn 호출. 정지한 상태의 방향 전환 API 없음 | 기존 Turn을 public으로 개방해 이동 없이 방향 정렬 |
-| `Assets/Scripts/FSM/@Detector/PlayerDetector.cs` | 원형 감지·Linecast·Target 제공. 첫 후보 선택, Gizmo에서 감지 함수를 호출해 Target 변경 | 기존 API를 유지하며 대상 선택·생존 판정·Gizmo 부작용 정리 |
-| `Assets/Scripts/FSM/GroundedAgent/StateControl/States/GroundedState.cs` | 이동 입력으로 Motor·MoveSpeed 갱신 | 대기·추적 실행에 재사용 |
-| `Assets/Scripts/FSM/NPC/AIMonstor/MonsterState/States/MonsterAttackState.cs` | AttackState 확장, 진입 시 수평 속도 정지 | 그대로 재사용 |
-| `Assets/Scripts/FSM/NPC/AIMonstor/MonsterState/States/MonsterHitState.cs` | HitState 확장, 진입 시 수평 속도 정지 | 그대로 재사용 |
-| `Assets/Scripts/FSM/Agent/StateControl/TransitionRules/Attack/AttackTransition.cs` | 요청 플래그 수신 후 TryStartAttack 성공 시 전이. 플래그는 Unsubscribe에서 정리 | 그대로 재사용. Brain이 별도 전이를 만들지 않음 |
-| `Assets/Scripts/FSM/Agent/StateControl/TransitionRules/Attack/AttackEndTransition.cs` | 실제 End Event 수신 후 Monster는 Grounded 고정 복귀 | 그대로 재사용 |
-| `Assets/Scripts/FSM/Agent/Combat/Health.cs` | CurrentHealth·IsDead 제공 | Brain은 현재 생존 값 조회, 새 UniRx 구독 불필요 |
-| `Assets/Scripts/FSM/Agent/Handler/AgentCombatHandler.cs` | 공격 타입·box 범위·OnFrame 피해 적용 | 변경하지 않음 |
-
-앞선 Editor 확인에서 Goblin Root에는 MonsterController·Input·Animator 어댑터·Motor·Health·Combat·Rigidbody2D·Collider가 있고, Visual에는 실제 Animator·SpriteRenderer·AnimationEventProxy가 있었다. Brain·Detector는 없었다. 구현 시작 시 현재 연결을 다시 확인한다.
-
-주의: 기본 Monster의 GroundedState는 **기본 이동 State**다. 실제 지면 접촉을 판정하지 않으며, Monster에는 GroundDetector·FallState가 없다. 첫 검증은 평평한 동일 플랫폼에서 수행한다.
-
-## 4. 목표 구조와 책임
+## 2. 구조와 책임
 
 ```text
-PlayerDetector
-  └─ 대상 탐색·생존·장애물 확인 → Target
-
-MonsterBrain
-  ├─ 현재 State·대상 거리·높이·공격 간격 확인
-  ├─ Motor.Turn: Grounded에서 공격 전 방향 정렬만 수행
-  └─ MonsterInput.SetMovement / RequestAttack
-
-MonsterController
-  ├─ Brain Initialize / Tick 호출
-  ├─ 기존 FSM Execute
-  └─ 실제 Attack 진입 결과 → Brain.NotifyAttackStarted
-
-MonsterInput → AttackTransition → MonsterAttackState
-  └─ 기존 OnFrame 피해 적용 / End Event 복귀
+PlayerDetector + Health
+  → MonsterBrain / 향후 BehaviorTree
+  → MonsterInput.SetMovement / RequestAttack
+  → 기존 GroundedState / AttackTransition
+  → Handler·Motor·Animator
 ```
 
-### 책임 경계
+| 요소 | 책임 |
+| --- | --- |
+| PlayerDetector | 생존·가시 대상 탐색 |
+| MonsterBrain | 거리·높이·요청 간격·복귀 판단, Input에만 명령 전달 |
+| MonsterInput | 기존 이동 값 보관·공격 요청 발행 |
+| MonsterController | 기존 초기화·Factory·FSM·Animation Event 처리 유지 |
+| State·Handler·Motor | 기존 입력에 따른 행동 실행·방향 변경 |
 
-- Detector는 관측만 수행한다. 공격 여부·State 전이를 결정하지 않는다.
-- Brain은 행동 의도·AI 공격 간격을 관리한다. `ChangeState()`·TryStartAttack·ApplyAttackType·PerformAttack·Animator 설정을 직접 호출하지 않는다.
-- 방향 정렬은 Motor의 기존 방향 기능만 사용한다. Brain이 Transform scale·Rigidbody 속도를 직접 수정하지 않는다.
-- Input은 값·요청을 전달한다. 감지·쿨다운·상태 검사 코드를 넣지 않는다.
-- Controller는 의존성 주입·실행 순서·State 결과 전달을 맡는다. 추적·거리 판단 코드를 Controller에 모으지 않는다.
-- State·Transition은 기존 실행과 우선순위를 유지한다. 타깃 검색이나 AI 쿨다운을 공용 AttackTransition에 넣지 않는다.
+- Brain과 Controller는 서로 참조하지 않는다. Controller가 Brain 초기화·Update 호출·공격 결과 통보를 담당하지 않는다.
+- Brain에는 Controller·Motor·Animator·CombatHandler를 주입하지 않는다. Transform은 위치·기존 방향 조회만 하고 변경하지 않는다.
+- State 조회·공격 시작 시각 공개·별도 방향 입력·새 인터페이스는 추가하지 않는다.
+- 대기·추적·복귀는 SetMovement로, 공격은 RequestAttack으로 전달한다.
+- 좌우 이동의 방향 변경은 기존 `AgentMotor2D.Move → private Turn`에 맡긴다. Turn 접근자와 실행 흐름은 유지한다.
 
-## 5. MonsterBrain 구성
+## 3. MonsterBrain Component
 
-### 파일과 초기화
-
-- 신규 파일: `Assets/Scripts/FSM/NPC/AIMonstor/@Behavior/MonsterBrain.cs`
-- namespace: `ProjectRE`
-- Unity.Behavior Action 노드가 아닌 일반 MonoBehaviour다.
-- 자체 `Update()`·`FixedUpdate()`·Coroutine 루프를 만들지 않는다.
-
-초기화 시그니처는 다음 구성을 사용한다. 모두 실제로 사용하는 의존성이며 Func·Action 래핑이나 새 인터페이스를 추가하지 않는다.
+신규 경로: `Assets/Scripts/FSM/NPC/AIMonstor/@Behavior/MonsterBrain.cs`
 
 ```csharp
-public void Initialize(
-    MonsterController controller,
+private void Initialize(
     MonsterInput input,
     PlayerDetector detector,
-    AgentMotor2D motor);
-
-public void Tick(float deltaTime);
-public void NotifyAttackStarted();
+    Health health);
 ```
 
-### 보관할 값
+- 일반 MonoBehaviour, namespace ProjectRE.
+- 자체 Awake에서 같은 Root의 Input·Detector·Health를 얻어 Initialize에 전달한다. 별도 Bootstrap이나 Controller 연결은 만들지 않는다.
+- Awake에서는 참조·설정만 준비하고, 판단은 기존 Health 초기화와 FSM Start 이후 Update에서 시작한다.
+- Brain Update가 입력을 전달하고 Controller Update가 기존 FSM을 실행한다. DefaultExecutionOrder를 지정하고 기존 Script Execution Order와 대조한다.
+- 최초 Start에서 초기 배치 x좌표를 저장한다. 비활성화·재활성화로 복귀 위치를 변경하지 않는다.
+- Initialize에서 필수 참조와 설정을 검증한다. 잘못된 설정은 오류로 전달하고 정상 준비되지 않은 Brain은 판단하지 않는다.
+- FSM Execute·FixedUpdate·Coroutine·공개 Tick을 추가하지 않는다.
 
-| 종류 | 값 | 용도 |
+| 보관 값 | 용도 |
+| --- | --- |
+| Input·Detector·Health | 명령 전달·대상 감지·자신의 생존 여부 조회 |
+| attackDistance | 추적을 멈추고 공격을 요청하는 x축 거리 |
+| maxAttackHeightDifference | 추적·공격 가능한 대상의 높이 차이 |
+| attackRequestInterval | 공격 요청을 발행하는 최소 간격 |
+| maxChaseDistance | 초기 위치 기준 x축 추적 제한 거리 |
+| returnArrivalDistance | 초기 위치 복귀 완료 거리 |
+| _homeX | 최초 배치 x좌표 |
+| _isReturning | 복귀 완료 전 재추적을 막는 판단 플래그 |
+| _nextAttackRequestTime | 다음 공격 요청 가능 시각 |
+
+설정은 private SerializeField, 의존성·런타임 값은 private으로 둔다. 공격·피격 상태 복제, 공격 입력 버퍼, Controller 조회용 값을 만들지 않는다.
+
+## 4. 행동 판단
+
+| 순서 | 조건 | 전달할 입력 |
 | --- | --- | --- |
-| 의존성 | Controller | 생존 값·읽기 전용 State 판별 |
-| 의존성 | Input | 이동 명령·공격 요청 전달 |
-| 의존성 | Detector | 현재 감지 대상 |
-| 의존성 | Motor | 정지 상태에서 대상 방향 정렬 |
-| Inspector | attackDistance | x축 추적을 멈추고 공격을 요청하는 거리 |
-| Inspector | maxAttackHeightDifference | 다른 높이의 대상에게 공격·무리한 추적 제한 |
-| Inspector | attackInterval | 실제 공격 시작 사이의 최소 간격 |
-| 런타임 | remainingAttackInterval | 남은 공격 간격 |
+| 1 | 자신이 사망함 | 이동 0, 공격 요청 없음 |
+| 2 | 복귀 진행 중 | 초기 위치 방향 이동, 도착하면 이동 0 |
+| 3 | Monster가 초기 위치의 추적 제한을 벗어남 | 복귀 시작 |
+| 4 | 생존·가시 대상 없음 | 초기 위치에서 벗어났으면 복귀, 이미 도착했으면 이동 0 |
+| 5 | 대상이 추적 제한 밖이거나 높이 조건 미충족 | 복귀 또는 초기 위치 대기 |
+| 6 | 대상이 공격 거리 밖 | 대상 방향으로 x축 이동 |
+| 7 | 공격 거리 안이지만 기존 바라보는 방향과 반대 | 대상 방향 이동만 전달, 해당 판단에서는 공격 요청 없음 |
+| 8 | 공격 거리 안이며 방향 일치 | 이동 0, 요청 간격 완료 시 RequestAttack 1회 |
 
-- 함수 내부 값은 private, 외부 호출 API만 public으로 둔다.
-- 대상은 해당 Tick의 지역 변수와 Detector.Target을 활용한다. 초기 구현에 별도 TargetContext·Blackboard·Queue·입력 예약 플래그를 만들지 않는다.
-- 현재 State로 충분한 `_isAttacking`·`_isDead` 값을 Brain에 중복 보관하지 않는다.
-- Initialize에서 null·유효 설정·1번 공격 데이터 존재 여부를 확인한다. 실패 시 명확한 오류를 전달하고 정상 초기화되지 않은 Brain을 Tick하지 않도록 연결한다.
-- 초기화 여부만 보관하는 bool을 불필요하게 추가하지 않는다. 필수 참조와 호출 수명으로 관리한다.
-- 주석은 간결한 단답형으로 작성하고, 클래스·외부 API에 필요한 summary만 추가한다.
+### 방향
 
-### 수치 정책
+- 추적·복귀 이동은 기존 Move에서 자동으로 방향을 바꾼다.
+- 가까운 뒤쪽 대상은 좌우 이동 입력으로 먼저 방향을 맞춘 뒤 다음 판단에서 공격한다. 제자리 회전용 API는 추가하지 않는다.
+- Root의 기존 localScale.x 부호를 조회해 방향을 확인한다. 같은 x좌표의 허용 오차 안에서는 기존 방향을 유지한다.
+- 방향 정렬에는 정상 이동이 수반될 수 있다. 이동 없이 즉시 회전한다는 검증 조건은 두지 않는다.
 
-본 문서에서는 최종 수치를 확정하지 않는다. 구현 시 검증용 값과 조정 근거를 기록하고, 사용자가 Inspector에서 조정한다.
+### 공격 요청·실제 실행
 
-- 감지 반경은 PlayerDetector의 기존 viewRadius를 사용한다.
-- attackDistance는 Goblin 1번 AttackData의 offset·size와 양쪽 Collider를 함께 보고 설정한다. AI 요청 거리와 실제 피해 범위를 동일한 개념으로 취급하지 않는다.
-- 높이 기준은 두 Root의 기준점·발 위치를 확인한다. Collider 중심과 발 기준 좌표를 혼용하지 않는다.
-- 공격 간격은 시작 기준이다. Clip보다 짧아도 Attack 상태에서는 새 공격이 발생하지 않으며, 길면 Grounded 복귀 후 남은 간격 동안 대기한다.
-- 쿨다운은 `Mathf.Max(0f, remaining - deltaTime)`로 감소시켜 음수 누적을 막고 `<= 0f`로 완료 판정한다. clamp로 0을 보장하는 경우 임의 epsilon을 추가하지 않는다.
-- 거리·높이 경계에는 단위와 크기에 맞는 작은 허용 오차를 둔다. 필요 이상으로 공격 범위를 확대하거나 모든 float 비교에 동일한 오차를 강제하지 않는다.
+- 기존 1번 AttackType·AttackTransition·AttackEndTransition·Animation Event를 유지한다.
+- 요청 발행 후 `_nextAttackRequestTime = Time.time + attackRequestInterval`로 갱신한다.
+- 이 간격은 **실제 공격 시작 간격이 아니라 Brain의 입력 발행 간격**이다. FSM 상태·공격 시작 여부를 조회하거나 추정하지 않는다.
+- Attack·Hit 중에도 Brain은 환경에 따른 입력값을 갱신할 수 있다. 실제 이동·회전·전이는 현재 State와 기존 Rule이 처리한다.
+- 현재 Attack·Hit에는 공격 요청 Rule이 구독되어 있지 않으므로 해당 시점의 새 요청을 Input이 예약하지 않는다. 다음 발행 시 조건을 다시 판단한다.
+- 피격·사망은 기존 FSM 우선순위에 맡긴다. Brain이 모션을 취소하거나 Motor.StopHorizontal을 호출하지 않는다.
+- 현재 GroundedState.OnEnter는 보관된 이동 입력을 바로 적용한다. 모션 종료 후에는 최신 판단 결과가 이어지도록 유지한다.
+- 기존 AttackTransition의 시작 거절 플래그 유지 정책은 변경하지 않는다. 필수 공격 데이터는 Prefab 검증으로 확인하고, 런타임 공격 데이터 교체·차단의 재시도 정책은 제외한다.
 
-## 6. Tick의 판단 순서
+### 추적 제한·복귀
 
-| 순서 | 조건 | 명령·처리 |
+- 제한 기준은 Monster와 대상 각각의 `abs(x - _homeX)`이다. 감지 반경과 추적 제한 거리를 구분한다.
+- 제한 초과·대상 상실·높이 조건 미충족 시, 초기 위치에서 returnArrivalDistance보다 멀면 _isReturning을 설정한다.
+- 복귀 중에는 대상 재감지·공격 요청을 중지하고 먼저 초기 위치에 도착한다.
+- 복귀는 _homeX 방향의 이동 입력만 전달한다. 위치 강제 이동·y좌표 보정은 하지 않는다.
+- 도착 범위 안이면 이동 0, _isReturning 해제. 다음 판단부터 대상 탐색을 재개한다.
+- 피격 중에도 복귀 의도와 입력은 유지할 수 있으나 실제 움직임은 FSM에 맡긴다. 넉백을 덮어쓰지 않는다.
+- 공격 거리·높이·복귀 도착에는 단위에 맞는 허용 오차를 적용한다. 복귀 범위는 이동 속도·물리 이동 폭을 고려해 왕복 떨림이 없는지 검증한다.
+- maxChaseDistance는 returnArrivalDistance보다 크게 설정한다. 거리·요청 간격은 기존 공격 box·Collider·검증 구간을 보고 조정한다.
+
+현재 Monster에는 지면 감지·Fall·경로 탐색이 없다. 같은 높이의 평평하고 왕복 가능한 구간을 대상으로 하며, 벽 우회·낭떠러지 회피·다른 플랫폼 복귀는 제외한다.
+
+### 비활성화
+
+- Brain.OnDisable에서 자신의 이동 명령을 0으로 정리한다. State·Animator·물리는 직접 변경하지 않는다.
+- Brain을 꺼도 Controller와 진행 중 FSM 행동은 유지한다.
+- 재활성화 시 초기 위치·복귀 의도·다음 요청 시각은 유지한다. Time.time 기준으로 요청 간격을 다시 확인한다.
+
+## 5. PlayerDetector 보완
+
+기존 IsTargetInView·Target·SerializeField 이름과 Target의 Collider Transform 계약을 유지한다.
+
+- 부모 Health를 확인해 활성·생존 후보 중 가장 가까운 가시 Player를 선택한다. 후보가 없으면 Target은 null이다.
+- Linecast는 자기·대상 Collider 중심을 사용한다. 자기 Collider가 없으면 기존 Transform 위치를 사용한다.
+- Brain의 대상 거리·높이 계산은 부모 Health가 있는 Agent Root를 기준으로 통일한다.
+- Gizmo에서는 감지 함수를 호출하지 않는다. 반경·마지막 감지 결과만 표시하고 unused dirToTarget은 삭제한다.
+- Detector 자체 Update·NonAlloc 최적화는 추가하지 않는다. Brain의 대상 판단 시 한 번 호출한다.
+- AIPlayer와 공유하므로 API·직렬화 참조·기존 대상 사용을 회귀 확인한다.
+
+## 6. 변경 파일
+
+경로는 프로젝트 루트 기준이다.
+
+| 구분 | 경로 | 작업 |
 | --- | --- | --- |
-| 1 | 매 Tick | 남은 공격 간격 감소 |
-| 2 | 사망 또는 GroundedState가 아님 | 이동 입력 zero, 감지·방향 변경·공격 요청 중지 |
-| 3 | 생존·시야 유효 대상 없음 | 이동 입력 zero, 대기 |
-| 4 | 높이 차이가 허용 범위 밖 | 이동 입력 zero, 대기. 플랫폼 이동 시도 없음 |
-| 5 | x축 거리가 공격 거리 밖 | 대상 방향으로 x=±1 이동 입력 |
-| 6 | 공격 거리 안 | 이동 입력 zero, 대상 쪽 방향 정렬 |
-| 7 | 거리 안이고 간격 완료 | RequestAttack 1회 발행 |
+| 신규 | Assets/Scripts/FSM/NPC/AIMonstor/@Behavior/MonsterBrain.cs | 독립 판단 Component·추적·공격 요청·복귀 |
+| 수정 | Assets/Scripts/FSM/@Detector/PlayerDetector.cs | 생존 후보 선택·Linecast·Gizmo 정리 |
+| 수정 | Assets/Prefabs/Monster/Goblin.prefab | Root에 Brain·Detector, Mask·설정 연결 |
 
-추가 정책:
+Controller·Input·Motor·Factory·FactoryData·기존 State·Transition에는 코드를 추가하지 않는다. Unity 에셋은 Editor API로 수정하고 Goblin Variant에만 저장한다. Visual의 실제 Animator·Proxy와 BasicMonster 상속을 유지한다.
 
-- Attack·Hit에서는 이동 **명령값만** zero로 정리한다. Brain이 Motor.StopHorizontal을 반복 호출해 기존 넉백·물리를 덮어쓰지 않는다.
-- 공격 시작 후 대상이 움직이거나 사라져도 Brain이 현재 공격을 강제로 취소하지 않는다. 실제 타격 시점의 범위 판정으로 명중 여부를 결정한다.
-- Attack 중 방향은 고정한다. 매 프레임 타깃을 따라 회전시켜 타격 방향이 바뀌지 않게 한다.
-- x축 차이가 방향 판별 허용 오차 이내면 현재 방향을 유지한다. 거의 같은 위치에서 좌·우가 반복 전환되지 않게 한다.
-- 첫 구현은 가시 대상 중 가장 가까운 대상 선택을 사용한다. 대상 기억·선택 고정은 제외한다.
-- 대상이 사라졌는데 마지막 이동 명령이 유지되지 않도록 모든 대기 경로에서 zero를 전달한다.
+## 7. 구현 순서
 
-## 7. Controller 연결과 실제 공격 진입 확인
+### 1 — 현재 코드·설정 확인
 
-### 7.1 선택적 Brain 초기화
+- [x] Git 사용자 변경·프로젝트 지침·현재 시그니처 확인.
+- [x] Goblin 필수 데이터·1번 공격·Animator·Proxy·Layer 연결 확인.
+- [x] 이동 입력 → GroundedState → Handler → Move·Turn 경로 확인.
+- [x] 기존 공격 Rule의 구독·해제와 Attack·Hit 중 입력 처리 확인.
+- [x] 검증용 거리·요청 간격·복귀 설정과 왕복 가능한 구간 기록.
 
-MonsterController.Awake에서 기존 base 초기화·Animator·Factory 구성을 보존한 뒤, 같은 Root의 Brain과 PlayerDetector를 확인하고 Initialize한다.
+### 2 — Detector
 
-- Brain이 없는 Monster는 기존 외부 명령 방식 그대로 동작한다.
-- MonsterController에 Brain을 강제하는 RequireComponent를 추가하지 않는다.
-- Brain이 있는데 Detector가 없거나 설정이 잘못되면 조용히 자동 판단을 생략하지 말고 오류를 전달한다.
-- MonsterController.Awake에서 주입하고, Start의 최초 Grounded 진입 후 Tick을 시작한다.
-- 초기화 중 `FindObjectOfType`·태그 검색·전역 PlayerController 접근을 사용하지 않는다.
+- [x] PlayerDetector의 생존 후보 선택·Linecast·Target 정리 구현.
+- [x] Gizmo의 대상 갱신 부작용 제거.
+- [x] AIPlayer 공유 호출부·직렬화 참조 회귀 확인. BehaviorGraph 실제 실행은 제외.
 
-### 7.2 실행 순서
+### 3 — 독립 MonsterBrain
 
-MonsterController.Update를 확장한다.
+- [x] 자체 Awake·Initialize·Start·Update·FSM보다 앞선 입력 실행 순서 구성.
+- [x] Input·Detector·Health만 참조, Controller·Motor 상호 참조 미추가.
+- [x] 대기·추적·기존 이동을 통한 방향 정렬·공격 요청 간격 구현.
+- [x] 추적 제한·대상 상실 복귀·도착·재감지 구현.
+- [x] 자신의 사망·OnDisable 이동 명령 정리 구현.
+- [x] 직접 상태·물리·Animator 변경 및 공격 입력 버퍼 미추가 확인.
 
-```text
-초기화된 Brain이 활성화된 경우 Tick(Time.deltaTime)
-  → base.Update()
-  → 기존 State.Execute에서 Transition 평가·행동 실행
-```
+### 4 — Goblin 연결·검증
 
-- Brain은 Grounded에서 이미 구독 중인 AttackTransition에 요청한다.
-- 같은 Controller Update의 FSM 평가에서 요청을 처리한다.
-- base.Update는 한 번만 호출한다. Brain이 FSM Execute를 다시 호출하지 않는다.
-- Brain이 없거나 비활성화되어도 FSM은 계속 실행한다.
-- Hit·Death가 같은 프레임에 충족되면 기존 Factory 순서에 따라 공격보다 먼저 처리한다.
+- [x] Editor API로 Goblin에 Brain·Detector·Mask·설정 연결.
+- [x] Controller·Input·Motor·FSM 코드가 기존 상태인지 확인.
+- [x] 컴파일·Console·Prefab 참조·Goblin Play 및 입력 판단 경계 검증. 결과는 10절에 기록.
+- [x] 공유 Detector의 AIPlayer API·Prefab 참조 회귀 확인. BehaviorGraph Play는 미검증.
+- [x] 임시 테스트 요소 정리, 사용자 Scene·무관한 변경 보존.
+- [x] 실제 완료 항목만 체크하고 미검증·수동 조정 항목 기록.
 
-### 7.3 Attack 진입 통보
+## 8. 검증 항목
 
-MonsterController.ChangeState를 재정의하되, 기존 전환은 base.ChangeState에 맡긴다.
+| 상황 | 기대 결과 |
+| --- | --- |
+| 최초 생성·대상 없음 | 기존 Grounded 대기, 초기 배치 위치 보관 |
+| 좌·우 대상 추적 | 기존 이동 입력으로 이동·방향·MoveSpeed 변경 |
+| 가까운 뒤쪽 대상 | 정상 이동으로 방향 정렬 후 공격 요청 |
+| 공격 거리·요청 간격 충족 | 요청 발행, 실제 Attack 진입은 기존 Rule로 처리 |
+| Attack·Hit 중 이동값·공격 요청 갱신 | 현재 State 수명 유지, 요청 버퍼·직접 물리 변경 없음 |
+| OnFrame·End Event | 기존 피해·Grounded 복귀 유지 |
+| 공격 요청과 피격·사망 동시 발생 | 기존 Death → Hit → Attack 우선순위 유지 |
+| 대상 상실·사망·높이 차이·추적 제한 초과 | 복귀 입력 전달, 실제 움직임은 FSM에 따름 |
+| 복귀 도중 Player 재등장 | 복귀 완료 전 재추적·공격 요청 없음 |
+| 복귀 도중 피격 | 넉백 보존, Grounded 복귀 후 최신 이동 입력 적용 |
+| 초기 위치 도착 | 허용 범위에서 정지, 다음 판단에 대상 탐색 재개 |
+| Brain 비활성화·재활성화 | 이동 입력 정리, 초기 위치·요청 시각 유지 |
+| Brain 없는 Monster | 기존 외부 이동·공격 요청 정상 |
+| 실행 순서 | 참조·Health·FSM 준비 후 판단, 입력 전달 후 기존 FSM 실행 |
+| Gizmo·공유 Detector | 런타임 대상 변경 없음, AIPlayer 회귀 없음 |
 
-1. 전환 전 Attack 계열인지 읽기 전용으로 확인한다.
-2. base.ChangeState(stateType)를 호출한다.
-3. **비-Attack → 실제 Attack 계열 진입**이 확인되면 Brain.NotifyAttackStarted를 호출한다.
-4. Brain은 remainingAttackInterval을 attackInterval로 설정한다.
+거리·방향·복귀 도착 경계도 테스트한다. 실제 Clip 재생의 타격·종료 Event를 검증하며, 수동 Event 호출·미실행 Play 검증을 성공으로 기록하지 않는다.
 
-- 요청 타입 이름만 보고 성공으로 판단하지 않는다. 미등록 목적지·거절된 요청에는 통보하지 않는다.
-- 일반적인 상태 재설정·같은 Attack 유지에는 시작 간격을 반복 갱신하지 않는다.
-- 통보는 Controller와 Brain 사이의 작은 직접 호출로 구성한다. 초기 버전에 공용 OnStateChanged 이벤트·추가 인터페이스를 만들지 않는다.
-- Brain은 NotifyAttackStarted에서 공격 적용이나 State 전이를 수행하지 않는다.
+사용자 수동 확인: 방향 정렬의 이동량·공격 정지 거리·요청 간격·추적 제한 거리·복귀 도착 범위·경계 떨림.
 
-### 7.4 State 판별
+## 9. 향후 BehaviorTree 전환
 
-AgentController에 아래 읽기 전용 함수를 추가한다.
+- Detector·Health·기존 MonsterInput·FSM을 재사용한다.
+- 대기·추적·공격 요청·복귀 판단을 조건·행동 노드로 옮긴다.
+- C# Brain을 비활성화한 뒤 BehaviorTree만 같은 Input에 명령을 전달한다.
+- 판단 방식 교체를 위해 Controller·Motor·FSM에 전용 참조나 분기를 추가하지 않는다.
 
-```csharp
-public bool IsState<TState>() where TState : AgentStateBase
-    => _currentState is TState;
-```
+## 10. 구현·검증 결과
 
-- Dictionary·현재 State 참조를 외부에 공개하지 않는다.
-- typeof(AttackState)와 `_currentState.GetType()`의 정확한 일치로 비교하지 않는다. 실제 값은 MonsterAttackState이며 Player도 파생 AttackState를 사용한다.
-- 공통 실행·전환·종료 수명은 변경하지 않는다.
+### 적용 내용
 
-## 8. Detector와 방향 기능의 최소 보완
+- MonsterBrain: Input·Detector·Health만 참조하는 독립 Component. 자체 Awake에서 의존성을 준비하고 Start에서 최초 배치 x좌표 저장.
+- DefaultExecutionOrder(-100) 지정. 기존 MonsterController의 등록 순서 0과 대조. Controller 호출·별도 Tick·상태 조회 미추가.
+- PlayerDetector: 부모 Health 기반 생존·활성·가시 후보 선택, 가장 가까운 Collider를 Target으로 유지. 대상 없음·사망·차폐 시 null 정리.
+- Goblin Variant Root에 Brain·Detector 추가. BasicMonster, 기존 Visual Animator·Proxy·FSM·입력·전투 데이터 유지.
+- 거리·높이·추적 제한·복귀 판정에 0.01 허용 오차 적용. 공격 요청 간격은 Time.time 기준이며 실제 공격 시작 간격과 구분.
 
-### PlayerDetector
+### Goblin 검증 설정
 
-기존 `IsTargetInView()`·`Target`·SerializeField 이름을 유지한다. 이 컴포넌트는 AIPlayerBrain도 사용하므로 호출 계약과 직렬화 값을 보존한다.
+| 설정 | 값 |
+| --- | --- |
+| 공격 거리 / 허용 높이 차이 | 1.8 / 0.75 |
+| 공격 요청 간격 | 1초 |
+| 초기 위치 기준 추적 제한 / 복귀 도착 거리 | 8 / 0.15 |
+| 감지 반경 | 6 |
+| 대상 / 장애물 Mask | Player(256) / Ground·Wall(192) |
+| 기존 이동 속도 / Fixed Timestep | 6 / 0.02초 |
+| 평지 1회 물리 이동 폭 / 복귀 판정 범위 | 약 0.12 / 0.16(도착 거리 + 허용 오차) |
 
-- 반경 내 후보 중 활성 상태이며 생존한 Player를 고른다. Health는 후보의 부모 계층까지 확인한다.
-- 장애물 Linecast를 통과한 후보 중 가장 가까운 대상을 선택한다.
-- Goblin Root가 발 위치인 점을 고려해 Linecast 시작·종료를 지면 위의 몸체 기준으로 확인한다. 자기 Collider가 있으면 bounds.center를 시작점, 대상 Collider의 bounds.center를 종료점으로 사용하고, 자기 Collider가 없을 때만 기존 Transform 위치를 시작점으로 사용한다. 발 위치 사이의 선이 지형에 닿아 같은 플랫폼의 Player를 항상 차폐 대상으로 판단하지 않게 검증한다.
-- Player의 복수 Collider가 후보에 나타나도 피해·공격 요청을 Collider 수만큼 발행하지 않는다.
-- 기존 Target의 Collider Transform 전달 계약은 임의로 Root Transform으로 바꾸지 않는다. Brain에서 높이 기준점이 필요한 경우 부모 Health가 있는 Agent Root를 별도로 확인한다.
-- 후보가 없으면 Target을 null로 정리한다. 기존 대상이 파괴·비활성화·사망한 경우에도 즉시 제외한다.
-- OnDrawGizmos는 감지 함수를 호출하지 않고 반경과 마지막 감지 결과만 표시한다. Scene View가 런타임 Target을 변경하지 않게 한다.
-- 사용하지 않는 dirToTarget 지역 변수는 정리한다.
-- 첫 구현은 기존 OverlapCircleAll을 유지한다. NonAlloc 버퍼·별도 감지 스케줄러는 프로파일링 후 검토한다.
-- 감지는 Brain.Tick에서 필요한 Grounded 구간에 한 번 호출한다. Detector에 별도 Update를 추가하지 않는다.
+이동 속도 6은 기존 사용자 변경을 유지한 값이며 Motor SO를 수정하지 않았다. 검증은 초기 위치 x=0, y=0, 지면 상단 y=0의 임시 평지에서 수행했다. 실제 스테이지의 공격 정지 거리·충돌·복귀 구간은 별도 조정 대상이다.
 
-공유 Detector의 후보 선택·사망 제외 변경은 AIPlayer에도 영향을 줄 수 있다. 관련 호출부 회귀를 확인하며, AIPlayerBrain의 unrelated 로직까지 리팩토링하지 않는다.
+### 자동 검증
 
-### AgentMotor2D
+Unity Editor에서 임시 Play 환경과 메모리 컴파일 검증 코드를 사용했다. 총 38개 체크 통과: 실제 Play·Physics 검사 27개, 입력 판단 경계 검사 11개. 경계 검사는 private Update를 직접 호출했으므로 실제 FSM 재생 검사와 구분한다.
 
-- 기존 private Turn(Vector2)를 public으로 개방한다.
-- Move가 기존과 동일하게 Turn을 호출하도록 유지한다.
-- Brain은 Grounded에서 공격 전 Turn을 호출하고, 속도 변경은 State에 맡긴다.
-- SetFacing·FaceTarget 등의 동등한 새 함수를 추가하지 않는다.
-- FacingDirection 캐시 변수를 다시 만들지 않는다. 현재 Root scale 방향 규칙을 유지한다.
-- Player 이동·방향·Dash 회귀를 확인한다. Visual 크기는 변경하지 않는다.
+| 분류 | 확인 결과 |
+| --- | --- |
+| Detector | 부모 Health·자식 Collider Target 계약 유지. 가까운 생존 대상 선택, 사망·비활성·벽 차폐 시 Target 정리 |
+| 생성·이동 | Health·최초 위치 초기화, 대상 없는 Grounded 대기, 좌우 추적과 기존 Motor 방향 변경 |
+| 가까운 뒤쪽 대상 | 이동 입력으로 방향 정렬 후 공격 요청. 관측한 3회 요청 모두 올바른 방향 |
+| 실제 Attack Clip | 수동 Animation Event 호출 없이 피해 2회(대상 HP 200 → 196), End 2회, Attack → Grounded 복귀 |
+| 요청 간격 | 3회 발행 간 최소 약 1.001초. 실제 공격 시작 시각이 아닌 입력 발행 시각 측정 |
+| 모션 중 입력 | Attack 중 이동 입력을 바꿔도 수평 이동 정지 유지. 종료 후 최신 이동 입력 적용. Attack 중 요청은 다음 공격으로 예약되지 않음 |
+| 복귀·재감지 | 높이 차이·대상 사망·추적 제한 시 복귀. 복귀 중 재등장한 대상은 도착 전 재추적하지 않음. 관측 도착 x≈-0.1193 |
+| 피격·사망 | 복귀 중 Hit 진입·실제 Clip 종료 후 복귀 지속. Hit 중 외부 수평 속도를 Brain이 덮어쓰지 않음. Hit·Death 우선순위와 실제 Death Clip 종료 후 파괴 유지 |
+| 비활성화·외부 입력 | Brain 비활성화 시 이동 0. 재활성화 시 초기 위치·복귀 의도·다음 요청 시각 유지. Brain 제거 후 기존 외부 이동·공격·종료 경로 정상 |
+| 허용 오차 | 공격 거리·높이·복귀 도착·대상 추적 제한의 경계 양쪽과 자신의 제한 초과·사망 판단 통과 |
+| Prefab·공유 API | Goblin Variant·Animator 1개·Proxy 참조·Missing Script 0 확인. Player AI Prefab의 기존 Detector Mask·반경(4)·참조 유지, 호출부 컴파일 확인 |
 
-## 9. 입력·수명·요청 잔류 정책
+컴파일 실패 및 이번 검증에서 추가된 오류 로그 없음. Console 기록에 남아 있는 기존 InGameUI.Awake의 NullReferenceException은 작업 전 오류이며 이번 범위에서 수정하지 않았다.
 
-- MonsterInput의 Action 계약과 SetMovement는 변경하지 않는다.
-- Brain은 Attack·Hit·Death에서 RequestAttack을 호출하지 않는다. 다음 공격을 미리 예약하지 않는다.
-- 공격 종료 후 대상·거리·간격을 **다시 판단**해 새로운 요청을 발행한다. 이는 자동 의사결정이지 공격 입력 버퍼가 아니다.
-- AttackTransition 플래그는 기존 State.Exit의 Unsubscribe에서 해제한다. Brain이 직접 Rule 플래그를 정리하지 않는다.
-- TryStartAttack은 Health·데이터 확인과 타입 선택이라는 기존 책임을 유지한다. 거기에 AI 거리·쿨다운 코드를 섞지 않는다.
-- Initialize에서 정상적인 1번 공격 데이터를 확인한다. 데이터 누락으로 TryStartAttack이 계속 실패하는 요청 스팸을 정상 동작으로 허용하지 않는다.
-- 현재 AttackTransition은 Grounded에서 시작이 거절되면 요청 플래그를 유지한다. 이번에 이를 수정하지 않으며, 실행 중 공격 데이터를 교체·차단하는 기능은 범위 밖이다. 해당 기능이 추가되면 실패 요청의 폐기·재시도 정책을 별도로 설계한다.
-- Brain.OnDisable은 주입된 Input이 존재할 때 이동 명령을 zero로 정리한다. 직접 State.Exit이나 Animation 초기화를 호출하지 않는다.
-- Brain을 끄는 것은 **자동 판단을 끄는 것**이다. 진행 중 Attack·Hit와 FSM·물리는 계속 실행한다.
-- 간격은 Brain이 활성화된 Tick에서 감소한다. 비활성화로 간격을 즉시 초기화하지 않는다.
-- 새 UniRx·Action 구독이 없으므로 Brain에 CompositeDisposable·등록/해제 계층을 추가하지 않는다.
-- GameObject 파괴 시 기존 AgentController.OnDestroy의 State·Rule 정리를 유지한다. 풀링·Root 비활성화 후 FSM 재초기화는 이번 범위에서 보장하지 않는다.
+임시 검증 코드·오브젝트는 정리했다. 기존 InGame 씬을 Edit 모드로 복원했고 isDirty=false를 확인했다. Scene·BasicMonster·기존 Controller·Input·Motor·FSM·AIPlayer 전용 코드에는 변경을 저장하지 않았다.
 
-## 10. 변경 파일과 Prefab 적용
+### 남은 수동 확인
 
-| 구분 | 경로 | 변경 내용 |
-| --- | --- | --- |
-| 신규 | `Assets/Scripts/FSM/NPC/AIMonstor/@Behavior/MonsterBrain.cs` | 작은 판단 클래스·Inspector 설정·Tick·공격 시작 결과 처리 |
-| 수정 | `Assets/Scripts/FSM/NPC/AIMonstor/@Hub/MonsterController.cs` | 선택적 Initialize, Brain → FSM 실행 순서, 실제 Attack 진입 통보 |
-| 수정 | `Assets/Scripts/FSM/Agent/@Hub/AgentController.cs` | 읽기 전용 IsState<TState> |
-| 수정 | `Assets/Scripts/FSM/Agent/Move/2D/AgentMotor2D.cs` | 기존 Turn 접근자 변경 |
-| 수정 | `Assets/Scripts/FSM/@Detector/PlayerDetector.cs` | 가장 가까운 생존 대상·읽기 전용 Gizmo 표시 |
-| 수정 | `Assets/Prefabs/Monster/Goblin.prefab` | Root에 Brain·PlayerDetector 추가, 값·Mask 연결 |
-| 갱신 | `Docs/FSM/Monster_Brain_Behavior_Implementation_Plan.md` | 구현 체크·검증 결과·남은 조정값 기록 |
-| 생성 동반 | 신규 C#·@Behavior 폴더의 `.meta` | Editor가 생성한 GUID 유지 |
+- [ ] 실제 InGame의 같은 높이·왕복 가능한 구간에 Goblin 배치 후 방향 정렬의 이동량·공격 정지 거리 확인.
+- [ ] 요청 간격·추적 제한·복귀 도착 범위 조정, 실제 프레임 레이트·충돌 조건에서 경계 떨림 확인.
+- [ ] AIPlayer BehaviorGraph 전체 Play 회귀 확인. 이번 작업에서는 공유 Detector 물리 검사·API·Prefab 참조만 검증.
 
-다음은 변경하지 않는다.
-
-- BasicMonster.prefab, MonsterInput, Factory·FactoryData·기존 State·Rule.
-- MonsterAnimator·AnimationData·Goblin Clip·Override·Stat/Motor SO.
-- Player·AIPlayer의 전용 코드, 원본 외부 아트 에셋.
-
-Prefab 연결 기준:
-
-- Brain과 Detector는 Goblin Root에 추가한다. 실제 Unity Animator·Proxy는 Visual의 기존 한 개를 유지한다.
-- Detector의 playerMask는 실제 Player Collider Layer, obstacleMask는 기존 지형·벽 Layer와 대조한다.
-- 자기 자신·Enemy·배경 Sprite만 있는 오브젝트는 대상에서 제외한다.
-- Brain attackDistance·높이 기준을 기존 공격 box와 실제 Collider에 맞춰 조정한다.
-- Variant 수정은 Goblin에만 저장한다. 공용 템플릿으로 Apply하지 않는다.
-- Scene 자동 배치·맵 설정 등록은 하지 않는다. Play 검증이 필요하면 원래 Scene을 보존하는 임시 환경을 사용한다.
-
-## 11. 순차 구현 체크리스트
-
-### Phase 0 — 현재 소스·참조 재확인
-
-- [ ] Git 상태·사용자 변경·프로젝트 지침 확인.
-- [ ] 본 문서의 함수·클래스·경로를 현재 소스와 대조.
-- [ ] Goblin Variant·실제 Animator·Proxy·1번 AttackData·Layer 연결 확인.
-- [ ] PlayerDetector 공유 호출부와 AgentMotor2D 이동·방향 사용처 확인.
-- [ ] 검증용 거리·높이·간격 값 및 테스트 위치 기록.
-
-### Phase 1 — 최소 공통 API와 Detector
-
-- [ ] AgentController에 읽기 전용 IsState<TState> 추가.
-- [ ] AgentMotor2D의 기존 Turn을 public으로 변경하고 Move 동작 유지.
-- [ ] PlayerDetector의 가장 가까운 생존 후보 선택·Target null 정리 구현.
-- [ ] Gizmo의 Target 갱신 부작용 제거.
-- [ ] 발 위치·Collider 중심과 Linecast를 대조해 같은 플랫폼 감지가 지형에 가려지지 않는지 확인.
-- [ ] 기존 SerializeField·Target Transform 계약 보존 확인.
-- [ ] 컴파일과 공유 컴포넌트 회귀 확인.
-
-### Phase 2 — 작은 MonsterBrain
-
-- [ ] @Behavior/MonsterBrain.cs 추가, ProjectRE namespace 적용.
-- [ ] Initialize 의존성·필수 설정·1번 공격 데이터 검증 구현.
-- [ ] 간격 감소·State 제한·감지·높이·거리 판단을 순서대로 구현.
-- [ ] 추적·정지·공격 전 방향 정렬·단발 요청 구현.
-- [ ] NotifyAttackStarted에서 간격 설정만 수행.
-- [ ] OnDisable에서 이동 명령 정리.
-- [ ] 자체 Update·직접 전이·중복 상태 bool·새 인터페이스가 없는지 확인.
-
-### Phase 3 — MonsterController 연결
-
-- [ ] 기존 Awake 흐름 뒤 선택적 Brain.Initialize 연결.
-- [ ] 활성 Brain.Tick → base.Update 순서로 Update 구성.
-- [ ] 실제 비-Attack → Attack 진입 뒤 NotifyAttackStarted 전달.
-- [ ] Brain이 없는 기존 Monster의 외부 명령 방식 유지 확인.
-- [ ] Factory의 Death → Hit → Attack 우선순위 보존 확인.
-- [ ] 구독·State Execute·공격 피해 중복 호출이 없는지 확인.
-
-### Phase 4 — Goblin Variant 연결
-
-- [ ] Editor API로 Goblin에 Brain·PlayerDetector 추가.
-- [ ] Player·장애물 Mask와 검증용 설정 연결.
-- [ ] Variant 상속·GUID·Visual Animator·Proxy 연결 보존 확인.
-- [ ] BasicMonster·Scene·맵 설정·Goblin 모션·전투 수치를 변경하지 않았는지 확인.
-
-### Phase 5 — 검증과 인수인계
-
-- [ ] 컴파일·Console·Prefab 참조 검사.
-- [ ] 아래 자동/Play 검증 시나리오 수행.
-- [ ] 공용 Detector·Motor·State 판별 변경의 Player/AIPlayer 회귀 확인.
-- [ ] 임시 오브젝트·테스트 파일 정리, 원래 Scene 상태 보존 확인.
-- [ ] 사용자 수동 확인과 아직 미검증인 항목 분리.
-- [ ] 실제 완료 항목만 체크하고 결과·수치·제한사항 기록.
-
-## 12. 검증 시나리오
-
-| 시나리오 | 기대 결과 | 확인 방식 |
-| --- | --- | --- |
-| Goblin 최초 생성 | 기존 Grounded 진입 후 판단 시작, 초기화 순서 오류 없음 | Editor / Play |
-| Player 없음 | 이동 입력 zero, Idle 표현, 공격 요청 없음 | Play |
-| 좌·우 감지 대상 | 대상 방향 추적, MoveSpeed·방향 일치 | Play |
-| 대상이 시작부터 뒤쪽·공격 거리 안 | 이동 없이 올바른 방향으로 공격 | Play / 수동 |
-| 거리는 가깝고 높이는 다름 | 추적·공격 중지, 플랫폼 간 이동 시도 없음 | Play |
-| 벽이 사이에 있음 | 시야 제외, 이전 이동 명령 zero | Play |
-| 대상 감지 범위 이탈·삭제·비활성화·사망 | Target 정리, 추적·새 공격 중지 | Play |
-| 복수 유효 Player | 가장 가까운 생존·가시 후보 선택 | Detector 검증 |
-| Player 복수 Collider | Brain의 요청·이동 판단이 Collider 수로 중복되지 않음 | Detector / Play |
-| 공격 진입 | 1번 타입, 수평 속도 정지, 실제 진입 때 간격 시작 | Play |
-| 공격 OnFrame / End | 기존 프레임 피해·Grounded 복귀 유지 | 실제 Clip Play |
-| 요청·피격·사망 동시 충족 | 기존 Death → Hit → Attack 순서 유지 | Play |
-| Attack·Hit 중 대상 방향 변경 | 새 요청·방향 변경 없음, 넉백 덮어쓰기 없음 | Play |
-| 공격 종료 후 간격 남음 | Grounded에서 대기, 완료 후 대상 조건 재평가 | Play |
-| 공격 중 대상 이탈 | 현재 모션 정상 종료, 이후 자동 공격 없음 | Play |
-| 공격 종료 뒤 대상 유지 | 간격·조건 충족 시 새 요청으로 반복. 입력 버퍼 사용 없음 | Play |
-| Brain만 비활성화 | 이동 명령 정리, FSM·진행 중 모션은 유지 | Play |
-| Brain 없음 | 기존 외부 SetMovement·RequestAttack 정상 동작 | Play |
-| Scene Gizmo on/off | 런타임 대상 선택 결과가 Gizmo로 바뀌지 않음 | Editor / Play |
-| 거리·높이 경계·거의 같은 x좌표 | 불필요한 방향 떨림·정확한 float 일치 의존 없음 | 경계값 테스트 |
-| 실제 파생 State | MonsterAttackState를 AttackState 계열로 정상 판별 | 코드 / Play |
-| Player 회귀 | 이동·방향·Jump/Dash·공격 흐름 유지 | 관련 Play / 수동 |
-| AIPlayer 회귀 | 기존 PlayerDetector API·직렬화 참조·대상 사용 유지 | 코드 / 가능한 Play |
-
-검증한 Console의 새 오류와 기존 오류를 구분한다. Editor 연결 실패·미실행 Play 검증은 성공으로 기록하지 않는다. 임시 preview·End Event 수동 호출은 실제 게임 입력·실제 Clip Event 재생 검증을 대체하지 않는다.
-
-### 사용자 수동 확인
-
-- [ ] Goblin이 공격 범위에 도달했을 때 정지 위치·무기 범위가 자연스러운지 확인.
-- [ ] 가까운 Player가 뒤에 있을 때 공격 방향 확인.
-- [ ] 공격 간격·추적 속도·Idle/Move 표현이 의도에 맞는지 확인.
-- [ ] 대상 이탈·피격·사망 후 불필요한 추적·자동 공격이 남지 않는지 확인.
-- [ ] 거리 경계에서 좌·우·Idle/Move가 반복해서 떨리지 않는지 확인.
-
-속도·공격 box·Clip 타이밍 조정이 추가로 필요하면 사용자와 범위를 확인한다. Brain 구현을 이유로 기존 SO·모션을 임의 변경하지 않는다.
-
-## 13. 완료 기준과 이후 확장
-
-### 완료 기준
-
-- 새 판단 클래스는 MonsterBrain 하나이며 기존 네 State·Attack 입출력 유지.
-- 감지·판단·입력·실행 책임이 분리되어 있음.
-- Brain은 외부 전이·피해·Animator 제어를 하지 않음.
-- 실제 Attack 진입으로 공격 간격이 시작됨.
-- Hit·Death 우선순위와 공격 종료 Event 유지.
-- 대상 이탈·사망·Brain 비활성화 후 이동 명령 잔류 없음.
-- Goblin에만 자동 판단 적용, BasicMonster 외부 명령 방식 보존.
-- 공용 변경의 회귀·수동 대기·미검증 결과를 구분해 기록.
-
-### 이후 확장 시점
-
-- 순찰만 추가: 대상이 없는 분기의 정책 확장부터 검토. 바로 PatrolState를 추가하지 않는다.
-- 도주·경계·대상 기억·여러 공격 선택 증가: C# 판단 코드가 복잡해지는 시점에 Behavior Graph 전환 검토.
-- Graph 전환 시 감지 → 입력 → FSM 연결과 기존 State는 재사용하고, **의사결정 소유자는 한 곳**으로 둔다. C# Brain과 Graph가 동시에 이동·공격을 결정하게 하지 않는다.
-- 플랫폼 이동·낭떠러지·점프가 필요: 현재 Grounded 이름만으로 대응 가능하다고 가정하지 않고 Detector·이동·Fall 등 별도 계획 작성.
-- 다중 공격이 필요: int AttackType 입력·Animator 분기·시작 판정 정책을 별도 계획으로 확장. 이번 1번 단발 정책에 미리 구현하지 않는다.
-
-### 구현 요청 예시
-
-> `Docs/FSM/Monster_Brain_Behavior_Implementation_Plan.md`와 현재 소스를 확인하고 Phase 0부터 순서대로 구현해 주세요. 작은 C# MonsterBrain으로 Goblin의 감지·추적·단발 공격을 연결하고, 기존 네 State·AttackTransition·End Event를 유지해 주세요. Behavior Graph·순찰·새 State·기존 Scene 저장·전투 수치 변경·Git 커밋은 하지 말고, 실제 완료 항목만 체크하고 수동 확인 항목을 알려 주세요.
+벽 우회·낭떠러지 회피·다른 플랫폼 복귀·BehaviorTree 제작은 기존 제외 범위를 유지한다.

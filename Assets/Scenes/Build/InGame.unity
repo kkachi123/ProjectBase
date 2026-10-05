@@ -5511,45 +5511,8 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents:
-    - targetCorrespondingSourceObject: {fileID: 2649715645403659636, guid: 1a1fac7e97f117a4682421d78d8cfa8a, type: 3}
-      insertIndex: 6
-      addedObject: {fileID: 518305923}
-    - targetCorrespondingSourceObject: {fileID: 2649715645403659636, guid: 1a1fac7e97f117a4682421d78d8cfa8a, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 518305924}
+    m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 1a1fac7e97f117a4682421d78d8cfa8a, type: 3}
---- !u!1 &518305908 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 2649715645403659636, guid: 1a1fac7e97f117a4682421d78d8cfa8a, type: 3}
-  m_PrefabInstance: {fileID: 518305907}
-  m_PrefabAsset: {fileID: 0}
---- !u!114 &518305923
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 518305908}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c450731d633f29b4cb83428cb004ca49, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::ProjectRE.AgentDashHandler2D
---- !u!114 &518305924
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 518305908}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f9e51bf5aaa03cf46b3bcc502034f2dc, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::MapSystem.ParallaxLayer
-  scrollFactor: {x: 0.5, y: 0.5}
-  targetCamera: {fileID: 0}
 --- !u!1 &544091597
 GameObject:
   m_ObjectHideFlags: 0
@@ -15081,19 +15044,19 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 961911945703354557, guid: c120b6b05a9159b4982ccc263a9c35c2, type: 3}
       propertyPath: m_LocalScale.x
-      value: 2
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 961911945703354557, guid: c120b6b05a9159b4982ccc263a9c35c2, type: 3}
       propertyPath: m_LocalScale.y
-      value: 2
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 961911945703354557, guid: c120b6b05a9159b4982ccc263a9c35c2, type: 3}
       propertyPath: m_LocalScale.z
-      value: 2
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 961911945703354557, guid: c120b6b05a9159b4982ccc263a9c35c2, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -10.792648
+      value: -0.39
       objectReference: {fileID: 0}
     - target: {fileID: 961911945703354557, guid: c120b6b05a9159b4982ccc263a9c35c2, type: 3}
       propertyPath: m_LocalPosition.y
@@ -15135,9 +15098,37 @@ PrefabInstance:
       propertyPath: m_ConstrainProportionsScale
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 3640948814562112618, guid: c120b6b05a9159b4982ccc263a9c35c2, type: 3}
+      propertyPath: offset.y
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5406366158671647999, guid: c120b6b05a9159b4982ccc263a9c35c2, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 6
+      objectReference: {fileID: 0}
+    - target: {fileID: 5406366158671647999, guid: c120b6b05a9159b4982ccc263a9c35c2, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 6
+      objectReference: {fileID: 0}
     - target: {fileID: 5718515402252523039, guid: c120b6b05a9159b4982ccc263a9c35c2, type: 3}
       propertyPath: m_Name
       value: Goblin
+      objectReference: {fileID: 0}
+    - target: {fileID: 5755232718238823882, guid: c120b6b05a9159b4982ccc263a9c35c2, type: 3}
+      propertyPath: m_Size.x
+      value: 1.46
+      objectReference: {fileID: 0}
+    - target: {fileID: 5755232718238823882, guid: c120b6b05a9159b4982ccc263a9c35c2, type: 3}
+      propertyPath: m_Size.y
+      value: 2.3
+      objectReference: {fileID: 0}
+    - target: {fileID: 5755232718238823882, guid: c120b6b05a9159b4982ccc263a9c35c2, type: 3}
+      propertyPath: m_Offset.y
+      value: 1.1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5999034543030102801, guid: c120b6b05a9159b4982ccc263a9c35c2, type: 3}
+      propertyPath: _maxAttackHeightDifference
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
