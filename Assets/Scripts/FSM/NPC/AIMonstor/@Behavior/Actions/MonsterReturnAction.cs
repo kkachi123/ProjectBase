@@ -26,7 +26,7 @@ public partial class MonsterReturnAction : Action
     {
         var context = Context.Value;
         float deltaX = context.HomeX - context.transform.position.x;
-        if (Mathf.Abs(deltaX) <= context.ArrivalDistance + MonsterBehaviorContext.DistanceTolerance)
+        if (Mathf.Abs(deltaX) <= context.ArrivalDistance)
         {
             context.CompleteReturn();
             return Status.Success;

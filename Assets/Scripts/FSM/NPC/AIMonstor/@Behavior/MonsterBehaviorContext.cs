@@ -9,48 +9,35 @@ namespace ProjectRE
     [RequireComponent(typeof(BehaviorGraphAgent))]
     public class MonsterBehaviorContext : MonoBehaviour
     {
-        public const float DistanceTolerance = 0.01f;
-
         [Header("Attack Requests")]
-        [Min(0.01f), SerializeField] private float _attackDistance = 1.8f;
-        [Tooltip("몸통 Collider 바닥 기준 추적·공격 허용 높이 차이.")]
-        [Min(0f), SerializeField] private float _maxAttackHeightDifference = 0.75f;
-        [Min(0.01f), SerializeField] private float _attackRequestInterval = 1f;
+        [SerializeField] private MonsterAttackBehaviorHandler _attack = new();
 
         [Header("Chase and Return")]
-        [Min(0.01f), SerializeField] private float _maxChaseDistance = 8f;
-        [Min(0.01f), SerializeField] private float _returnArrivalDistance = 0.15f;
-        [Min(0f), SerializeField] private float _lostTargetWait = 2f;
+        [SerializeField] private MonsterChaseReturnBehaviorHandler _chaseReturn = new();
 
-        [Header("Patrol and Rear Approach")]
-        [Min(0f), SerializeField] private float _patrolRadius = 2f;
-        [Min(0f), SerializeField] private float _patrolWaitMin = 1f;
-        [Min(0f), SerializeField] private float _patrolWaitMax = 2f;
-        [Min(0.01f), SerializeField] private float _rearApproachTimeout = 1.5f;
+        [Header("Patrol")]
+        [SerializeField] private MonsterPatrolBehaviorHandler _patrol = new();
 
         private MonsterInput _input;
         private PlayerDetector _detector;
         private Health _health;
-        private Collider2D _bodyCollider;
         private BehaviorGraphAgent _agent;
         private Transform _target;
         private Health _targetHealth;
         private Collider2D _targetBodyCollider;
-        private bool _isEngaged;
-        private bool _isReturning;
         private BlackboardVariable<bool> _deadVariable;
         private BlackboardVariable<bool> _returnVariable;
         private BlackboardVariable<bool> _lostVariable;
         private BlackboardVariable<bool> _targetValidVariable;
         private BlackboardVariable<GameObject> _targetVariable;
 
-        public float HomeX { get; private set; }
-        public float AttackDistance => _attackDistance;
-        public float ArrivalDistance => _returnArrivalDistance;
+        public float HomeX => _chaseReturn.HomeX;
+        public float AttackDistance => _attack.AttackDistance;
+        public float ArrivalDistance => _chaseReturn.ArrivalDistance;
         public bool IsDead => _health.IsDead.Value;
         public bool HasValidTarget { get; private set; }
-        public bool NeedsReturn { get; private set; }
-        public bool NeedsLostTargetWait => _isEngaged && !HasValidTarget && !NeedsReturn;
+        public bool NeedsReturn => _chaseReturn.NeedsReturn;
+        public bool NeedsLostTargetWait => _chaseReturn.NeedsLostTargetWait(HasValidTarget);
         public Transform TargetRoot => _targetHealth != null ? _targetHealth.transform : null;
 
         /// <summary>자기 참조 캐시 및 그래프 초기 설정 전달.</summary>
@@ -59,22 +46,22 @@ namespace ProjectRE
             _input = GetComponent<MonsterInput>();
             _detector = GetComponent<PlayerDetector>();
             _health = GetComponent<Health>();
-            _bodyCollider = GetComponent<Collider2D>();
+            _attack.Initialize(GetComponent<Collider2D>());
             _agent = GetComponent<BehaviorGraphAgent>();
             _agent.SetVariableValue("Context", this);
             _agent.SetVariableValue("Input", _input);
-            _agent.SetVariableValue("AttackRequestInterval", _attackRequestInterval);
-            _agent.SetVariableValue("LostTargetWait", _lostTargetWait);
-            _agent.SetVariableValue("PatrolRadius", _patrolRadius);
-            _agent.SetVariableValue("PatrolWaitMin", _patrolWaitMin);
-            _agent.SetVariableValue("PatrolWaitMax", _patrolWaitMax);
-            _agent.SetVariableValue("RearApproachTimeout", _rearApproachTimeout);
+            _agent.SetVariableValue("AttackRequestInterval", _attack.AttackRequestInterval);
+            _agent.SetVariableValue("LostTargetWait", _chaseReturn.LostTargetWait);
+            _agent.SetVariableValue("PatrolRadius", _patrol.PatrolRadius);
+            _agent.SetVariableValue("PatrolWaitMin", _patrol.PatrolWaitMin);
+            _agent.SetVariableValue("PatrolWaitMax", _patrol.PatrolWaitMax);
+            _agent.SetVariableValue("RearApproachTimeout", _attack.RearApproachTimeout);
         }
 
         /// <summary>초기 X 좌표 저장 및 실행 Blackboard 참조 캐시.</summary>
         private void Start()
         {
-            HomeX = transform.position.x;
+            _chaseReturn.Initialize(transform, transform.position.x);
             _agent.SetVariableValue("HomeX", HomeX);
             _agent.GetVariable("IsDead", out _deadVariable);
             _agent.GetVariable("NeedsReturn", out _returnVariable);
@@ -88,14 +75,10 @@ namespace ProjectRE
         {
             UpdateTargetReferences(!IsDead && _detector.IsTargetInView() ? _detector.Target : null);
             bool hasTarget = _targetHealth != null && !_targetHealth.IsDead.Value;
-            bool targetOutsideLimits = hasTarget
-                && (Mathf.Abs(TargetRoot.position.x - HomeX) > _maxChaseDistance + DistanceTolerance
-                    || Mathf.Abs(_targetBodyCollider.bounds.min.y - _bodyCollider.bounds.min.y)
-                        > _maxAttackHeightDifference + DistanceTolerance);
-            HasValidTarget = hasTarget && !targetOutsideLimits;
-            NeedsReturn = _isReturning
-                || Mathf.Abs(transform.position.x - HomeX) > _maxChaseDistance + DistanceTolerance
-                || (_isEngaged && targetOutsideLimits);
+            HasValidTarget = hasTarget
+                && _chaseReturn.IsWithinChaseRange(TargetRoot.position.x)
+                && _attack.IsWithinHeightRange(_targetBodyCollider);
+            _chaseReturn.UpdateState();
             PublishFlags();
         }
 
@@ -111,24 +94,24 @@ namespace ProjectRE
         }
 
         /// <summary>추적 시작 기록. 일반 순찰과 대상 상실을 구분.</summary>
-        public void BeginEngagement() => _isEngaged = true;
+        public void BeginEngagement() => _chaseReturn.BeginEngagement();
 
         /// <summary>복귀 완료 전 재추적 방지.</summary>
         public void BeginReturn()
         {
-            _isReturning = true;
-            NeedsReturn = true;
+            _chaseReturn.BeginReturn();
             PublishFlags();
         }
 
         /// <summary>복귀 완료 후 교전·복귀 기록 초기화.</summary>
         public void CompleteReturn()
         {
-            _isReturning = false;
-            _isEngaged = false;
-            NeedsReturn = false;
+            _chaseReturn.CompleteReturn();
             PublishFlags();
         }
+
+        /// <summary>공격 관리자의 수평 거리 판정 전달.</summary>
+        public bool IsInAttackRange(float deltaX) => _attack.IsInAttackRange(deltaX);
 
         /// <summary>우선순위 조건과 대상 참조를 Blackboard에 반영.</summary>
         private void PublishFlags()

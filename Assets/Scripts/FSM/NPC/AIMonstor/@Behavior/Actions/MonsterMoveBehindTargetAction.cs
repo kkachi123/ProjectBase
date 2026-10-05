@@ -39,7 +39,7 @@ public partial class MonsterMoveBehindTargetAction : Action
 
         float destinationX = _target.position.x - _targetFacing * context.AttackDistance * 0.8f;
         float deltaX = destinationX - context.transform.position.x;
-        if (Mathf.Abs(deltaX) <= context.ArrivalDistance + MonsterBehaviorContext.DistanceTolerance)
+        if (Mathf.Abs(deltaX) <= context.ArrivalDistance)
             return Status.Success;
         if (Time.time >= _endTime)
             return Status.Failure;

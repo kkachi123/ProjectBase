@@ -27,7 +27,7 @@ public partial class MonsterPatrolAction : Action
     protected override Status OnUpdate()
     {
         float deltaX = _destinationX - Context.Value.transform.position.x;
-        if (Mathf.Abs(deltaX) <= Context.Value.ArrivalDistance + MonsterBehaviorContext.DistanceTolerance)
+        if (Mathf.Abs(deltaX) <= Context.Value.ArrivalDistance)
             return Status.Success;
 
         Input.Value.SetMovement(new Vector2(Mathf.Sign(deltaX), 0f));

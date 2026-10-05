@@ -11,6 +11,8 @@ using Action = Unity.Behavior.Action;
     category: "Action/Monster", id: "b310aa1e5f0e4f5bb5abb1110cab0207")]
 public partial class MonsterRequestAttackAction : Action
 {
+    private const float FacingDeadZone = 0.01f;
+
     [SerializeReference] public BlackboardVariable<MonsterBehaviorContext> Context;
     [SerializeReference] public BlackboardVariable<MonsterInput> Input;
     [SerializeReference] public BlackboardVariable<float> Interval = new(1f);
@@ -27,10 +29,10 @@ public partial class MonsterRequestAttackAction : Action
             return Status.Failure;
 
         float deltaX = context.TargetRoot.position.x - context.transform.position.x;
-        if (Mathf.Abs(deltaX) > context.AttackDistance + MonsterBehaviorContext.DistanceTolerance)
+        if (!context.IsInAttackRange(deltaX))
             return Status.Failure;
 
-        if (Mathf.Abs(deltaX) > MonsterBehaviorContext.DistanceTolerance
+        if (Mathf.Abs(deltaX) > FacingDeadZone
             && Mathf.Sign(deltaX) != Mathf.Sign(context.transform.localScale.x))
         {
             Input.Value.SetMovement(new Vector2(Mathf.Sign(deltaX), 0f));

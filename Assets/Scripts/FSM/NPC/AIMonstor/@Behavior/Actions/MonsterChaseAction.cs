@@ -29,7 +29,7 @@ public partial class MonsterChaseAction : Action
             return Status.Failure;
 
         float deltaX = context.TargetRoot.position.x - context.transform.position.x;
-        if (Mathf.Abs(deltaX) <= context.AttackDistance + MonsterBehaviorContext.DistanceTolerance)
+        if (context.IsInAttackRange(deltaX))
             return Status.Success;
 
         Input.Value.SetMovement(new Vector2(Mathf.Sign(deltaX), 0f));

@@ -196,13 +196,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 03d6f65349fb8104b9707eb2efc06bb0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ProjectRE.MonsterBehaviorContext
-  _attackDistance: 1.8
-  _maxAttackHeightDifference: 1
-  _attackRequestInterval: 1
-  _maxChaseDistance: 8
-  _returnArrivalDistance: 0.15
-  _lostTargetWait: 2
-  _patrolRadius: 2
-  _patrolWaitMin: 1
-  _patrolWaitMax: 2
-  _rearApproachTimeout: 1.5
+  _attack:
+    _attackDistance: 1.8
+    _maxAttackHeightDifference: 1
+    _attackRequestInterval: 1
+    _rearApproachTimeout: 1.5
+  _chaseReturn:
+    _maxChaseDistance: 8
+    _returnArrivalDistance: 0.15
+    _lostTargetWait: 1.5
+  _patrol:
+    _patrolRadius: 2
+    _patrolWaitMin: 1
+    _patrolWaitMax: 2
