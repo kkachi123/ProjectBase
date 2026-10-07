@@ -4,7 +4,7 @@ namespace ProjectRE
     using UnityEngine;
 
     /// <summary>감지 결과·초기 위치·행동 설정을 개체별 Blackboard에 전달.</summary>
-    [DisallowMultipleComponent, DefaultExecutionOrder(-100)]
+    [DisallowMultipleComponent, DefaultExecutionOrder(-100)] // 컴포넌트 중복 방지 , 다른 컴포넌트보다 먼저 Awake() 호출
     [RequireComponent(typeof(MonsterInput), typeof(PlayerDetector), typeof(Health))]
     [RequireComponent(typeof(BehaviorGraphAgent))]
     public class MonsterBehaviorContext : MonoBehaviour
