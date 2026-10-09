@@ -1,437 +1,313 @@
-# MonsterBehaviorContext · Handler · Action 연결 정리
+# Monster Behavior · Handler · Blackboard · Action 연결 정리
 
-작성 기준: 2026-10-07 현재 작업 트리의 소스와 저장된 `BasicMonsterBehavior.asset`.
+작성 기준: 2026-10-07 책임 분리 후 소스와 BasicMonsterBehavior.asset. 2026-10-09 기본 Variable Comparison 조건 교체, 교전·순찰 Subgraph 분리, Detector 탐색 전용화·AIPlayer 제거 및 단일 Player 대상 관리 단순화 반영.
 
-현재 구현을 설명하는 참고 문서. 리팩토링 계획이나 Play 모드 검증 결과가 아님. 아래 기본값은 스크립트 선언값이며, Prefab·Scene Inspector 값과 Override는 별도 적용.
+현재 구현의 변수·함수·사용처를 설명하는 참고 문서. 기본값은 스크립트 선언값이며 Prefab·Scene Inspector 값과 Override는 별도 적용. 이 문서는 Play 모드 검증 결과를 의미하지 않음.
 
-## 1. 제작 목적과 책임 분리
-
-`MonsterBehaviorContext`는 몬스터가 감지한 대상과 행동 설정을 Behavior Graph에 전달하는 연결 Component. 이동·공격 실행이나 FSM 상태 전환을 직접 수행하지 않음.
+## 1. 책임과 연결 구조
 
 | 구성 요소 | 제작 목적 | 담당하지 않는 부분 |
 |---|---|---|
-| `MonsterBehaviorContext` | 자기·대상 참조 캐시, Handler 초기화, 판정 조합, Blackboard 전달 | 이동 실행, 공격 실행, 대기 타이머 |
-| `MonsterAttackBehaviorHandler` | 공격·배후 접근 설정, 수평 공격 거리·허용 높이 판정 | 공격 입력 발행, 공격 State 진입, 배후 이동 타이머 |
-| `MonsterChaseReturnBehaviorHandler` | 초기 위치, 교전·복귀 기록, 추적 제한·상실 대기 필요 판정 | 이동 입력, 실제 상실 대기 시간 경과 처리 |
-| `MonsterPatrolBehaviorHandler` | 순찰 반경·정지 시간 설정 보관 | 목적지 선택, 순찰 이동, 정지 타이머 |
-| Action | Context·Blackboard를 읽고 이동·공격 입력 전달. 행동별 목적지·타이머 관리 | 공통 감지 판정, FSM 직접 전환 |
-| `MonsterFlagCondition` | 연결된 Blackboard bool 확인 | 감지·거리 계산, Action 실행 |
-| `MonsterInput` | 이동 명령 보관, 단발 공격 요청 Event 발행 | 행동 선택, 공격 가능 여부 판정 |
+| PlayerDetector | 감지 반경 내 Collider 탐색·장애물 확인 | Health 검색, 후보 캐시, 생존 판정, 최근접 선택, 구독·Blackboard 기록 |
+| MonsterTargetBehaviorHandler | 단일 Player Collider·Health 캐시, 생존·시야 확인, 선택 대상·Target 기록 | 후보 목록 관리, 최근접 비교, 사망 구독, 높이·추적 범위 종합 판정 |
+| MonsterBehaviorBlackboard | 변수 이름·타입·실행 변수 참조의 단일 접근 지점 | 행동 판단, 타이머, 공격 요청 시각 변경 |
+| MonsterAttackBehaviorHandler | 공격·배후 접근 설정 전달, 거리·높이 판정 | 공격 입력, FSM 진입, 배후 이동 타이머 |
+| MonsterChaseReturnBehaviorHandler | 초기 위치·교전·복귀 기록, 복귀·상실 대기 플래그 기록 | 이동 입력, 실제 대기 타이머 |
+| MonsterPatrolBehaviorHandler | 순찰 반경·정지 시간 설정 전달 | 랜덤 목적지 선택, 이동, 정지 타이머 |
+| MonsterBehaviorContext | 자기 참조 캐시, Handler 주입, 판정 조합·갱신 순서, 자기 사망 정보 전달 | Handler 단순 전달 함수, 전체 플래그 일괄 기록 |
+| Action | Handler 조회·행동 기록 변경, 이동·공격 입력, 목적지·타이머 관리 | FSM 직접 전환 |
+| Variable Comparison (Unity 기본 조건) | 연결된 Blackboard bool과 true 비교 | 감지·거리 계산 |
 
 ```text
-PlayerDetector + Health
-          ↓
-MonsterBehaviorContext ← 개체별 Handler 3개
-          ├─ 읽기 전용 속성·함수 → Action
-          └─ Blackboard → Condition / Action / 기본 대기 노드
-                                      ↓
-                                 MonsterInput
-                                      ↓
-                         기존 Controller · FSM · Motor · Animator
+PlayerDetector → Target Handler → Context의 종합 판정
+                                   ↓
+                         ChaseReturn.UpdateState
+
+Context + 각 Handler → MonsterBehaviorBlackboard → 기존 Graph
+                                                   ↓
+Action → Context.Attack / ChaseReturn / Target → MonsterInput
+                                                   ↓
+                                   기존 Controller · FSM · Motor · Animator
 ```
 
-Handler는 `[Serializable]` 일반 C# 클래스. Context의 직렬화 필드로 개체별 보유. 별도 Component나 자체 `Update()` 없음. Context·Graph·다른 Handler를 역참조하지 않음.
-
-이 문서의 **직접 사용**은 C# 호출, **간접 사용**은 Context 전달 함수 또는 Blackboard 연결을 거친 사용을 의미.
+설정 Handler 3개는 기존 Serializable 일반 C# 클래스이며 Context가 개체별 소유. Target Handler와 wrapper도 일반 C# 클래스. 별도 Component·인터페이스·상속 구조·자체 Update 없음. Handler는 Context·Graph·다른 Handler를 역참조하지 않고 주입받은 wrapper만 사용.
 
 ## 2. MonsterBehaviorContext
 
 소스: [MonsterBehaviorContext.cs](E:/Unity/Project/ProjectBase/Assets/Scripts/FSM/NPC/AIMonstor/@Behavior/MonsterBehaviorContext.cs)
 
-### 2.1 클래스 설정
+### 2.1 클래스·필드·속성
 
-| 설정 | 목적 |
-|---|---|
-| `DisallowMultipleComponent` | 같은 GameObject에 Context 중복 추가 방지 |
-| `DefaultExecutionOrder(-100)` | 기본 실행 순서 Component보다 초기화·갱신을 먼저 수행하도록 순서 지정. 모든 Component보다 먼저 실행한다는 의미는 아님 |
-| `RequireComponent` | `MonsterInput`, `PlayerDetector`, `Health`, `BehaviorGraphAgent` 의존 Component 선언 |
-| `Header` | Inspector에서 공격, 추적·복귀, 순찰 설정 그룹 구분 |
+DisallowMultipleComponent는 중복 Component 방지. DefaultExecutionOrder(-100)는 기본 순서 Component와 BehaviorGraphAgent(-50)보다 먼저 Start·Update를 실행하도록 지정. Graph의 Awake 초기화 후 Context Start에서 실행 변수를 연결하고, Agent Start에서 행동 실행 시작.
 
-자기 몸통 `Collider2D`는 `Awake()`에서 공격 Handler에 주입. 현재 `RequireComponent` 목록에는 포함되지 않음.
+RequireComponent는 MonsterInput·PlayerDetector·Health·BehaviorGraphAgent 선언. 자기 몸통 Collider2D는 Awake에서 캐시하며 기존처럼 RequireComponent 목록에는 포함하지 않음.
 
-### 2.2 Handler 필드
-
-| 변수 | 제작 목적 | 실제 사용 경로 |
+| 변수·속성 | 제작 목적 | 사용처 |
 |---|---|---|
-| `_attack` | 공격 설정과 거리·높이 판정 보관 | `Awake()` 설정 전달, `Update()` 높이 판정, `AttackDistance`·`IsInAttackRange()` 전달 → 추적·공격 요청·배후 접근 Action |
-| `_chaseReturn` | 초기 위치·교전·복귀 상태 관리 | `Start()` 초기화, `Update()` 제한 판정, 교전·복귀 전달 함수 → 추적·복귀·상실 대기 Action 및 관련 Condition |
-| `_patrol` | 순찰 설정 보관 | `Awake()` → `PatrolRadius`, `PatrolWaitMin`, `PatrolWaitMax` Blackboard → 순찰 Action·기본 `WaitRangeAction` |
+| _attack / Attack | 공격 설정·판정 Handler 소유·공개 | Start 주입, RefreshState 높이 판정, 추적·공격 요청·배후 접근 Action |
+| _chaseReturn / ChaseReturn | 추적·복귀 Handler 소유·공개 | Start 주입, RefreshState 범위·기록 갱신, 추적·복귀·대기·순찰·배후 접근 Action |
+| _patrol / Patrol | 순찰 설정 Handler 소유·공개 | Start에서 Graph 설정 전달. 현재 Action은 Blackboard 설정 사용 |
+| _targetHandler / Target | 선택 대상 Handler 소유·공개 | RefreshState 대상 갱신, 추적·공격 요청·배후 접근 Action의 Target.Root |
+| _input | 자기 MonsterInput 캐시 | Blackboard Input 전달, 비활성화 시 이동 초기화 |
+| _detector | 자기 감지 Component 캐시 | Target Handler에 주입 |
+| _health | 자기 Health 캐시 | IsDead, 자기 사망 구독 |
+| _agent | 자기 BehaviorGraphAgent 캐시 | Start에서 wrapper Bind |
+| _bodyCollider | 자기 몸통 Collider 캐시 | Attack.Initialize에 주입 |
+| _blackboard | 개체별 실행 변수 접근 | Context·Input 초기 설정, IsDead·HasValidTarget 기록. 초기화 전 null |
+| _deathSubscription | 자기 사망 구독의 IDisposable | SubscribeDeath·OnDisable에서 교체·해제 |
+| IsDead | 자기 Health.IsDead.Value 조회 | 대상 갱신 여부 판단. Graph는 구독으로 전달받은 동명 Blackboard bool 확인 |
+| HasValidTarget | 생존·추적 범위·허용 높이 조합 결과 | 교전 Condition, 추적·공격 요청·배후 접근·상실 대기 Action |
 
-### 2.3 자기·대상 참조 변수
+_attack, _chaseReturn, _patrol의 직렬화 필드 이름과 내부 설정 경로는 유지. 런타임 Target Handler와 wrapper는 Inspector 설정을 추가하지 않음.
 
-| 변수 | 제작 목적 | 설정·사용 지점 | Action·Condition 연결 |
-|---|---|---|---|
-| `_input` | 이 몬스터의 `MonsterInput` 캐시 | `Awake()`에서 확보, Blackboard `Input`에 전달. `OnDisable()`에서 이동 초기화 | 모든 Monster Action이 Blackboard `Input`으로 사용 |
-| `_detector` | 대상 감지 Component 캐시 | `Awake()`에서 확보, `Update()`에서 시야 확인 | `HasValidTarget`·`TargetRoot`를 통해 대상 관련 Action·Condition에 간접 전달 |
-| `_health` | 자기 사망 여부 확인 | `Awake()`에서 확보, `IsDead`에서 읽음 | Blackboard `IsDead` → 사망 분기의 `MonsterFlagCondition` → `MonsterStopAction` |
-| `_agent` | 실행 Graph의 Blackboard 접근 | `Awake()`에서 확보, `SetVariableValue()`·`GetVariable()`에 사용 | Action·Condition의 변수 연결을 준비. 입력 실행은 하지 않음 |
-| `_target` | Detector가 반환한 Transform 및 변경 여부 기록 | `UpdateTargetReferences()`에서 이전 대상과 비교 | 대상 변경 때만 Health·Collider 참조 재검색. Action에 직접 노출하지 않음 |
-| `_targetHealth` | 감지 대상의 생존 확인 및 행동 기준 Transform 확보 | 대상 변경 시 `GetComponentInParent<Health>()`로 캐시 | `HasValidTarget`, `TargetRoot` → 추적·공격 요청·배후 접근·상실 대기 |
-| `_targetBodyCollider` | 대상 몸통의 월드 바닥 높이 계산 | 대상 Health GameObject의 `Collider2D` 캐시 → `_attack.IsWithinHeightRange()` | 높이 판정 → `HasValidTarget` → 대상 유효 Condition·상실 대기 분기 |
+### 2.2 함수와 실행 순서
 
-`_target`은 감지된 Collider의 Transform일 수 있음. `TargetRoot`는 그 대상에서 찾은 **Health Component가 붙은 Transform**. 반드시 최상위 `transform.root`를 의미하지 않음.
+| 함수 | 목적·처리 | 호출·사용처 |
+|---|---|---|
+| Awake() | 자기 Component만 캐시 | Unity 생명주기. 이 시점에는 Blackboard 설정을 기록하지 않음 |
+| Start() | wrapper Bind → Context·Input 설정 → Handler 초기화 → 자기 사망 구독 → 최초 판정 | 모든 Awake 이후 실행. HomeX는 이 시점의 X 유지 |
+| OnEnable() | Start 이후 재활성화 시 자기 사망 구독 복구·최초 판정 | 첫 활성화에서는 wrapper가 null이므로 Start에 초기화 위임 |
+| Update() | RefreshState 호출 | Handler 자체 Update를 추가하지 않음 |
+| RefreshState() | 대상 갱신 → HasValidTarget 조합·기록 → ChaseReturn.UpdateState 전달 | Start·OnEnable·Update. 사망 시 대상 Handler Clear |
+| SubscribeDeath() | 기존 자기 구독 Dispose 후 Health.IsDead 구독 | Start·재활성화. 현재 값이 즉시 전달되고 이후 변경 시 Blackboard IsDead 기록 |
+| OnDisable() | 자기 사망 구독 해제, Player 캐시·Target·HasValidTarget·이동 입력 초기화 | 교전·복귀 기록과 HomeX는 유지 |
 
-Context의 자기 Component 검색은 `Awake()`에 위치. 대상 Component 검색은 대상 Transform이 바뀔 때만 수행. 단, 호출되는 `PlayerDetector.IsTargetInView()` 내부의 후보 대상 검색까지 없어졌다는 의미는 아님.
+종합 판정은 Target.IsAlive && ChaseReturn.IsWithinChaseRange(Target.Root.position.x) && Attack.IsWithinHeightRange(Target.BodyCollider).
 
-### 2.4 Blackboard 참조 변수
+공격 거리 충족 여부는 종합 판정에 포함하지 않음. 추적·공격 요청 Action이 별도로 확인. 대상이 감지됐지만 높이·추적 범위가 부적합하면 Target.Root는 존재하고 HasValidTarget만 false.
 
-모두 `Start()`에서 실행 Blackboard의 변수 참조를 캐시하고, `PublishFlags()`에서 `.Value` 갱신. 별도 판정값을 중복 보관하는 필드가 아니라 Graph가 읽을 변수의 참조.
+기존 Context의 HomeX, AttackDistance, ArrivalDistance, NeedsReturn, NeedsLostTargetWait, TargetRoot 전달 속성과 BeginEngagement, BeginReturn, CompleteReturn, IsInAttackRange 전달 함수는 제거. PublishFlags, UpdateTargetReferences도 제거.
 
-| 변수 | Blackboard 이름 | 전달 값 | 사용 Action·Condition |
-|---|---|---|---|
-| `_deadVariable` | `IsDead` | `IsDead` | 사망 Guard의 `MonsterFlagCondition.Flag` → `MonsterStopAction` |
-| `_returnVariable` | `NeedsReturn` | `NeedsReturn` | 복귀 Guard의 `MonsterFlagCondition.Flag` → `MonsterReturnAction` |
-| `_lostVariable` | `NeedsLostTargetWait` | `NeedsLostTargetWait` | 상실 대기 Guard의 `MonsterFlagCondition.Flag` → `MonsterWaitForTargetAction` |
-| `_targetValidVariable` | `HasValidTarget` | `HasValidTarget` | 교전 Guard의 `MonsterFlagCondition.Flag` → 추적·공격 분기 |
-| `_targetVariable` | `Target` | `TargetRoot.gameObject` 또는 `null` | 현재 연결된 Monster Action은 이 변수를 직접 읽지 않고 `Context.TargetRoot` 사용 |
+## 3. MonsterBehaviorBlackboard
 
-### 2.5 공개 속성
+소스: [MonsterBehaviorBlackboard.cs](E:/Unity/Project/ProjectBase/Assets/Scripts/FSM/NPC/AIMonstor/@Behavior/MonsterBehaviorBlackboard.cs)
 
-| 속성 | 제작 목적·값의 출처 | 직접 사용 | 간접 사용 |
-|---|---|---|---|
-| `HomeX` | 추적·복귀 Handler가 저장한 초기 X 좌표 | `MonsterPatrolAction.OnStart()`, `MonsterReturnAction.OnUpdate()` | `Start()`에서 Blackboard `HomeX`에도 전달. 현재 Action은 Context 속성으로 읽음 |
-| `AttackDistance` | 공격 Handler의 수평 공격 거리 | `MonsterMoveBehindTargetAction.OnUpdate()`의 배후 목적지 계산 | 추적·공격 요청의 거리 판정은 이 속성 대신 `IsInAttackRange()` 사용 |
-| `ArrivalDistance` | 추적·복귀 Handler의 도착 인정 범위 | `MonsterPatrolAction`, `MonsterReturnAction`, `MonsterMoveBehindTargetAction`의 `OnUpdate()` | 순찰·복귀·배후 도착 판정에 같은 범위 사용 |
-| `IsDead` | 자기 `_health.IsDead.Value` | Context `Update()`·`PublishFlags()` | Blackboard `IsDead` → `MonsterFlagCondition` |
-| `HasValidTarget` | 감지·생존·초기 위치 기준 대상 추적 범위·높이 조건을 조합한 결과 | 추적·공격 요청·배후 접근·상실 대기 Action | Blackboard `HasValidTarget` → `MonsterFlagCondition`; 상실 대기 필요 판정에도 사용 |
-| `NeedsReturn` | 복귀 진행 중이거나 자기 초기 위치 제한 초과 | 추적·공격 요청·배후 접근 Action에서 실패 판정 | Blackboard `NeedsReturn` → 복귀 Condition; 상실 대기 필요 판정에도 사용 |
-| `NeedsLostTargetWait` | 교전 경험이 있고 유효 대상이 없으며 복귀 필요 상태가 아닌지 확인 | Context `PublishFlags()` | Blackboard 값 → 상실 대기 Condition. 대기 Action 자체는 이 속성을 직접 읽지 않음 |
-| `TargetRoot` | `_targetHealth.transform` 또는 `null` | 추적·공격 요청·배후 접근 Action에서 위치·방향 확인. Context에서 추적 범위 판정 | Blackboard `Target` 전달 |
+변수 이름은 wrapper의 private …Name 상수에만 보관. 아래 private 필드는 값의 복사본이 아니라 실행 Graph의 BlackboardVariable<T> 참조. 같은 행의 공개 속성은 해당 참조의 Value를 읽고 씀.
 
-`HasValidTarget == true`는 **공격 거리 안에 있음**을 의미하지 않음. 공격 거리 판단은 추적·공격 요청 Action에서 별도 수행.
+| 변수 이름·공개 속성 | private 참조 | 타입 | 기록 주체 | Graph 소비처 |
+|---|---|---|---|---|
+| Context | _context | MonsterBehaviorContext | Context Start | Stop 제외 6종 Action의 Context |
+| Input | _input | MonsterInput | Context Start | 7종 Action의 Input |
+| Target | _target | GameObject | Target Handler | 현재 Action 필드에 직접 연결 없음. Action은 Target.Root 조회 |
+| HomeX | _homeX | float | ChaseReturn.Initialize | 현재 Action은 ChaseReturn.HomeX 조회 |
+| IsDead | _isDead | bool | Context 자기 사망 구독 | 최우선 사망 Guard의 Flag |
+| NeedsReturn | _needsReturn | bool | ChaseReturn | 복귀 Guard의 Flag |
+| NeedsLostTargetWait | _needsLostTargetWait | bool | ChaseReturn | 상실 대기 Guard의 Flag |
+| HasValidTarget | _hasValidTarget | bool | Context | 교전 Guard의 Flag |
+| AttackRequestInterval | _attackRequestInterval | float | Attack.Initialize | 공격 요청 Interval, 교전 마지막 Wait |
+| RearApproachTimeout | _rearApproachTimeout | float | Attack.Initialize | 배후 접근 Timeout |
+| LostTargetWait | _lostTargetWait | float | ChaseReturn.Initialize | 상실 대기 Seconds |
+| PatrolRadius | _patrolRadius | float | Patrol.Initialize | 순찰 Radius |
+| PatrolWaitMin | _patrolWaitMin | float | Patrol.Initialize | 순찰 후 WaitRange.Min |
+| PatrolWaitMax | _patrolWaitMax | float | Patrol.Initialize | 순찰 후 WaitRange.Max |
 
-`TargetRoot != null`과 `HasValidTarget == true`도 같은 의미가 아님. 대상이 감지됐지만 높이·추적 범위 조건을 벗어나면 Transform은 남고 유효 판정만 false가 될 수 있음.
+| 함수 | 목적 |
+|---|---|
+| Bind(BehaviorGraphAgent agent) | 위 14개 실행 변수 참조를 한 번 확보 |
+| GetVariable<T>(agent, variableName) | Bind 시점에만 누락·타입 불일치 확인. 개체 이름·변수 이름·기대 타입을 포함한 오류 전달 |
 
-### 2.6 함수
+Handler·Context에서 문자열·SetVariableValue·GetVariable을 사용하지 않음. Graph 변수 이름 변경 시 wrapper 상수도 수정 필요. 런타임 Graph를 교체·재초기화하는 별도 기능은 이번 범위에 포함하지 않음.
 
-| 함수 | 제작 목적·처리 내용 | 호출 주체 | 연결된 Action·Condition |
-|---|---|---|---|
-| `Awake()` | 자기 참조 캐시, 공격 Handler에 몸통 Collider 주입, Context·Input·설정값 Blackboard 전달 | Unity 생명주기 | 전체 Action의 참조·설정 준비 |
-| `Start()` | 추적·복귀 Handler에 자기 Transform·초기 X 주입, `HomeX` 전달, 동적 Blackboard 참조 캐시 | Unity 생명주기 | 순찰·복귀 기준점, Condition의 동적 플래그 갱신 준비 |
-| `Update()` | 살아 있을 때 Detector 확인 → 대상 캐시 갱신 → 유효 대상 판정 → 자기 추적 제한 갱신 → Blackboard 반영 | Unity 생명주기 | 네 플래그 Condition과 대상 관련 Action에 최신 판정 제공 |
-| `UpdateTargetReferences(Transform target)` | 대상이 변경됐을 때만 Health·몸통 Collider 캐시 갱신. 감지 해제 시 참조 초기화 | `Update()` | 대상 관련 Action에 `TargetRoot` 제공, 높이·생존 판정 준비 |
-| `BeginEngagement()` | Handler에 교전 시작 기록 | `MonsterChaseAction.OnStart()` | 이전에 추적한 대상 상실과 평상시 순찰을 구분 |
-| `BeginReturn()` | 복귀 상태 기록 후 즉시 `PublishFlags()` 호출 | `MonsterWaitForTargetAction.OnUpdate()`, `MonsterReturnAction.OnStart()` | 대기 만료 후 복귀 Guard 활성화, 복귀 중 재추적 방지 |
-| `CompleteReturn()` | 교전·복귀 기록 초기화 후 즉시 `PublishFlags()` 호출 | `MonsterReturnAction.OnUpdate()` | 복귀 Guard 해제, 이후 대상 유효 여부에 따라 교전·순찰 선택 가능 |
-| `IsInAttackRange(float deltaX)` | 공격 Handler의 수평 거리 판정 전달 | `MonsterChaseAction.OnUpdate()`, `MonsterRequestAttackAction.OnUpdate()` | 추적 종료·공격 요청 거리 조건 통일 |
-| `PublishFlags()` | 사망·복귀·상실 대기·대상 유효·대상 GameObject를 실행 Blackboard에 반영 | `Update()`, `BeginReturn()`, `CompleteReturn()` | `MonsterFlagCondition`의 판단 입력 갱신 |
-| `OnDisable()` | 자기 이동 입력을 0으로 초기화 | Unity 생명주기 | 비활성화 시 남은 이동 명령 제거. Handler 기록·타이머 초기화 함수는 아님 |
+NextAttackRequestTime은 wrapper에서 바인딩·초기화·갱신하지 않음. 공격 요청 Action의 기존 실행 기록 유지. Self도 wrapper 관리 대상이 아니며 Graph Agent의 기존 설정 유지.
 
-## 3. MonsterAttackBehaviorHandler
+## 4. PlayerDetector: 물리 탐색 전용
+
+소스: [PlayerDetector.cs](E:/Unity/Project/ProjectBase/Assets/Scripts/FSM/@Detector/PlayerDetector.cs)
+
+감지 반경 내 Collider 반환과 장애물 확인만 담당. Target, TargetHealth, TargetBodyCollider, IsTargetInView()와 후보 캐시는 제거. 생존 판정·Player 참조 캐시·선택 대상 관리는 Target Handler 담당. Player 한 명·몸통 Collider 하나 전제로 최근접 비교 없음. 별도 Component·인터페이스 추가 없음.
+
+| 변수·속성 | 목적·사용 |
+|---|---|
+| playerMask | OverlapCircleAll의 감지 레이어. 기존 Inspector 필드 유지 |
+| obstacleMask | 감지 원점과 후보 Collider 중심 사이 Linecast 장애물 확인 |
+| offset | transform.position에 더할 감지 원점 Offset |
+| viewRadius | 감지 반경. 기존 Inspector 필드·Gizmo 유지 |
+
+| 함수 | 목적 |
+|---|---|
+| FindCandidates(out Vector2 origin) | transform.position + offset을 원점으로 반환하고 기존 OverlapCircleAll로 Collider 배열 반환 |
+| HasLineOfSight(origin, candidate) | 원점과 후보 bounds.center 사이 Linecast에 장애물이 없으면 true |
+| OnDrawGizmos() | 기존 원점·반경을 빨간색으로 표시. 대상 선택 여부 색상 변경 없음 |
+
+playerMask, obstacleMask, offset, viewRadius의 직렬화 이름·Inspector 값은 유지. 원형 검색과 OverlapCircleAll 결과 배열 할당 최적화는 진행하지 않음.
+
+기존 호출자인 AIPlayerBrain·AIPlayerInput·AIPlayer 전용 Action 6개 및 해당 meta 제거. Player AI.prefab과 meta, SampleScene의 Player AI1·Player AI2 Prefab 인스턴스만 삭제. SampleScene과 직접 입력 Player, 공용 Detector·FSM·Animator·Clip·SO 및 Monster Graph 유지. 예전 AIPlayer Behavior Graph는 작업 전부터 에셋이 없는 상태.
+
+## 5. MonsterTargetBehaviorHandler
+
+소스: [MonsterTargetBehaviorHandler.cs](E:/Unity/Project/ProjectBase/Assets/Scripts/FSM/NPC/AIMonstor/@Behavior/Handlers/MonsterTargetBehaviorHandler.cs)
+
+| 변수·속성 | 목적·사용 |
+|---|---|
+| _detector | Initialize에서 주입한 감지 Component |
+| _blackboard | 개체별 Target 변수 기록용 wrapper |
+| _cachedCollider | 최초 발견 또는 인스턴스 교체 시 확보한 Player 몸통 Collider. 인식 해제 후에도 유지 |
+| _health | _cachedCollider와 같은 GameObject에서 TryGetComponent로 확보한 Health. 캐시 Collider 변경 시에만 검색 |
+| Root | 현재 선택된 몸통 Collider가 있으면 캐시 Health의 Transform. 선택 해제 후 null |
+| BodyCollider | 현재 선택 대상의 몸통 Collider. 감지 결과 참조를 그대로 사용. 높이 판정에서 현재 bounds 조회 |
+| IsAlive | 선택 대상 존재·Health 존재·Health.IsDead.Value를 직접 확인. 값 저장·사망 구독 없음 |
+
+| 함수 | 목적·소비처 |
+|---|---|
+| Initialize(detector, blackboard) | Context Start에서 의존성 주입 |
+| UpdateTarget() | Context RefreshState 호출. 탐지 결과 하나 확보 → 캐시 Collider 변경 시 Health 검색 → 범위 내 존재·생존·시야 판정 → 선택 대상 갱신 |
+| SetTarget(targetCollider) | 선택 BodyCollider를 ReferenceEquals로 비교. 변경 시 선택 Collider·Blackboard Target만 갱신. Player 캐시는 유지 |
+| Clear() | 자기 사망·비활성화 시 선택 대상 해제 후 캐시 Collider·Health 전체 초기화 |
+
+Player는 동시에 한 명이며 playerMask에 잡히는 몸통 Collider도 하나. OverlapCircleAll 결과의 첫 Collider 또는 null만 사용. 다른 Collider가 감지 레이어에 섞이면 이 전제가 깨지므로 공격 범위 Trigger·다른 오브젝트는 제외. Health와 몸통 Collider는 같은 GameObject에 배치. 부모 검색·추가 Collider 검색·자기 제외·최근접 비교 없음.
+
+감지된 Collider와 _cachedCollider가 ReferenceEquals로 같으면 Component 검색 생략. 다른 인스턴스일 때만 TryGetComponent<Health>() 수행. Health 없는 Collider는 선택하지 않으며 동일 Collider에 대한 검색을 반복하지 않음. Health·몸통 Collider는 생존 중 교체하지 않는 현재 구조를 기준으로 함.
+
+범위 이탈·시야 상실·Player 사망 시 Root·BodyCollider·Blackboard Target만 해제. _cachedCollider·_health는 유지하므로 동일 Player 재인식 시 검색 없음. 몬스터 사망·비활성화의 Clear()에서만 두 캐시까지 해제. 캐시는 후보 목록이 아니라 참조 한 쌍이며 각 몬스터가 개별 소유.
+
+Player 사망 즉시 IsAlive는 직접 조회로 false. 선택 참조·Target 해제와 Context의 HasValidTarget 반영은 다음 갱신에서 수행. Context의 높이·추적 범위 판정은 유지하며 이 판정에 실패해도 감지된 Target 자체를 바꾸지 않음. Collider bounds는 현재 월드 위치·크기를 반영.
+
+## 6. 행동별 설정 Handler
+
+### 6.1 MonsterAttackBehaviorHandler
 
 소스: [MonsterAttackBehaviorHandler.cs](E:/Unity/Project/ProjectBase/Assets/Scripts/FSM/NPC/AIMonstor/@Behavior/Handlers/MonsterAttackBehaviorHandler.cs)
 
-공격 관련 **설정·판정**을 보관하는 관리자. 공격 요청을 보내거나 공격 애니메이션을 직접 시작하지 않음.
+| 변수·속성 | 기본값·목적 | 사용처 |
+|---|---|---|
+| _attackDistance / AttackDistance | 1.8. 수평 공격 거리 | 추적·공격 요청 판정, 배후 목적지 거리 |
+| _maxAttackHeightDifference | 0.75. 몸통 바닥 높이 차이 허용값 | Context HasValidTarget 조합 |
+| _attackRequestInterval / AttackRequestInterval | 1. 공격 요청 간격 | Initialize → Blackboard → RequestAttack.Interval·기본 Wait |
+| _rearApproachTimeout / RearApproachTimeout | 1.5. 배후 접근 제한 시간 | Initialize → Blackboard → MoveBehindTarget.Timeout |
+| _bodyCollider | 자기 몸통 참조 | Initialize 주입, 높이 판정 |
 
-### 3.1 변수·속성
+| 함수 | 목적·소비처 |
+|---|---|
+| Initialize(bodyCollider, blackboard) | 자기 몸통 캐시·공격 시간 설정 2개 기록. wrapper를 별도 필드로 보관하지 않음 |
+| IsInAttackRange(deltaX) | Abs(deltaX) <= 공격 거리. Chase·RequestAttack이 직접 호출 |
+| IsWithinHeightRange(targetBodyCollider) | 자기·대상 bounds.min.y 차이 비교. Context가 직접 호출 |
 
-| 변수·속성 | 코드 기본값 | 제작 목적 | 사용 경로·Action·Condition |
-|---|---|---|---|
-| `_attackDistance` | `1.8f` | 수평 공격 거리 기준 | `IsInAttackRange()` → Context → 추적·공격 요청 Action. `AttackDistance` → 배후 접근 목적지 |
-| `_maxAttackHeightDifference` | `0.75f` | 자기·대상 몸통 Collider 바닥 높이 차이의 허용값 | `IsWithinHeightRange()` → Context `HasValidTarget` → 대상 유효 Condition 및 상실 대기 판단 |
-| `_attackRequestInterval` | `1f` | 공격 입력 요청 간격 설정 | `AttackRequestInterval` → Blackboard 동명 변수 → 공격 요청 Action `Interval`, 교전 마지막 기본 `WaitAction` |
-| `_rearApproachTimeout` | `1.5f` | 배후 접근을 시도할 최대 시간 설정 | `RearApproachTimeout` → Blackboard 동명 변수 → 배후 접근 Action `Timeout` |
-| `_bodyCollider` | 주입 전 `null` | 자기 몸통의 월드 바닥 높이 참조 | Context `Awake()` → `Initialize()`; 높이 판정에서 사용 |
-| `AttackDistance` | `_attackDistance` 전달 | 배후 목적지 계산에 필요한 거리 공개 | Context 동명 속성 → `MonsterMoveBehindTargetAction` |
-| `AttackRequestInterval` | `_attackRequestInterval` 전달 | Graph에 넘길 요청 간격 공개 | Context `Awake()` → Blackboard → 공격 요청 Action·기본 대기 노드 |
-| `RearApproachTimeout` | `_rearApproachTimeout` 전달 | Graph에 넘길 접근 제한 시간 공개 | Context `Awake()` → Blackboard → 배후 접근 Action |
+높이는 Sprite 크기나 Transform Y 대신 Collider 월드 바닥을 사용. Collider Offset·Scale 반영. 공용 DistanceTolerance 추가 없음.
 
-높이 비교 기준은 `transform.position.y`나 Sprite 크기가 아니라 `Collider2D.bounds.min.y`. Collider의 월드 크기·Offset·Transform Scale이 반영된 바닥 위치 사용.
-
-### 3.2 함수
-
-| 함수 | 제작 목적·판정식 | 직접 호출 | 최종 사용 |
-|---|---|---|---|
-| `Initialize(Collider2D bodyCollider)` | 자기 몸통 Collider 의존성 주입 | Context `Awake()` | 높이 판정 준비 |
-| `IsInAttackRange(float deltaX)` | `Abs(deltaX) <= _attackDistance` | Context 동명 전달 함수 | 추적 도착, 공격 요청 가능 거리 확인 |
-| `IsWithinHeightRange(Collider2D targetBodyCollider)` | `Abs(대상 바닥 Y - 자기 바닥 Y) <= _maxAttackHeightDifference` | Context `Update()` | 유효 대상·상실 대기 분기 판단 |
-
-거리 판정에는 별도의 공용 `DistanceTolerance`를 더하지 않음. 공격 방향 정렬의 `FacingDeadZone`은 공격 요청 Action의 별도 역할.
-
-## 4. MonsterChaseReturnBehaviorHandler
+### 6.2 MonsterChaseReturnBehaviorHandler
 
 소스: [MonsterChaseReturnBehaviorHandler.cs](E:/Unity/Project/ProjectBase/Assets/Scripts/FSM/NPC/AIMonstor/@Behavior/Handlers/MonsterChaseReturnBehaviorHandler.cs)
 
-어디까지 추적할지, 이미 교전했는지, 복귀를 완료할 때까지 유지할지를 기록하는 관리자. 실제 이동·대기 타이머는 Action 담당.
+| 변수·속성 | 기본값·목적 | 사용처 |
+|---|---|---|
+| _maxChaseDistance | 8. 초기 X 기준 허용 수평 범위 | 대상 유효 판정, 자기 즉시 복귀 판정 |
+| _returnArrivalDistance / ArrivalDistance | 0.15. 도착 범위 | 순찰·복귀·배후 접근 Action |
+| _lostTargetWait / LostTargetWait | 2. 교전 대상 상실 후 정지 시간 | Initialize → Blackboard → WaitForTarget.Seconds |
+| _owner | 자기 Transform | UpdateState에서 자기 범위 확인 |
+| _blackboard | 실행 플래그·초기 설정 기록 | Initialize·PublishState |
+| _isEngaged | 추적 시작 이력. 초기 false | BeginEngagement 기록, 상실 대기 필요 판정 |
+| _isReturning | 복귀 시작부터 완료까지 유지. 초기 false | BeginReturn·CompleteReturn·UpdateState |
+| HomeX | Start 시점 초기 X | 대상·자기 제한, 순찰·복귀 기준점, Blackboard 표현 |
+| NeedsReturn | 복귀 진행 또는 자기 범위 초과 | Action 실패 판정·복귀 Guard |
+| NeedsLostTargetWait | 교전 이력 있고 유효 대상 없고 복귀 필요 아님 | 상실 대기 Guard |
 
-### 4.1 변수·속성
+| 함수 | 목적·소비처 |
+|---|---|
+| Initialize(owner, homeX, blackboard) | 자기·기준점·wrapper 주입, HomeX·LostTargetWait 기록 |
+| IsWithinChaseRange(targetX) | Abs(targetX - HomeX) <= 제한 거리. Context가 대상 유효 판정에 사용 |
+| UpdateState(hasValidTarget) | 복귀 진행·자기 범위로 NeedsReturn 계산. 교전 이력 && !유효 대상 && !복귀 필요로 NeedsLostTargetWait 계산. 두 플래그 기록 |
+| BeginEngagement() | 교전 이력 기록. Chase.OnStart 직접 호출 |
+| BeginReturn() | 복귀 유지·NeedsReturn true, NeedsLostTargetWait false, 즉시 두 플래그 기록. WaitForTarget·Return이 직접 호출 |
+| CompleteReturn() | 교전·복귀 기록과 두 플래그 false, 즉시 기록. Return.OnUpdate 직접 호출 |
+| PublishState() | 자신의 두 플래그만 wrapper에 반영. Context의 전체 PublishFlags 호출 대체 |
 
-| 변수·속성 | 코드 기본값 | 제작 목적 | 사용 경로·Action·Condition |
-|---|---|---|---|
-| `_maxChaseDistance` | `8f` | 초기 위치에서 허용할 수평 범위 | 대상 위치 비교 → `HasValidTarget`; 자기 위치 비교 → `NeedsReturn`. 각각 대상 유효·복귀 Condition에 전달 |
-| `_returnArrivalDistance` | `0.15f` | 목적지에 도착했다고 인정할 수평 범위 | `ArrivalDistance` → Context → 순찰·복귀·배후 접근 Action |
-| `_lostTargetWait` | `2f` | 교전 대상 상실 후 대기 시간 설정 | `LostTargetWait` → Blackboard → `MonsterWaitForTargetAction.Seconds` |
-| `_owner` | 주입 전 `null` | 몬스터 자신의 현재 위치 참조 | Context `Start()`에서 주입, `UpdateState()`의 자기 범위 판정 |
-| `_isEngaged` | `false` | 추적을 시작한 교전 기록 | 추적 Action → `BeginEngagement()`; 상실 대기 필요 판정에 사용. 복귀 완료 시 false |
-| `_isReturning` | `false` | 복귀 시작 이후 완료까지 복귀 유지 | 대기 만료·복귀 시작 → `BeginReturn()`; `UpdateState()`에서 복귀 플래그 유지. 복귀 완료 시 false |
-| `HomeX` | 초기화 전 `0f` | 초기 위치의 X 기록 | Context `Start()`에서 저장 → 대상·자기 범위 판정, 순찰·복귀 기준점 |
-| `ArrivalDistance` | `_returnArrivalDistance` 전달 | 도착 범위 공개 | Context 동명 속성 → 순찰·복귀·배후 접근 Action |
-| `LostTargetWait` | `_lostTargetWait` 전달 | 상실 대기 시간 공개 | Context `Awake()` → Blackboard → 상실 대기 Action |
-| `NeedsReturn` | 초기 `false` | 자기 범위 초과 또는 복귀 진행 상태 | Context 속성·Blackboard → 복귀 Condition. 추적·공격 요청·배후 접근 중단 판단에도 사용 |
+대상 시야·생존·높이·추적 범위 조건 상실은 대기 후 복귀. 몬스터 자기 범위 초과는 즉시 복귀. 복귀 시작·완료 직후 Graph가 이전 플래그를 읽지 않도록 같은 프레임 기록 유지.
 
-`_maxChaseDistance`의 기준은 **몬스터 초기 X 위치**. 몬스터와 대상 사이의 현재 거리와 다름.
-
-`_isEngaged`는 현재 공격 State인지 나타내는 값이 아님. 추적을 시작한 이력이 있어 대상 상실 대기가 필요한지를 구분하는 기록.
-
-### 4.2 함수
-
-| 함수 | 제작 목적·처리 내용 | 직접 호출 | Action·Condition 연결 |
-|---|---|---|---|
-| `Initialize(Transform owner, float homeX)` | 자기 Transform·초기 X 저장 | Context `Start()` | 순찰·복귀·추적 제한 기준 준비 |
-| `IsWithinChaseRange(float targetX)` | `Abs(targetX - HomeX) <= _maxChaseDistance` | Context `Update()` | 대상 유효 판정 → 교전·상실 대기 분기 |
-| `UpdateState()` | `NeedsReturn = _isReturning \|\| Abs(자기 X - HomeX) > _maxChaseDistance` | Context `Update()` | 자기 제한 초과는 즉시 복귀. 대상 높이·거리 조건 상실만으로 즉시 복귀하지 않음 |
-| `NeedsLostTargetWait(bool hasValidTarget)` | `_isEngaged && !hasValidTarget && !NeedsReturn` | Context 동명 속성 | Blackboard → 상실 대기 Condition |
-| `BeginEngagement()` | `_isEngaged = true` | Context 전달 함수 ← 추적 Action `OnStart()` | 교전 후 상실 대기를 활성화할 기록 |
-| `BeginReturn()` | `_isReturning = true`, `NeedsReturn = true` | Context 전달 함수 ← 상실 대기 Action·복귀 Action | 복귀 분기 활성화, 복귀 완료 전 재추적 억제 |
-| `CompleteReturn()` | `_isReturning`, `_isEngaged`, `NeedsReturn` 모두 false | Context 전달 함수 ← 복귀 Action `OnUpdate()` | 복귀·상실 대기 기록 종료 |
-
-Handler 자체는 Blackboard를 갱신하지 않음. `BeginReturn()`·`CompleteReturn()` 호출 뒤 같은 프레임 Blackboard 반영은 Context의 전달 함수가 담당.
-
-## 5. MonsterPatrolBehaviorHandler
+### 6.3 MonsterPatrolBehaviorHandler
 
 소스: [MonsterPatrolBehaviorHandler.cs](E:/Unity/Project/ProjectBase/Assets/Scripts/FSM/NPC/AIMonstor/@Behavior/Handlers/MonsterPatrolBehaviorHandler.cs)
 
-현재 순찰 실행 함수 없이 설정값만 보관. 목적지·타이머를 Handler로 옮긴 구조가 아님.
-
-| 변수·속성 | 코드 기본값 | 제작 목적 | Action 연결 |
-|---|---|---|---|
-| `_patrolRadius` | `2f` | 초기 X를 중심으로 순찰 목적지를 뽑을 반경 | `PatrolRadius` → Context `Awake()` → Blackboard → `MonsterPatrolAction.Radius` |
-| `_patrolWaitMin` | `1f` | 순찰 후 랜덤 정지 시간의 최소값 | `PatrolWaitMin` → Blackboard → 기본 `WaitRangeAction.Min` |
-| `_patrolWaitMax` | `2f` | 순찰 후 랜덤 정지 시간의 최대값 | `PatrolWaitMax` → Blackboard → 기본 `WaitRangeAction.Max` |
-| `PatrolRadius` | `_patrolRadius` 전달 | 순찰 반경 공개 | 순찰 Action의 목적지 선택 |
-| `PatrolWaitMin` | `_patrolWaitMin` 전달 | 랜덤 대기 최소 시간 공개 | 기본 범위 대기 노드 |
-| `PatrolWaitMax` | `_patrolWaitMax` 전달 | 랜덤 대기 최대 시간 공개 | 기본 범위 대기 노드 |
-
-## 6. Blackboard → Action·Condition 연결표
-
-Graph 소스: [BasicMonsterBehavior.asset](E:/Unity/Project/ProjectBase/Assets/Prefabs/Monster/BasicMonsterBehavior.asset)
-
-| Blackboard 변수 | 값을 설정하는 곳 | 실제 읽는 곳·필드 | 제작 목적 |
-|---|---|---|---|
-| `Context` | Context `Awake()` | Stop을 제외한 6종 Monster Action의 `Context` | 판정·대상·초기 위치·기록 변경 함수 접근 |
-| `Input` | Context `Awake()` | 7종 Monster Action의 `Input` | 이동·공격 요청 전달 |
-| `HomeX` | Context `Start()` | 현재 연결된 Action 필드에는 직접 연결 없음 | 초기 X의 Blackboard 표현. 순찰·복귀 Action은 `Context.HomeX` 사용 |
-| `Target` | Context `PublishFlags()` | 현재 연결된 Action 필드에는 직접 연결 없음 | 감지 대상 Health GameObject의 Blackboard 표현. 대상 Action은 `Context.TargetRoot` 사용 |
-| `IsDead` | Context `PublishFlags()` | 사망 Guard의 `MonsterFlagCondition.Flag` | 최우선 정지 분기 조건 |
-| `NeedsReturn` | Context `PublishFlags()` | 복귀 Guard의 `MonsterFlagCondition.Flag` | 복귀 분기 조건 |
-| `NeedsLostTargetWait` | Context `PublishFlags()` | 상실 대기 Guard의 `MonsterFlagCondition.Flag` | 대상 상실 후 정지 대기 분기 조건 |
-| `HasValidTarget` | Context `PublishFlags()` | 교전 Guard의 `MonsterFlagCondition.Flag` | 추적·공격 분기 조건 |
-| `AttackRequestInterval` | Context `Awake()` | 두 공격 요청 노드의 `Interval`, 교전 마지막 기본 `WaitAction.SecondsToWait` | 요청 간격 및 교전 분기 재실행 전 대기 |
-| `NextAttackRequestTime` | 공격 요청 Action `OnUpdate()` | 두 공격 요청 노드의 `NextRequestTime` | 다음 공격 요청 허용 시각. 동일 개체의 두 공격 분기가 같은 변수 사용 |
-| `LostTargetWait` | Context `Awake()` | 상실 대기 Action `Seconds` | 대상 상실 후 대기 길이 |
-| `PatrolRadius` | Context `Awake()` | 순찰 Action `Radius` | 랜덤 목적지 선택 범위 |
-| `PatrolWaitMin` | Context `Awake()` | 기본 `WaitRangeAction.Min` | 순찰 정지 시간 최소값 |
-| `PatrolWaitMax` | Context `Awake()` | 기본 `WaitRangeAction.Max` | 순찰 정지 시간 최대값 |
-| `RearApproachTimeout` | Context `Awake()` | 배후 접근 Action `Timeout` | 배후 접근 제한 시간 |
-| `Self` | Context에서는 설정하지 않음 | 현재 연결된 Monster Action·Flag Condition에서 직접 사용 없음 | Graph에 선언된 자기 GameObject 변수 |
-
-`NextAttackRequestTime`은 Context가 캐시하거나 매 프레임 덮어쓰지 않음. Action이 갱신하는 실행 기록. 현재 Graph의 공유 변수 목록은 비어 있으므로, 여기서 공유는 서로 다른 몬스터가 아니라 **한 몬스터 실행 Graph 안의 두 공격 노드 사이**를 의미.
-
-## 7. Action별 사용 목적과 실행 함수
-
-Action의 `Context`, `Input`, 시간·반경 필드는 Blackboard 연결을 통해 값을 받음. Handler 인스턴스를 직접 전달받지 않음.
-
-### 7.1 MonsterChaseAction
-
-소스: [MonsterChaseAction.cs](E:/Unity/Project/ProjectBase/Assets/Scripts/FSM/NPC/AIMonstor/@Behavior/Actions/MonsterChaseAction.cs)
-
-목적: 유효한 대상을 수평 공격 거리까지 추적.
-
-| 함수 | 사용하는 Context 요소 | 처리 |
+| 변수·속성 | 기본값·목적 | 사용처 |
 |---|---|---|
-| `OnStart()` | `BeginEngagement()` | 교전 시작 기록, Running 반환 |
-| `OnUpdate()` | `HasValidTarget`, `NeedsReturn`, `TargetRoot`, `transform`, `IsInAttackRange()` | 대상 상실·복귀 필요 시 Failure. 공격 거리 도착 시 Success. 나머지는 대상 방향 이동 입력 |
-| `OnEnd()` | Context 사용 없음 | `Input.SetMovement(Vector2.zero)`로 도착·실패·중단 시 이동 초기화 |
+| _patrolRadius / PatrolRadius | 2. 초기 X 주변 목적지 선택 반경 | Blackboard → Patrol.Radius |
+| _patrolWaitMin / PatrolWaitMin | 1. 순찰 후 정지 시간 최소값 | Blackboard → 기본 WaitRange.Min |
+| _patrolWaitMax / PatrolWaitMax | 2. 순찰 후 정지 시간 최대값 | Blackboard → 기본 WaitRange.Max |
+| Initialize(blackboard) | 위 설정 3개 기록 | Context Start 호출. wrapper를 별도 필드로 보관하지 않음 |
 
-자체 목적지·타이머 필드 없음. 대상 위치를 매 갱신 읽음. 현재 Graph에는 기본 추적과 배후 접근 실패 대체용으로 같은 Action 타입의 노드가 두 개 존재.
+## 7. Action·Condition 사용처
 
-### 7.2 MonsterRequestAttackAction
+Action의 기존 Context·Input·시간·반경 Blackboard 필드 및 노드 ID 유지. Handler는 기존 Context 참조를 통해 접근. 모든 이동 Action의 OnEnd는 Input.SetMovement(Vector2.zero) 유지.
 
-소스: [MonsterRequestAttackAction.cs](E:/Unity/Project/ProjectBase/Assets/Scripts/FSM/NPC/AIMonstor/@Behavior/Actions/MonsterRequestAttackAction.cs)
-
-목적: 대상 방향을 이동 입력으로 맞추고, 요청 간격에 따라 단발 공격 입력 발행.
-
-| 변수·함수 | 목적·사용 |
-|---|---|
-| `FacingDeadZone = 0.01f` | 대상과 X 위치가 거의 같은 경우 불필요한 방향 정렬 방지. 거리 조건에 더하는 허용 오차가 아님 |
-| `Interval` | Blackboard `AttackRequestInterval` 연결. 다음 요청 허용 시각 계산 |
-| `NextRequestTime` | Blackboard `NextAttackRequestTime` 연결. 공격 경로가 바뀌어도 요청 간격 기록 유지 |
-| `OnStart()` | Running 반환. 즉시 공격 요청하지 않음 |
-| `OnUpdate()` | `HasValidTarget`, `NeedsReturn`, `TargetRoot`, `transform`, `IsInAttackRange()` 사용. 대상·거리 확인 → `transform.localScale.x`로 자기 방향 확인 → 필요 시 좌우 이동 입력 → 정지 → 시간 확인 → 허용 시각 갱신·`Input.RequestAttack()` → Success |
-| `OnEnd()` | 방향 정렬을 위해 남긴 이동 입력 초기화 |
-
-`RequestAttack()` 성공은 공격 요청을 보냈다는 의미. 실제 공격 가능 여부·FSM 진입은 `AttackTransition`과 `MonsterController.TryStartAttack()`이 판단. 이 Action은 공격 애니메이션 종료를 기다리지 않음.
-
-### 7.3 MonsterMoveBehindTargetAction
-
-소스: [MonsterMoveBehindTargetAction.cs](E:/Unity/Project/ProjectBase/Assets/Scripts/FSM/NPC/AIMonstor/@Behavior/Actions/MonsterMoveBehindTargetAction.cs)
-
-목적: 대상 배후의 수평 목적지로 접근. 실패하면 Graph의 다음 Selector 자식인 일반 추적으로 대체.
-
-| 변수·함수 | 목적·사용 |
-|---|---|
-| `Timeout` | Blackboard `RearApproachTimeout` 연결 |
-| `_target` | 접근 시작 시 `Context.TargetRoot` 저장. 접근 중 대상 교체 확인 |
-| `_targetFacing` | 시작 시 대상 `localScale.x`의 부호 저장. 접근 중 방향 재선택 제외 |
-| `_endTime` | `Time.time + Timeout.Value`로 이번 접근 제한 시각 저장 |
-| `OnStart()` | `HasValidTarget` 확인 후 대상·방향·종료 시각 저장 |
-| `OnUpdate()` | `HasValidTarget`, `NeedsReturn`, `TargetRoot`, `AttackDistance`, `ArrivalDistance`, `transform` 사용. 목적지까지 이동. 도착 Success, 대상 상실·교체·복귀 필요·시간 초과 Failure |
-| `OnEnd()` | 도착·실패·중단 시 이동 입력 초기화 |
-
-배후 목적지: `대상 현재 X - 시작 때 저장한 대상 방향 × AttackDistance × 0.8f`.
-
-대상 위치는 계속 따라가지만 방향은 시작 시점 값을 유지. 현재 코드에는 Y 이동, 경로 탐색, 벽 회피가 없음.
-
-### 7.4 MonsterWaitForTargetAction
-
-소스: [MonsterWaitForTargetAction.cs](E:/Unity/Project/ProjectBase/Assets/Scripts/FSM/NPC/AIMonstor/@Behavior/Actions/MonsterWaitForTargetAction.cs)
-
-목적: 교전 대상이 유효하지 않게 됐을 때 정지 대기. 재인식 시 취소, 만료 시 복귀 시작.
-
-| 변수·함수 | 목적·사용 |
-|---|---|
-| `Seconds` | Blackboard `LostTargetWait` 연결 |
-| `_endTime` | `Time.time + Seconds.Value`로 이번 상실 대기 종료 시각 저장 |
-| `OnStart()` | 이동 정지, 대기 종료 시각 기록 |
-| `OnUpdate()` | `HasValidTarget`이면 Success로 대기 종료. 아직 시간이 남으면 Running. 만료 시 `Context.BeginReturn()` 후 Success |
-| `OnEnd()` | 대기 종료·중단 시 이동 입력 초기화 |
-
-`NeedsLostTargetWait`의 bool 판정은 Handler·Context, 시간을 실제로 세는 책임은 이 Action에 위치.
-
-### 7.5 MonsterReturnAction
-
-소스: [MonsterReturnAction.cs](E:/Unity/Project/ProjectBase/Assets/Scripts/FSM/NPC/AIMonstor/@Behavior/Actions/MonsterReturnAction.cs)
-
-목적: 초기 X 위치로 복귀. 자체 타이머·목적지 필드 없음.
-
-| 함수 | 사용하는 Context 요소 | 처리 |
+| Action | 필드·기록 | 함수별 Handler·Context 사용 |
 |---|---|---|
-| `OnStart()` | `BeginReturn()` | 복귀 진행 기록 |
-| `OnUpdate()` | `HomeX`, `ArrivalDistance`, `transform`, `CompleteReturn()` | 초기 X 방향으로 이동. 도착 범위에 들어오면 교전·복귀 기록 초기화 후 Success |
-| `OnEnd()` | Context 사용 없음 | 완료·중단 시 이동 입력 초기화 |
+| [MonsterChaseAction](E:/Unity/Project/ProjectBase/Assets/Scripts/FSM/NPC/AIMonstor/@Behavior/Actions/MonsterChaseAction.cs) | Context, Input | OnStart: ChaseReturn.BeginEngagement. OnUpdate: HasValidTarget·ChaseReturn.NeedsReturn 확인 → Target.Root와 자기 X 비교 → Attack.IsInAttackRange면 Success, 아니면 이동 |
+| [MonsterRequestAttackAction](E:/Unity/Project/ProjectBase/Assets/Scripts/FSM/NPC/AIMonstor/@Behavior/Actions/MonsterRequestAttackAction.cs) | Context, Input, Interval, NextRequestTime, FacingDeadZone=0.01 | OnStart: Running. OnUpdate: 유효 대상·복귀·공격 거리 확인 → 자기 localScale.x와 대상 방향 정렬 → 정지 → 요청 시각 확인·갱신 → RequestAttack |
+| [MonsterMoveBehindTargetAction](E:/Unity/Project/ProjectBase/Assets/Scripts/FSM/NPC/AIMonstor/@Behavior/Actions/MonsterMoveBehindTargetAction.cs) | Context, Input, Timeout, _target, _targetFacing, _endTime | OnStart: Target.Root·시작 방향·제한 시각 저장. OnUpdate: 대상 교체·상실·복귀 필요 확인, Attack.AttackDistance로 배후 목적지 계산, ChaseReturn.ArrivalDistance·시간 제한 확인 후 이동 |
+| [MonsterWaitForTargetAction](E:/Unity/Project/ProjectBase/Assets/Scripts/FSM/NPC/AIMonstor/@Behavior/Actions/MonsterWaitForTargetAction.cs) | Context, Input, Seconds, _endTime | OnStart: 정지·종료 시각 저장. OnUpdate: HasValidTarget이면 대기 취소, 만료 전 Running, 만료 후 ChaseReturn.BeginReturn·Success |
+| [MonsterReturnAction](E:/Unity/Project/ProjectBase/Assets/Scripts/FSM/NPC/AIMonstor/@Behavior/Actions/MonsterReturnAction.cs) | Context, Input | OnStart: ChaseReturn.BeginReturn. OnUpdate: HomeX 방향 이동, ArrivalDistance 도착 시 CompleteReturn·Success |
+| [MonsterPatrolAction](E:/Unity/Project/ProjectBase/Assets/Scripts/FSM/NPC/AIMonstor/@Behavior/Actions/MonsterPatrolAction.cs) | Context, Input, Radius, _destinationX | OnStart: ChaseReturn.HomeX ± Radius 랜덤 목적지 저장. OnUpdate: ChaseReturn.ArrivalDistance 도착 확인·이동 |
+| [MonsterStopAction](E:/Unity/Project/ProjectBase/Assets/Scripts/FSM/NPC/AIMonstor/@Behavior/Actions/MonsterStopAction.cs) | Input | OnStart: 이동 입력 0·Success. Context 참조·타이머 없음. 변경 없음 |
+| Variable Comparison (Unity 기본 조건) | Variable, Operator, ComparisonValue | 각 Guard의 Blackboard bool을 Equal 연산자로 true와 비교. Context·Handler 직접 참조 없음. 별도 프로젝트 조건 스크립트 없음 |
 
-`HasValidTarget`을 직접 확인하지 않음. 복귀 유지 플래그와 Graph 우선순위로 복귀 완료 전 재추적 방지.
+배후 목적지 = 대상 현재 X - 시작 때 저장한 방향 × Attack.AttackDistance × 0.8.
+대상 위치는 계속 읽고 대상 방향은 시작 시점 값 유지. Y 이동·경로 탐색·벽 회피 추가 없음.
 
-### 7.6 MonsterPatrolAction
+FacingDeadZone은 X가 거의 같을 때 방향 정렬 방지용이며 거리 비교 허용 오차가 아님. NextRequestTime은 동일 몬스터 Graph의 두 공격 요청 노드가 공유. 몬스터 개체 간 공유 아님.
 
-소스: [MonsterPatrolAction.cs](E:/Unity/Project/ProjectBase/Assets/Scripts/FSM/NPC/AIMonstor/@Behavior/Actions/MonsterPatrolAction.cs)
+RequestAttack 성공은 입력 발행이며 실제 FSM 진입 성공을 뜻하지 않음. 기존 [MonsterInput](E:/Unity/Project/ProjectBase/Assets/Scripts/FSM/NPC/AIMonstor/Input/MonsterInput.cs) → [AttackTransition](E:/Unity/Project/ProjectBase/Assets/Scripts/FSM/Agent/StateControl/TransitionRules/Attack/AttackTransition.cs) → [MonsterController](E:/Unity/Project/ProjectBase/Assets/Scripts/FSM/NPC/AIMonstor/@Hub/MonsterController.cs) 판단 경로 유지.
 
-목적: 초기 위치 주변에서 랜덤 X 목적지를 선택하고 이동.
+## 8. Graph 계층과 실행 흐름
 
-| 변수·함수 | 목적·사용 |
-|---|---|
-| `Radius` | Blackboard `PatrolRadius` 연결 |
-| `_destinationX` | `Context.HomeX + Random.Range(-Radius.Value, Radius.Value)`로 이번 순찰 목적지 저장 |
-| `OnStart()` | 목적지 1회 선택 |
-| `OnUpdate()` | `Context.transform.position.x`, `ArrivalDistance` 사용. 도착 Success, 나머지는 목적지 방향 이동 |
-| `OnEnd()` | 완료·우선순위 중단 시 이동 입력 초기화 |
-
-순찰 후 정지 시간은 이 Action에 없음. Graph의 `MonsterStopAction`과 기본 `WaitRangeAction`으로 분리.
-
-### 7.7 MonsterStopAction
-
-소스: [MonsterStopAction.cs](E:/Unity/Project/ProjectBase/Assets/Scripts/FSM/NPC/AIMonstor/@Behavior/Actions/MonsterStopAction.cs)
-
-| 변수·함수 | 목적·사용 |
-|---|---|
-| `Input` | 이동 정지를 전달할 Blackboard 참조. Context 필드 없음 |
-| `OnStart()` | `Input.SetMovement(Vector2.zero)` 후 Success 반환 |
-
-현재 Graph에서는 사망 분기와 순찰 이동 후 정지에 사용. 이 Action 자체가 시간을 세거나 사망 애니메이션을 실행하지 않음.
-
-## 8. MonsterFlagCondition과 실제 Graph 분기
-
-소스: [MonsterFlagCondition.cs](E:/Unity/Project/ProjectBase/Assets/Scripts/FSM/NPC/AIMonstor/@Behavior/Conditions/MonsterFlagCondition.cs)
-
-| 변수·함수 | 제작 목적 |
-|---|---|
-| `Flag` | 이 Condition 인스턴스가 확인할 Blackboard bool 연결 |
-| `IsTrue()` | 연결된 `Flag.Value` 그대로 반환 |
-
-Context·Handler를 직접 참조하지 않음. 같은 Condition 타입을 네 Guard에 배치하고 다른 플래그를 연결.
-
-| 우선순위 | Condition의 `Flag` | 실행 분기 | Context·Handler에서 만든 조건 |
-|---|---|---|---|
-| 1 | `IsDead` | `MonsterStopAction` | 자기 Health 사망 |
-| 2 | `NeedsReturn` | `MonsterReturnAction` | 자기 초기 위치 제한 초과 또는 복귀 진행 |
-| 3 | `NeedsLostTargetWait` | `MonsterWaitForTargetAction` | 교전 이력 있음 + 유효 대상 없음 + 복귀 필요 아님 |
-| 4 | `HasValidTarget` | 추적 → 랜덤 공격 행동 → 기본 대기 | 감지·생존·대상 추적 범위·허용 높이 충족 |
-| 5 | 별도 Flag Condition 없음 | 순찰 → 정지 → 랜덤 시간 대기 | 위 분기에서 실행할 행동이 없는 경우의 기본 행동 |
-
-저장된 Graph의 실제 행동 연결만 표시한 구조:
+Graph: [BasicMonsterBehavior.asset](E:/Unity/Project/ProjectBase/Assets/Prefabs/Monster/BasicMonsterBehavior.asset)
 
 ```text
-반복 실행 → 우선순위 Selector
+반복 → 우선순위 Selector
 ├─ IsDead              → Stop
 ├─ NeedsReturn         → Return
 ├─ NeedsLostTargetWait → WaitForTarget
-├─ HasValidTarget      → Sequence
-│  ├─ Chase
-│  ├─ Random
-│  │  ├─ Sequence
-│  │  │  ├─ Selector: MoveBehindTarget → 실패 시 Chase
-│  │  │  └─ RequestAttack
-│  │  └─ RequestAttack
-│  └─ Wait(AttackRequestInterval)
-└─ Sequence
-   ├─ Patrol
-   ├─ Stop
-   └─ WaitRange(PatrolWaitMin, PatrolWaitMax)
+├─ HasValidTarget      → Run Subgraph: Monster Combat
+└─ Run Subgraph: Monster Patrol
 ```
 
-Graph가 분기 우선순위·랜덤 선택·실패 대체를 구성. Context와 Handler는 해당 분기를 선택하는 판정·설정·기록을 제공. Condition은 플래그만 확인.
+상위 Graph는 기존 행동 선택·중단 우선순위 담당. 복잡한 교전·순찰만 정적 Run Subgraph로 분리. 단일 Action인 Stop·Return·WaitForTarget은 상위에 유지.
 
-## 9. 대표 실행 흐름
+| 하위 Graph | 내부 흐름 | 상위 Blackboard 연결 |
+|---|---|---|
+| [MonsterCombatBehavior.asset](E:/Unity/Project/ProjectBase/Assets/Prefabs/Monster/MonsterCombatBehavior.asset) | Chase → Random으로 배후 접근 후 공격 또는 직접 공격 선택 → Wait. 배후 접근 실패 시 기존 Chase 대체 유지 | Context, Input, AttackRequestInterval, NextAttackRequestTime, RearApproachTimeout |
+| [MonsterPatrolBehavior.asset](E:/Unity/Project/ProjectBase/Assets/Prefabs/Monster/MonsterPatrolBehavior.asset) | Patrol → Stop → WaitRange | Context, Input, PatrolRadius, PatrolWaitMin, PatrolWaitMax |
 
-### 9.1 대상 인식 → 추적 → 공격
+하위 Graph의 On Start는 Repeat 해제. 상위 반복이 다음 행동 선택 담당. 하위 변수는 이름만 맞춘 복사값이 아닌 상위 실행 Blackboard의 동일 변수 객체로 연결. NextAttackRequestTime은 하위 Graph 재진입 시에도 유지. Self는 Unity의 기본 소유자 변수. Shared 옵션은 사용하지 않아 몬스터 개체별로 독립.
 
-1. Context `Update()`에서 Detector를 통해 대상 인식.
-2. 대상 생존·초기 위치 기준 추적 범위·높이 조건을 조합해 `HasValidTarget` 갱신.
-3. `PublishFlags()` → Blackboard `HasValidTarget` → 교전 Condition.
-4. `MonsterChaseAction.OnStart()` → Context `BeginEngagement()` → Handler `_isEngaged = true`.
-5. 추적 Action이 `IsInAttackRange()`까지 이동 입력 전달.
-6. Graph가 일반 공격 또는 배후 접근 후 공격 선택.
-7. 공격 요청 Action이 대상·거리·방향·요청 시간을 확인하고 `MonsterInput.RequestAttack()` 발행.
-8. 기존 `AttackTransition`이 요청을 받아 `MonsterController.TryStartAttack()` 판단 후 FSM 공격 진입.
+위 네 bool은 각 Guard의 Variable Comparison.Variable에 연결. Operator는 Equal, ComparisonValue는 true. 기존 MonsterFlagCondition은 기본 조건으로 대체 후 삭제. 상위 Blackboard 변수 이름·GUID·설정, 행동 우선순위, 기존 Action 노드 ID·필드 연결과 Guard의 Lower Priority 설정 유지. 분리된 Sequence 진입 위치에는 새 Run Subgraph 노드 추가.
 
-공격 입력 경로 소스: [MonsterInput.cs](E:/Unity/Project/ProjectBase/Assets/Scripts/FSM/NPC/AIMonstor/Input/MonsterInput.cs), [AttackTransition.cs](E:/Unity/Project/ProjectBase/Assets/Scripts/FSM/Agent/StateControl/TransitionRules/Attack/AttackTransition.cs), [MonsterController.cs](E:/Unity/Project/ProjectBase/Assets/Scripts/FSM/NPC/AIMonstor/@Hub/MonsterController.cs), [MonsterStateFactory.cs](E:/Unity/Project/ProjectBase/Assets/Scripts/FSM/NPC/AIMonstor/MonsterState/MonsterStateFactory.cs).
+실행 복제본 2개에서 개체별 변수 독립성·상하위 변수 참조 연결 및 사망에 따른 교전·순찰 Subgraph 중단과 Stop 이동 초기화 검증. 실제 몬스터의 이동·공격·복귀 Play 테스트는 별도 수동 확인 필요.
 
-### 9.2 대상 상실 → 대기 → 복귀
+1. 대상 인식: Detector 물리 탐색 → Target Handler 단일 Player 참조 캐시·생존·시야 확인 → Context 종합 판정 → wrapper HasValidTarget → 추적·공격 분기.
+2. 대상 상실: 유효 판정 false → ChaseReturn의 교전 기록으로 상실 대기 활성화 → Action 타이머. 재인식하면 추적 재개, 만료하면 Handler BeginReturn의 즉시 플래그 기록으로 복귀.
+3. 자기 제한 초과: NeedsReturn이 상실 대기보다 우선. 복귀 중 대상을 재인식해도 복귀 완료 전 교전 분기로 전환하지 않음.
+4. 복귀 완료: Handler CompleteReturn → 기록·플래그 즉시 초기화 → 다음 순찰·교전 선택 가능.
+5. 자기 사망: Health 구독 → wrapper IsDead → 최우선 Stop. 다음 Context 갱신에서 선택 대상 해제.
 
-1. 시야 상실, 대상 사망, 허용 높이 초과 또는 대상 초기 위치 기준 추적 범위 초과로 `HasValidTarget = false`.
-2. 교전 기록이 있고 자기 복귀 필요 조건은 없으면 `NeedsLostTargetWait = true`.
-3. 상실 대기 Condition → `MonsterWaitForTargetAction.OnStart()`에서 정지·종료 시각 기록.
-4. 유효 대상 재인식 시 대기를 끝내고 Graph의 교전 분기 선택 가능.
-5. 재인식 없이 대기 만료 시 Context `BeginReturn()` → Handler 복귀 기록 → 즉시 Blackboard 갱신.
-6. 복귀 Condition → `MonsterReturnAction` 실행.
-7. `HomeX`의 `ArrivalDistance` 안에 도착하면 Context `CompleteReturn()` → 교전·복귀 기록 초기화.
+## 9. 초기화·수명·설정 유지 기준
 
-몬스터 자신의 초기 위치 제한 초과는 `NeedsReturn = true`이므로 상실 대기보다 높은 우선순위로 즉시 복귀. 사망은 그보다 높은 정지 분기.
+- 시간·반경 Blackboard 설정은 Start의 Handler Initialize에서 전달. Inspector 런타임 값 변경을 자동 동기화하는 기능은 없음.
+- 거리·높이 설정은 Handler 속성·함수 호출 시 현재 필드값 사용.
+- HomeX는 최초 Start 시점 유지. 비활성화·재활성화나 복귀 때 재기록하지 않음.
+- 비활성화 시 자기 사망 구독 해제·Player 캐시 전체 해제·이동 초기화. 재활성화 시 자기 현재 사망 값 수신 및 감지 Player 참조 재확보.
+- 자기 사망 구독 Dispose는 해당 구독만 해제하며 Health의 ReactiveProperty 자체를 Dispose하지 않음. Target Handler에는 구독 없음.
+- 각 Context의 Handler·wrapper, 각 Target Handler의 단일 Player 캐시는 개체별 독립.
+- 순찰·복귀·배후 접근 도착은 기존 ArrivalDistance 범위 사용. 정확한 0 도착이나 추가 공용 거리 오차를 요구하지 않음.
+- Prefab·Scene 설정 이전 없음. 기존 설정 Handler 직렬화 경로 유지.
+- Handler·Action API나 Blackboard 소유권 변경 시 해당 표와 실행 흐름을 함께 갱신.
 
-### 9.3 대상 없음 → 순찰 → 정지
+## 10. 탐색 책임 이전 검증 이력
 
-교전 이력이 없는 상태에서 대상이 없으면 상실 대기를 실행하지 않음. 순찰 Action이 목적지 선택·이동을 수행하고, Stop으로 입력을 0으로 만든 뒤 기본 WaitRange가 설정 범위의 랜덤 시간 대기.
+아래는 단일 Player 단순화 전의 다중 후보·구독 버전 검증 결과. 현재 구조에서 최근접 선택·후보 목록 캐시·대상 구독은 제거.
 
-## 10. 설정값을 읽는 시점과 사용 시 주의점
+- Unity Edit Mode의 임시 독립 씬에서 19개 검증 항목 통과. 검증 씬·스크립트 제거.
+- 자기 자신·사망·Health 없는 후보 제외, 최근접 선택, offset·장애물 판정 확인.
+- 반복 감지 시 후보 캐시 재사용, 동일 Health의 다중 Collider 간 구독 유지, 대상 변경 후 이전 사망 구독 해제 확인.
+- 시야 상실 시 선택 대상 해제 및 반경 내 후보 캐시 유지, 범위 이탈·파괴 시 캐시 제거, Clear 전체 정리와 개체별 독립성 확인.
+- 남은 Player·Monster Prefab 5개와 열린 InGame 씬의 Missing Script 없음. 현재 컴파일·Console 오류 없음.
+- 이번 작업에서 InGame·Goblin Prefab·Monster Graph 파일 변경 없음. SampleScene은 AIPlayer 인스턴스 2개만 제거.
+- 실제 Play 모드의 추적·상실 대기·복귀·배후 접근·공격 회귀는 수동 확인 필요.
 
-| 구분 | 현재 동작 |
-|---|---|
-| Blackboard로 복사하는 시간·반경 설정 | Context `Awake()`에서 전달. 이후 Handler Inspector 값을 바꾸는 것만으로 Blackboard가 자동 동기화되는 코드는 없음 |
-| Context·Handler에서 직접 읽는 거리·높이 설정 | 해당 속성·판정 함수 호출 때 Handler 값 사용 |
-| 초기 위치 | Context `Start()` 시점 X 저장. 복귀할 때마다 현재 위치로 재설정하지 않음 |
-| 도착 범위 | 순찰·복귀·배후 접근에서 `ArrivalDistance` 사용. 정확한 0 도착이나 추가 공용 거리 오차를 요구하지 않음 |
-| 공격 거리 | 몬스터·대상 Health Transform의 수평 위치 차이 사용. Collider 표면 간 거리는 아님 |
-| 높이 차이 | 자기·대상 몸통 Collider의 월드 바닥 위치 차이 사용 |
-| 배후 위치 | 대상 방향은 접근 시작 때 고정, 위치는 접근 중 계속 확인 |
-| 비활성화 | Context `OnDisable()`은 이동 입력만 초기화. 교전·복귀 기록을 모두 초기화하는 함수가 아님 |
-| 입력과 FSM | Behavior는 입력을 발행. 실제 이동·공격 적용과 State 전이는 기존 FSM 책임 |
+## 11. 단일 Player 대상 관리 단순화 검증
 
-현재 구현에서는 `HomeX`, `Target`, `Self` Blackboard 변수를 연결된 Monster Action·Condition이 직접 읽지 않음. 이는 현재 사용 경로의 설명이며, 이 문서에서 삭제를 제안하거나 코드를 변경한 것은 아님.
-
-## 11. 문서 갱신 기준
-
-- Context·Handler 변수 또는 함수가 바뀌면 해당 목록과 사용 경로 갱신.
-- Action이 참조하는 속성·함수가 바뀌면 Action별 표와 공개 속성 사용처 갱신.
-- Graph의 Blackboard 연결·분기 순서가 바뀌면 연결표와 Graph 구조 갱신.
-- 설정 기본값 변경은 선언값과 실제 Prefab·Scene Override를 구분해서 기록.
-- 새로운 Handler나 Action 추가 시 입력 실행·판정·타이머의 소유 위치를 함께 기록.
+- Handler는 주석·빈 줄 포함 134줄에서 63줄로 축소. 후보 Dictionary·삭제 List·중첩 클래스·최근접 비교·대상 사망 구독 제거.
+- Unity Edit Mode의 임시 독립 씬에서 실제 Detector·Target Handler·Context·행동 Action을 호출한 33개 항목 통과. 검증 씬·스크립트 제거.
+- 동일 Collider에서 Component 검색을 생략하는 경로, 범위 이탈·장애물·사망 후 캐시 유지와 재인식, Player 인스턴스 교체·파괴·Health 누락 처리 확인.
+- Context의 높이·추적 범위 판정 및 상실 대기·재인식 취소·복귀 완료 전 재추적 방지 확인.
+- Chase·WaitForTarget·Return·MoveBehindTarget·RequestAttack의 상태 반환·이동 입력·요청 간격 확인. 전체 Graph의 실제 Play 실행 결과를 의미하지 않음.
+- 비활성화 시 캐시·선택 대상·이동 입력 전체 정리, 재활성화 시 참조 재확보, 자기 사망 구독 유지와 몬스터별 독립성 확인.
+- 현재 컴파일·Console 오류 없음. 실제 Motor 이동·FSM 공격·Animator를 포함한 Play 모드 회귀는 수동 확인 필요.

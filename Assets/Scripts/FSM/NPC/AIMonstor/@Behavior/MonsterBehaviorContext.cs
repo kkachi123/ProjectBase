@@ -1,14 +1,17 @@
 namespace ProjectRE
 {
+    using System;
+    using UniRx;
     using Unity.Behavior;
     using UnityEngine;
 
-    /// <summary>감지 결과·초기 위치·행동 설정을 개체별 Blackboard에 전달.</summary>
+    /// <summary>Handler 초기화·판정 조합·갱신 순서 관리.</summary>
     [DisallowMultipleComponent, DefaultExecutionOrder(-100)] // 컴포넌트 중복 방지 , 다른 컴포넌트보다 먼저 Awake() 호출
     [RequireComponent(typeof(MonsterInput), typeof(PlayerDetector), typeof(Health))]
     [RequireComponent(typeof(BehaviorGraphAgent))]
     public class MonsterBehaviorContext : MonoBehaviour
     {
+        // Inspector 행동 설정
         [Header("Attack Requests")]
         [SerializeField] private MonsterAttackBehaviorHandler _attack = new();
 
@@ -18,114 +21,99 @@ namespace ProjectRE
         [Header("Patrol")]
         [SerializeField] private MonsterPatrolBehaviorHandler _patrol = new();
 
+        // 자기 Component 참조
         private MonsterInput _input;
         private PlayerDetector _detector;
         private Health _health;
         private BehaviorGraphAgent _agent;
-        private Transform _target;
-        private Health _targetHealth;
-        private Collider2D _targetBodyCollider;
-        private BlackboardVariable<bool> _deadVariable;
-        private BlackboardVariable<bool> _returnVariable;
-        private BlackboardVariable<bool> _lostVariable;
-        private BlackboardVariable<bool> _targetValidVariable;
-        private BlackboardVariable<GameObject> _targetVariable;
+        private Collider2D _bodyCollider;
 
-        public float HomeX => _chaseReturn.HomeX;
-        public float AttackDistance => _attack.AttackDistance;
-        public float ArrivalDistance => _chaseReturn.ArrivalDistance;
+        // 런타임 관리 객체
+        private MonsterBehaviorBlackboard _blackboard;
+        private readonly MonsterTargetBehaviorHandler _targetHandler = new();
+
+        // 구독 수명 관리
+        private IDisposable _deathSubscription;
+
+        // 외부 공개 접근자
+        public MonsterAttackBehaviorHandler Attack => _attack;
+        public MonsterChaseReturnBehaviorHandler ChaseReturn => _chaseReturn;
+        public MonsterPatrolBehaviorHandler Patrol => _patrol;
+        public MonsterTargetBehaviorHandler Target => _targetHandler;
         public bool IsDead => _health.IsDead.Value;
+        // 대상 유효성 판정. 사망·추적 범위·허용 높이 모두 만족 시 true.
         public bool HasValidTarget { get; private set; }
-        public bool NeedsReturn => _chaseReturn.NeedsReturn;
-        public bool NeedsLostTargetWait => _chaseReturn.NeedsLostTargetWait(HasValidTarget);
-        public Transform TargetRoot => _targetHealth != null ? _targetHealth.transform : null;
 
-        /// <summary>자기 참조 캐시 및 그래프 초기 설정 전달.</summary>
+        /// <summary>자기 Component 참조 캐시.</summary>
         private void Awake()
         {
             _input = GetComponent<MonsterInput>();
             _detector = GetComponent<PlayerDetector>();
             _health = GetComponent<Health>();
-            _attack.Initialize(GetComponent<Collider2D>());
+            _bodyCollider = GetComponent<Collider2D>();
             _agent = GetComponent<BehaviorGraphAgent>();
-            _agent.SetVariableValue("Context", this);
-            _agent.SetVariableValue("Input", _input);
-            _agent.SetVariableValue("AttackRequestInterval", _attack.AttackRequestInterval);
-            _agent.SetVariableValue("LostTargetWait", _chaseReturn.LostTargetWait);
-            _agent.SetVariableValue("PatrolRadius", _patrol.PatrolRadius);
-            _agent.SetVariableValue("PatrolWaitMin", _patrol.PatrolWaitMin);
-            _agent.SetVariableValue("PatrolWaitMax", _patrol.PatrolWaitMax);
-            _agent.SetVariableValue("RearApproachTimeout", _attack.RearApproachTimeout);
         }
 
-        /// <summary>초기 X 좌표 저장 및 실행 Blackboard 참조 캐시.</summary>
+        /// <summary>실행 Blackboard 연결·Handler 주입·사망 구독·최초 판정.</summary>
         private void Start()
         {
-            _chaseReturn.Initialize(transform, transform.position.x);
-            _agent.SetVariableValue("HomeX", HomeX);
-            _agent.GetVariable("IsDead", out _deadVariable);
-            _agent.GetVariable("NeedsReturn", out _returnVariable);
-            _agent.GetVariable("NeedsLostTargetWait", out _lostVariable);
-            _agent.GetVariable("HasValidTarget", out _targetValidVariable);
-            _agent.GetVariable("Target", out _targetVariable);
+            var blackboard = new MonsterBehaviorBlackboard();
+            blackboard.Bind(_agent);
+            _blackboard = blackboard;
+            _blackboard.Context = this;
+            _blackboard.Input = _input;
+            _attack.Initialize(_bodyCollider, _blackboard);
+            _chaseReturn.Initialize(transform, transform.position.x, _blackboard);
+            _patrol.Initialize(_blackboard);
+            _targetHandler.Initialize(_detector, _blackboard);
+            SubscribeDeath();
+            RefreshState();
         }
 
-        /// <summary>감지·높이·추적 제한 결과 갱신. 이동·공격 명령 제외.</summary>
-        private void Update()
+        /// <summary>재활성화 시 구독 복구 및 Graph 실행 전 판정 갱신.</summary>
+        private void OnEnable()
         {
-            UpdateTargetReferences(!IsDead && _detector.IsTargetInView() ? _detector.Target : null);
-            bool hasTarget = _targetHealth != null && !_targetHealth.IsDead.Value;
-            HasValidTarget = hasTarget
-                && _chaseReturn.IsWithinChaseRange(TargetRoot.position.x)
-                && _attack.IsWithinHeightRange(_targetBodyCollider);
-            _chaseReturn.UpdateState();
-            PublishFlags();
-        }
-
-        /// <summary>대상 변경 시 체력·몸통 Collider 캐시, 감지 해제 시 초기화.</summary>
-        private void UpdateTargetReferences(Transform target)
-        {
-            if (_target == target)
+            if (_blackboard == null)
                 return;
 
-            _target = target;
-            _targetHealth = target != null ? target.GetComponentInParent<Health>() : null;
-            _targetBodyCollider = _targetHealth != null ? _targetHealth.GetComponent<Collider2D>() : null;
+            SubscribeDeath();
+            RefreshState();
         }
 
-        /// <summary>추적 시작 기록. 일반 순찰과 대상 상실을 구분.</summary>
-        public void BeginEngagement() => _chaseReturn.BeginEngagement();
+        /// <summary>대상·종합 판정·추적 복귀 순서로 갱신.</summary>
+        private void Update() => RefreshState();
 
-        /// <summary>복귀 완료 전 재추적 방지.</summary>
-        public void BeginReturn()
+        /// <summary>대상 생존·추적 범위·허용 높이 조합 후 복귀 판정 전달.</summary>
+        private void RefreshState()
         {
-            _chaseReturn.BeginReturn();
-            PublishFlags();
+            if (IsDead)
+                _targetHandler.Clear();
+            else
+                _targetHandler.UpdateTarget();
+
+            HasValidTarget = _targetHandler.IsAlive
+                && _chaseReturn.IsWithinChaseRange(_targetHandler.Root.position.x)
+                && _attack.IsWithinHeightRange(_targetHandler.BodyCollider);
+            _blackboard.HasValidTarget = HasValidTarget;
+            _chaseReturn.UpdateState(HasValidTarget);
         }
 
-        /// <summary>복귀 완료 후 교전·복귀 기록 초기화.</summary>
-        public void CompleteReturn()
+        /// <summary>자기 사망 변경을 Blackboard에 구독 전달.</summary>
+        private void SubscribeDeath()
         {
-            _chaseReturn.CompleteReturn();
-            PublishFlags();
+            _deathSubscription?.Dispose();
+            _deathSubscription = _health.IsDead.Subscribe(isDead => _blackboard.IsDead = isDead);
         }
 
-        /// <summary>공격 관리자의 수평 거리 판정 전달.</summary>
-        public bool IsInAttackRange(float deltaX) => _attack.IsInAttackRange(deltaX);
-
-        /// <summary>우선순위 조건과 대상 참조를 Blackboard에 반영.</summary>
-        private void PublishFlags()
-        {
-            _deadVariable.Value = IsDead;
-            _returnVariable.Value = NeedsReturn;
-            _lostVariable.Value = NeedsLostTargetWait;
-            _targetValidVariable.Value = HasValidTarget;
-            _targetVariable.Value = TargetRoot != null ? TargetRoot.gameObject : null;
-        }
-
-        /// <summary>비활성화 시 이동 입력 초기화.</summary>
+        /// <summary>비활성화 시 구독·대상·이동 입력 해제. 교전·복귀 기록 유지.</summary>
         private void OnDisable()
         {
+            _deathSubscription?.Dispose();
+            _deathSubscription = null;
+            _targetHandler.Clear();
+            HasValidTarget = false;
+            if (_blackboard != null)
+                _blackboard.HasValidTarget = false;
             if (_input != null)
                 _input.SetMovement(Vector2.zero);
         }

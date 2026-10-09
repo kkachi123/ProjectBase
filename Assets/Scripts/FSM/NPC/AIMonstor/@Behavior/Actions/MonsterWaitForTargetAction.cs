@@ -32,7 +32,7 @@ public partial class MonsterWaitForTargetAction : Action
         if (Time.time < _endTime)
             return Status.Running;
 
-        Context.Value.BeginReturn();
+        Context.Value.ChaseReturn.BeginReturn();
         return Status.Success;
     }
 

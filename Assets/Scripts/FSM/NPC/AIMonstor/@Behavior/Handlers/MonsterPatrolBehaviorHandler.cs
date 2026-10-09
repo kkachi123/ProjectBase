@@ -14,5 +14,13 @@ namespace ProjectRE
         public float PatrolRadius => _patrolRadius;
         public float PatrolWaitMin => _patrolWaitMin;
         public float PatrolWaitMax => _patrolWaitMax;
+
+        /// <summary>순찰 반경·정지 시간 설정을 Blackboard에 전달.</summary>
+        public void Initialize(MonsterBehaviorBlackboard blackboard)
+        {
+            blackboard.PatrolRadius = _patrolRadius;
+            blackboard.PatrolWaitMin = _patrolWaitMin;
+            blackboard.PatrolWaitMax = _patrolWaitMax;
+        }
     }
 }

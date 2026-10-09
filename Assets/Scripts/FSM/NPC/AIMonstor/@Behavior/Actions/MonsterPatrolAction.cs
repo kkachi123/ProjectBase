@@ -19,7 +19,7 @@ public partial class MonsterPatrolAction : Action
     /// <summary>순찰 목적지 1회 선택.</summary>
     protected override Status OnStart()
     {
-        _destinationX = Context.Value.HomeX + UnityEngine.Random.Range(-Radius.Value, Radius.Value);
+        _destinationX = Context.Value.ChaseReturn.HomeX + UnityEngine.Random.Range(-Radius.Value, Radius.Value);
         return Status.Running;
     }
 
@@ -27,7 +27,7 @@ public partial class MonsterPatrolAction : Action
     protected override Status OnUpdate()
     {
         float deltaX = _destinationX - Context.Value.transform.position.x;
-        if (Mathf.Abs(deltaX) <= Context.Value.ArrivalDistance)
+        if (Mathf.Abs(deltaX) <= Context.Value.ChaseReturn.ArrivalDistance)
             return Status.Success;
 
         Input.Value.SetMovement(new Vector2(Mathf.Sign(deltaX), 0f));

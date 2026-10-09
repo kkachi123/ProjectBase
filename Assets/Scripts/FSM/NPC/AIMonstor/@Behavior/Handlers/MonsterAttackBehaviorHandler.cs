@@ -19,8 +19,13 @@ namespace ProjectRE
         public float AttackRequestInterval => _attackRequestInterval;
         public float RearApproachTimeout => _rearApproachTimeout;
 
-        /// <summary>자기 몸통 Collider 주입.</summary>
-        public void Initialize(Collider2D bodyCollider) => _bodyCollider = bodyCollider;
+        /// <summary>자기 몸통 Collider 주입 및 공격 시간 설정 전달.</summary>
+        public void Initialize(Collider2D bodyCollider, MonsterBehaviorBlackboard blackboard)
+        {
+            _bodyCollider = bodyCollider;
+            blackboard.AttackRequestInterval = _attackRequestInterval;
+            blackboard.RearApproachTimeout = _rearApproachTimeout;
+        }
 
         /// <summary>수평 공격 거리 내 대상 확인.</summary>
         public bool IsInAttackRange(float deltaX) => Mathf.Abs(deltaX) <= _attackDistance;

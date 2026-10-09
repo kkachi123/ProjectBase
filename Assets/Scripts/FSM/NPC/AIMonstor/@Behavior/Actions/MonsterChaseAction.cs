@@ -17,7 +17,7 @@ public partial class MonsterChaseAction : Action
     /// <summary>교전 시작 기록 후 추적 시작.</summary>
     protected override Status OnStart()
     {
-        Context.Value.BeginEngagement();
+        Context.Value.ChaseReturn.BeginEngagement();
         return Status.Running;
     }
 
@@ -25,11 +25,11 @@ public partial class MonsterChaseAction : Action
     protected override Status OnUpdate()
     {
         var context = Context.Value;
-        if (!context.HasValidTarget || context.NeedsReturn)
+        if (!context.HasValidTarget || context.ChaseReturn.NeedsReturn)
             return Status.Failure;
 
-        float deltaX = context.TargetRoot.position.x - context.transform.position.x;
-        if (context.IsInAttackRange(deltaX))
+        float deltaX = context.Target.Root.position.x - context.transform.position.x;
+        if (context.Attack.IsInAttackRange(deltaX))
             return Status.Success;
 
         Input.Value.SetMovement(new Vector2(Mathf.Sign(deltaX), 0f));

@@ -17,7 +17,7 @@ public partial class MonsterReturnAction : Action
     /// <summary>복귀 진행 기록 후 초기 위치 이동 시작.</summary>
     protected override Status OnStart()
     {
-        Context.Value.BeginReturn();
+        Context.Value.ChaseReturn.BeginReturn();
         return Status.Running;
     }
 
@@ -25,10 +25,10 @@ public partial class MonsterReturnAction : Action
     protected override Status OnUpdate()
     {
         var context = Context.Value;
-        float deltaX = context.HomeX - context.transform.position.x;
-        if (Mathf.Abs(deltaX) <= context.ArrivalDistance)
+        float deltaX = context.ChaseReturn.HomeX - context.transform.position.x;
+        if (Mathf.Abs(deltaX) <= context.ChaseReturn.ArrivalDistance)
         {
-            context.CompleteReturn();
+            context.ChaseReturn.CompleteReturn();
             return Status.Success;
         }
 

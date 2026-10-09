@@ -24,7 +24,7 @@ public partial class MonsterMoveBehindTargetAction : Action
         if (!Context.Value.HasValidTarget)
             return Status.Failure;
 
-        _target = Context.Value.TargetRoot;
+        _target = Context.Value.Target.Root;
         _targetFacing = Mathf.Sign(_target.localScale.x);
         _endTime = Time.time + Timeout.Value;
         return Status.Running;
@@ -34,12 +34,12 @@ public partial class MonsterMoveBehindTargetAction : Action
     protected override Status OnUpdate()
     {
         var context = Context.Value;
-        if (!context.HasValidTarget || context.NeedsReturn || context.TargetRoot != _target)
+        if (!context.HasValidTarget || context.ChaseReturn.NeedsReturn || context.Target.Root != _target)
             return Status.Failure;
 
-        float destinationX = _target.position.x - _targetFacing * context.AttackDistance * 0.8f;
+        float destinationX = _target.position.x - _targetFacing * context.Attack.AttackDistance * 0.8f;
         float deltaX = destinationX - context.transform.position.x;
-        if (Mathf.Abs(deltaX) <= context.ArrivalDistance)
+        if (Mathf.Abs(deltaX) <= context.ChaseReturn.ArrivalDistance)
             return Status.Success;
         if (Time.time >= _endTime)
             return Status.Failure;

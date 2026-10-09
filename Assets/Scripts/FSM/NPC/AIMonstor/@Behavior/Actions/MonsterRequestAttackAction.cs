@@ -25,11 +25,11 @@ public partial class MonsterRequestAttackAction : Action
     protected override Status OnUpdate()
     {
         var context = Context.Value;
-        if (!context.HasValidTarget || context.NeedsReturn)
+        if (!context.HasValidTarget || context.ChaseReturn.NeedsReturn)
             return Status.Failure;
 
-        float deltaX = context.TargetRoot.position.x - context.transform.position.x;
-        if (!context.IsInAttackRange(deltaX))
+        float deltaX = context.Target.Root.position.x - context.transform.position.x;
+        if (!context.Attack.IsInAttackRange(deltaX))
             return Status.Failure;
 
         if (Mathf.Abs(deltaX) > FacingDeadZone
