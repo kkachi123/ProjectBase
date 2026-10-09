@@ -1,11 +1,17 @@
 namespace ProjectRE
 {
+    using System;
     using UnityEngine;
 
-    /// <summary>단일 Player 참조 캐시·생존 판정과 Target Blackboard 관리.</summary>
+    /// <summary>주입한 Player의 감지·추적 가능 판정과 대상 Blackboard 관리.</summary>
+    [Serializable]
     public class MonsterTargetBehaviorHandler
     {
+        [Tooltip("자기·대상 몸통 Collider 바닥 기준 추적 허용 높이 차이.")]
+        [Min(0f), SerializeField] private float _maxTargetHeightDifference = 0.75f;
+
         private PlayerDetector _detector;
+        private Collider2D _bodyCollider;
         private MonsterBehaviorBlackboard _blackboard;
 
         // 인식 해제 후에도 유지하는 Player 참조
@@ -13,49 +19,73 @@ namespace ProjectRE
         private Health _health;
 
         // 현재 선택 대상
-        public Transform Root => BodyCollider != null && _health != null ? _health.transform : null;
+        public Transform Root { get; private set; }
         public Collider2D BodyCollider { get; private set; }
-        public bool IsAlive => BodyCollider != null && _health != null && !_health.IsDead.Value;
+        public bool HasValidTarget { get; private set; }
 
-        /// <summary>감지 Component와 개체별 Blackboard 주입.</summary>
-        public void Initialize(PlayerDetector detector, MonsterBehaviorBlackboard blackboard)
+        /// <summary>감지 Component·자기 몸통·개체별 Blackboard 주입.</summary>
+        public void Initialize(PlayerDetector detector, Collider2D bodyCollider, MonsterBehaviorBlackboard blackboard)
         {
             _detector = detector;
+            _bodyCollider = bodyCollider;
             _blackboard = blackboard;
-            _blackboard.Target = Root != null ? Root.gameObject : null;
         }
 
-        /// <summary>단일 Player 감지·참조 확보·생존과 시야 확인.</summary>
-        public void UpdateTarget()
+        /// <summary>기존 대상 초기화 후 유효한 Player 생존·몸통 참조 주입.</summary>
+        public void BindPlayer(Health health, Collider2D bodyCollider)
         {
-            Collider2D[] targetsInRadius = _detector.FindCandidates(out Vector2 origin);
-            Collider2D targetCollider = targetsInRadius.Length > 0 ? targetsInRadius[0] : null;
-
-            if (targetCollider != null && !ReferenceEquals(_cachedCollider, targetCollider))
+            Clear();
+            if (health == null || bodyCollider == null)
             {
-                _cachedCollider = targetCollider;
-                targetCollider.TryGetComponent(out _health);
+                Debug.LogError("MonsterTargetBehaviorHandler: Player Health 또는 몸통 Collider 누락.");
+                return;
             }
 
-            bool canTarget = targetCollider != null && _health != null && !_health.IsDead.Value
-                && _detector.HasLineOfSight(origin, targetCollider);
-            SetTarget(canTarget ? targetCollider : null);
+            _health = health;
+            _cachedCollider = bodyCollider;
+        }
+
+        /// <summary>현재 몬스터 시야·대상 생존·허용 높이로 추적 가능 여부 기록.</summary>
+        public void UpdateTarget()
+        {
+            if (_cachedCollider == null)
+            {
+                Clear();
+                return;
+            }
+
+            bool isDetected = !_health.IsDead.Value
+                && _cachedCollider.enabled && _cachedCollider.gameObject.activeInHierarchy
+                && _detector.IsWithinRange(_cachedCollider, out Vector2 origin)
+                && _detector.HasLineOfSight(origin, _cachedCollider);
+            SetTarget(isDetected);
+            HasValidTarget = isDetected && IsWithinHeightRange();
+            _blackboard.HasValidTarget = HasValidTarget;
+        }
+
+        /// <summary>자기·대상 몸통 바닥의 허용 높이 차이 확인.</summary>
+        private bool IsWithinHeightRange()
+        {
+            return Mathf.Abs(_cachedCollider.bounds.min.y - _bodyCollider.bounds.min.y)
+                <= _maxTargetHeightDifference;
         }
 
         /// <summary>선택 대상 변경 시 참조와 Blackboard만 갱신. Player 캐시 유지.</summary>
-        private void SetTarget(Collider2D targetCollider)
+        private void SetTarget(bool isDetected)
         {
-            if (ReferenceEquals(BodyCollider, targetCollider))
-                return;
-
-            BodyCollider = targetCollider;
-            _blackboard.Target = Root != null ? Root.gameObject : null;
+            Root = isDetected ? _health.transform : null;
+            BodyCollider = isDetected ? _cachedCollider : null;
+            GameObject target = isDetected ? _health.gameObject : null;
+            if (_blackboard.Target != target)
+                _blackboard.Target = target;
         }
 
-        /// <summary>자기 사망·비활성화 시 선택 대상과 Player 캐시 전체 해제.</summary>
+        /// <summary>초기화 후 선택 대상·추적 판정·Player 캐시 전체 해제.</summary>
         public void Clear()
         {
-            SetTarget(null);
+            SetTarget(false);
+            HasValidTarget = false;
+            _blackboard.HasValidTarget = false;
             _cachedCollider = null;
             _health = null;
         }

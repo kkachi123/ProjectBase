@@ -7,11 +7,9 @@ namespace ProjectRE
     [Serializable]
     public class MonsterChaseReturnBehaviorHandler
     {
-        [Min(0.01f), SerializeField] private float _maxChaseDistance = 8f;
         [Min(0.01f), SerializeField] private float _returnArrivalDistance = 0.15f;
         [Min(0f), SerializeField] private float _lostTargetWait = 2f;
 
-        private Transform _owner;
         private MonsterBehaviorBlackboard _blackboard;
         private bool _isEngaged;
         private bool _isReturning;
@@ -22,23 +20,19 @@ namespace ProjectRE
         public bool NeedsReturn { get; private set; }
         public bool NeedsLostTargetWait { get; private set; }
 
-        /// <summary>자기 Transform·초기 X 주입 및 복귀 설정 전달.</summary>
-        public void Initialize(Transform owner, float homeX, MonsterBehaviorBlackboard blackboard)
+        /// <summary>순찰·복귀 기준 초기 X 주입 및 복귀 설정 전달.</summary>
+        public void Initialize(float homeX, MonsterBehaviorBlackboard blackboard)
         {
-            _owner = owner;
             HomeX = homeX;
             _blackboard = blackboard;
             _blackboard.HomeX = homeX;
             _blackboard.LostTargetWait = _lostTargetWait;
         }
 
-        /// <summary>초기 위치 기준 대상 추적 범위 확인.</summary>
-        public bool IsWithinChaseRange(float targetX) => Mathf.Abs(targetX - HomeX) <= _maxChaseDistance;
-
-        /// <summary>복귀 진행 또는 자기 추적 범위 초과 확인. 대상 상실은 대기 후 복귀.</summary>
+        /// <summary>복귀 진행 유지. 교전 대상의 시야·유효성 상실은 대기 후 복귀.</summary>
         public void UpdateState(bool hasValidTarget)
         {
-            NeedsReturn = _isReturning || Mathf.Abs(_owner.position.x - HomeX) > _maxChaseDistance;
+            NeedsReturn = _isReturning;
             NeedsLostTargetWait = _isEngaged && !hasValidTarget && !NeedsReturn;
             PublishState();
         }

@@ -2,7 +2,7 @@
 
 > PDF 갱신을 위한 단일 원본 문서다. 코드 구조가 바뀌면 먼저 이 문서의 **변경 이력**, **현재 구조**, **검증 상태**를 갱신한다.
 >
-> 대상 범위: Player 직접 입력 기반 FSM과 기본 네 상태 Monster 실행 구조. Goblin 기준 Controller·Input·Animator·Factory·prefab 제작을 완료했다. Behavior 의사결정과 다중 공격 타입 입력은 아직 구현하지 않았다.
+> 대상 범위: Player 직접 입력 기반 FSM과 기본 네 상태 Monster 실행 구조, MonsterInput을 사용하는 Behavior 의사결정 계층. Goblin의 실행 구조와 기본 BT를 구현했으며, 이번 `Monster Refactoring3-1`에서 씬 Player 연결·인식·추적 복귀 기준을 개선했다. 다중 공격 타입 입력은 아직 구현하지 않았다.
 
 ## 1. 리팩토링 이전 구조
 
@@ -151,6 +151,15 @@ Controller -> StateFactory -> State(필요한 의존성만 주입)
 - Root의 MonsterAnimator가 Visual의 실제 Animator 한 개를 제어한다. Visual의 AgentAnimationEventProxy가 공격 유효 프레임·종료 이벤트를 Controller에 전달한다.
 - 같은 네 상태·단발 공격을 사용하는 다른 몬스터는 Clip·Override·데이터·prefab variant를 교체한다. 다른 행동이나 다중 공격은 별도 확장 대상이다.
 
+### Monster Behavior와 Player 인식
+
+- Behavior Graph는 순찰·추적·상실 대기·복귀·배후 접근·공격 요청·사망 정지를 선택하고, Action은 MonsterInput만 조작한다. 실제 행동 실행·중단·Animation은 기존 FSM이 담당한다.
+- `MonsterBehaviorContext`는 Handler 초기화·갱신 순서·자기 사망 정보 전달을 관리한다. Handler는 개체별 `MonsterBehaviorBlackboard` wrapper로 담당 값을 기록한다.
+- `ScenePlayerManager`에 씬의 실제 Player를 Inspector로 할당한다. Context는 초기화·재활성화 때 Health·몸통 Collider를 Target Handler에 주입하며 Manager를 필드로 보관하지 않는다.
+- `PlayerDetector`는 현재 몬스터 원점에서 Player 몸통 중심까지 XY 제곱 거리로 확인하고, 범위 안에서만 장애물 Linecast를 수행한다. 반복 Overlap 탐색·배열 처리·Component 검색은 없다.
+- Target Handler가 생존·활성·현재 시야·몸통 바닥 높이로 `HasValidTarget`을 판정한다. Attack Handler는 공격 설정과 수평 공격 거리만 담당한다.
+- 초기 위치 기준 Player·몬스터 거리 제한은 제거했다. 교전 중 시야를 잃으면 설정 시간만큼 대기 후 복귀하며, 대기 중 재인식은 추적을 재개한다. 복귀를 시작하면 완료까지 유지하고, 초기 X는 순찰·복귀 목적지에만 사용한다.
+
 ### Animator capability
 
 | 클래스 | 책임 |
@@ -295,6 +304,27 @@ Monster 제작 과정에서 공용 Rule의 기존 수명 문제를 함께 정리
 
 GetHitTransition의 Dispose는 해당 Rule이 만든 구독만 종료한다. Health ReactiveProperty 자체나 UI 등 다른 소비자의 구독을 해제하지 않는다. Disable/Enable 풀링 수명 정책은 추가하지 않았다.
 
+### 4.9 Monster Refactoring3-1: Player 인식과 추적·복귀 기준 개선
+
+기본 BT·FSM·Animator 연결을 유지하면서 Player 참조 확보와 인식 판정을 단순화했다. 특히 현재 시야에 Player가 남아 있는데 초기 위치 기준 제한 때문에 추적이 멈추던 동작을 수정했다.
+
+| 변경 구성 | 변경 전 | 변경 후 |
+| --- | --- | --- |
+| ScenePlayerManager·InGame | 물리 탐색으로 Player 참조 확보 | 씬 전용 싱글톤의 Inspector Player를 Context가 초기화·재활성화 때 주입. 동적 등록 이벤트·자동 탐색·씬 간 유지 없음 |
+| PlayerDetector | OverlapCircleAll·후보 배열·playerMask 사용 | 현재 감지 원점과 몸통 중심의 XY 제곱 거리 판정. 범위 안에서만 장애물 Linecast |
+| MonsterTargetBehaviorHandler | 감지 후보로 참조 확보, Context에서 추적 유효성 조합 | BindPlayer로 주입 참조 보관. 생존·활성·거리·시야·높이 판정과 Target·HasValidTarget Blackboard 기록 통합 |
+| MonsterAttackBehaviorHandler | 자기 몸통과 대상 높이까지 판정 | 높이 설정·판정을 Target Handler로 이전. 공격 설정·수평 거리 판정만 유지 |
+| MonsterChaseReturnBehaviorHandler | 초기 X에서 Player·몬스터가 8을 초과해 멀어지면 추적 중단·복귀 | 초기 거리 제한·자기 Transform 캐시 제거. 현재 시야 상실 후 대기·복귀, HomeX는 목적지로만 유지 |
+| MonsterBehaviorContext | 대상 유효성 조합과 개별 참조 null 검사 | 초기화·갱신 순서와 결과 전달. 생명주기 입구·주입 검증·대상 소멸에 필요한 체크만 유지 |
+| Goblin 설정 | 공격 Handler에 허용 높이 1 보관 | Target Recognition으로 값 1 이전. 감지 반경 6·상실 대기 1.5초·기존 Graph 연결 유지 |
+| 검증 지침·설명 문서 | 임시 Verification 코드로 동작을 강제하는 확인 방식 | 상황·조작·기대 결과를 안내한 뒤 사용자 수동 조작과 읽기 전용 상태 확인. 현재 API와 이전 검증 이력을 구분 |
+
+갱신 중 Overlap 탐색과 Component 검색을 제거한 구조 변경이며, CPU·GC 개선 수치는 측정하지 않았다. 선택 대상이 해제돼도 주입 참조는 유지하므로 같은 Player를 다시 인식할 때 탐색하지 않는다. 몬스터 비활성화·사망 시 참조를 정리하고 재활성화 때 다시 주입한다.
+
+Unity CLI 컴파일 확인 후 사용자가 현재 시야 기준 추적·상실 대기·복귀·대기 중 재인식 흐름의 정상 동작을 확인했다. Managers 부재로 발생하는 기존 UI·Player 사망 완료 오류는 별도 문제로 남겼다. 런타임 Player 교체·Title 등록 흐름·Boss 패턴·AI 휴면은 이번 범위에 포함하지 않았다.
+
+상세 API·설정·검증 이력은 [MonsterBehaviorContext_Reference.md](E:/Unity/Project/ProjectBase/Docs/FSM/MonsterBehaviorContext_Reference.md)에 기록한다. PDF는 이번 커밋에서 재생성하지 않는다.
+
 ## 5. 검증 상태
 
 | 항목 | 상태 | 근거 / 남은 확인 |
@@ -322,11 +352,13 @@ GetHitTransition의 Dispose는 해당 Rule이 만든 구독만 종료한다. Hea
 | Monster 피격·사망 | 제작 단계 Play Mode 검증 완료 | Grounded/Attack→Hit→Grounded, Grounded/Attack/Hit의 치명타→Death 직접 전환, 실제 Death End 후 제거 확인 |
 | Action·UniRx 구독 수명 | 제작 단계 검증 완료 | GetHit 중복 구독·Dispose·재진입, 이미 true인 사망 값, 파괴된 객체의 입력·State 전환 연결 해제 확인 |
 | Goblin prefab·Override | 제작 단계 연결 검증 완료 | Missing Script 없음, 실제 Animator 1개, 다섯 Override slot·Clip Animation Event 연결 확인 |
+| Monster Refactoring3-1 컴파일 | 완료 | 변경된 Player 연결·Target·Attack·ChaseReturn·Context 코드의 Unity 재컴파일 성공. Console 현재 컴파일 오류 없음 |
+| 현재 시야 기준 추적·상실 대기·복귀 | 사용자 수동 검증 완료 | 초기 위치 거리 제한 제거 후 시야 안에서 추적, 시야 이탈 후 1.5초 대기·복귀, 대기 중 재인식 시 추적 재개 정상 동작 확인 |
 | 공용 Rule의 Player 회귀 | 조건부 검증 완료 | 테스트 객체에만 누락된 DashHandler 보완 후 지상/공중 AttackEnd·Hit 복귀·기존 Hit 우선 사망 순서 확인. 원본 Player prefab의 정상 초기화까지 보장하지 않음 |
 | 기존 Orc 잔여 참조 | 제작 단계 검사 완료 | 삭제 대상 C# 이름·Orc prefab GUID 잔여 참조 없음. 원본 아트·관련 없는 Agent 에셋 보존 |
 | Goblin 시각·밸런스 | 수동 검증 필요 | 발 위치·크기·Clip FPS·공격 프레임·Collider·공격 범위·체력·피해 조정 필요 |
 
-Monster 실행 검증은 원래 InGame 씬을 보존한 임시 Play Mode 씬에서 외부 명령과 실제 Animator Clip 이벤트로 수행했다. 제작 후 원래 씬을 복원했다. 수동 화면 검증까지 통과한 것으로 기록하지 않는다. 이 표는 제작 단계에서 확보한 결과이며 로그 갱신만으로 테스트를 재실행한 것은 아니다.
+초기 Monster 제작 단계의 실행 검증은 원래 InGame 씬을 보존한 임시 Play Mode 씬에서 외부 명령과 실제 Animator Clip 이벤트로 수행했다. 제작 후 원래 씬을 복원했다. 해당 과거 결과는 수동 화면 검증과 구분한다. 이번 Monster Refactoring3-1의 시야 기준 추적·복귀는 별도로 사용자 수동 확인을 받았으며, 로그 갱신만으로 테스트를 재실행한 것은 아니다.
 
 Plan7의 독립 Animator 평가는 Preview Scene에서 저장된 Controller를 재생했다. Edit 모드에서는 Animation Event가 자동 발행되지 않아 클립 이벤트 시점에 기존 Proxy의 OnAnimationEnd를 수동 호출하고 AttackEndTransition을 평가한 뒤 FSM 종료 파라미터를 모의 적용했다. 결과는 경로·종료 규칙 연결 확인으로 한정한다. 임시 `Codex_ComboPlan7Verification` 파일·오브젝트는 제거했고 생산 코드·에셋에 포함하지 않았다. 사용자의 직접 Exit 삭제 후 이번 로그 최신화에서는 저장된 에셋만 정적으로 점검했다.
 
@@ -338,7 +370,8 @@ Player 회귀 검사에서는 저장된 `ProjectRE_Player Variant.prefab`에 Age
 
 - Goblin 시각·공격 타이밍·밸런스 수동 검증과 필요한 수치 조정
 - 기본 Monster의 다중 공격 요청·Animator 분기: int attackType을 입력부터 실행까지 전달하는 후속 확장안. 현재 미적용
-- Monster의 Behavior·Brain·타깃 선택·순찰·추적 등 의사결정 계층
+- 기본 Monster BT 이후의 추가 행동·다른 행동 프로필. 현재 순찰·추적·상실 대기·복귀·배후 접근·공격 요청·사망 정지는 구현됨
+- ScenePlayerManager의 씬 고정 Player 연결을 Title 등록 흐름·런타임 Player 교체와 연결하는 후속 작업
 - 비행·낙하·공중 공격·콤보 등 다른 행동 프로필과 다른 Monster 계열의 이행
 - Player prefab의 기존 AgentDashHandler2D 누락과 전체 수동 회귀 확인
 - Player 공격·End 클립 분리 후 실제 종료 이벤트·콤보 분기·잔여 Trigger·피격 중단·공중 복귀 및 종료 포즈 수동 확인. End 추가에 따른 이동·점프 재개 타이밍 조정
@@ -353,7 +386,7 @@ Player 회귀 검사에서는 저장된 `ProjectRE_Player Variant.prefab`에 Age
 4. Goblin 크기·모션·타격 프레임·Collider와 밸런스를 수동 검증한다.
 5. Player prefab 설정 문제와 최신 Jump·Combo·Dash 전체 수동 검증을 별도 작업으로 진행한다.
 6. 같은 행동 프로필의 다음 몬스터는 공용 코드 복제 없이 에셋·Override·variant·데이터로 제작한다. 다른 프로필은 먼저 확장 범위를 정한다.
-7. Behavior 의사결정은 별도 요청 이후 설계한다. 현재 명령 실행 구조에 자동 행동을 임의 추가하지 않는다.
+7. 기본 Behavior의 Input → FSM 실행 경계를 유지한다. 새로운 의사결정·행동 프로필은 별도 요청 이후 설계한다.
 8. 성능·GC 개선 수치는 Profiler 측정 이후에만 문서에 기록한다.
 
 ## 7. PDF 갱신 규칙
@@ -380,7 +413,7 @@ Player 회귀 검사에서는 저장된 `ProjectRE_Player Variant.prefab`에 Age
 
 ### 업데이트 시 작성 원칙
 
-- 기본 단발 Monster 제작과 아직 구현하지 않은 다중 공격·Behavior·다른 행동 프로필을 구분한다.
+- 기본 단발 Monster·현재 구현한 Behavior와 아직 구현하지 않은 다중 공격·다른 행동 프로필을 구분한다.
 - 성능 수치나 체감 개선 정도는 측정값이 없으면 추정하지 않는다.
 - 수동 테스트 전에는 ‘완료’ 대신 ‘코드/구성 완료, 수동 검증 필요’로 기록한다.
 - 코드 변경이 발생하면 먼저 이 문서의 변경 이력과 검증 상태를 갱신한 뒤 PDF를 갱신한다.

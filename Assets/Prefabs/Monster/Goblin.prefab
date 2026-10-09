@@ -147,9 +147,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ff9ece546e2d239489983dcdfc76f041, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ProjectRE.PlayerDetector
-  playerMask:
-    serializedVersion: 2
-    m_Bits: 256
   obstacleMask:
     serializedVersion: 2
     m_Bits: 192
@@ -198,7 +195,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ProjectRE.MonsterBehaviorContext
   _attack:
     _attackDistance: 1.8
-    _maxAttackHeightDifference: 1
     _attackRequestInterval: 1
     _rearApproachTimeout: 1.5
   _chaseReturn:
@@ -209,3 +205,5 @@ MonoBehaviour:
     _patrolRadius: 2
     _patrolWaitMin: 1
     _patrolWaitMax: 2
+  _targetHandler:
+    _maxTargetHeightDifference: 1

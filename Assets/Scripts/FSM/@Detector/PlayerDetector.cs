@@ -4,17 +4,17 @@
 
     public class PlayerDetector : MonoBehaviour
     {
-        [SerializeField] private LayerMask playerMask;
         [SerializeField] private LayerMask obstacleMask;
         [SerializeField] Vector3 offset = new Vector3(0f, 1.0f, 0f);
         [Range(0, 20)]
         [SerializeField] private float viewRadius = 5f;
 
-        /// <summary>감지 반경 내 후보와 탐색 원점 반환.</summary>
-        public Collider2D[] FindCandidates(out Vector2 origin)
+        /// <summary>현재 탐색 원점에서 대상 몸통 중심까지의 거리 확인.</summary>
+        public bool IsWithinRange(Collider2D target, out Vector2 origin)
         {
             origin = transform.position + offset;
-            return Physics2D.OverlapCircleAll(origin, viewRadius, playerMask);
+            Vector2 delta = (Vector2)target.bounds.center - origin;
+            return delta.sqrMagnitude <= viewRadius * viewRadius;
         }
 
         /// <summary>탐색 원점과 후보 중심 사이 장애물 확인.</summary>
