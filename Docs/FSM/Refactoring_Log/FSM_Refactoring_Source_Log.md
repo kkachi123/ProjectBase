@@ -157,8 +157,9 @@ Controller -> StateFactory -> State(필요한 의존성만 주입)
 - `MonsterBehaviorContext`는 Handler 초기화·갱신 순서·자기 사망 정보 전달을 관리한다. Handler는 개체별 `MonsterBehaviorBlackboard` wrapper로 담당 값을 기록한다.
 - `ScenePlayerManager`에 씬의 실제 Player를 Inspector로 할당한다. Context는 초기화·재활성화 때 Health·몸통 Collider를 Target Handler에 주입하며 Manager를 필드로 보관하지 않는다.
 - `PlayerDetector`는 현재 몬스터 원점에서 Player 몸통 중심까지 XY 제곱 거리로 확인하고, 범위 안에서만 장애물 Linecast를 수행한다. 반복 Overlap 탐색·배열 처리·Component 검색은 없다.
-- Target Handler가 생존·활성·현재 시야·몸통 바닥 높이로 `HasValidTarget`을 판정한다. Attack Handler는 공격 설정과 수평 공격 거리만 담당한다.
-- 초기 위치 기준 Player·몬스터 거리 제한은 제거했다. 교전 중 시야를 잃으면 설정 시간만큼 대기 후 복귀하며, 대기 중 재인식은 추적을 재개한다. 복귀를 시작하면 완료까지 유지하고, 초기 X는 순찰·복귀 목적지에만 사용한다.
+- Target Handler가 생존·활성·현재 시야·몸통 바닥 높이로 Blackboard `HasValidTarget`을 직접 기록하고 `Root`·`DeltaX`를 제공한다. Attack Handler는 공격 거리·배후 제한 시간과 개체별 요청 가능 시각을 관리한다.
+- Graph 분기·기본 Wait/WaitRange는 Blackboard, 커스텀 Action의 설정·판정은 Context의 Handler, 입력은 Context.Input으로 구분한다. Action의 Blackboard 연결은 Context 하나이며 Context에는 개별 설정 전달 getter를 만들지 않는다.
+- `LostTarget = _isEngaged && !HasValidTarget`으로 상실 판정을 통합한다. 공통 Both Guard가 교전·대기·복귀를 중단하고, 대기뿐 아니라 복귀 중 재인식도 즉시 추적을 재개한다. 초기 X는 순찰·복귀 목적지에만 사용한다.
 
 ### Animator capability
 
@@ -325,7 +326,70 @@ Unity CLI 컴파일 확인 후 사용자가 현재 시야 기준 추적·상실 
 
 상세 API·설정·검증 이력은 [MonsterBehaviorContext_Reference.md](E:/Unity/Project/ProjectBase/Docs/FSM/MonsterBehaviorContext_Reference.md)에 기록한다. PDF는 이번 커밋에서 재생성하지 않는다.
 
+#### 후속 정리: 미사용 Blackboard Target 제거
+
+Action 사용처 확인 결과 추적·공격 요청·배후 접근은 Context.Target.Root를 조회하며, Blackboard Target은 동일 대상 GameObject를 기록할 뿐 읽는 코드·노드가 없었다. 대상 Handler의 Root는 유지하고 wrapper의 Target 이름·참조·속성·Bind 및 Handler의 Blackboard Target 기록만 제거했다.
+
+BasicMonsterBehavior의 작성용·실행용 Blackboard에서도 Unity Editor API로 Target을 제거했다. 기존 노드 ID·배치·필드 연결·우선순위와 다른 변수 GUID는 유지했다. HasValidTarget 기록과 시야·높이·상실 대기·복귀 정책은 변경하지 않았다. Unity 재컴파일 성공을 확인했으며, 정리 이후의 실제 Play 회귀는 별도 수동 확인으로 남긴다.
+
+추가로 Blackboard HomeX와 Target Handler의 공개 BodyCollider는 기록 후 읽지 않는 후보로 확인했다. 일부 Handler의 공개 설정 getter와 Context.Patrol도 외부 사용이 없지만 실제 설정 필드·Graph 연결은 사용 중이다. 이 후보들은 보고만 하고 이번 변경에서는 유지했다.
+
+#### 후속 정리: 행동 설정·공유 상태 조회를 Blackboard로 통일
+
+Handler getter와 Blackboard가 같은 정보를 따로 제공해 설정·상태의 조회 경로가 나뉘어 있었다. Action의 조회를 **Inspector → Handler.Initialize → 개체별 Blackboard → Action**으로 통일하고, Handler는 담당 설정 전달·기록 변경·판정 결과 기록에 집중하도록 정리했다.
+
+| 구성 요소 | 변경 전 | 변경 후 |
+| --- | --- | --- |
+| MonsterBehaviorBlackboard·Graph | HomeX는 기록만 하고 공격·도착 거리는 Handler에서 조회 | AttackDistance·ArrivalDistance 추가. HomeX와 함께 실제 Action·Subgraph 연결. wrapper는 15개 실행 변수 참조 관리 |
+| Attack·Patrol Handler | 설정 getter와 일부 거리 판정 함수 공개 | 직렬화 필드·Initialize 기록 유지, 설정 getter·IsInAttackRange 제거 |
+| ChaseReturn Handler | HomeX 저장, _isReturning·NeedsReturn 중복 기록, 상태 속성 → PublishState | HomeX·복귀 상태는 Blackboard에만 보관. BeginReturn·CompleteReturn 직접 기록. UpdateState()는 Blackboard 유효 대상·복귀 값을 읽어 상실 대기만 갱신 |
+| Target Handler·Context | HasValidTarget 저장 속성, Context HasValidTarget·IsDead 전달 getter | Target은 Blackboard HasValidTarget 직접 기록. Context는 Blackboard IsDead 조회. 자기 사망 구독·Root 참조와 갱신 순서 유지 |
+| 행동 Action | 설정·상태를 Handler와 Blackboard에서 혼합 조회 | BlackboardVariable<T>.Value로 통일. 대상 위치와 교전·복귀 기록 변경만 Context 경유 |
+| 상위·Combat·Patrol Graph | 거리·일부 상태가 Action 필드로 연결되지 않음 | 모든 반복 Action과 정적 Subgraph에 신규 필드 전달. 작성용·실행용 Graph를 함께 갱신 |
+
+기존 Inspector 필드·값·Prefab Override, 노드 ID·배치·우선순위·기존 필드 연결·변수 GUID는 유지했다. 배후 접근 계수 0.8과 도착 범위 비교, 현재 시야·높이 정책은 변경하지 않았다. _isEngaged는 대상 상실을 판단할 교전 이력이므로 유지하며, 미사용 공개 BodyCollider는 별도 작업으로 남겼다. 씬·Prefab·FSM·Animator 수정이나 임시 Migration·Verification 파일은 없다.
+
+Unity 컴파일 완료와 Console 현재 오류 0을 확인했다. 저장된 실행 Graph에서 상위·Combat·Patrol 변수와 Action 필드가 같은 변수 객체를 참조하는 것을 읽기 전용으로 확인했다. 최신 실제 순찰·추적·배후 접근·공격·상실 대기·복귀는 사용자 수동 회귀로 남긴다. 이전 시야 기준 변경의 수동 확인을 이번 변경의 검증 결과로 간주하지 않는다.
+
+#### 후속 개선: Blackboard·행동 흐름 단순화
+
+설정·상태를 모든 Action 필드에 연결한 결과 노드 문구가 길어지고, 같은 대상 유효성·복귀 조건을 추적·배후 접근·공격에서 반복 확인했다. Graph가 행동 순서와 공통 중단을 맡고, Handler가 필요한 정보·판정을 제공하며, Action은 입력을 실행하는 구조로 정리했다.
+
+| 요소 | 이전 | 개선 |
+| --- | --- | --- |
+| Target Handler | 선택 Root·BodyCollider 중복 기록, Action마다 수평 거리 계산 | 미사용 BodyCollider·SetTarget 제거. Player _cachedCollider·자기 _bodyCollider 유지, Root·DeltaX 제공 |
+| Blackboard | 상위 17·Combat 10·Patrol 8개 변수, 입력·행동 설정·요청 시각 연결 | 상위 8·Combat 2·Patrol 4개. Context·상태·기본 Wait/WaitRange 설정만 유지 |
+| Context·Handler 조회 | Action마다 여러 Blackboard 필드 연결 | Context의 Input·Attack·ChaseReturn·Patrol·Target 직접 접근. 개별 설정 전달 getter 없음 |
+| 상실·복귀 | NeedsReturn·NeedsLostTargetWait, BeginReturn, 전용 WaitForTarget Action | LostTarget 하나와 _isEngaged 이력. Stop → 기본 Wait → Return Sequence, 전용 Action 삭제 |
+| 공통 중단 | Action마다 대상 유효·복귀 검사. 복귀 중 재인식은 복귀 유지 | 교전·상실 Guard Both, 사망 최우선. 대기·복귀·순찰 중 재인식 시 즉시 교전 재개 |
+| 교전 순서 | Random 두 경로에 RequestAttack 중복, 공격 후 Wait | Chase → Random(배후 접근/실패 시 Chase 또는 Stop) → 공통 RequestAttack 하나 |
+| 공격 요청 | 공격 거리 재검사, Blackboard 다음 요청 시각 | 거리는 Chase만 확인. RequestAttack은 방향·간격 확인 후 입력 1회. Attack Handler의 비공개 시각 유지 |
+| 노드 표시 | 입력·거리·시간·bool을 나열한 긴 문구 | [Context] 추적·배후 접근·공격 요청·복귀·순찰·정지 |
+
+공격 결정 이후 Player가 공격 거리 밖으로 이동해도 대상이 유효하면 공격을 시도한다. 대상 자체가 유효하지 않으면 Graph Guard가 교전을 중단한다. 요청 완료는 입력 발행 완료이며 실제 공격 시작·실행·종료는 기존 FSM 책임이다. 공격 경로 변경·재인식·Subgraph 재진입으로 요청 가능 시각을 초기화하지 않는다.
+
+HomeX는 최초 Start에서 Handler에 한 번 기록한다. Graph 상태값을 Handler bool 필드로 다시 복제하지 않으며 _isEngaged만 최초 미감지와 교전 이후 상실을 구분한다. 모든 이동 Action의 종료 입력 초기화는 유지하고 기반 Action·새 인터페이스는 추가하지 않았다.
+
+Return Action의 OnUpdate는 이동·도착 판정만 수행하도록 정리했다. OnEnd에서 이동 입력을 초기화하고, CurrentStatus가 Success일 때만 CompleteReturn을 호출한다. 재인식·사망으로 중단된 복귀를 완료로 기록하지 않는다. 공격 요청 시각 기록은 실제 입력 발행과 함께 유지한다.
+
+Unity Editor API로 작성용·실행용 Graph 세 개를 갱신·빌드·저장했다. 남은 변수 GUID와 유지된 Action 노드 ID를 보존했고, LostTarget은 기존 NeedsLostTargetWait GUID를 사용한다. 불필요한 노드·필드는 제거하고 새 Sequence·Stop·Wait 연결을 추가했다. 씬·Prefab·FSM·Animator와 기존 Inspector 필드·값·Override는 변경하지 않았다. 임시 Migration·Verification 스크립트는 작성하지 않았다.
+
+Unity 컴파일 완료와 Console 현재 오류 0을 확인했다. 실행 Graph의 우선순위·Both Observer·상실 Sequence·공통 요청 노드 하나, 상하위 Context 및 대기 변수의 동일 객체 연결을 읽기 전용으로 확인했다. Goblin의 실제 설정값은 변경 전후 일치하며 상실 대기 1.5초·요청 간격 1초를 보존했다. 최신 Play 회귀는 아직 수행하지 않았으며 이전 단계의 수동 결과와 구분한다. 조작 방법은 MonsterBehaviorContext_Reference.md 16절에 기록했다.
+
+#### 후속 정리: 공격 선택·Action 종료 책임 확정
+
+교전은 **Chase → Random(배후 접근 / 정지) → 공통 RequestAttack**으로 확정했다. 배후 이동 아래 Try In Order와 실패 시 대체 Chase는 사용자가 제거했다. 배후 도착 시 공격 요청으로 진행하고, 시간 초과 시 해당 Sequence가 실패하여 그 회차에는 공격을 요청하지 않는다. 이후 상위 반복에서 Chase부터 재선택한다.
+
+RequestAttack은 공격 거리 재검사를 하지 않는다. 대상의 반대 방향을 바라볼 때만 기존 이동 입력으로 방향을 정렬하고, 요청 간격이 지난 뒤 시각 기록·입력 1회 발행을 수행한다. Motor가 방향·수평 속도를 함께 적용하므로 짧은 정렬 이동이 발생할 수 있으며 현재 방식을 유지한다. FacingDeadZone 0.01은 공격 거리나 부동소수점 도착 오차가 아니다.
+
+Return은 OnUpdate에서 이동·도착을 판정하고, OnEnd에서 모든 종료의 이동 입력을 정리한다. CurrentStatus == Success일 때만 CompleteReturn을 호출하므로 재인식·사망으로 중단된 복귀를 완료로 기록하지 않는다. 요청 시각 기록은 실제 발행 직전 OnUpdate에 유지한다. Chase 교전 기록·배후 방향/제한 시각·순찰 목적지는 OnStart, 이동 입력 해제는 OnEnd에 유지한다.
+
+작성 Graph와 BasicMonsterBehavior 내부 실행 Combat 모듈 모두 Random 하위가 배후 접근·Stop 두 개임을 읽기 전용으로 확인했다. 요청 노드 1개, Context 공유 연결, 상위 8·Combat 2·Patrol 4개 변수, 기존 Goblin Inspector 값 유지도 확인했다. 이번 문서 갱신에서 코드·Graph·Scene·Prefab은 변경하지 않았으며 최신 Play 회귀 결과를 새로 주장하지 않는다.
+
+MonsterBehaviorContext_Class_Diagram.pdf는 **2D Grounded Monster 기준**으로 최신화했다. Context의 개체별 Handler·wrapper 소유, Scene Player 주입, 거리·시야·높이 판정, Action의 Handler 조회·입력 요청, Unity 기본 Condition·Wait 연결을 반영한다. 제거된 대상 구독·Blackboard Target·복귀 플래그·전용 대기 Action은 현재 구조에서 제외했다. 이후 제작 지침은 [FSM_Monster_Behavior_Creation_Guide.md](../ProjectSkill/FSM_Monster_Behavior_Creation_Guide.md)에 정리한다.
+
 ## 5. 검증 상태
+
 
 | 항목 | 상태 | 근거 / 남은 확인 |
 | --- | --- | --- |
@@ -354,6 +418,8 @@ Unity CLI 컴파일 확인 후 사용자가 현재 시야 기준 추적·상실 
 | Goblin prefab·Override | 제작 단계 연결 검증 완료 | Missing Script 없음, 실제 Animator 1개, 다섯 Override slot·Clip Animation Event 연결 확인 |
 | Monster Refactoring3-1 컴파일 | 완료 | 변경된 Player 연결·Target·Attack·ChaseReturn·Context 코드의 Unity 재컴파일 성공. Console 현재 컴파일 오류 없음 |
 | 현재 시야 기준 추적·상실 대기·복귀 | 사용자 수동 검증 완료 | 초기 위치 거리 제한 제거 후 시야 안에서 추적, 시야 이탈 후 1.5초 대기·복귀, 대기 중 재인식 시 추적 재개 정상 동작 확인 |
+| Monster 행동 설정·공유 상태 Blackboard 통일 | 코드·Graph·컴파일 확인 완료, 수동 회귀 필요 | 기존 변수·노드·필드 연결 보존, 신규 거리·상태 필드와 모든 반복 Action 연결, 실행 상하위 동일 변수 객체 확인. 최신 순찰·공격·대기·복귀는 미관찰 |
+| Monster Blackboard·행동 흐름 단순화 | 코드·Graph·컴파일 확인 완료, 수동 회귀 필요 | 모든 Action Context 단일 연결, LostTarget·Both Guard·기본 대기/복귀, 요청 노드 1개·Handler 간격 관리 확인. 대기·복귀 재인식과 거리 밖 공격 시도 등 최신 Play는 미관찰 |
 | 공용 Rule의 Player 회귀 | 조건부 검증 완료 | 테스트 객체에만 누락된 DashHandler 보완 후 지상/공중 AttackEnd·Hit 복귀·기존 Hit 우선 사망 순서 확인. 원본 Player prefab의 정상 초기화까지 보장하지 않음 |
 | 기존 Orc 잔여 참조 | 제작 단계 검사 완료 | 삭제 대상 C# 이름·Orc prefab GUID 잔여 참조 없음. 원본 아트·관련 없는 Agent 에셋 보존 |
 | Goblin 시각·밸런스 | 수동 검증 필요 | 발 위치·크기·Clip FPS·공격 프레임·Collider·공격 범위·체력·피해 조정 필요 |

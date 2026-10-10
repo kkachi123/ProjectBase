@@ -11,14 +11,11 @@ namespace ProjectRE
         [Min(0f), SerializeField] private float _patrolWaitMin = 1f;
         [Min(0f), SerializeField] private float _patrolWaitMax = 2f;
 
-        public float PatrolRadius => _patrolRadius;
-        public float PatrolWaitMin => _patrolWaitMin;
-        public float PatrolWaitMax => _patrolWaitMax;
+        public float Radius => _patrolRadius;
 
-        /// <summary>순찰 반경·정지 시간 설정을 Blackboard에 전달.</summary>
+        /// <summary>기본 WaitRange에 필요한 정지 시간만 Blackboard에 전달.</summary>
         public void Initialize(MonsterBehaviorBlackboard blackboard)
         {
-            blackboard.PatrolRadius = _patrolRadius;
             blackboard.PatrolWaitMin = _patrolWaitMin;
             blackboard.PatrolWaitMax = _patrolWaitMax;
         }

@@ -20,8 +20,7 @@ namespace ProjectRE
 
         // 현재 선택 대상
         public Transform Root { get; private set; }
-        public Collider2D BodyCollider { get; private set; }
-        public bool HasValidTarget { get; private set; }
+        public float DeltaX => Root.position.x - _bodyCollider.transform.position.x;
 
         /// <summary>감지 Component·자기 몸통·개체별 Blackboard 주입.</summary>
         public void Initialize(PlayerDetector detector, Collider2D bodyCollider, MonsterBehaviorBlackboard blackboard)
@@ -58,9 +57,8 @@ namespace ProjectRE
                 && _cachedCollider.enabled && _cachedCollider.gameObject.activeInHierarchy
                 && _detector.IsWithinRange(_cachedCollider, out Vector2 origin)
                 && _detector.HasLineOfSight(origin, _cachedCollider);
-            SetTarget(isDetected);
-            HasValidTarget = isDetected && IsWithinHeightRange();
-            _blackboard.HasValidTarget = HasValidTarget;
+            Root = isDetected ? _health.transform : null;
+            _blackboard.HasValidTarget = isDetected && IsWithinHeightRange();
         }
 
         /// <summary>자기·대상 몸통 바닥의 허용 높이 차이 확인.</summary>
@@ -70,21 +68,10 @@ namespace ProjectRE
                 <= _maxTargetHeightDifference;
         }
 
-        /// <summary>선택 대상 변경 시 참조와 Blackboard만 갱신. Player 캐시 유지.</summary>
-        private void SetTarget(bool isDetected)
-        {
-            Root = isDetected ? _health.transform : null;
-            BodyCollider = isDetected ? _cachedCollider : null;
-            GameObject target = isDetected ? _health.gameObject : null;
-            if (_blackboard.Target != target)
-                _blackboard.Target = target;
-        }
-
         /// <summary>초기화 후 선택 대상·추적 판정·Player 캐시 전체 해제.</summary>
         public void Clear()
         {
-            SetTarget(false);
-            HasValidTarget = false;
+            Root = null;
             _blackboard.HasValidTarget = false;
             _cachedCollider = null;
             _health = null;

@@ -7,47 +7,39 @@ using Action = Unity.Behavior.Action;
 
 /// <summary>기존 이동 입력으로 방향 정렬 후 단발 공격 요청.</summary>
 [Serializable, GeneratePropertyBag]
-[NodeDescription(name: "Monster Request Attack", story: "[Input] attack target of [Context] every [Interval]",
+[NodeDescription(name: "Monster Request Attack", story: "[Context] 공격 요청",
     category: "Action/Monster", id: "b310aa1e5f0e4f5bb5abb1110cab0207")]
 public partial class MonsterRequestAttackAction : Action
 {
     private const float FacingDeadZone = 0.01f;
 
     [SerializeReference] public BlackboardVariable<MonsterBehaviorContext> Context;
-    [SerializeReference] public BlackboardVariable<MonsterInput> Input;
-    [SerializeReference] public BlackboardVariable<float> Interval = new(1f);
-    [SerializeReference] public BlackboardVariable<float> NextRequestTime;
 
     /// <summary>방향 정렬과 요청 가능 시각 확인 시작.</summary>
     protected override Status OnStart() => Status.Running;
 
-    /// <summary>대상·거리·방향·요청 간격 확인 후 공격 입력 발행.</summary>
+    /// <summary>방향 정렬·요청 간격 확인 후 공격 입력 발행. 거리 재검사 제외.</summary>
     protected override Status OnUpdate()
     {
         var context = Context.Value;
-        if (!context.HasValidTarget || context.ChaseReturn.NeedsReturn)
-            return Status.Failure;
-
-        float deltaX = context.Target.Root.position.x - context.transform.position.x;
-        if (!context.Attack.IsInAttackRange(deltaX))
-            return Status.Failure;
+        float deltaX = context.Target.DeltaX;
 
         if (Mathf.Abs(deltaX) > FacingDeadZone
             && Mathf.Sign(deltaX) != Mathf.Sign(context.transform.localScale.x))
         {
-            Input.Value.SetMovement(new Vector2(Mathf.Sign(deltaX), 0f));
+            context.Input.SetMovement(new Vector2(Mathf.Sign(deltaX), 0f));
             return Status.Running;
         }
 
-        Input.Value.SetMovement(Vector2.zero);
-        if (Time.time < NextRequestTime.Value)
+        context.Input.SetMovement(Vector2.zero);
+        if (!context.Attack.CanRequestAttack())
             return Status.Running;
 
-        NextRequestTime.Value = Time.time + Interval.Value;
-        Input.Value.RequestAttack();
+        context.Attack.RecordAttackRequest();
+        context.Input.RequestAttack();
         return Status.Success;
     }
 
     /// <summary>공격 요청·대상 상실·우선순위 중단 시 방향 입력 초기화.</summary>
-    protected override void OnEnd() => Input.Value.SetMovement(Vector2.zero);
+    protected override void OnEnd() => Context.Value.Input.SetMovement(Vector2.zero);
 }

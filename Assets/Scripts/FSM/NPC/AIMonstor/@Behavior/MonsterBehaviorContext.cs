@@ -38,13 +38,11 @@ namespace ProjectRE
         private IDisposable _deathSubscription;
 
         // 외부 공개 접근자
+        public MonsterInput Input => _input;
         public MonsterAttackBehaviorHandler Attack => _attack;
         public MonsterChaseReturnBehaviorHandler ChaseReturn => _chaseReturn;
         public MonsterPatrolBehaviorHandler Patrol => _patrol;
         public MonsterTargetBehaviorHandler Target => _targetHandler;
-        public bool IsDead => _health.IsDead.Value;
-        // 대상 유효성 판정. 생존·활성·현재 시야·허용 높이 모두 만족 시 true.
-        public bool HasValidTarget => _targetHandler.HasValidTarget;
 
         /// <summary>자기 Component 참조 캐시.</summary>
         private void Awake()
@@ -63,8 +61,6 @@ namespace ProjectRE
             blackboard.Bind(_agent);
             _blackboard = blackboard;
             _blackboard.Context = this;
-            _blackboard.Input = _input;
-            _attack.Initialize(_blackboard);
             _chaseReturn.Initialize(transform.position.x, _blackboard);
             _patrol.Initialize(_blackboard);
             _targetHandler.Initialize(_detector, _bodyCollider, _blackboard);
@@ -104,11 +100,11 @@ namespace ProjectRE
         /// <summary>대상 판정 갱신 후 추적·복귀 상태 전달.</summary>
         private void RefreshState()
         {
-            if (IsDead)
+            if (_blackboard.IsDead)
                 _targetHandler.Clear();
             else
                 _targetHandler.UpdateTarget();
-            _chaseReturn.UpdateState(HasValidTarget);
+            _chaseReturn.UpdateState();
         }
 
         /// <summary>자기 사망 변경을 Blackboard에 구독 전달.</summary>
