@@ -5,10 +5,10 @@ using System;
 public class GroundedFallTransition : ITransitionRule
 {
     private GroundDetector _groundDetector;
-    private AgentMotor2D _motor;
+    private GroundedMotor2D _motor;
     public Type NextStateType => typeof(FallState);
 
-    public GroundedFallTransition(GroundDetector groundDetector, AgentMotor2D motor)
+    public GroundedFallTransition(GroundDetector groundDetector, GroundedMotor2D motor)
     {
         _groundDetector = groundDetector;
         _motor = motor;

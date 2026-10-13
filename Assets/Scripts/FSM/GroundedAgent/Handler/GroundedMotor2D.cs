@@ -3,7 +3,7 @@
     using UnityEngine;
 
     [RequireComponent(typeof(Rigidbody2D))]
-    public class AgentMotor2D : MonoBehaviour
+    public class GroundedMotor2D : MonoBehaviour, IAgentMotor2D
     {
         Rigidbody2D _rb;
         public float VerticalVelocity => _rb.linearVelocity.y;
@@ -17,6 +17,9 @@
         {
             _rb.linearVelocity = new Vector2(0f, _rb.linearVelocity.y);
         }
+
+        // 전체 이동 속도 정지.
+        public void Stop() => _rb.linearVelocity = Vector2.zero;
 
         public void Move(Vector2 horizontalInput, float moveSpeed)
         {

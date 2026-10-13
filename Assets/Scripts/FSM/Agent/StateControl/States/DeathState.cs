@@ -1,13 +1,12 @@
 ﻿namespace ProjectRE
 {
-using UnityEngine;
 public class DeathState : AgentStateBase
 {
     private IDeathAnimation _animator;
     private AgentCombatHandler _combatHandler;
-    private AgentMovementHandler2D _movementHandler;
+    private IAgentMovementStop _movementHandler;
 
-    public DeathState(IDeathAnimation animator, AgentCombatHandler combatHandler, AgentMovementHandler2D movementHandler)
+    public DeathState(IDeathAnimation animator, AgentCombatHandler combatHandler, IAgentMovementStop movementHandler)
     {
         _animator = animator;
         _combatHandler = combatHandler;
@@ -18,7 +17,7 @@ public class DeathState : AgentStateBase
     {
         _animator.SetDeath(true);
         _combatHandler.ResetAttackType();
-        _movementHandler.HandleMove(Vector2.zero);
+        _movementHandler.Stop();
     }
 
     protected override void OnExecute(float deltaTime)

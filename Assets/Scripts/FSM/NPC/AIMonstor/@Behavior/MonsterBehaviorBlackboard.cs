@@ -1,6 +1,5 @@
 namespace ProjectRE
 {
-    using System;
     using Unity.Behavior;
 
     /// <summary>변수 이름과 타입별 실행 Blackboard 참조 관리.</summary>
@@ -42,12 +41,10 @@ namespace ProjectRE
             _patrolWaitMax = GetVariable<float>(agent, PatrolWaitMaxName);
         }
 
-        /// <summary>Bind 시점의 변수 누락·타입 불일치 확인.</summary>
+        /// <summary>실행 Blackboard의 타입 지정 변수 참조 확보.</summary>
         private static BlackboardVariable<T> GetVariable<T>(BehaviorGraphAgent agent, string variableName)
         {
-            if (!agent.GetVariable<T>(variableName, out var variable) || variable == null)
-                throw new InvalidOperationException($"{agent.name}: Blackboard '{variableName}' ({typeof(T).Name}) missing or type mismatch.");
-
+            agent.GetVariable<T>(variableName, out var variable);
             return variable;
         }
     }

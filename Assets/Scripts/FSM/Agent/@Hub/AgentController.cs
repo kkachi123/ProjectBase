@@ -4,7 +4,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-[RequireComponent(typeof(AgentMotor2D), typeof(Health), typeof(AgentCombatHandler))]
+[RequireComponent(typeof(Health), typeof(AgentCombatHandler))]
 
 /// <summary>
 /// Agent 공통 컴포넌트 초기화 및 Type 기반 FSM 상태 전환 관리.
@@ -14,21 +14,18 @@ public abstract class AgentController : MonoBehaviour, IAgentAnimationListener ,
     [Header("Data Assets")]
     [SerializeField] protected AgentStatData _statData;
     public AgentStatData StatData => _statData;
-    [SerializeField] protected AgentMotorData _motorData;
 
     [Header("Input Components")]
     protected IAgentMovementInput _moveInput;
     public IAgentCombatInput CombatInput { get; private set; }
 
     [Header("Core Components")]
-    protected AgentMotor2D _motor;
     [SerializeField] protected AgentAnimationEventProxy _animationEventProxy;
     public Health Health { get; private set; }
     public event Action OnAnimationEnded;
 
     [Header("Handlers")]
     [SerializeField] protected AgentCombatHandler _combatHandler;
-    protected AgentMovementHandler2D _movementHandler;
 
     [Header("State Machine")]
     protected Dictionary<Type, AgentStateBase> _states = new();
@@ -37,7 +34,6 @@ public abstract class AgentController : MonoBehaviour, IAgentAnimationListener ,
     protected virtual void Awake()
     {
         // Core Component Initialization
-        _motor = GetComponent<AgentMotor2D>();
         _moveInput = GetComponent<IAgentMovementInput>();
         CombatInput = GetComponent<IAgentCombatInput>();
 
@@ -48,8 +44,6 @@ public abstract class AgentController : MonoBehaviour, IAgentAnimationListener ,
         _animationEventProxy?.Initialize(this);
         _combatHandler = GetComponent<AgentCombatHandler>();
         _combatHandler?.Initialize(_statData.attackDatas);
-
-        _movementHandler =  new AgentMovementHandler2D(_motor, _motorData);
     }
 
     protected virtual void Start()
@@ -58,7 +52,6 @@ public abstract class AgentController : MonoBehaviour, IAgentAnimationListener ,
         {
             state.OnTransition += ChangeState;
         }
-        ChangeState(typeof(GroundedState));
     }
     protected virtual void Update()
     {

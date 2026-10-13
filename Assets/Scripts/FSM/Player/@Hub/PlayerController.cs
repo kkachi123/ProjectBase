@@ -11,6 +11,8 @@
 
         [SerializeField] private PlayerAnimator _playerAnimator;
         [SerializeField] private AgentImpactHandler _impactHandler;
+        [SerializeField] private PlayerMotorData _motorData;
+        protected override GroundedMotorData MovementData => _motorData;
 
         public Stamina Stamina { get; private set; }
 
@@ -31,16 +33,15 @@
             _playerInput = GetComponent<PlayerInput>();
             _dashHandler = GetComponent<AgentDashHandler2D>();
             _wallDetector = GetComponent<WallDetector>();
-            if (_motorData is PlayerMotorData playerMotorData)
-                _dashHandler.Initialize(playerMotorData, _groundDetector, _wallDetector);
+            _dashHandler.Initialize(_motorData, _groundDetector, _wallDetector);
             _impactHandler = GetComponent<AgentImpactHandler>();
-            _impactHandler.Initialize(_motor, _motorData);
+            _impactHandler.Initialize(_groundedMotor, _motorData.knockbackForce);
 
             _states = new PlayerStateFactory().CreateStates(
                 new PlayerStateFactoryData
                 {
                     PlayerAnimator = _playerAnimator,
-                    Motor = _motor,
+                    Motor = _groundedMotor,
                     MovementHandler = _movementHandler,
                     MovementInput = _moveInput,
                     CombatHandler = _combatHandler,
@@ -56,6 +57,12 @@
                     AttackStarter = this,
                 }
             );
+        }
+
+        protected override void Start()
+        {
+            base.Start();
+            ChangeState(typeof(GroundedState));
         }
 
         #region State Animation Event

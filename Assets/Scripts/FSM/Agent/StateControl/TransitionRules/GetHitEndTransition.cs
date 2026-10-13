@@ -7,15 +7,19 @@ public interface IAnimationEventSource
 }
 public class GetHitEndTransition : IEventTransitionRule
 {
-    public Type NextStateType => typeof(GroundedState);
+    public Type NextStateType { get; }
 
     private readonly IAnimationEventSource _eventSource;
     private bool _isSubscribed;
     private bool _shouldTransition;
 
     public GetHitEndTransition(IAnimationEventSource eventSource)
+        : this(eventSource, typeof(GroundedState)) { }
+
+    public GetHitEndTransition(IAnimationEventSource eventSource, Type returnStateType)
     {
         _eventSource = eventSource;
+        NextStateType = returnStateType;
     }
 
     public void Subscribe()

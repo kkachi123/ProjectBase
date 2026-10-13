@@ -4,10 +4,10 @@ public class FallState : AgentStateBase
 {
     private readonly IGroundedAnimation _groundedAnimation;
     private readonly IAirborneAnimation _airborneAnimation;
-    private AgentMovementHandler2D _movementHandler;
+    private GroundedMovementHandler2D _movementHandler;
     private IAgentMovementInput _moveInput;
 
-    public FallState(IGroundedAnimation groundedAnimation, IAirborneAnimation airborneAnimation, AgentMovementHandler2D movementHandler, IAgentMovementInput moveInput)
+    public FallState(IGroundedAnimation groundedAnimation, IAirborneAnimation airborneAnimation, GroundedMovementHandler2D movementHandler, IAgentMovementInput moveInput)
     {
         _groundedAnimation = groundedAnimation;
         _airborneAnimation = airborneAnimation;

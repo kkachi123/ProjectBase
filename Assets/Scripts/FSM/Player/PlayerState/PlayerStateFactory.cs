@@ -4,7 +4,7 @@
     using System.Collections.Generic;
 
     /// <summary>Player 전용 State 구성에 필요한 공통·전용 의존성 전달.</summary>
-    public class PlayerStateFactoryData : StateFactoryData
+    public class PlayerStateFactoryData : GroundedStateFactoryData
     {
         /// <summary>공통 Animator 참조의 PlayerAnimator 타입 접근·주입.</summary>
         public PlayerAnimator PlayerAnimator
@@ -58,7 +58,7 @@
             states[typeof(DashState)].AddTransition(new DashEndTransition(data.DashHandler, data.GroundDetector));
 
             states[typeof(HitState)].AddTransition(new DeathTransition(data.Health.IsDead));
-            states[typeof(HitState)].AddTransition(new GetHitEndTransition(data.AnimationEventSource));
+            states[typeof(HitState)].AddTransition(new GetHitEndTransition(data.AnimationEventSource, typeof(GroundedState)));
         }
     }
 }

@@ -1,6 +1,5 @@
 namespace ProjectRE
 {
-    using System;
     using System.Collections.Generic;
     using UnityEngine;
 
@@ -17,17 +16,7 @@ namespace ProjectRE
 
         public override void Initialize()
         {
-            if (_animationData is not MonsterAnimationDataSO data)
-                throw new InvalidOperationException($"{name}: MonsterAnimationDataSO is required.");
-            if (_anim == null || _anim.runtimeAnimatorController == null)
-                throw new InvalidOperationException($"{name}: Visual Animator and Controller are required.");
-
-            ValidateParameter(data.IsHitBool, AnimatorControllerParameterType.Bool);
-            ValidateParameter(data.IsDeathBool, AnimatorControllerParameterType.Bool);
-            ValidateParameter(data.IsGroundedBool, AnimatorControllerParameterType.Bool);
-            ValidateParameter(data.IsAttackBool, AnimatorControllerParameterType.Bool);
-            ValidateParameter(data.MoveSpeedFloat, AnimatorControllerParameterType.Float);
-            ValidateParameter(data.AttackTypeInt, AnimatorControllerParameterType.Int);
+            var data = (MonsterAnimationDataSO)_animationData;
 
             base.Initialize();
             _boolParameters.Clear();
@@ -37,17 +26,6 @@ namespace ProjectRE
             Register(_boolParameters, MonsterAnimationBoolType.Attack, data.IsAttackBool);
             Register(_floatParameters, MonsterAnimationFloatType.MoveSpeed, data.MoveSpeedFloat);
             Register(_intParameters, MonsterAnimationIntType.AttackType, data.AttackTypeInt);
-        }
-
-        private void ValidateParameter(string parameterName, AnimatorControllerParameterType type)
-        {
-            foreach (AnimatorControllerParameter parameter in _anim.parameters)
-            {
-                if (parameter.name == parameterName && parameter.type == type)
-                    return;
-            }
-
-            throw new InvalidOperationException($"{name}: Animator parameter '{parameterName}' ({type}) is missing.");
         }
 
         public void SetGrounded(bool value) => SetBool(_boolParameters, MonsterAnimationBoolType.Grounded, value);

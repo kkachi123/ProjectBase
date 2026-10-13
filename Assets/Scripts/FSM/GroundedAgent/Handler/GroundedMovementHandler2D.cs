@@ -2,14 +2,14 @@
 {
 using UnityEngine;
 /// <summary>
-/// AgentMotor2D와 이동 데이터 기반 지상·공중 이동, 점프, 넉백 실행.
+/// 지상 이동·공중 수평 제어·점프·넉백 실행.
 /// </summary>
-public class AgentMovementHandler2D 
+public class GroundedMovementHandler2D : IAgentMovementStop
 {
-    private AgentMotor2D _motor;
-    private AgentMotorData _data;
+    private GroundedMotor2D _motor;
+    private GroundedMotorData _data;
 
-    public AgentMovementHandler2D(AgentMotor2D motor, AgentMotorData data)
+    public GroundedMovementHandler2D(GroundedMotor2D motor, GroundedMotorData data)
     {
         _motor = motor;
         _data = data;
@@ -38,5 +38,8 @@ public class AgentMovementHandler2D
         Vector2 finalForce = (direction + Vector2.up * 0.5f).normalized;
         _motor.Knockback(finalForce, _data.knockbackForce);
     }
+
+    // 수직 속도·중력 유지 후 수평 이동만 정지.
+    public void Stop() => _motor.StopHorizontal();
 }
 }

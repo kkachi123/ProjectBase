@@ -5,12 +5,12 @@ namespace ProjectRE
     public class GroundedState : AgentStateBase
     {
         private readonly IGroundedAnimation _animator;
-        private readonly AgentMovementHandler2D _movementHandler;
+        private readonly GroundedMovementHandler2D _movementHandler;
         private readonly IAgentMovementInput _movementInput;
 
         public GroundedState(
             IGroundedAnimation animator,
-            AgentMovementHandler2D movementHandler,
+            GroundedMovementHandler2D movementHandler,
             IAgentMovementInput movementInput)
         {
             _animator = animator;

@@ -24,16 +24,8 @@ public class MonsterStateFactory : AgentStateFactory<MonsterStateFactoryData>
         states[typeof(AttackState)].AddTransition(new AttackEndTransition(data.AnimationEventSource, typeof(GroundedState)));
 
         states[typeof(HitState)].AddTransition(new DeathTransition(data.Health.IsDead));
-        states[typeof(HitState)].AddTransition(new GetHitEndTransition(data.AnimationEventSource));
+        states[typeof(HitState)].AddTransition(new GetHitEndTransition(data.AnimationEventSource, typeof(GroundedState)));
 
-        foreach (AgentStateBase state in states.Values)
-        {
-            foreach (ITransitionRule rule in state._transitionRules)
-            {
-                if (!states.ContainsKey(rule.NextStateType))
-                    throw new InvalidOperationException($"Monster transition destination is not registered: {rule.NextStateType.Name}");
-            }
-        }
     }
 }
 }

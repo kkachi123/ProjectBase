@@ -9,9 +9,9 @@ public class LandTransition : ITransitionRule
 {
     public Type NextStateType => typeof(GroundedState);
     private GroundDetector _groundDetector;
-    private AgentMotor2D _motor;
+    private GroundedMotor2D _motor;
 
-    public LandTransition(GroundDetector groundDetector, AgentMotor2D motor)
+    public LandTransition(GroundDetector groundDetector, GroundedMotor2D motor)
     {
         _groundDetector = groundDetector;
         _motor = motor;

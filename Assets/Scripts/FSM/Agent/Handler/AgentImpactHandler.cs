@@ -8,19 +8,19 @@ public interface IKnockbackListener
 
 public class AgentImpactHandler : MonoBehaviour, IKnockbackListener
 {
-    private AgentMotor2D _motor;
-    private AgentMotorData _data;
+    private IAgentMotor2D _motor;
+    private float _knockbackForce;
 
-    public void Initialize(AgentMotor2D motor, AgentMotorData data)
+    public void Initialize(IAgentMotor2D motor, float knockbackForce)
     {
         _motor = motor;
-        _data = data;
+        _knockbackForce = knockbackForce;
     }
 
     public void HandleKnockback(Vector2 direction)
     {
          Vector2 finalForce = (direction + Vector2.up * 0.5f).normalized;
-        _motor.Knockback(finalForce, _data.knockbackForce);
+        _motor.Knockback(finalForce, _knockbackForce);
     }
 }
 }

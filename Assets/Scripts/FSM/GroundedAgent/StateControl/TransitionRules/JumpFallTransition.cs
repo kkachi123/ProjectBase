@@ -6,9 +6,9 @@ public class JumpFallTransition : ITransitionRule
 {
     public Type NextStateType => typeof(FallState);
 
-    private readonly AgentMotor2D _motor;
+    private readonly GroundedMotor2D _motor;
 
-    public JumpFallTransition(AgentMotor2D motor)
+    public JumpFallTransition(GroundedMotor2D motor)
     {
         _motor = motor;
     }

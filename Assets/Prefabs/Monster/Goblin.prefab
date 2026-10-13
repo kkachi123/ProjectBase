@@ -116,6 +116,14 @@ PrefabInstance:
       propertyPath: m_ConstrainProportionsScale
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 8653674729123717503, guid: 2897a090a2c82d040be9a58cdee0a5d0, type: 3}
+      propertyPath: rayBoxSize.x
+      value: 1.1680001
+      objectReference: {fileID: 0}
+    - target: {fileID: 8653674729123717503, guid: 2897a090a2c82d040be9a58cdee0a5d0, type: 3}
+      propertyPath: playerFootPos.y
+      value: -0.000000048428774
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -198,7 +206,6 @@ MonoBehaviour:
     _attackRequestInterval: 1
     _rearApproachTimeout: 1.5
   _chaseReturn:
-    _maxChaseDistance: 8
     _returnArrivalDistance: 0.15
     _lostTargetWait: 1.5
   _patrol:

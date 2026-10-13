@@ -1,14 +1,13 @@
-﻿namespace ProjectRE
+namespace ProjectRE
 {
     using System;
     using System.Collections.Generic;
 
     /// <summary>State 생성·전이 연결에 필요한 Agent 공통 의존성 전달.</summary>
-    public class StateFactoryData
+    public abstract class StateFactoryData
     {
         public AgentAnimator Animator { get; set; }
-        public AgentMotor2D Motor { get; set; }
-        public AgentMovementHandler2D MovementHandler { get; set; }
+        public abstract IAgentMovementStop MovementStop { get; }
         public IAgentMovementInput MovementInput { get; set; }
         public AgentCombatHandler CombatHandler { get; set; }
         public IAgentCombatInput CombatInput { get; set; }
@@ -36,7 +35,7 @@
         protected virtual void AddCommonStates(TData data, Dictionary<Type, AgentStateBase> states)
         {
             states.Add(typeof(HitState), new HitState(data.Animator, data.CombatHandler));
-            states.Add(typeof(DeathState), new DeathState(data.Animator, data.CombatHandler, data.MovementHandler));
+            states.Add(typeof(DeathState), new DeathState(data.Animator, data.CombatHandler, data.MovementStop));
         }
 
         /// <summary>Agent별 State 추가 또는 공통 State의 전용 구현 교체.</summary>

@@ -3,7 +3,7 @@ namespace ProjectRE
     using System.Collections.Generic;
     public class PlayerAttackState : AttackState
     {
-        private readonly AgentMotor2D _motor;
+        private readonly GroundedMotor2D _motor;
         private readonly Stamina _stamina;
         private readonly List<AttackData> _attackDatas;
         private readonly IComboAnimation _comboAnimator;
@@ -12,7 +12,7 @@ namespace ProjectRE
         public PlayerAttackState(
             IComboAnimation comboAnimator,
             AgentCombatHandler combatHandler,
-            AgentMotor2D motor,
+            GroundedMotor2D motor,
             Stamina stamina,
             AgentStatData statData,
             IAgentCombatInput combatInput
