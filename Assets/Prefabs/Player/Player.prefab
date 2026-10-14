@@ -66,11 +66,13 @@ MonoBehaviour:
   _attackHandler:
     _attackDefinitions:
     - Role: 0
+      AnimatorAttackType: 1
       Attacks:
       - {fileID: 11400000, guid: 637513756fb62cf48955b8def7da99ff, type: 2}
       - {fileID: 11400000, guid: a763c765c2ab56949b36a1918960fb2a, type: 2}
       - {fileID: 11400000, guid: d5e990951bacabd49a27dc1215310337, type: 2}
     - Role: 1
+      AnimatorAttackType: 3
       Attacks:
       - {fileID: 11400000, guid: 79d4db4acdba330489744de85ae94dc0, type: 2}
 --- !u!114 &6786316900135613947
