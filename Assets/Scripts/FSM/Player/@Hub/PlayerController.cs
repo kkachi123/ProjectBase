@@ -4,7 +4,7 @@
     [RequireComponent(typeof(AgentImpactHandler))]
     [RequireComponent(typeof(PlayerAnimator))]
     /// <summary>
-    /// Player 전용 컴포넌트·FSM 초기화 및 공격 시작 조건 판정.
+    /// Player 전용 컴포넌트·공격 Handler·FSM 초기화.
     /// </summary>
     public class PlayerController : GroundedAgentController
     {
@@ -12,6 +12,8 @@
         [SerializeField] private PlayerAnimator _playerAnimator;
         [SerializeField] private AgentImpactHandler _impactHandler;
         [SerializeField] private PlayerMotorData _motorData;
+        [SerializeField] private PlayerAttackHandler _attackHandler = new();
+        public PlayerAttackHandler AttackHandler => _attackHandler;
         protected override GroundedMotorData MovementData => _motorData;
 
         public Stamina Stamina { get; private set; }
@@ -36,6 +38,7 @@
             _dashHandler.Initialize(_motorData, _groundDetector, _wallDetector);
             _impactHandler = GetComponent<AgentImpactHandler>();
             _impactHandler.Initialize(_groundedMotor, _motorData.knockbackForce);
+            _attackHandler.Initialize(_groundDetector, Stamina, _groundedMotor, CombatInput, _playerAnimator, _combatHandler);
 
             _states = new PlayerStateFactory().CreateStates(
                 new PlayerStateFactoryData
@@ -44,17 +47,15 @@
                     Motor = _groundedMotor,
                     MovementHandler = _movementHandler,
                     MovementInput = _moveInput,
-                    CombatHandler = _combatHandler,
                     CombatInput = CombatInput,
                     Health = this.Health,
                     GroundDetector = _groundDetector,
                     JumpInput = _playerInput,
                     DashInput = _playerInput,
                     DashHandler = _dashHandler,
-                    Stamina = Stamina,
-                    StatData = _statData,
+                    AttackHandler = _attackHandler,
                     AnimationEventSource = this,
-                    AttackStarter = this,
+                    AttackStarter = _attackHandler,
                 }
             );
         }
@@ -72,31 +73,5 @@
         }
         #endregion
 
-        #region State Input Event
-        /// <summary>지상 여부에 따른 공격 타입 적용 및 공격 시작 가능 여부 반환.</summary>
-        public override bool TryStartAttack()
-        {
-            int attackType = IsGrounded ? 1 : 3;
-            if (CheckCanPlayerAttack(attackType))
-            {
-                _combatHandler.ApplyAttackType(attackType);
-                return true;
-            }
-            return false;
-        }
-
-        private bool CheckCanPlayerAttack(int attackType)
-        {
-            // 설정 범위를 벗어난 공격 타입 차단.
-            if (!_combatHandler.CanApplyAttackType(attackType))
-                return false;
-
-            // Stamina 부족 시 공격 시작 차단.
-            if (!Stamina.CanUse(_statData.attackDatas[attackType - 1].usedStamina))
-                return false;
-            return true;
-        }
-
-        #endregion
     }
 }

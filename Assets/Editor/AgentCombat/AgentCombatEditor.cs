@@ -5,10 +5,14 @@ using ProjectRE;
 
 public class AgentCombatEditor : EditorWindow
 {
-    private AgentCombatHandler _targetHandler;
+    private AgentMeleeHitHandler2D _targetHandler;
     private Animator _animator;
     private AgentStatData _statData;
+    private PlayerController _playerController;
+    private readonly List<PlayerAttackDataSO> _attackAssets = new();
+    private readonly List<string> _attackLabels = new();
     private int _selectedIndex = 0;
+    private int AttackCount => _playerController != null ? _attackAssets.Count : _statData != null ? _statData.attackDatas.Count : 0;
 
     private AnimationClip _currentClip;
     private float _animationTime;
@@ -23,12 +27,11 @@ public class AgentCombatEditor : EditorWindow
         GetWindow<AgentCombatEditor>("Agent Combat Editor");
     }
 
-    public static void OpenWithTarget(AgentCombatHandler handler)
+    public static void OpenWithTarget(AgentMeleeHitHandler2D handler)
     {
         AgentCombatEditor window = GetWindow<AgentCombatEditor>("Agent Combat Editor");
         window._targetHandler = handler;
-        window._animator = handler.GetComponentInChildren<Animator>();
-        window.AutoFindStatData();
+        window.RefreshTarget();
         window.Show();
     }
 
@@ -49,34 +52,42 @@ public class AgentCombatEditor : EditorWindow
         EditorGUILayout.LabelField("Target Setup", EditorStyles.boldLabel);
 
         EditorGUI.BeginChangeCheck();
-        _targetHandler = (AgentCombatHandler)EditorGUILayout.ObjectField("Target Handler", _targetHandler, typeof(AgentCombatHandler), true);
-        if (EditorGUI.EndChangeCheck() && _targetHandler != null)
-        {
-            _animator = _targetHandler.GetComponentInChildren<Animator>();
-            AutoFindStatData();
-        }
+        _targetHandler = (AgentMeleeHitHandler2D)EditorGUILayout.ObjectField("Target Handler", _targetHandler, typeof(AgentMeleeHitHandler2D), true);
+        if (EditorGUI.EndChangeCheck()) RefreshTarget();
         if (_targetHandler == null)
         {
-            EditorGUILayout.HelpBox("Assign an AgentCombatHandler to edit its attack ranges.", MessageType.Info);
+            EditorGUILayout.HelpBox("Assign an AgentMeleeHitHandler2D to edit its attack ranges.", MessageType.Info);
             return;
         }
 
         EditorGUILayout.Space();
         EditorGUILayout.LabelField("Data Management", EditorStyles.boldLabel);
 
-        EditorGUI.BeginChangeCheck();
-        _statData = (AgentStatData)EditorGUILayout.ObjectField("Stat Data Asset", _statData, typeof(AgentStatData), false);
-        if(EditorGUI.EndChangeCheck() && _statData == null)
+        if (_playerController == null)
         {
-            EditorGUILayout.HelpBox("Assign an AgentStatData asset to edit attack ranges.", MessageType.Warning);
-            return;
+            EditorGUI.BeginChangeCheck();
+            _statData = (AgentStatData)EditorGUILayout.ObjectField("Stat Data Asset", _statData, typeof(AgentStatData), false);
+            if (EditorGUI.EndChangeCheck())
+            {
+                _selectedIndex = 0;
+                LoadFromSO();
+            }
         }
-        if (_statData != null)
+        if (AttackCount > 0)
         {
-            string[] options = new string[_statData.attackDatas.Count];
-            for (int i = 0; i < _statData.attackDatas.Count; i++)
-                options[i] = $"Attack {i + 1}";
+            string[] options = new string[AttackCount];
+            for (int i = 0; i < AttackCount; i++)
+                options[i] = _playerController != null ? _attackLabels[i] : $"Attack {i + 1}";
+            _selectedIndex = Mathf.Clamp(_selectedIndex, 0, AttackCount - 1);
+            EditorGUI.BeginChangeCheck();
             _selectedIndex = EditorGUILayout.Popup("Select Index", _selectedIndex, options);
+            if (EditorGUI.EndChangeCheck()) LoadFromSO();
+
+            if (_playerController != null)
+            {
+                using (new EditorGUI.DisabledScope(true))
+                    EditorGUILayout.ObjectField("Attack Data Asset", _attackAssets[_selectedIndex], typeof(PlayerAttackDataSO), false);
+            }
 
             EditorGUILayout.BeginHorizontal();
             if (GUILayout.Button("Load from SO")) LoadFromSO();
@@ -92,6 +103,8 @@ public class AgentCombatEditor : EditorWindow
 
             _isSceneHandleEnabled = EditorGUILayout.Toggle("Show Scene Handles", _isSceneHandleEnabled);
         }
+        else
+            EditorGUILayout.HelpBox("Assign attack data in the Player Attack Handler or Monster Stat Data.", MessageType.Info);
 
         EditorGUILayout.Space();
         EditorGUILayout.LabelField("Animation Preview", EditorStyles.boldLabel);
@@ -129,31 +142,57 @@ public class AgentCombatEditor : EditorWindow
         if (GUI.changed) SceneView.RepaintAll();
     }
 
-    private void AutoFindStatData()
+    // 대상 변경 시에만 Controller·Animator 및 편집할 SO 목록 확보.
+    private void RefreshTarget()
     {
-        var controller = _targetHandler.GetComponent<AgentController>();
-        if (controller != null)
+        StopAnimationMode();
+        _animator = null;
+        _statData = null;
+        _playerController = null;
+        _attackAssets.Clear();
+        _attackLabels.Clear();
+        _selectedIndex = 0;
+        _tempData = default;
+        if (_targetHandler == null) return;
+
+        _animator = _targetHandler.GetComponentInChildren<Animator>();
+        AgentController controller = _targetHandler.GetComponent<AgentController>();
+        _playerController = controller as PlayerController;
+        if (_playerController != null)
         {
-            _statData = controller.StatData;
-            if (_statData == null) Debug.LogWarning("AgentController does not have a reference to AgentStatData.");
+            foreach (PlayerAttackHandler.AttackDefinition definition in _playerController.AttackHandler.AttackDefinitions)
+            {
+                for (int i = 0; i < definition.Attacks.Length; i++)
+                {
+                    if (definition.Attacks[i] == null) continue;
+                    _attackAssets.Add(definition.Attacks[i]);
+                    _attackLabels.Add($"{definition.Role} / {i + 1}");
+                }
+            }
         }
+        else if (controller != null)
+            _statData = controller.StatData;
+        LoadFromSO();
     }
 
     private void LoadFromSO()
     {
-        if (_statData == null || _selectedIndex >= _statData.attackDatas.Count) return;
-        _tempData = _statData.attackDatas[_selectedIndex];
+        if (_selectedIndex >= AttackCount) return;
+        _tempData = _playerController != null ? _attackAssets[_selectedIndex].Data : _statData.attackDatas[_selectedIndex];
         SceneView.RepaintAll();
     }
 
     private void SaveToSO()
     {
-        if (_statData == null || _selectedIndex >= _statData.attackDatas.Count) return;
-        Undo.RecordObject(_statData, "Save Attack Range");
-        _statData.attackDatas[_selectedIndex] = _tempData;
-        EditorUtility.SetDirty(_statData);
-        AssetDatabase.SaveAssets();
-        Debug.Log($"Saved AttackData index {_selectedIndex} to {_statData.name}");
+        if (_selectedIndex >= AttackCount) return;
+        Object asset = _playerController != null ? _attackAssets[_selectedIndex] : (Object)_statData;
+        Undo.RecordObject(asset, "Save Attack Range");
+        if (_playerController != null)
+            _attackAssets[_selectedIndex].Data = _tempData;
+        else
+            _statData.attackDatas[_selectedIndex] = _tempData;
+        EditorUtility.SetDirty(asset);
+        AssetDatabase.SaveAssetIfDirty(asset);
     }
 
     private void SampleAnimation()
@@ -181,14 +220,15 @@ public class AgentCombatEditor : EditorWindow
 
     private void OnSceneGUI(SceneView sceneView)
     {
-        if (!_isSceneHandleEnabled || _targetHandler == null) return;
+        if (!_isSceneHandleEnabled || _targetHandler == null || AttackCount == 0) return;
 
         float facing = _targetHandler.transform.localScale.x > 0 ? 1f : -1f;
         Vector3 pos = _targetHandler.transform.position;
-        Vector3 areaCenter = pos + new Vector3(_tempData.offset.x * facing, _tempData.offset.y, 0f);
+        _targetHandler.GetHitBox(_tempData, out Vector2 center, out Vector2 size);
+        Vector3 areaCenter = new Vector3(center.x, center.y, pos.z);
 
         Handles.color = Color.yellow;
-        Handles.DrawWireCube(areaCenter, new Vector3(_tempData.size.x, _tempData.size.y, 0.1f));
+        Handles.DrawWireCube(areaCenter, new Vector3(size.x, size.y, 0.1f));
 
         // Center Handle
         EditorGUI.BeginChangeCheck();

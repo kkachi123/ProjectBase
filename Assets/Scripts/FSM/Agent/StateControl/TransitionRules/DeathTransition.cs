@@ -10,7 +10,7 @@ public class DeathTransition : ITransitionRule
 
     public DeathTransition(IReadOnlyReactiveProperty<bool> isDead)
     {
-        IsDead = isDead ?? throw new ArgumentNullException(nameof(isDead));
+        IsDead = isDead;
     }
 
     public bool ShouldTransition(float deltatime)

@@ -9,7 +9,7 @@ namespace ProjectRE
         public AgentAnimator Animator { get; set; }
         public abstract IAgentMovementStop MovementStop { get; }
         public IAgentMovementInput MovementInput { get; set; }
-        public AgentCombatHandler CombatHandler { get; set; }
+        public AgentMeleeHitHandler2D MeleeHitHandler { get; set; }
         public IAgentCombatInput CombatInput { get; set; }
         public IAttackStarter AttackStarter { get; set; }
         public IAnimationEventSource AnimationEventSource { get; set; }
@@ -34,8 +34,8 @@ namespace ProjectRE
         /// <summary>공통 Hit·Death State 등록. 파생 Factory에서 구성 확장 가능.</summary>
         protected virtual void AddCommonStates(TData data, Dictionary<Type, AgentStateBase> states)
         {
-            states.Add(typeof(HitState), new HitState(data.Animator, data.CombatHandler));
-            states.Add(typeof(DeathState), new DeathState(data.Animator, data.CombatHandler, data.MovementStop));
+            states.Add(typeof(HitState), new HitState(data.Animator));
+            states.Add(typeof(DeathState), new DeathState(data.Animator, data.MovementStop));
         }
 
         /// <summary>Agent별 State 추가 또는 공통 State의 전용 구현 교체.</summary>

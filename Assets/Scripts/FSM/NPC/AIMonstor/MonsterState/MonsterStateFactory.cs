@@ -9,8 +9,8 @@ public class MonsterStateFactory : AgentStateFactory<MonsterStateFactoryData>
     protected override void AddAgentStates(MonsterStateFactoryData data, Dictionary<Type, AgentStateBase> states)
     {
         states.Add(typeof(GroundedState), new GroundedState(data.MonsterAnimator, data.MovementHandler, data.MovementInput));
-        states.Add(typeof(AttackState), new MonsterAttackState(data.MonsterAnimator, data.CombatHandler, data.Motor));
-        states[typeof(HitState)] = new MonsterHitState(data.MonsterAnimator, data.CombatHandler, data.Motor);
+        states.Add(typeof(AttackState), new MonsterAttackState(data.MonsterAnimator, data.MeleeHitHandler, data.Motor, data.StatData));
+        states[typeof(HitState)] = new MonsterHitState(data.MonsterAnimator, data.Motor);
     }
 
     protected override void ConfigureTransitions(MonsterStateFactoryData data, Dictionary<Type, AgentStateBase> states)

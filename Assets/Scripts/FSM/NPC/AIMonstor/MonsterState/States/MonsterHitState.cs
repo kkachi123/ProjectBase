@@ -5,8 +5,8 @@ namespace ProjectRE
     {
         private readonly GroundedMotor2D _motor;
 
-        public MonsterHitState(IHitAnimation animator, AgentCombatHandler combatHandler, GroundedMotor2D motor)
-            : base(animator, combatHandler)
+        public MonsterHitState(IHitAnimation animator, GroundedMotor2D motor)
+            : base(animator)
         {
             _motor = motor;
         }

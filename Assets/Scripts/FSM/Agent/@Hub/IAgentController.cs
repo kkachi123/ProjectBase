@@ -2,7 +2,7 @@
 {
     public interface IAgentAnimationListener
     {
-        void OnAnimationEvent(AnimEventType type);
+        void OnAnimationEvent(AnimEventType type, int intParameter = 0);
     }
 
     public interface IAttackStarter

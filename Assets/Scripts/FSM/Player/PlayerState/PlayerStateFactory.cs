@@ -16,8 +16,7 @@
         public IAgentJumpInput JumpInput { get; set; }
         public IAgentDashInput DashInput { get; set; }
         public AgentDashHandler2D DashHandler { get; set; }
-        public Stamina Stamina { get; set; }
-        public AgentStatData StatData { get; set; }
+        public PlayerAttackHandler AttackHandler { get; set; }
     }
 
     /// <summary>공통 Hit·Death 기반 Player 행동 State 및 전이 순서 구성.</summary>
@@ -29,7 +28,7 @@
             states.Add(typeof(JumpState), new JumpState(data.PlayerAnimator, data.PlayerAnimator, data.MovementHandler, data.MovementInput));
             states.Add(typeof(FallState), new FallState(data.PlayerAnimator, data.PlayerAnimator, data.MovementHandler, data.MovementInput));
             states.Add(typeof(DashState), new DashState(data.PlayerAnimator, data.DashHandler));
-            states.Add(typeof(AttackState), new PlayerAttackState(data.PlayerAnimator, data.CombatHandler, data.Motor, data.Stamina, data.StatData, data.CombatInput));
+            states.Add(typeof(AttackState), new PlayerAttackState(data.PlayerAnimator, data.AttackHandler));
         }
 
         protected override void ConfigureTransitions(PlayerStateFactoryData data, Dictionary<Type, AgentStateBase> states)

@@ -1,58 +1,27 @@
 namespace ProjectRE
 {
-    using System.Collections.Generic;
+    /// <summary>Player 공격 모션 및 Handler 실행 수명 연결.</summary>
     public class PlayerAttackState : AttackState
     {
-        private readonly GroundedMotor2D _motor;
-        private readonly Stamina _stamina;
-        private readonly List<AttackData> _attackDatas;
-        private readonly IComboAnimation _comboAnimator;
+        private readonly PlayerAttackHandler _attackHandler;
 
-        private IAgentCombatInput _combatInput;
-        public PlayerAttackState(
-            IComboAnimation comboAnimator,
-            AgentCombatHandler combatHandler,
-            GroundedMotor2D motor,
-            Stamina stamina,
-            AgentStatData statData,
-            IAgentCombatInput combatInput
-            )
-            : base(comboAnimator, combatHandler)
+        public PlayerAttackState(ICombatAnimation animator, PlayerAttackHandler attackHandler)
+            : base(animator)
         {
-            _motor = motor;
-            _stamina = stamina;
-            _attackDatas = statData.attackDatas;
-            _comboAnimator = comboAnimator;
-            _combatInput = combatInput;
+            _attackHandler = attackHandler;
         }
 
         protected override void OnEnter()
         {
-            _combatInput.OnAttackRequested += HandleComboInput;
+            _attackHandler.BeginAttack();
             base.OnEnter();
-
-            if (CombatHandler.CurrentAttackType != 3)
-                _motor.StopHorizontal();
         }
 
         protected override void OnExit()
         {
-            _combatInput.OnAttackRequested -= HandleComboInput;
-            // 마지막 지상 3타·공중 공격의 미소비 Trigger가 다음 Attack에 남지 않도록 초기화.
-            _comboAnimator.ResetComboTrigger();
+            _attackHandler.EndAttack();
             base.OnExit();
         }
-
-
-        protected override void Attack()
-        {
-            base.Attack();
-            _stamina.Use(_attackDatas[CombatHandler.CurrentAttackType - 1].usedStamina);
-        }
-
-        private void HandleComboInput()
-        {
-            _comboAnimator.SetComboTrigger();
-        }
+        public override void OnAttackFrame(int attackStep) => _attackHandler.OnAttackFrame(attackStep);
     }
 }

@@ -17,7 +17,7 @@ public class AgentAnimationEventProxy : MonoBehaviour
         _controller = controller;
     }
     // Called by Animation Events
-    public virtual void OnAnimationOnFrame() => _controller?.OnAnimationEvent(AnimEventType.OnFrame);
+    public virtual void OnAnimationOnFrame(int intParameter) => _controller?.OnAnimationEvent(AnimEventType.OnFrame, intParameter);
     public virtual void OnAnimationEnd() => _controller?.OnAnimationEvent(AnimEventType.End);
 }
 }

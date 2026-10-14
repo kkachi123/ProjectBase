@@ -19,15 +19,15 @@ public class AttackEndTransition : IEventTransitionRule
 
     public AttackEndTransition(IAnimationEventSource eventSource, GroundDetector groundDetector)
     {
-        _eventSource = eventSource ?? throw new ArgumentNullException(nameof(eventSource));
-        _groundDetector = groundDetector ?? throw new ArgumentNullException(nameof(groundDetector));
+        _eventSource = eventSource;
+        _groundDetector = groundDetector;
     }
 
     /// <summary>지면 감지 없이 등록된 상태로 고정 복귀.</summary>
     public AttackEndTransition(IAnimationEventSource eventSource, Type returnStateType)
     {
-        _eventSource = eventSource ?? throw new ArgumentNullException(nameof(eventSource));
-        _returnStateType = returnStateType ?? throw new ArgumentNullException(nameof(returnStateType));
+        _eventSource = eventSource;
+        _returnStateType = returnStateType;
     }
 
     public bool ShouldTransition(float deltaTime)

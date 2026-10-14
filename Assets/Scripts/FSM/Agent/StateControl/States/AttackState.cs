@@ -3,34 +3,26 @@ namespace ProjectRE
     public abstract class AttackState : AgentStateBase
     {
         protected readonly ICombatAnimation Animator;
-        protected readonly AgentCombatHandler CombatHandler;
 
-        protected AttackState(ICombatAnimation animator, AgentCombatHandler combatHandler)
+        protected AttackState(ICombatAnimation animator)
         {
             Animator = animator;
-            CombatHandler = combatHandler;
         }
 
         protected override void OnEnter()
         {
-            Attack();
+            Animator.SetAttack(true);
         }
 
         protected override void OnExecute(float deltaTime) { }
 
         protected override void OnExit()
         {
-            CombatHandler.ResetAttackType();
             Animator.SetAttack(false);
             Animator.SetAttackType(0);
         }
 
-        protected virtual void Attack()
-        {
-            int attackType = CombatHandler.CurrentAttackType;
-            Animator.SetAttack(true);
-            Animator.SetAttackType(attackType);
-            CombatHandler.ApplyAttackType(attackType);
-        }
+        /// <summary>현재 State의 공격 실행에 타격 Event 전달.</summary>
+        public abstract void OnAttackFrame(int attackStep);
     }
 }

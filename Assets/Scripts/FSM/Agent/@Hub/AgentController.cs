@@ -4,12 +4,12 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-[RequireComponent(typeof(Health), typeof(AgentCombatHandler))]
+[RequireComponent(typeof(Health), typeof(AgentMeleeHitHandler2D))]
 
 /// <summary>
 /// Agent 공통 컴포넌트 초기화 및 Type 기반 FSM 상태 전환 관리.
 /// </summary>
-public abstract class AgentController : MonoBehaviour, IAgentAnimationListener , IAnimationEventSource , IAttackStarter
+public abstract class AgentController : MonoBehaviour, IAgentAnimationListener , IAnimationEventSource
 {
     [Header("Data Assets")]
     [SerializeField] protected AgentStatData _statData;
@@ -25,7 +25,7 @@ public abstract class AgentController : MonoBehaviour, IAgentAnimationListener ,
     public event Action OnAnimationEnded;
 
     [Header("Handlers")]
-    [SerializeField] protected AgentCombatHandler _combatHandler;
+    [SerializeField] protected AgentMeleeHitHandler2D _combatHandler;
 
     [Header("State Machine")]
     protected Dictionary<Type, AgentStateBase> _states = new();
@@ -42,8 +42,7 @@ public abstract class AgentController : MonoBehaviour, IAgentAnimationListener ,
 
         // Handler Initialization
         _animationEventProxy?.Initialize(this);
-        _combatHandler = GetComponent<AgentCombatHandler>();
-        _combatHandler?.Initialize(_statData.attackDatas);
+        _combatHandler = GetComponent<AgentMeleeHitHandler2D>();
     }
 
     protected virtual void Start()
@@ -89,12 +88,12 @@ public abstract class AgentController : MonoBehaviour, IAgentAnimationListener ,
     }
     
     /// <summary>Animation Event를 현재 State 동작 또는 공용 종료 이벤트로 전달.</summary>
-    public virtual void OnAnimationEvent(AnimEventType type)
+    public virtual void OnAnimationEvent(AnimEventType type, int intParameter = 0)
     {
         if (type == AnimEventType.OnFrame)
         {
-            if (_currentState is AttackState)
-                _combatHandler.PerformAttack();
+            if (_currentState is AttackState attackState)
+                attackState.OnAttackFrame(intParameter);
             return;
         }
 
@@ -111,6 +110,5 @@ public abstract class AgentController : MonoBehaviour, IAgentAnimationListener ,
         OnAnimationEnded?.Invoke();
     }
     public virtual void OnDeathFinished() { }
-    public virtual bool TryStartAttack() { return false; }
 }
 }
