@@ -19,8 +19,8 @@
 | 확인 대상 | 파일 |
 | --- | --- |
 | 설정·전략 생성·선택 | `Player/Attack/PlayerAttackHandler.cs` |
-| 실행 계약·기존 전략 | `Player/Attack/IPlayerAttackStrategy.cs`, `PlayerGroundComboAttack.cs`, `PlayerAirAttack.cs` |
-| 공격 SO | `Player/SOData/PlayerAttackDataSO.cs` |
+| 실행 계약·기존 전략 | `Player/SOData/PlayerAttackSO.cs`, `Player/Attack/AttackStrategy/PlayerGroundComboAttackSO.cs`, `PlayerAirAttackSO.cs`(같은 폴더) |
+| 공격 설정 | 위 공격 SO의 `AttackData[]`. 데이터 전용 SO는 사용하지 않음 |
 | 초기화·State 연결 | `Player/@Hub/PlayerController.cs`, `Player/PlayerState/PlayerStateFactory.cs`, `Player/PlayerState/States/PlayerAttackState.cs` |
 | 공용 State·전이 수명 | `Agent/StateControl/AgentStateBase.cs`, `Agent/StateControl/States/AttackState.cs`, `Agent/StateControl/TransitionRules/Attack/AttackTransition.cs`, `AttackEndTransition.cs` |
 | Event·타격·Animator 계약 | `Agent/Handler/AgentAnimationEventProxy.cs`, `AgentMeleeHitHandler2D.cs`, `Agent/@Hub/IAgentAnimator.cs` |
@@ -35,8 +35,8 @@ Animator·Clip은 `Assets/Prefabs/Player/Animations/`의 `Hero_Anim.controller`�
 | 순서 | 작업·완료 결과 |
 | --- | --- |
 | 1. 모션·요구 확인 | 지정 Clip의 공격·회복 구간, 사용할 역할·발동 방식·타격 시점 결정 |
-| 2. 설정·전략 구성 | 단계별 SO와 실행 전략 준비, 역할별 AttackDefinition에 모션 선택값·SO 배열 등록 |
-| 3. 선택 경로 연결 | Initialize의 생성 분기와 TryStartAttack의 선택 정책 연결. 기존 역할 교체·단계 추가라면 불필요한 새 역할 없음 |
+| 2. 설정·전략 구성 | 실행 방식에 맞는 공격 SO를 생성하고 내부 단계별 수치 설정. AttackDefinition에 모션 선택값·SO 등록 |
+| 3. 선택 경로 연결 | 기존 역할은 SO 교체만 수행. 새 발동 조건·역할이 필요할 때만 TryStartAttack의 선택 정책 확장 |
 | 4. Animator 연결 | Attack 내부의 진입점·모션·콤보/종료 분기·공통 출구 연결 |
 | 5. Event·Prefab 연결 | 타격·종료 Event와 실제 Animator·Proxy·Handler·SO 참조 연결 |
 | 6. 검증 | 컴파일·설정 확인 후 사용자 조작으로 진입·타격·종료·중단 확인 |
@@ -48,13 +48,13 @@ Animator·Clip은 `Assets/Prefabs/Player/Animations/`의 `Hero_Anim.controller`�
 | 구성 | 책임 |
 | --- | --- |
 | PlayerController | Component 확보·의존성 주입·Factory 구성 |
-| PlayerAttackHandler | Inspector 역할/모션 선택값/SO 목록, 개체별 전략 생성, 선택·시작 가능 판정, 모션 타입 적용·비용 소비 |
+| PlayerAttackHandler | Inspector 역할/모션 선택값/SO 목록, 개체별 SO 복제·주입·제거, 선택·시작 가능 판정, 모션 타입 적용·비용 소비 |
 | PlayerAttackState | 공통 Attack Bool과 Handler의 진입·타격·종료 연결 |
-| IPlayerAttackStrategy 구현체 | 공격별 실행·타격·입력 구독·Trigger·Preview 정리 |
+| PlayerAttackSO 파생 클래스 | 단계별 수치와 공격별 실행·타격·입력 구독·Trigger·Preview 정리 |
 | AgentMeleeHitHandler2D | 전달받은 AttackData로 수평 사각형 피해·넉백 적용, 공용 범위 계산·Gizmo 표시 |
 | Animator | 모션 선택, 콤보 입력 수락·순서 및 종료 모션 분기 |
 
-전략은 일반 C# 객체로 개체마다 생성한다. `IPlayerAttackStrategy`는 `StartData`, `Begin()`, `OnAttackFrame(int attackStep)`, `End()`만 사용한다.
+전략은 `PlayerAttackSO : ScriptableObject`를 상속한다. 계약은 `Initialize(...)`, `StartData`, `Begin()`, `OnAttackFrame(int attackStep)`, `End()`다. `StartData`는 첫 단계의 AttackData다. 각 장착 원본을 Handler.Initialize에서 한 번 Instantiate하고 참조를 주입한다. SO Unity 생명주기 콜백에서 구독·공격을 시작하지 않는다.
 
 ```text
 PlayerInput.OnAttackRequested
@@ -72,43 +72,45 @@ Clip End → OnAnimationEnded → AttackEndTransition → State.Exit → 전략 
 - 시작 판정에서 전략과 역할별 모션 선택값을 함께 고정한다. Begin에서 지면 상태를 다시 판단하지 않으며 착지하더라도 공격 중 전략·모션값을 바꾸지 않는다. 비용은 시작 SO 기준으로 State 진입당 한 번만 소비한다.
 - AttackState는 공통 Bool 활성화·해제 및 종료 시 모션 타입 0 초기화를 담당한다. PlayerAttackHandler의 Animator 필드는 모션 타입 적용에 사용한다.
 - 전략은 State를 직접 전환하지 않는다. 정상 종료·피격·사망·파괴는 기존 Exit 경로로 정리한다. 비활성화·풀링 재사용 수명은 별도 요구가 있을 때 설계한다.
-- Handler는 타격 Handler를 보관하지 않고 전략 생성 시 전달한다. 입력 구독·ComboTrigger·Gizmo Preview의 정리는 사용하는 전략의 End에서 수행한다.
+- Handler는 타격 Handler를 보관하지 않고 복제본 초기화 시 전달한다. 입력 구독·ComboTrigger·Gizmo Preview의 정리는 사용하는 전략의 End에서 수행한다.
 - `AttackDefinitions` 공개 접근자는 Combat Editor 조회용이다. 직렬화된 `_attackDefinitions`는 런타임 전략 생성에도 사용한다.
+- 원본 SO에는 단계별 수치만 직렬화한다. 실행 참조·구독은 복제본에만 보관하며 원본 변경을 실행 중 자동 동기화하지 않는다.
+- Controller.OnDestroy는 기존 State Exit 후 Handler.Dispose를 호출하여 실행 복제본을 제거한다. 공격마다 복제·제거하거나 재활성화 때 재생성하지 않는다.
 
 ## 4. 기존 역할·데이터 규칙
 
 | 역할 | 설정 | 실행 |
 | --- | --- | --- |
-| GroundCombo | 지상 1·2·3타 SO 배열, AttackDefinition 모션 선택값 1 | 진입 시 수평 정지, 공격 중 입력으로 ComboTrigger 설정, 단계별 SO 타격 |
-| AirAttack | 공중 SO 하나, AttackDefinition 모션 선택값 3 | 이동·중력 유지, 각 타격 Event에서 동일 SO 적용, 콤보 입력 구독 없음 |
+| GroundCombo | PlayerGroundComboAttackSO 하나의 AttackData 3개, 모션 선택값 1 | 진입 시 수평 정지, 공격 중 입력으로 ComboTrigger 설정, 단계별 타격 |
+| AirAttack | PlayerAirAttackSO 하나의 AttackData 1개, 모션 선택값 3 | 이동·중력 유지, 각 타격 Event에서 같은 데이터 적용, 콤보 입력 구독 없음 |
 
-- 역할 목록 순서는 선택에 영향을 주지 않는다. **역할 내부의 지상 SO 순서는 콤보 단계와 대응**하므로 임의로 바꾸지 않는다.
-- PlayerAttackDataSO는 피해·범위·비용을 담은 `AttackData Data`만 보관한다. 모션 선택값은 SO가 아니라 `AttackDefinition.AnimatorAttackType`에 역할별로 설정한다. 런타임 상태·구독·타이머는 SO에 넣지 않는다.
-- 공격 SO는 `Assets/Prefabs/Player/ScriptableObjects/Attacks/`에 배치한다. 기존 지상 3타와 공중 공격은 별도 SO다.
-- Player Stats의 공격 목록은 사용하지 않는다. 새 Player 공격을 기존 `AgentStatData.attackDatas`에 중복 등록하지 않는다. Monster의 기존 StatData 목록은 별도 경로로 유지한다.
+- 역할 목록 순서는 선택에 영향을 주지 않는다. **지상 SO 내부의 AttackData 배열 순서는 콤보 단계와 대응**하므로 임의로 바꾸지 않는다.
+- PlayerAttackSO는 피해·범위·비용 배열과 실행 계약을 보유한다. 모션 선택값은 `AttackDefinition.AnimatorAttackType`에 역할별로 설정한다.
+- 공격 SO는 `Assets/Prefabs/Player/ScriptableObjects/Attacks/`에 배치한다. 현재 PlayerGroundComboAttack.asset과 PlayerAirAttack.asset 두 개다.
+- Player Stats의 공격 목록은 사용하지 않는다. 새 Player 공격을 기존 `AgentStatData.attackDatas`에 중복 등록하지 않는다. 지상 Monster도 전용 MonsterAttackSO를 사용한다.
 - 모션 선택값은 콤보 단계 번호가 아니다. 현재 지상 콤보 중 AttackType은 1을 유지한다.
 
 ## 5. 추가 방식별 작업
 
 ### 기존 공격의 수치·범위 변경
 
-1. 해당 역할의 PlayerAttackDataSO를 수정한다. 공유 에셋인지 확인하여 다른 개체에 대한 영향을 구분한다.
-2. 타격 Handler Inspector의 Combat Editor에서 역할·단계 SO를 선택한다. Undo·Scene Handle·Animation Preview를 유지한다.
+1. 해당 역할의 공격 SO 내부 AttackData를 수정한다. 공유 에셋인지 확인하여 다음 초기화부터 영향을 받는 개체를 구분한다.
+2. 타격 Handler Inspector의 Combat Editor에서 역할·단계를 선택한다. Undo·Scene Handle·Animation Preview를 유지한다. Play 중 저장도 원본만 편집하며 현재 복제본에는 반영하지 않는다.
 3. `GetHitBox()`와 실제 타격이 같은 계산을 사용하는지 확인한다. 수치 변경만으로 Controller·State·Transition을 수정하지 않는다.
 
 ### 지상 콤보 단계 추가
 
-1. 새 단계 SO를 생성하여 GroundCombo의 Attacks 배열에 추가한다.
+1. GroundCombo에 장착한 SO의 Attacks 배열에 새 단계 AttackData를 추가한다. 별도 단계 SO는 생성하지 않는다.
 2. 해당 Clip·콤보 전이·실패 시 End 모션을 Animator에 연결하고, 타격 Event에 새 단계 번호를 넣는다.
-3. 지상 전략은 `1.._attacks.Length`만 처리한다. **0·음수·범위 초과는 무시**하며 인자 0을 첫 공격으로 해석하지 않는다.
+3. 지상 전략은 `1..Attacks.Count`만 처리한다. **0·음수·범위 초과는 무시**하며 인자 0을 첫 공격으로 해석하지 않는다.
 4. 같은 단계에서 여러 타격 Event가 필요하면 모두 같은 단계 번호를 사용한다. 단계별 Stamina 추가 소비는 현재 정책에 포함되지 않는다.
 
 ### 새로운 공격 전략 추가
 
-1. `Player/Attack/`에 필요한 의존성만 받는 `IPlayerAttackStrategy` 구현체를 추가한다. 새 Component·Factory·Resolver·Wrapper는 요구가 없으면 만들지 않는다.
-2. 새 역할이면 PlayerAttackRole을 추가하고 Handler.Initialize의 전략 생성 분기와 TryStartAttack의 선택 정책을 함께 갱신한다. **현재 두 역할의 분기를 그대로 두고 Inspector 항목만 추가하면 새 전략으로 연결되지 않는다.**
-3. 기존 역할의 실행 방식 교체라면 해당 역할의 생성 코드만 교체한다. 전략 클래스 Type·설정 목록 인덱스로 선택하지 않는다.
-4. AttackDefinition의 AnimatorAttackType을 Animator의 해당 공격 진입 조건과 맞추고, 전략의 StartData는 시작 비용의 원본으로 사용한다. 입력 구독은 Begin에서 등록하고 End에서 해제한다.
+1. `Player/Attack/AttackStrategy/`에 PlayerAttackSO 파생 클래스를 추가한다. Initialize는 기존 의존성을 전달받고 실제 사용하는 참조만 저장한다. 새 Component·Factory·Resolver·Wrapper는 요구가 없으면 만들지 않는다.
+2. CreateAssetMenu로 원본 SO를 생성하고 단계별 수치를 입력한다. 기존 역할의 실행 방식 교체라면 AttackDefinition.Attack 참조만 바꾼다. Handler.Initialize에 종류별 생성 분기를 추가하지 않는다.
+3. 별도 발동 조건이 필요한 새 역할이면 PlayerAttackRole과 TryStartAttack의 선택 정책을 갱신한다. 전략 클래스 Type·설정 목록 인덱스로 선택하지 않는다.
+4. AttackDefinition의 AnimatorAttackType을 Animator의 해당 공격 진입 조건과 맞추고, StartData.usedStamina는 시작 비용으로 사용한다. 입력 구독은 복제본의 Begin에서 등록하고 End에서 해제한다.
 5. 타격은 OnAttackFrame에서 처리한다. 근접 공격이면 PerformAttack(data)와 공용 GetHitBox를 사용한다. Preview가 필요하면 전략에서 설정하고 End에서 해제한다.
 6. Factory의 `typeof(AttackState)` 키와 기존 PlayerAttackState·AttackTransition·AttackEndTransition을 우선 재사용한다. 별도 State나 지속 실행 계약은 실제 요구가 있을 때만 확장한다.
 
@@ -179,8 +181,8 @@ Base Layer
 - End Event는 FSM 전이 요청이다. AttackEndTransition → State.Exit → IsAttack false·AttackType 0 → Animator Exit의 순서를 유지한다. Animator의 Exit만 연결해 FSM 종료 Event를 생략하지 않는다.
 - Proxy·Controller의 `intParameter`는 일반 정수 전달용이며, 공격 경로에서만 `attackStep`으로 해석한다. 현재 OnFrame 처리 대상은 AttackState 계열이다.
 - 실제 Unity Animator와 Proxy는 같은 GameObject에 연결한다. 기존 함수 이름·Event 시점을 임의로 바꾸지 않는다.
-- 타격 Handler의 `_targetLayer`, 기존 SO 값·GUID·Prefab Override를 보존한다. 역할별 SO와 AnimatorAttackType은 PlayerController의 `_attackHandler._attackDefinitions`에 설정한다.
-- 지정·신규 Clip과 End Clip은 `Assets/Prefabs/Player/Animations/`, 공격 SO는 `Assets/Prefabs/Player/ScriptableObjects/Attacks/`, 전용 전략은 `Assets/Scripts/FSM/Player/Attack/`에 배치한다. 기존 사용자 경로·공유 에셋은 필요 없이 이동하지 않는다.
+- 타격 Handler의 `_targetLayer`, 기존 SO 값·GUID·Prefab Override를 보존한다. 역할별 Attack과 AnimatorAttackType은 PlayerController의 `_attackHandler._attackDefinitions`에 설정한다.
+- 지정·신규 Clip과 End Clip은 `Assets/Prefabs/Player/Animations/`, 공격 SO는 `Assets/Prefabs/Player/ScriptableObjects/Attacks/`, 전용 SO 전략 클래스는 `Assets/Scripts/FSM/Player/Attack/AttackStrategy/`에 배치한다. 기존 사용자 경로·공유 에셋은 필요 없이 이동하지 않는다.
 - Scene·Prefab·Animator·Clip·SO는 Unity Editor API로 변경한다. CLI는 샌드박스 밖에서 실행한다. 미저장 Scene을 자동 저장·재로드하지 않으며, 연결 불가 시 수동 설정 위치·값을 안내한다.
 - 코드 주석은 짧은 단답형으로 작성한다. 과도한 throw 검증·중복 null 체크·임시 Migration·Verification 스크립트를 추가하지 않는다.
 
@@ -193,6 +195,7 @@ Base Layer
 - [ ] 지상 단계별 피해·범위, 공중 다단 타격·이동·중력·착지 후 전략 고정 확인.
 - [ ] 타격·종료 Event의 누락·중복과 연속 입력 시 단계 건너뜀·자동 반복·FSM/Animator 불일치 없음.
 - [ ] 종료·피격·사망·반복 공격 후 구독·ComboTrigger·Preview 잔류 없음.
+- [ ] 같은 원본을 사용하는 개체의 실행 참조가 독립적이고, 원본은 변경되지 않으며 파괴 후 실행 SO 복제본이 남지 않음.
 - [ ] Gizmo·Combat Editor·실제 타격 범위 및 Player 이동·Jump·Dash·Goblin 회귀 확인.
 
 Play 검증 전 사용자 조작과 기대 결과를 먼저 안내하고 State·Animator·Stamina·Console을 읽어 확인한다. 강제 입력·피해·상태 전환 코드는 만들지 않는다. 컴파일 성공과 실제 동작 확인을 구분해 보고한다.

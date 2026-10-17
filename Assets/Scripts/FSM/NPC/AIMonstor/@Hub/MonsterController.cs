@@ -114,6 +114,13 @@ namespace ProjectRE
             _target.Clear();
         }
 
+        /// <summary>현재 State 종료 후 개체별 공격 SO 복제본 제거.</summary>
+        protected override void OnDestroy()
+        {
+            base.OnDestroy();
+            _attackHandler.Dispose();
+        }
+
         /// <summary>공격 종료는 전략에 전달. Hit·Death는 공용 Event 흐름 유지.</summary>
         public override void OnAnimationEvent(AnimEventType type, int intParameter = 0)
         {

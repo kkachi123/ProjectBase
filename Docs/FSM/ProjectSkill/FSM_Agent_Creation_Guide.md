@@ -39,7 +39,7 @@
 
 - State: PatrolWait·Patrol·Chase·LostTargetWait·Return·Attack·Hit·Death. 시작 PatrolWait.
 - MonsterInput·BT 없이 대상 Handler를 갱신하고 State·Rule에서 판단·행동한다.
-- 공격은 Handler에 역할·모션값·SO를 장착하고 전략으로 실행한다. Goblin은 일반·배후 두 전략에 같은 모션값 1을 사용한다.
+- 공격은 Handler 목록에 모션값·MonsterAttackSO를 장착한다. 개체별 복제본으로 실행하며 Goblin은 일반·배후 두 SO에 같은 모션값 1을 사용한다. 역할 enum·종류별 생성 분기는 추가하지 않는다.
 - Hit에서 수평 정지, Death 모션 종료 후 삭제. 공격·피격 종료 후 현재 상황으로 다음 행동을 판단한다.
 - GroundDetector는 FixedUpdate에서 갱신한다. 새 지상 일반 Monster는 기존 흐름·코드를 재사용한다.
 
@@ -58,7 +58,7 @@
 2. **초기화**: 공통 Awake 후 자기 Component·Animator를 초기화한다. Player는 Input·공격 Handler를, Monster는 최초 Start에서 대상·전략·HomeX를 준비한 뒤 전용 FactoryData를 구성한다. Input·AttackStarter는 필요한 Player 경로에서만 주입한다.
 3. **Factory 구성**: `AddCommonStates → AddAgentStates → ConfigureTransitions`. 기본 공통 State는 Hit·Death다. State 추가·교체를 끝낸 뒤 최종 객체에 Rule을 등록한다. Type 키·전이 수명은 State 가이드를 따른다.
 4. **시작·실행 연결**: State 구성을 마친 뒤 base.Start가 전환 이벤트를 연결한다. 시작 State는 각 Controller에서 선택한다. Monster는 대상 갱신 후 base.Update를 한 번 호출한다. 직접 상속한 Controller는 FixedUpdate를 구현하고 필요한 접지 갱신을 보존한다.
-5. **종료 정책 연결**: 기본 `OnDeathFinished()`는 빈 함수다. 요구한 삭제·비활성화·유지 정책을 구현한다. `OnDestroy()`를 재정의하면 공통 정리를 보존한다. 풀링은 비활성화·재활성화 시 구독·Health·State·Animator·속도 초기화를 별도 설계한다.
+5. **종료 정책 연결**: 기본 `OnDeathFinished()`는 빈 함수다. 요구한 삭제·비활성화·유지 정책을 구현한다. `OnDestroy()`를 재정의하면 공통 State Exit를 먼저 수행한 뒤 공격 Handler.Dispose로 실행 SO 복제본을 제거한다. 풀링은 비활성화·재활성화 시 구독·Health·State·Animator·속도 초기화를 별도 설계한다.
 
 ### 공격 흐름
 
@@ -69,7 +69,7 @@ Monster: 대상·거리·간격 → MonsterAttackTransition → TryPrepareAttack
 → MonsterAttackState → 일반/배후 전략 → 실제 종료 결과 → 다음 행동
 ```
 
-모션 선택값과 타격 데이터는 분리한다. Player는 역할별 SO 배열·Frame 단계, Monster는 전략별 공격 SO를 사용한다. 공용 AgentMeleeHitHandler2D에는 선택된 AttackData를 전달하며 타격·Gizmo·Editor가 같은 범위를 계산한다.
+모션 선택값은 Handler의 장착 설정에 둔다. Player는 역할별 PlayerAttackSO 하나와 내부 단계별 AttackData 배열, Monster는 장착 MonsterAttackSO 목록을 사용한다. 원본 설정은 초기화 때 실행 SO로 복제하고 런타임 상태는 개체별로 보관한다. 공용 AgentMeleeHitHandler2D에는 선택된 AttackData를 전달하며 타격·Gizmo·Editor가 같은 범위를 계산한다.
 
 ## 5. 에셋·Prefab 연결
 

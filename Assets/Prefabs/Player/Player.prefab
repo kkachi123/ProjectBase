@@ -58,7 +58,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _statData: {fileID: 11400000, guid: bbd7a6feca900de40b6381f1e29bff55, type: 2}
   _animationEventProxy: {fileID: 8638326237852265103}
-  _combatHandler: {fileID: 6125933212912360794}
   _groundDetector: {fileID: 3853302286112741967}
   _playerAnimator: {fileID: 7307054896481694828}
   _impactHandler: {fileID: 6264426419169757140}
@@ -67,14 +66,11 @@ MonoBehaviour:
     _attackDefinitions:
     - Role: 0
       AnimatorAttackType: 1
-      Attacks:
-      - {fileID: 11400000, guid: 637513756fb62cf48955b8def7da99ff, type: 2}
-      - {fileID: 11400000, guid: a763c765c2ab56949b36a1918960fb2a, type: 2}
-      - {fileID: 11400000, guid: d5e990951bacabd49a27dc1215310337, type: 2}
+      Attack: {fileID: 11400000, guid: 4f479e0b472a37c4896c9a5912a2b47d, type: 2}
     - Role: 1
       AnimatorAttackType: 3
-      Attacks:
-      - {fileID: 11400000, guid: 79d4db4acdba330489744de85ae94dc0, type: 2}
+      Attack: {fileID: 11400000, guid: 45c708618f835ba4a97b135105466b48, type: 2}
+  _combatHandler: {fileID: 6125933212912360794}
 --- !u!114 &6786316900135613947
 MonoBehaviour:
   m_ObjectHideFlags: 0

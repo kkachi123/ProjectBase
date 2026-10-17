@@ -2,7 +2,7 @@
 
 > PDF 갱신을 위한 단일 원본 문서다. 코드 구조가 바뀌면 먼저 이 문서의 **변경 이력**, **현재 구조**, **검증 상태**를 갱신한다.
 >
-> 대상 범위: Player 직접 입력 FSM과 지상 일반 Monster 판단·행동 FSM. Monster의 이전 BT·Input 구조는 이력으로 보존하고, 현재는 8개 State와 장착형 일반·배후 공격 전략을 사용한다. 최신 전환과 검증 상태는 4.10절 기준이며 실제 Play 회귀는 수동 확인 대기다.
+> 대상 범위: Player 직접 입력 FSM과 지상 일반 Monster 판단·행동 FSM. Monster의 이전 BT·Input 구조는 이력으로 보존하고, 현재는 8개 State와 장착형 일반·배후 공격 SO를 사용한다. 최신 공격 구조는 4.11절 기준이며 실제 Play 회귀는 수동 확인 대기다.
 
 ## 1. 리팩토링 이전 구조
 
@@ -91,22 +91,23 @@ Controller -> StateFactory -> State(필요한 의존성만 주입)
 
 - 외부 상태(`Grounded`, `Hero_jump`, `Hero_fall_start`, `Hero_fall_loop`)는 개별 Combo State가 아닌 `Attack` Sub State Machine으로만 진입한다.
 - `Attack` Sub State Machine의 `Entry`는 `Hero_Combo1` 내부의 지상 `Hero_Attack1`과 Attack 바로 아래의 공중 `Hero_Attack3`만 선택한다. 지상 2·3타는 Animator 내부 전이로만 이어진다.
-- 공용 `AttackTransition`이 최초 공격 입력을 받고 `TryStartAttack()` 성공 시에만 AttackState에 진입한다. Player는 이 시점에 지상 1타 또는 공중 3타를 `CombatHandler`에 준비한다.
-- `AttackState.OnEnter()`는 준비된 `CurrentAttackType`으로 Animator 공격 진입을 적용한다.
+- 공용 `AttackTransition`이 최초 공격 입력을 받고 PlayerAttackHandler.TryStartAttack 성공 시에만 AttackState에 진입한다. 지면 상태·Stamina로 역할별 공격 SO 복제본과 모션값을 선택한다.
+- PlayerAttackState가 Handler.BeginAttack을 호출하여 모션값·전략 Begin·Stamina 소비를 처리하고 공용 AttackState가 Attack Bool을 설정한다. CurrentAttackType·CombatHandler 선택 경로는 사용하지 않는다.
 - `AttackType`은 최초 공격 진입점만 결정한다. 지상 Combo는 `1`, 공중 단일 공격은 `3`을 사용한다.
 - 지상 Combo의 1→2→3 순서는 Animator 내부의 `ComboTrigger` 전이로만 진행하며, AttackState는 Combo 중 재진입하지 않는다.
 
 ### Combo Attack 책임 분리
 
-- `IAgentCombatInput`은 `OnAttackRequested` 이벤트를 제공하는 공용 공격 입력 계약이다. PlayerInput도 이 계약을 구현하므로 `AgentController.CombatInput`은 Player에서 null이 아니다.
+- `IAgentCombatInput`은 `OnAttackRequested` 이벤트를 제공한다. PlayerInput을 Player의 전이·콤보 SO 복제본에 주입하며 AgentController는 입력을 보관하지 않는다.
 - 기본 `AttackTransition`은 최초 공격 요청을 구독하고 `TryStartAttack()` 성공 시에만 AttackState로 진입하는 공용 이벤트 전이다.
 - `ComboAttackTransition`, `ComboAttackEndTransition`은 제거했다. TransitionRule은 다시 State 진입·종료 판단만 담당한다.
-- `AttackState`는 준비된 공격 타입을 Animator에 적용하고 공통 정리를 담당한다.
-- `PlayerAttackState`는 진입 시 지상 공격의 수평 이동을 멈추고, AttackState 동안의 공격 입력을 `IComboAnimation.SetComboTrigger()`로 전달한다.
+- `AttackState`는 공통 Attack Bool과 종료 시 모션값 초기화를 담당한다.
+- `PlayerAttackState`는 Handler의 Begin·Frame·End만 연결한다. PlayerGroundComboAttackSO 복제본이 수평 정지와 공격 중 입력 구독·ComboTrigger·Preview를 관리한다.
+- PlayerAttackSO는 단계별 AttackData와 실행 계약을 보관한다. 지상 3단계·공중 1단계를 각각 하나의 원본 SO로 설정하며, 실행 개체마다 한 번 복제한다. 시작 비용은 첫 데이터로 진입당 한 번 소비한다.
 - Animator는 각 Combo 전이의 `Has Exit Time`, Exit Time, Duration으로 입력 수락 시점과 연결 타이밍을 제어한다.
 - 공격 실행 클립과 종료 클립을 분리했다. 지상 1·2타에서 콤보 입력이 있으면 다음 공격으로 연결하고, 입력이 없거나 최종타·공중 공격이면 대응하는 `Hero_AttackN_End` State로 진행한다.
 - 공격 실행 클립에는 타격 이벤트만, 대응 `_end` 클립에는 `OnAnimationEnd` 1개만 둔다. `AttackEndTransition`은 해당 End 클립의 이벤트를 받아 현재 지면 상태에 따라 Grounded/Fall로 복귀한다.
-- 공격 실행·콤보·End 모션 동안 같은 `PlayerAttackState`를 유지한다. 종료 이벤트 후 FSM Exit에서 잔여 ComboTrigger·IsAttack·AttackType을 정리한다.
+- 공격 실행·콤보·End 모션 동안 같은 `PlayerAttackState`를 유지한다. 종료 이벤트 후 FSM Exit → Handler.EndAttack → SO.End에서 구독·잔여 ComboTrigger·Preview를 정리하고 공용 State가 IsAttack·AttackType을 초기화한다.
 - 지상·공중 공격의 기존 직접 `Attack → Exit` 전이 4개를 제거했다. 정상 종료는 `Attack → End → Exit`로 통일하고, 피격·사망은 기존 Any State 경로를 유지한다.
 
 ### 공중 Sub State Machine 진입
@@ -157,9 +158,10 @@ Controller -> StateFactory -> State(필요한 의존성만 주입)
 - `ScenePlayerManager`에 씬의 실제 Player를 할당한다. Controller가 시작·재활성화 때 Health·몸통 Collider를 MonsterTargetHandler에 주입한다.
 - PlayerDetector의 중심 XY 거리·범위 안 Linecast와 Target의 생존·활성·몸통 바닥 높이 판정을 유지한다. 지속 갱신 중 Component 검색·Overlap 탐색은 없다.
 - Target은 Root·DeltaX·HasValidTarget을 제공한다. 기존 Blackboard·중복 상실 플래그·교전 기록은 제거했고 현재 State가 대기·복귀 진행을 나타낸다.
-- 행동 설정은 MonsterBehaviorDataSO, 전략별 타격·진입 거리·종료 후 간격·배후 제한은 MonsterAttackDataSO에 둔다. 런타임 상태는 SO와 분리한다.
-- 일반 공격과 배후 공격은 개체별 전략이다. Attack Handler는 조건 충족 장착 전략을 동일 확률로 선택하고 실제 정상 종료부터 다음 간격을 기록한다.
+- 행동 설정은 MonsterBehaviorDataSO, 공격 수치·로직은 MonsterAttackSO와 파생 SO에 둔다. 원본에는 설정만 저장하고 실행 참조·Status·타이머는 개체별 복제본에 보관한다.
+- Handler에는 모션값·공격 SO 목록을 장착한다. 역할 enum·종류별 생성 분기 없이 복제하고, 조건 충족 항목을 동일 확률로 선택하여 실제 정상 종료부터 다음 간격을 기록한다.
 - 배후 준비는 Grounded 이동, 도착 후 실제 Attack 모션·타격을 실행한다. AttackState 내부 전략 단계이며 HFSM이 아니다.
+- 배후 SO는 근접 SO를 상속하여 실제 타격·종료를 재사용한다. 복제본은 비활성화·재활성화 때 유지하며 Controller 파괴의 State Exit 후 Handler.Dispose로 제거한다. 원본 수정은 다음 초기화부터 반영한다.
 
 ### Animator capability
 
@@ -386,7 +388,7 @@ Return은 OnUpdate에서 이동·도착을 판정하고, OnEnd에서 모든 종�
 
 작성 Graph와 BasicMonsterBehavior 내부 실행 Combat 모듈 모두 Random 하위가 배후 접근·Stop 두 개임을 읽기 전용으로 확인했다. 요청 노드 1개, Context 공유 연결, 상위 8·Combat 2·Patrol 4개 변수, 기존 Goblin Inspector 값 유지도 확인했다. 이번 문서 갱신에서 코드·Graph·Scene·Prefab은 변경하지 않았으며 최신 Play 회귀 결과를 새로 주장하지 않는다.
 
-MonsterBehaviorContext_Class_Diagram.pdf는 **2D Grounded Monster 기준**으로 최신화했다. Context의 개체별 Handler·wrapper 소유, Scene Player 주입, 거리·시야·높이 판정, Action의 Handler 조회·입력 요청, Unity 기본 Condition·Wait 연결을 반영한다. 제거된 대상 구독·Blackboard Target·복귀 플래그·전용 대기 Action은 현재 구조에서 제외했다. 이후 제작 지침은 [FSM_Monster_Behavior_Creation_Guide.md](../ProjectSkill/FSM_Monster_Behavior_Creation_Guide.md)에 정리한다.
+당시 Behavior 클래스 다이어그램은 **2D Grounded Monster 기준**으로 Context의 개체별 Handler·wrapper 소유, Scene Player 주입, 거리·시야·높이 판정, Action의 Handler 조회·입력 요청, Unity 기본 Condition·Wait 연결을 정리했다. 이후 자체 FSM으로 전환하여 해당 BT 다이어그램과 미사용 Behavior 제작 가이드는 삭제했다. 당시 설계·변경 과정은 본 절에 보존하고, 현재 제작에는 [지상 Monster 제작 가이드](../ProjectSkill/FSM_Grounded_Monster_Creation_Guide.md)를 사용한다.
 
 ### 4.10 지상 Monster 판단 정책 분리: BT·입력에서 자체 FSM으로 전환
 
@@ -401,15 +403,55 @@ Player와 AI가 같은 입력 경로를 사용하던 구조에서 판단 정책�
 | 배후 접근 | 별도 BT Action 이후 공격 요청 | AttackState 내 RearMelee 전략이 준비·실제 공격 관리 |
 | 간격 | 요청 발행부터 계산 | 실제 정상 공격 종료부터 계산. 실패·중단은 갱신하지 않음 |
 | 설정 | Context Inspector·StatData 공격 목록 | Behavior SO·전략별 Attack SO. Combat Editor도 공격 SO 편집 |
-| 구형 자료 | Context·Input·Graph가 실행 경로 | 코드·Graph·Prefab Component 제거. MD·PDF는 이전 이력으로 보존 |
+| 구형 자료 | Context·Input·Graph가 실행 경로 | 코드·Graph·Prefab Component 제거. 비교 자료의 핵심 이력은 본 로그에 통합 |
+
+#### 분리 전 기준선과 전환 결과
+
+분리 전 비교 기준은 커밋 `4ceef01be032a6732008bba7db951dcb5ccb7f99`의 소스·저장 Graph·Prefab이다. 당시 문서 제작은 읽기 전용 분석이었으며 Play 회귀·성능 측정을 수행하지 않았다.
+
+| 비교 항목 | 분리 전 | 분리 후 |
+|---|---|---|
+| Agent 공통 의존성 | 모든 Agent에 이동·공격 Input과 근접 타격 검색 요구 | 공통 실행·Health·Event만 유지, 필요한 Controller에 의존성 배치 |
+| 지상 Monster | Grounded·Attack·Hit·Death 4개 실행 State | PatrolWait·Patrol·Chase·LostTargetWait·Return·Attack·Hit·Death 8개 판단·실행 State |
+| 행동 판단 | Context·Handler 4개·커스텀 Action 6개·Graph 3개를 거쳐 Input 발행 | 대상 갱신 후 State와 순차 TransitionRule이 판단·실행 |
+| 공격 결과 | BT의 요청 발행 완료와 실제 공격 완료가 분리 | 전략 준비·실제 모션 종료 결과를 FSM이 직접 확인 |
+| Player | 직접 입력, 7개 State와 전용 공격 정책 | 직접 입력·State 수 유지. 공격 SO 전환은 후속 4.11절 |
+
+State 수 증가는 기존 BT의 순찰·대기·복귀 책임을 FSM으로 옮긴 결과다. 클래스 수나 코드량 감소 자체를 목표로 삼지 않았으며, 성능·GC 개선 수치는 측정하지 않았다. 초기 Controller 중심 구조와 첫 Factory 주입 전환은 1~2절의 별도 초기 이력이다.
+
+현재 주요 흐름은 `PatrolWait → Patrol`, 대상 인식 시 `Chase → Attack`, Chase 중 상실 시 `LostTargetWait → Return`이다. 대기·복귀 중 재인식은 Chase로 복귀한다. Attack·Hit 종료 후 유효 대상과 거리·간격을 다시 판단하여 Attack·Chase·Return을 선택하며, 배후 준비 중 대상 상실은 LostTargetWait로 전달한다. Death가 최우선이고 Hit가 그다음이다.
+
+Controller가 대상·Motor·이동·공격 Handler를 구성하고 Factory가 각 State와 Rule에 필요한 참조를 주입한다. Attack·Hit·Death는 기반 Type 키를 유지하고 독립 행동 State는 구체 Type 키를 사용한다. 이러한 상속은 코드 재사용이며 HFSM은 아니다.
+
+최초 Start에서 HomeX를 기록하고, Update에서 대상 갱신 후 Rule 평가·행동 실행을 수행한다. Disable은 현재 State·이동·대상을 정리하고 Enable은 대상 재주입 후 행동을 재개한다. HomeX·공격 간격·실행 SO는 재생성하지 않으며 파괴 시 State Exit 후 SO 복제본을 제거한다.
 
 Goblin의 순찰 반경 2·대기 1~2초·상실 대기 1.5초·도착 0.15·허용 높이 1·공격 거리 1.8·간격 1초·배후 제한 1.5초와 피해·범위를 이전했다. 일반·배후 SO는 독립이며 두 모션값은 1이다. Detector는 추가된 중복을 정리하고 기존 반경 6·offset (0,1,0)·장애물 마스크 192를 보존했다. Clip·AnimatorOverride·Collider·기존 Prefab GUID와 Scene Override는 유지했다.
 
-코드 삭제 전 Prefab의 Context·GraphAgent·Input을 해제했고 Unity Editor API로 SO·Prefab을 저장했다. GroundedState는 같은 GUID로 Player 폴더로 이동했다. Before 문서는 수정하지 않았다. 기존 Unity Behavior 패키지·Player 입력·공격 전략은 제거하지 않았다.
+코드 삭제 전 Prefab의 Context·GraphAgent·Input을 해제했고 Unity Editor API로 SO·Prefab을 저장했다. GroundedState는 같은 GUID로 Player 폴더로 이동했다. 기존 Unity Behavior 패키지·Player 입력은 제거하지 않았다. 당시 일반 C# 공격 전략은 후속 4.11절에서 실행 SO로 전환했다.
 
 검증: 런타임·Editor 소스 별도 컴파일 및 Unity 재컴파일 성공. Basic/Goblin·InGame 필수 참조와 구형 Component 제거·Detector 1개를 확인했다. 열린 InGame은 작업 전후 clean이며 자동 저장·재로드·Play 조작·임시 Migration/Verification 스크립트는 없었다. Console의 Editor 복구 Assert·Pipeline 미지원 status 명령 오류는 컴파일 실패와 구분한다. 실제 동작·Player 회귀는 수동 확인 대기다.
 
-현재 관계·수동 검증은 [Monster FSM After](../Agent_Seperation/Monster_FSM_After.md), 재사용 지침은 [지상 Monster 제작 가이드](../ProjectSkill/FSM_Grounded_Monster_Creation_Guide.md)에 기록한다. 기존 PDF는 이번 작업에서 재생성하지 않았다.
+Before/After 비교 MD와 SO 전환 이전 다이어그램은 정리하고 필요한 비교·설정·검증 기록은 본 로그에 통합했다. 현재 재사용 지침은 [지상 Monster 제작 가이드](../ProjectSkill/FSM_Grounded_Monster_Creation_Guide.md), 최신 공격 구조는 4.11절을 기준으로 한다.
+
+### 4.11 공격 정의 응집: C# 전략·데이터 SO에서 실행 SO로 전환
+
+공격 종류마다 일반 C# 전략과 별도 데이터 SO를 연결하고 Handler의 생성 분기를 수정하던 구조를 정리했다. Player·Monster를 하나의 범용 공격 프레임워크로 합치지 않고 각 영역의 SO 계약으로 분리했다.
+
+| 주제 | 이전 | 변경 후 |
+|---|---|---|
+| Player 공격 | IPlayerAttackStrategy + 단계별 PlayerAttackDataSO | PlayerAttackSO 파생 클래스가 수치 배열·로직 보유. 지상 콤보 3단계 SO 하나와 공중 SO 하나 |
+| Monster 공격 | 역할 enum Dictionary + IMonsterAttackStrategy + MonsterAttackDataSO | MonsterAttackSO 목록. 역할 enum·종류별 new 분기 제거 |
+| 배후 공격 재사용 | 별도 근접 실행 객체를 내부에 보관 | MonsterRearMeleeAttackSO가 MonsterMeleeAttackSO 상속. 실제 타격·모션·종료 재사용 |
+| 실행 상태 | 개체별 일반 C# 전략 객체 | 초기화 시 장착 원본을 한 번 복제·DI. 참조·Status·타이머·구독은 복제본에만 보관 |
+| 모션 선택 | Handler의 AnimatorAttackType | 그대로 유지. SO에는 모션 진입값을 중복 저장하지 않음 |
+| 종료 수명 | State Exit에서 실행 정리 | 기존 End 유지 + Controller 파괴 시 State Exit 후 Dispose로 복제본 제거 |
+| 편집 | 단계별 데이터 에셋 편집 | Combat Editor가 원본 SO의 단계별 데이터를 편집. Undo·Handle·Preview 유지. Play 중 원본 변경은 다음 초기화부터 반영 |
+
+Player 지상 1·2·3타의 피해·범위·비용과 공중 데이터를 각 새 SO에 복사했다. Goblin 일반·배후의 피해 2·거리 1.8·정상 종료 간격 1초와 배후 제한 1.5초를 보존했다. Player 모션값 1·3, Goblin 두 모션값 1과 Variant 장착 Override를 유지했다. 새 전략 에셋은 새 GUID이며 기존 Prefab·Clip·Animator는 GUID·전이를 유지한다.
+
+구형 데이터 SO 6개와 일반 C# 전략·인터페이스·데이터 클래스 8개는 참조 이전 확인 후 meta와 함께 제거했다. Player 역할별 선택·시작 시 비용 판정과 진입당 소비, 지상 Event 유효 단계·공중 다단 타격, Monster 현재/다음 선택 분리·종료 후 간격·FSM 결과 분기는 변경하지 않았다.
+
+설정 이전은 Editor API로 수행했다. InGame은 저장·재로드하지 않았고 임시 Migration·Verification 스크립트와 강제 조작은 작성하지 않았다. 최신 검증 결과는 아래 표와 [작업 계획](../Agent_Seperation/Attack_SO_Strategy_Refactoring_Plan.md)에 기록한다. 기존 PDF는 재생성하지 않았다.
 
 ## 5. 검증 상태
 
@@ -418,7 +460,8 @@ Goblin의 순찰 반경 2·대기 1~2초·상실 대기 1.5초·도착 0.15·허
 
 | 항목 | 상태 | 근거 / 남은 확인 |
 | --- | --- | --- |
-| 지상 Monster 자체 FSM·전략 분리 | 코드·Prefab·SO·컴파일 확인 완료 / Play 대기 | 8개 State·전용 전이·일반/배후 전략, 기존 수치·GUID·참조 유지. 실제 수동 조작은 After 문서 4절 기준 |
+| Player·Monster 공격 SO 전략 | 구현·설정 이전·최종 컴파일 확인 완료 / Play 대기 | 새 SO 4개·실행 클래스 6개. 수치 전부 일치·역할/모션값·Variant Override 유지·잔여 구형 참조 없음. 네 Prefab과 InGame Missing Script 0, InGame clean. 실제 회귀·실행 상태 독립·파괴 후 제거는 사용자 조작으로 확인 |
+| 지상 Monster 자체 FSM·전략 분리 | 코드·Prefab·SO·컴파일 확인 완료 / Play 대기 | 8개 State·전용 전이·일반/배후 전략, 기존 수치·GUID·참조 유지. 실제 수동 조작은 아래 최신 회귀 항목 기준 |
 | C# 컴파일 | Monster 제작 단계 완료 | 공용 Rule·Monster 코드 추가 후 Unity 컴파일 오류 없음. 아래 Player prefab 초기화 문제는 별도 런타임 설정 문제 |
 | Hero Animator parameter 계약 | 완료 | `PlayerAnimationDataSO`와 Animator parameter 이름을 기준으로 등록 |
 | Prefab Animator 바인딩 | 완료 | `Player`, `ProjectRE_Player Variant` 모두 Hero child Animator 연결 |
@@ -456,6 +499,24 @@ Plan7의 독립 Animator 평가는 Preview Scene에서 저장된 Controller를 �
 
 Player 회귀 검사에서는 저장된 `ProjectRE_Player Variant.prefab`에 AgentDashHandler2D가 없어 PlayerController.Awake의 초기화 오류가 발생했다. 당시 InGame 인스턴스에는 해당 컴포넌트가 있었으며, 원본 prefab은 수정하지 않고 테스트 객체에만 보완했다. 기존 설정 문제는 Monster 구현과 분리해 보류한다. Play Mode 진입 중 Pipeline 요청 한 번은 메인 스레드 시간 제한으로 실행되지 않았고, 진입 완료 후 재실행한 Monster 검증은 성공했다.
 
+### 최신 지상 Monster·Player 회귀 확인 대기
+
+ScenePlayerManager가 실제 Player를 참조하는 InGame에서 사용자가 Play·조작한다. 상태·Animator·공격 결과·Console을 읽어 확인하며 자동 입력·타격·위치 변경으로 대체하지 않는다. 아래 항목은 실제 통과 기록이 아니다.
+
+| 사용자 조작·상황 | 기대 결과 |
+|---|---|
+| 시야 밖에서 시작 | PatrolWait → Patrol 반복. 최초 미감지에 상실 대기·복귀 없음 |
+| 같은 높이에서 시야 진입 | Chase. HomeX에서 멀어져도 시야 유효 시 추적 유지 |
+| 공격 거리 진입·반복 관찰 | 일반 공격 또는 배후 접근 후 실제 공격. 준비 중 타격 없음 |
+| 정상 공격 종료 | 기존 간격 1초 유지. 거리 밖이면 Chase |
+| 배후 준비 중 시야 이탈 | 정지·상실 대기 1.5초 후 Return |
+| 대기·복귀 중 재인식 | 즉시 Chase 재개 |
+| 실제 공격 모션 중 시야 이탈 | 현재 공격 완료 후 상황 재판정 |
+| 공격·추적 중 피격·사망 | Hit/Death 우선, 잔여 이동·Trigger·Preview 없음. Hit 종료 후 다음 행동·Animator 일치, Death End 후 제거 |
+| Monster 비활성화·재활성화 | 대상 재연결, HomeX·간격·SO 복제본 유지 |
+| Player 이동·Jump·Dash·지상/공중 공격 | 기존 조작·콤보·Event·단계별 범위·Stamina 유지 |
+| 같은 SO를 사용하는 두 Monster와 개체 제거 | 참조·Status·타이머 독립, 제거된 개체의 실행 SO만 정리 |
+
 ## 6. 보류 및 예정 사항
 
 ### 보류
@@ -468,15 +529,15 @@ Player 회귀 검사에서는 저장된 `ProjectRE_Player Variant.prefab`에 Age
 - Player prefab의 기존 AgentDashHandler2D 누락과 전체 수동 회귀 확인
 - Player 공격·End 클립 분리 후 실제 종료 이벤트·콤보 분기·잔여 Trigger·피격 중단·공중 복귀 및 종료 포즈 수동 확인. End 추가에 따른 이동·점프 재개 타이밍 조정
 - Health·위치 재설정을 포함한 완전한 풀링·리스폰 정책. 현재 Disable/Enable의 State·대상·이동 정리만 구현
-- PDF 산출물 재생성: 이번 최신화는 원본 MD 기준이며 기존 두 PDF는 갱신하지 않음
+- PDF 산출물 제작: 현행 구조의 산출물은 필요 시 본 로그와 현재 소스를 기준으로 다시 제작. 삭제한 구형 다이어그램을 현재 설계로 사용하지 않음
 
 ### 다음 권장 순서
 
-1. After 문서의 사용자 조작 순서로 새 Monster FSM·전략과 Player 회귀를 확인한다.
+1. 5절의 사용자 조작 순서로 새 Monster FSM·전략과 Player 회귀를 확인한다.
 2. Goblin 시각·타격·Collider·간격을 수동 검증한 뒤 필요한 SO 값을 조정한다.
 3. 같은 지상 일반 Monster는 Controller·State 복제 없이 종별 SO·Override·Variant·장착 전략으로 제작한다.
 4. Flying·Boss·새 실제 공격·Runtime Player 교체는 별도 요구·계획으로 진행한다.
-5. Before/After 자료와 실제 검증 결과를 근거로 PDF를 갱신한다. 성능·GC 수치는 측정 후에만 기록한다.
+5. 본 로그의 변경 전후 기록과 실제 검증 결과를 근거로 PDF를 제작한다. 성능·GC 수치는 측정 후에만 기록한다.
 
 ## 7. PDF 갱신 규칙
 
@@ -502,7 +563,7 @@ Player 회귀 검사에서는 저장된 `ProjectRE_Player Variant.prefab`에 Age
 
 ### 업데이트 시 작성 원칙
 
-- 기본 단발 Monster·현재 구현한 Behavior와 아직 구현하지 않은 다중 공격·다른 행동 프로필을 구분한다.
+- 과거 Behavior 이력·현재 지상 Monster FSM·공격 SO와 아직 구현하지 않은 Flying·Boss·다른 행동 프로필을 구분한다.
 - 성능 수치나 체감 개선 정도는 측정값이 없으면 추정하지 않는다.
 - 수동 테스트 전에는 ‘완료’ 대신 ‘코드/구성 완료, 수동 검증 필요’로 기록한다.
 - 코드 변경이 발생하면 먼저 이 문서의 변경 이력과 검증 상태를 갱신한 뒤 PDF를 갱신한다.

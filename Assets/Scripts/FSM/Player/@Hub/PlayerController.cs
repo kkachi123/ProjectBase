@@ -69,6 +69,13 @@
             ChangeState(typeof(GroundedState));
         }
 
+        /// <summary>현재 State 종료 후 개체별 공격 SO 복제본 제거.</summary>
+        protected override void OnDestroy()
+        {
+            base.OnDestroy();
+            _attackHandler.Dispose();
+        }
+
         #region State Animation Event
         public override void OnDeathFinished()
         {
