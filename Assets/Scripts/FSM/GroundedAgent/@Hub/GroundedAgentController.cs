@@ -9,7 +9,6 @@ using UnityEngine;
 public abstract class GroundedAgentController : AgentController 
 {
     [SerializeField] protected GroundDetector _groundDetector;
-    protected IAgentJumpInput _jumpInput;
     protected GroundedMovementHandler2D _movementHandler;
     protected GroundedMotor2D _groundedMotor;
     protected abstract GroundedMotorData MovementData { get; }
@@ -23,7 +22,6 @@ public abstract class GroundedAgentController : AgentController
         base.Awake();
         _groundDetector = GetComponent<GroundDetector>();
 
-        _jumpInput = GetComponent<IAgentJumpInput>();
         _groundedMotor = GetComponent<GroundedMotor2D>();
         _movementHandler = new GroundedMovementHandler2D(_groundedMotor, MovementData);
     }

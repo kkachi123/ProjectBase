@@ -3,6 +3,7 @@
     using UnityEngine;
     [RequireComponent(typeof(AgentImpactHandler))]
     [RequireComponent(typeof(PlayerAnimator))]
+    [RequireComponent(typeof(PlayerInput), typeof(AgentMeleeHitHandler2D))]
     /// <summary>
     /// Player 전용 컴포넌트·공격 Handler·FSM 초기화.
     /// </summary>
@@ -13,6 +14,7 @@
         [SerializeField] private AgentImpactHandler _impactHandler;
         [SerializeField] private PlayerMotorData _motorData;
         [SerializeField] private PlayerAttackHandler _attackHandler = new();
+        [SerializeField] private AgentMeleeHitHandler2D _combatHandler;
         public PlayerAttackHandler AttackHandler => _attackHandler;
         protected override GroundedMotorData MovementData => _motorData;
 
@@ -33,12 +35,13 @@
 
 
             _playerInput = GetComponent<PlayerInput>();
+            _combatHandler = GetComponent<AgentMeleeHitHandler2D>();
             _dashHandler = GetComponent<AgentDashHandler2D>();
             _wallDetector = GetComponent<WallDetector>();
             _dashHandler.Initialize(_motorData, _groundDetector, _wallDetector);
             _impactHandler = GetComponent<AgentImpactHandler>();
             _impactHandler.Initialize(_groundedMotor, _motorData.knockbackForce);
-            _attackHandler.Initialize(_groundDetector, Stamina, _groundedMotor, CombatInput, _playerAnimator, _combatHandler);
+            _attackHandler.Initialize(_groundDetector, Stamina, _groundedMotor, _playerInput, _playerAnimator, _combatHandler);
 
             _states = new PlayerStateFactory().CreateStates(
                 new PlayerStateFactoryData
@@ -46,8 +49,8 @@
                     PlayerAnimator = _playerAnimator,
                     Motor = _groundedMotor,
                     MovementHandler = _movementHandler,
-                    MovementInput = _moveInput,
-                    CombatInput = CombatInput,
+                    MovementInput = _playerInput,
+                    CombatInput = _playerInput,
                     Health = this.Health,
                     GroundDetector = _groundDetector,
                     JumpInput = _playerInput,

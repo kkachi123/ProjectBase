@@ -9,7 +9,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 7725694964129040142}
-  - component: {fileID: 1245065221277399997}
   - component: {fileID: 1080534767251682691}
   - component: {fileID: 8283179681992747704}
   - component: {fileID: 2543010538732301723}
@@ -18,6 +17,7 @@ GameObject:
   - component: {fileID: 1348327245228352073}
   - component: {fileID: 3004176759045309049}
   - component: {fileID: 8653674729123717503}
+  - component: {fileID: 5210232932357125474}
   m_Layer: 9
   m_Name: BasicMonster
   m_TagString: Untagged
@@ -41,18 +41,6 @@ Transform:
   - {fileID: 3272162078263403340}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1245065221277399997
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2968562680067613100}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 07e761180f0c48048934fd70c2c61f8e, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::ProjectRE.MonsterInput
 --- !u!114 &1080534767251682691
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -149,9 +137,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ProjectRE.MonsterController
   _statData: {fileID: 0}
   _animationEventProxy: {fileID: 1449512428884320504}
-  _combatHandler: {fileID: 337250232637855799}
-  _groundDetector: {fileID: 8653674729123717503}
   _motorData: {fileID: 0}
+  _groundDetector: {fileID: 8653674729123717503}
+  _combatHandler: {fileID: 337250232637855799}
+  _behaviorData: {fileID: 11400000, guid: 1c36945c5f7ca3f40828f586414c5a11, type: 2}
+  _attackHandler:
+    _attackDefinitions: []
 --- !u!70 &3004176759045309049
 CapsuleCollider2D:
   m_ObjectHideFlags: 0
@@ -206,6 +197,23 @@ MonoBehaviour:
     m_Bits: 64
   rayBoxSize: {x: 0.57600003, y: 0.1}
   playerFootPos: {x: -0, y: -0.05, z: 0}
+--- !u!114 &5210232932357125474
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2968562680067613100}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ff9ece546e2d239489983dcdfc76f041, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ProjectRE.PlayerDetector
+  obstacleMask:
+    serializedVersion: 2
+    m_Bits: 0
+  offset: {x: 0, y: 1, z: 0}
+  viewRadius: 5
 --- !u!1 &6212682088628437652
 GameObject:
   m_ObjectHideFlags: 0

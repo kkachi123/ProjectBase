@@ -16,6 +16,34 @@ PrefabInstance:
       propertyPath: _motorData
       value: 
       objectReference: {fileID: 11400000, guid: 94e3172dcd4190145bc17d19d97f6a3d, type: 2}
+    - target: {fileID: 1348327245228352073, guid: 2897a090a2c82d040be9a58cdee0a5d0, type: 3}
+      propertyPath: _behaviorData
+      value: 
+      objectReference: {fileID: 11400000, guid: 2c02ce5514e237a44bc359f67fa33d86, type: 2}
+    - target: {fileID: 1348327245228352073, guid: 2897a090a2c82d040be9a58cdee0a5d0, type: 3}
+      propertyPath: _attackHandler._attackDefinitions.Array.size
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 1348327245228352073, guid: 2897a090a2c82d040be9a58cdee0a5d0, type: 3}
+      propertyPath: _attackHandler._attackDefinitions.Array.data[1].Role
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1348327245228352073, guid: 2897a090a2c82d040be9a58cdee0a5d0, type: 3}
+      propertyPath: _attackHandler._attackDefinitions.Array.data[0].Attack
+      value: 
+      objectReference: {fileID: 11400000, guid: 5ea11f31e2e08e74b808b3cd722b29e3, type: 2}
+    - target: {fileID: 1348327245228352073, guid: 2897a090a2c82d040be9a58cdee0a5d0, type: 3}
+      propertyPath: _attackHandler._attackDefinitions.Array.data[1].Attack
+      value: 
+      objectReference: {fileID: 11400000, guid: ad259e854e1c42b40a55d8672e3f4679, type: 2}
+    - target: {fileID: 1348327245228352073, guid: 2897a090a2c82d040be9a58cdee0a5d0, type: 3}
+      propertyPath: _attackHandler._attackDefinitions.Array.data[0].AnimatorAttackType
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1348327245228352073, guid: 2897a090a2c82d040be9a58cdee0a5d0, type: 3}
+      propertyPath: _attackHandler._attackDefinitions.Array.data[1].AnimatorAttackType
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 2968562680067613100, guid: 2897a090a2c82d040be9a58cdee0a5d0, type: 3}
       propertyPath: m_Name
       value: Goblin
@@ -55,6 +83,14 @@ PrefabInstance:
     - target: {fileID: 4301408341181955096, guid: 2897a090a2c82d040be9a58cdee0a5d0, type: 3}
       propertyPath: m_WasSpriteAssigned
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5210232932357125474, guid: 2897a090a2c82d040be9a58cdee0a5d0, type: 3}
+      propertyPath: viewRadius
+      value: 6
+      objectReference: {fileID: 0}
+    - target: {fileID: 5210232932357125474, guid: 2897a090a2c82d040be9a58cdee0a5d0, type: 3}
+      propertyPath: obstacleMask.m_Bits
+      value: 192
       objectReference: {fileID: 0}
     - target: {fileID: 6337107652496726756, guid: 2897a090a2c82d040be9a58cdee0a5d0, type: 3}
       propertyPath: m_Controller
@@ -127,90 +163,5 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents:
-    - targetCorrespondingSourceObject: {fileID: 2968562680067613100, guid: 2897a090a2c82d040be9a58cdee0a5d0, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 3640948814562112618}
-    - targetCorrespondingSourceObject: {fileID: 2968562680067613100, guid: 2897a090a2c82d040be9a58cdee0a5d0, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 8084120596978150384}
-    - targetCorrespondingSourceObject: {fileID: 2968562680067613100, guid: 2897a090a2c82d040be9a58cdee0a5d0, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 2199120178860219675}
+    m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 2897a090a2c82d040be9a58cdee0a5d0, type: 3}
---- !u!1 &5718515402252523039 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 2968562680067613100, guid: 2897a090a2c82d040be9a58cdee0a5d0, type: 3}
-  m_PrefabInstance: {fileID: 7380919793902548915}
-  m_PrefabAsset: {fileID: 0}
---- !u!114 &3640948814562112618
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5718515402252523039}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ff9ece546e2d239489983dcdfc76f041, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::ProjectRE.PlayerDetector
-  obstacleMask:
-    serializedVersion: 2
-    m_Bits: 192
-  offset: {x: 0, y: 1, z: 0}
-  viewRadius: 6
---- !u!114 &8084120596978150384
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5718515402252523039}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f0038c16c34866b4f9e25c9c0dc0f7e6, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Unity.Behavior::Unity.Behavior.BehaviorGraphAgent
-  m_Graph: {fileID: 666988855325060194, guid: c58dfb80780ff8641a71a732a04f3e16, type: 2}
-  m_BlackboardVariableOverridesList:
-  - rid: 2900184142808613407
-  m_OriginalGraph: {fileID: 666988855325060194, guid: c58dfb80780ff8641a71a732a04f3e16, type: 2}
-  m_IsInitialised: 0
-  m_IsStarted: 0
-  references:
-    version: 2
-    RefIds:
-    - rid: 2900184142808613407
-      type: {class: 'BlackboardVariable`1[[UnityEngine.GameObject, UnityEngine.CoreModule]]', ns: Unity.Behavior, asm: Unity.Behavior}
-      data:
-        GUID:
-          m_Value0: 1
-          m_Value1: 0
-        Name: Self
-        m_Value: {fileID: 5718515402252523039}
---- !u!114 &2199120178860219675
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5718515402252523039}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 03d6f65349fb8104b9707eb2efc06bb0, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::ProjectRE.MonsterBehaviorContext
-  _attack:
-    _attackDistance: 1.8
-    _attackRequestInterval: 1
-    _rearApproachTimeout: 1.5
-  _chaseReturn:
-    _returnArrivalDistance: 0.15
-    _lostTargetWait: 1.5
-  _patrol:
-    _patrolRadius: 2
-    _patrolWaitMin: 1
-    _patrolWaitMax: 2
-  _targetHandler:
-    _maxTargetHeightDifference: 1

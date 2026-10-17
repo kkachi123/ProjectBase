@@ -1,6 +1,6 @@
 # FSM Monster Behavior 제작 가이드
 
-기존 FSM Monster에 Unity Behavior Graph를 연결할 때 사용하는 AI 작업 지침. **BT는 입력을 결정하고, FSM은 실제 행동·애니메이션을 실행한다.** 현재 재사용 사례는 Grounded·Attack·Hit·Death를 사용하는 2D Grounded Monster다.
+보관용 문서: 아래는 삭제된 2D Grounded Monster BT의 제작 방식이다. 현재 지상 일반 Monster는 자체 FSM을 사용하므로 [현재 제작 가이드](FSM_Grounded_Monster_Creation_Guide.md)를 따른다. 삭제된 Context·Input·Graph를 현재 프로젝트에 존재하는 것으로 가정하거나 자동 복구하지 않는다. 다른 Agent에 BT가 필요하면 별도 요구부터 확인한다.
 
 ## 1. 작업 입력·소스 확인
 

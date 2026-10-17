@@ -6,6 +6,9 @@
     /// <summary>Player 전용 State 구성에 필요한 공통·전용 의존성 전달.</summary>
     public class PlayerStateFactoryData : GroundedStateFactoryData
     {
+        public IAgentMovementInput MovementInput { get; set; }
+        public IAgentCombatInput CombatInput { get; set; }
+        public IAttackStarter AttackStarter { get; set; }
         /// <summary>공통 Animator 참조의 PlayerAnimator 타입 접근·주입.</summary>
         public PlayerAnimator PlayerAnimator
         {

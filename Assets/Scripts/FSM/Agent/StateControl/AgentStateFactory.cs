@@ -8,10 +8,6 @@ namespace ProjectRE
     {
         public AgentAnimator Animator { get; set; }
         public abstract IAgentMovementStop MovementStop { get; }
-        public IAgentMovementInput MovementInput { get; set; }
-        public AgentMeleeHitHandler2D MeleeHitHandler { get; set; }
-        public IAgentCombatInput CombatInput { get; set; }
-        public IAttackStarter AttackStarter { get; set; }
         public IAnimationEventSource AnimationEventSource { get; set; }
         public Health Health { get; set; }
     }

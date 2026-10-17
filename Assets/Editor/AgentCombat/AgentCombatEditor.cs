@@ -9,10 +9,13 @@ public class AgentCombatEditor : EditorWindow
     private Animator _animator;
     private AgentStatData _statData;
     private PlayerController _playerController;
+    private MonsterController _monsterController;
     private readonly List<PlayerAttackDataSO> _attackAssets = new();
+    private readonly List<MonsterAttackDataSO> _monsterAttackAssets = new();
     private readonly List<string> _attackLabels = new();
     private int _selectedIndex = 0;
-    private int AttackCount => _playerController != null ? _attackAssets.Count : _statData != null ? _statData.attackDatas.Count : 0;
+    private int AttackCount => _playerController != null ? _attackAssets.Count
+        : _monsterController != null ? _monsterAttackAssets.Count : _statData != null ? _statData.attackDatas.Count : 0;
 
     private AnimationClip _currentClip;
     private float _animationTime;
@@ -63,7 +66,7 @@ public class AgentCombatEditor : EditorWindow
         EditorGUILayout.Space();
         EditorGUILayout.LabelField("Data Management", EditorStyles.boldLabel);
 
-        if (_playerController == null)
+        if (_playerController == null && _monsterController == null)
         {
             EditorGUI.BeginChangeCheck();
             _statData = (AgentStatData)EditorGUILayout.ObjectField("Stat Data Asset", _statData, typeof(AgentStatData), false);
@@ -77,7 +80,7 @@ public class AgentCombatEditor : EditorWindow
         {
             string[] options = new string[AttackCount];
             for (int i = 0; i < AttackCount; i++)
-                options[i] = _playerController != null ? _attackLabels[i] : $"Attack {i + 1}";
+                options[i] = _playerController != null || _monsterController != null ? _attackLabels[i] : $"Attack {i + 1}";
             _selectedIndex = Mathf.Clamp(_selectedIndex, 0, AttackCount - 1);
             EditorGUI.BeginChangeCheck();
             _selectedIndex = EditorGUILayout.Popup("Select Index", _selectedIndex, options);
@@ -87,6 +90,11 @@ public class AgentCombatEditor : EditorWindow
             {
                 using (new EditorGUI.DisabledScope(true))
                     EditorGUILayout.ObjectField("Attack Data Asset", _attackAssets[_selectedIndex], typeof(PlayerAttackDataSO), false);
+            }
+            else if (_monsterController != null)
+            {
+                using (new EditorGUI.DisabledScope(true))
+                    EditorGUILayout.ObjectField("Attack Data Asset", _monsterAttackAssets[_selectedIndex], typeof(MonsterAttackDataSO), false);
             }
 
             EditorGUILayout.BeginHorizontal();
@@ -104,7 +112,7 @@ public class AgentCombatEditor : EditorWindow
             _isSceneHandleEnabled = EditorGUILayout.Toggle("Show Scene Handles", _isSceneHandleEnabled);
         }
         else
-            EditorGUILayout.HelpBox("Assign attack data in the Player Attack Handler or Monster Stat Data.", MessageType.Info);
+            EditorGUILayout.HelpBox("Assign attack SOs in the Player or Monster Attack Handler.", MessageType.Info);
 
         EditorGUILayout.Space();
         EditorGUILayout.LabelField("Animation Preview", EditorStyles.boldLabel);
@@ -149,7 +157,9 @@ public class AgentCombatEditor : EditorWindow
         _animator = null;
         _statData = null;
         _playerController = null;
+        _monsterController = null;
         _attackAssets.Clear();
+        _monsterAttackAssets.Clear();
         _attackLabels.Clear();
         _selectedIndex = 0;
         _tempData = default;
@@ -158,6 +168,7 @@ public class AgentCombatEditor : EditorWindow
         _animator = _targetHandler.GetComponentInChildren<Animator>();
         AgentController controller = _targetHandler.GetComponent<AgentController>();
         _playerController = controller as PlayerController;
+        _monsterController = controller as MonsterController;
         if (_playerController != null)
         {
             foreach (PlayerAttackHandler.AttackDefinition definition in _playerController.AttackHandler.AttackDefinitions)
@@ -170,6 +181,15 @@ public class AgentCombatEditor : EditorWindow
                 }
             }
         }
+        else if (_monsterController != null)
+        {
+            foreach (MonsterAttackHandler.AttackDefinition definition in _monsterController.AttackHandler.AttackDefinitions)
+            {
+                if (definition.Attack == null) continue;
+                _monsterAttackAssets.Add(definition.Attack);
+                _attackLabels.Add(definition.Role.ToString());
+            }
+        }
         else if (controller != null)
             _statData = controller.StatData;
         LoadFromSO();
@@ -178,17 +198,21 @@ public class AgentCombatEditor : EditorWindow
     private void LoadFromSO()
     {
         if (_selectedIndex >= AttackCount) return;
-        _tempData = _playerController != null ? _attackAssets[_selectedIndex].Data : _statData.attackDatas[_selectedIndex];
+        _tempData = _playerController != null ? _attackAssets[_selectedIndex].Data
+            : _monsterController != null ? _monsterAttackAssets[_selectedIndex].Data : _statData.attackDatas[_selectedIndex];
         SceneView.RepaintAll();
     }
 
     private void SaveToSO()
     {
         if (_selectedIndex >= AttackCount) return;
-        Object asset = _playerController != null ? _attackAssets[_selectedIndex] : (Object)_statData;
+        Object asset = _playerController != null ? _attackAssets[_selectedIndex]
+            : _monsterController != null ? _monsterAttackAssets[_selectedIndex] : (Object)_statData;
         Undo.RecordObject(asset, "Save Attack Range");
         if (_playerController != null)
             _attackAssets[_selectedIndex].Data = _tempData;
+        else if (_monsterController != null)
+            _monsterAttackAssets[_selectedIndex].Data = _tempData;
         else
             _statData.attackDatas[_selectedIndex] = _tempData;
         EditorUtility.SetDirty(asset);

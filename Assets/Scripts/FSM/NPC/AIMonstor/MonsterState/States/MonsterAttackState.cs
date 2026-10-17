@@ -1,34 +1,19 @@
 namespace ProjectRE
 {
-    /// <summary>공용 단발 공격 실행 및 진입 시 수평 이동 정지.</summary>
+    /// <summary>선택 전략의 준비·실행 및 Animation Event 전달.</summary>
     public class MonsterAttackState : AttackState
     {
-        private readonly GroundedMotor2D _motor;
-        private readonly AgentMeleeHitHandler2D _hitHandler;
-        private readonly AgentStatData _statData;
+        private readonly MonsterAttackHandler _handler;
+        public MonsterAttackState(ICombatAnimation animator, MonsterAttackHandler handler) : base(animator) => _handler = handler;
 
-        public MonsterAttackState(ICombatAnimation animator, AgentMeleeHitHandler2D hitHandler, GroundedMotor2D motor, AgentStatData statData)
-            : base(animator)
-        {
-            _motor = motor;
-            _hitHandler = hitHandler;
-            _statData = statData;
-        }
-
-        protected override void OnEnter()
-        {
-            Animator.SetAttackType(1);
-            base.OnEnter();
-            _motor.StopHorizontal();
-            _hitHandler.SetPreviewData(_statData.attackDatas[0]);
-        }
-
-        /// <summary>기존 StatData의 첫 공격 데이터로 단발 타격.</summary>
-        public override void OnAttackFrame(int attackStep) => _hitHandler.PerformAttack(_statData.attackDatas[0]);
-
+        /// <summary>배후 준비 중 공격 모션을 켜지 않도록 전략이 시작 시점 결정.</summary>
+        protected override void OnEnter() => _handler.BeginAttack();
+        protected override void OnExecute(float deltaTime) => _handler.Execute(deltaTime);
+        public override void OnAttackFrame(int intParameter) => _handler.OnAttackFrame(intParameter);
+        public void OnAnimationEnd() => _handler.OnAnimationEnd();
         protected override void OnExit()
         {
-            _hitHandler.ClearPreview();
+            _handler.EndAttack();
             base.OnExit();
         }
     }

@@ -18,11 +18,11 @@
 | 초기화·전환·수명 | `Agent/@Hub/AgentController.cs` |
 | State·Factory·DI | `Agent/StateControl/AgentStateBase.cs`, `AgentStateFactory.cs`(같은 폴더) |
 | 입력·공격 시작 | `Agent/Input/IAgentInput.cs`, `Agent/@Hub/IAgentController.cs` |
-| Animator·Clip Event·피해 | `Agent/@Hub/AgentAnimator.cs`, `IAgentAnimator.cs`(같은 폴더), `Agent/Handler/AgentAnimationEventProxy.cs`, `AgentCombatHandler.cs`(같은 폴더) |
-| 기본 Monster 재사용 사례 | `NPC/AIMonstor/@Hub/`, `Input/`, `MonsterState/`, `SOData/`(모두 AIMonstor 아래) |
+| Animator·Clip Event·피해 | `Agent/@Hub/AgentAnimator.cs`, `IAgentAnimator.cs`(같은 폴더), `Agent/Handler/AgentAnimationEventProxy.cs`, `AgentMeleeHitHandler2D.cs`(같은 폴더) |
+| 기본 Monster 재사용 사례 | `NPC/AIMonstor/@Hub/`, `MonsterState/`, `Attack/`, `Handler/`, `SOData/` |
 | 추가 행동이 있을 때 | `GroundedAgent/`, `Player/`의 해당 State·Factory·Handler |
 
-에셋은 `Assets/Prefabs/Monster/BasicMonster.prefab`, `Goblin.prefab`, `Animations/BasicMonster_Anim.controller`를 확인한다. 상세 제작 사례는 [Monster 제작 문서](../Agent_Extenstion_Monster.md)를 참고한다. 과거 계획·가상 설계를 구현된 기능으로 취급하지 않는다.
+에셋은 `Assets/Prefabs/Monster/BasicMonster.prefab`, `Goblin.prefab`, `Animations/BasicMonster_Anim.controller`를 확인한다. 지상 일반 Monster는 [현재 제작 가이드](FSM_Grounded_Monster_Creation_Guide.md)를 따른다. 과거 계획·가상 설계를 구현된 기능으로 취급하지 않는다.
 
 ## 3. 재사용 또는 확장 결정
 
@@ -33,42 +33,43 @@
 | 독립적인 새 행동·전이 필요 | State·Rule·Handler·Animator 기능을 필요한 만큼 추가 |
 | 초기화·시작·사망·실행 정책 자체가 다름 | Controller·FactoryData·Factory 확장 검토 |
 
-현재 `AgentController`는 2D Motor·Combat에 의존한다. `MonsterController : AgentController`는 지면 감지를 사용하지 않고, `PlayerController : GroundedAgentController`는 사용한다. 지상 캐릭터라는 이유만으로 Grounded 기반을 선택하지 말고 점프·착지·낙하 요구로 판단한다. 3D·비행·풀링은 기존 템플릿으로 가능한지 별도 검토한다.
+`AgentController`는 FSM 실행·Health·Animation Event를 관리하며 Input·Motor·근접 타격을 강제하지 않는다. `MonsterController : AgentController`는 지상 Motor·Handler·GroundDetector를 직접 구성하고, Player는 GroundedAgentController를 사용한다. 상속과 실행 도구 재사용은 구분한다. 비행·Boss·완전한 풀링은 별도 요구를 확인한다.
 
 ### 기본 Monster 계약
 
-- State: Grounded·Attack·Hit·Death. 시작은 Grounded, 공격 타입은 1.
-- `MonsterInput.SetMovement(Vector2)`: x를 -1~1로 제한하고 y 제외. `RequestAttack()`: 인자 없는 단발 요청.
-- Attack·Hit 진입 시 수평 이동 정지, 종료 후 Grounded 복귀. Death 모션 종료 후 삭제.
-- Attack 중 추가 요청 예약 기능은 없다. Grounded 복귀 시 저장된 이동값이 다시 적용된다.
-- GroundDetector 없이 사용하는 Grounded는 기본 이동 State다. 판단 AI는 외부 명령 계층으로 별도 연결한다.
+- State: PatrolWait·Patrol·Chase·LostTargetWait·Return·Attack·Hit·Death. 시작 PatrolWait.
+- MonsterInput·BT 없이 대상 Handler를 갱신하고 State·Rule에서 판단·행동한다.
+- 공격은 Handler에 역할·모션값·SO를 장착하고 전략으로 실행한다. Goblin은 일반·배후 두 전략에 같은 모션값 1을 사용한다.
+- Hit에서 수평 정지, Death 모션 종료 후 삭제. 공격·피격 종료 후 현재 상황으로 다음 행동을 판단한다.
+- GroundDetector는 FixedUpdate에서 갱신한다. 새 지상 일반 Monster는 기존 흐름·코드를 재사용한다.
 
 | State | 전이 평가 순서 |
 | --- | --- |
-| Grounded | Death → Hit → Attack |
-| Attack | Death → Hit → AttackEnd(Grounded) |
-| Hit | Death → HitEnd(Grounded) |
+| 순찰·대기·추적·복귀 | Death → Hit → 대상·시간·도착·공격 조건 |
+| Attack | Death → Hit → 전략 완료·실패·대상 상실 결과 |
+| Hit | Death → HitEnd 후 상황 재판정 |
 | Death | 출구 없음 |
 
-점프·Dash·콤보·다중 공격·공중 피격 복귀 등은 기본 프로필과 다른 요구다. `AttackType` parameter의 존재만으로 다중 공격이 구현됐다고 가정하지 않는다.
+점프·Dash·콤보·공중 피격 복귀는 이 기본 프로필과 다른 요구다. 같은 모션을 사용하는 다른 공격 전술과 새 Animator 모션 분기는 구분한다.
 
 ## 4. 코드 제작 순서
 
 1. **필수 참조 확인**: StatData·MotorData·Proxy 등 공통 Awake에서 사용할 데이터를 먼저 확인한다. `RequireComponent`는 SO·Animator·직렬화 참조를 연결하지 않는다.
-2. **초기화**: `base.Awake()` → 전용 Animator·Handler 초기화 → FactoryData 주입 → Factory 결과를 `_states`에 할당한다. 공격 사용 시 CombatInput·AttackStarter도 주입한다.
+2. **초기화**: 공통 Awake 후 자기 Component·Animator를 초기화한다. Player는 Input·공격 Handler를, Monster는 최초 Start에서 대상·전략·HomeX를 준비한 뒤 전용 FactoryData를 구성한다. Input·AttackStarter는 필요한 Player 경로에서만 주입한다.
 3. **Factory 구성**: `AddCommonStates → AddAgentStates → ConfigureTransitions`. 기본 공통 State는 Hit·Death다. State 추가·교체를 끝낸 뒤 최종 객체에 Rule을 등록한다. Type 키·전이 수명은 State 가이드를 따른다.
-4. **시작·실행 연결**: 공통 `Start()`가 전환 이벤트를 연결하고 Grounded에 진입한다. 다른 시작 State는 이 연결을 보존하며 한 번만 진입하도록 구성한다. `Update()`의 Execute를 중복 실행하지 않는다. 직접 상속한 구체 Controller는 abstract `FixedUpdate()`를 구현하고, Grounded 기반이면 기존 지면 갱신을 보존한다.
+4. **시작·실행 연결**: State 구성을 마친 뒤 base.Start가 전환 이벤트를 연결한다. 시작 State는 각 Controller에서 선택한다. Monster는 대상 갱신 후 base.Update를 한 번 호출한다. 직접 상속한 Controller는 FixedUpdate를 구현하고 필요한 접지 갱신을 보존한다.
 5. **종료 정책 연결**: 기본 `OnDeathFinished()`는 빈 함수다. 요구한 삭제·비활성화·유지 정책을 구현한다. `OnDestroy()`를 재정의하면 공통 정리를 보존한다. 풀링은 비활성화·재활성화 시 구독·Health·State·Animator·속도 초기화를 별도 설계한다.
 
 ### 공격 흐름
 
 ```text
-공격 요청 → AttackTransition → TryStartAttack()·공격 타입 설정
-→ AttackState 진입 → 타격 Clip Event에서 PerformAttack()
-→ 종료 Event·End Rule → 다음 State → 공격 타입·Animator 값 정리
+Player: 입력 → AttackTransition → PlayerAttackHandler.TryStartAttack
+→ PlayerAttackState → 전략 Begin/Frame/End
+Monster: 대상·거리·간격 → MonsterAttackTransition → TryPrepareAttack
+→ MonsterAttackState → 일반/배후 전략 → 실제 종료 결과 → 다음 행동
 ```
 
-`ApplyAttackType()`은 타입 설정이며 피해 적용이 아니다. 공격 데이터 인덱스는 `attackDatas[attackType - 1]`이다. 공용 공격 입력은 `Action OnAttackRequested`이며, 타입 인자를 추가하면 기존 호출부 영향도 확인한다.
+모션 선택값과 타격 데이터는 분리한다. Player는 역할별 SO 배열·Frame 단계, Monster는 전략별 공격 SO를 사용한다. 공용 AgentMeleeHitHandler2D에는 선택된 AttackData를 전달하며 타격·Gizmo·Editor가 같은 범위를 계산한다.
 
 ## 5. 에셋·Prefab 연결
 
@@ -81,7 +82,7 @@
 | 종별 Clip·Override·Stat·Motor·작업용 Sprite | `Assets/Prefabs/Monster/{AgentName}/` 아래 `Animations/`, `ScriptableObjects/`, `Sprites/` |
 
 - `BasicMonster.prefab`은 Stat·Motor 데이터가 비어 있는 템플릿이다. `Goblin.prefab`을 연결 사례로 삼고 Variant에 종별 참조를 채운다.
-- Root에는 Controller·Input·Animator 어댑터·Motor·Rigidbody2D·Collider2D·Health·CombatHandler를, Visual에는 SpriteRenderer·실제 Unity Animator·Proxy를 둔다. 필요한 Handler·Detector만 추가한다.
+- Root에는 Controller·Animator 어댑터·Motor·Rigidbody2D·Collider2D·Health·근접 타격·GroundDetector·PlayerDetector를 둔다. Monster에는 Input·BT를 추가하지 않는다. Visual에는 SpriteRenderer·실제 Unity Animator·Proxy를 둔다.
 - 같은 행동이면 Override로 Idle·Move·Attack·Hit·Death Clip을 교체한다. 새 State·parameter·분기는 기반 Animator Controller를 확장해야 한다.
 - Collider의 피해 수신 컴포넌트와 CombatHandler의 `TryGetComponent` 판정, 대상 LayerMask·공격 범위·방향을 확인한다. PPU·pivot·Visual scale·Collider를 함께 조정한다. 현재 Motor는 Root scale을 x=±1, y=z=1로 설정하므로 외형 크기는 Visual에서 조절한다.
 - 원본 에셋·기존 GUID를 보존한다. Scene·Prefab·Animator·Clip·SO 편집은 연결된 Unity Editor의 CLI/MCP·Editor API로 수행하고 YAML 참조를 직접 수정하지 않는다. 사용자 Scene의 dirty·Play 상태와 기존 배치를 보존한다.
@@ -92,8 +93,8 @@
 
 | 시점 | Proxy 수신 함수 | 처리 |
 | --- | --- | --- |
-| 공격 유효 타격 | `OnAnimationOnFrame()` | 현재 AttackState 계열일 때 피해 판정 |
-| Attack·Hit 종료 | `OnAnimationEnd()` | `OnAnimationEnded` → End Rule |
+| 공격 유효 타격 | `OnAnimationOnFrame(intParameter)` | 현재 AttackState 계열에서 전략 타격. Monster 준비 중은 무시 |
+| Attack·Hit 종료 | `OnAnimationEnd()` | Monster 공격은 전략 완료·간격 기록, Hit·Player 공격은 기존 종료 Event/Rule |
 | Death 종료 | `OnAnimationEnd()` | `OnDeathFinished()` |
 
 ## 6. 완료 확인과 보고

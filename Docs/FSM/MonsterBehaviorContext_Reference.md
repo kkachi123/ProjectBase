@@ -1,6 +1,6 @@
 # Monster Behavior · Handler · Blackboard · Action 연결 정리
 
-현재 기준: Monster Blackboard·행동 흐름 단순화 적용. 10~15절은 이전 구조의 구현·검증 이력이며, 최신 적용 결과와 수동 확인 항목은 16절 기준.
+보관용 문서: 아래는 삭제된 Monster BT·Context 구조의 이전 구현·검증 이력이다. 현재 지상 Monster는 입력 없는 평면 FSM으로 전환했다. 최신 구조·검증 상태는 [Monster FSM After](Agent_Seperation/Monster_FSM_After.md), 제작 지침은 [지상 Monster 가이드](ProjectSkill/FSM_Grounded_Monster_Creation_Guide.md)를 따른다.
 
 적용 대상은 2D Grounded Monster. Grounded·Attack·Hit·Death FSM에 입력을 전달하며, 동일 층의 수평 이동을 기준으로 함. 비행·점프 경로·낙하 후 상층 복귀는 구현 범위가 아님.
 

@@ -31,7 +31,7 @@
 
 | 요소 | 책임·수명 |
 | --- | --- |
-| Input | 입력값·요청 전달. 전이·피해·행동 정책은 넣지 않음 |
+| Input | Player의 입력값·요청 전달. 직접 판단하는 Monster에는 강제하지 않음 |
 | TransitionRule | 진입/종료 조건과 `NextStateType` 판단 |
 | State | 행동의 진입·수행·정리. 독립 행동을 기존 State의 무관한 분기로 끼워 넣지 않음 |
 | Handler·Motor | 실행·완료 결과 제공. 직접 `ChangeState()`를 호출하지 않음 |
@@ -57,8 +57,8 @@ Exit: 이벤트 Rule Unsubscribe → OnExit
 공용 State의 파생 구현은 기반 타입을 Dictionary 키와 전이 목적지로 유지한다.
 
 ```csharp
-states.Add(typeof(AttackState), new MonsterAttackState(data.MonsterAnimator, data.CombatHandler, data.Motor));
-// AttackTransition.NextStateType == typeof(AttackState)
+states.Add(typeof(AttackState), new MonsterAttackState(data.MonsterAnimator, data.Attack));
+// MonsterAttackTransition.NextStateType == typeof(AttackState)
 ```
 
 새 독립 행동은 해당 State 타입을 키로 사용한다. 모든 목적지를 등록하고, Grounded/Fall처럼 동적 목적지는 반환 가능한 타입을 모두 확인한다. `AttackState`는 abstract이므로 직접 생성하지 않는다.
@@ -86,8 +86,9 @@ states.Add(typeof(AttackState), new MonsterAttackState(data.MonsterAnimator, dat
 
 | Clip 목적 | Proxy 함수·FSM 처리 |
 | --- | --- |
-| 공격 타격 | `OnAnimationOnFrame()` → 현재 AttackState 계열에서 피해 판정 |
-| Attack·Hit 등 Event로 종료하는 행동 | `OnAnimationEnd()` → OnAnimationEnded → 해당 End Rule |
+| 공격 타격 | `OnAnimationOnFrame(intParameter)` → 현재 AttackState 계열의 전략 타격 |
+| Player Attack·Hit 등 Event로 종료하는 행동 | `OnAnimationEnd()` → OnAnimationEnded → 해당 End Rule |
+| Monster Attack | `OnAnimationEnd()` → 전략 완료·간격 기록 → MonsterAttackEndTransition |
 | Death 종료 | `OnAnimationEnd()` → OnDeathFinished |
 
 Override Clip의 Event는 자동 승계를 가정하지 말고 직접 확인한다. Has Exit Time·Duration·Interruption 때문에 End 전에 빠져나가거나, 중단된 Clip의 늦은 Event가 현재 행동에 영향을 주는지 검증한다. Handler 완료로 종료하는 행동에는 종료용 Event를 강제하지 않는다.
@@ -98,6 +99,7 @@ Override Clip의 Event는 자동 승계를 가정하지 말고 직접 확인한�
 - **Dash 의존성**: AgentDashHandler2D는 현재 PlayerMotorData·GroundDetector·WallDetector를 요구한다. Execute에서 사용하는 시간과 물리 갱신 위치를 확인하고 다른 Agent에 그대로 복사하지 않는다. PlayerDashState·MonsterDashState·IDashExecution은 현재 구현이 아니다.
 - **요청 소비**: DashTransition은 평가 시 요청을 소비하고, AttackTransition은 시작 실패 시 요청을 유지하다 Unsubscribe에서 정리한다. 두 Rule의 예약 정책이 같다고 가정하지 않는다.
 - **Player 콤보**: 같은 Attack FSM State 안에서 Animator의 ComboTrigger로 세부 모션을 진행한다. 삭제된 Combo Handler 구조를 재도입하지 않는다.
+- **Monster 전략 준비**: 배후 접근은 MonsterAttackState 내부 단계이며 별도 HFSM이 아니다. 준비 중에는 공용 AttackState.OnEnter로 공격 Bool을 먼저 켜지 않는다. 이동은 전략 Execute, 전환은 Rule에서만 처리한다.
 
 ## 7. 검증과 완료 보고
 
