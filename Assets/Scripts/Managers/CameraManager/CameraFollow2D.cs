@@ -7,7 +7,7 @@ public class CameraFollow2D : MonoBehaviour
     [SerializeField] private Vector3 _offset = new Vector3(0f, 0f, -10f);
     [SerializeField] private float _followSpeed = 8f;
 
-    private Transform _target;
+    [SerializeField] private Transform _target;
 
     public Vector3 Offset => _offset;
     public Transform Target => _target;

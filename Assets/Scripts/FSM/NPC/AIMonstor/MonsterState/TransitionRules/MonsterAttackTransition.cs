@@ -2,7 +2,7 @@ namespace ProjectRE
 {
     using System;
 
-    /// <summary>入力要求を介さず距離・攻撃間隔から次の攻撃を準備。</summary>
+    /// <summary>입력 요청 없이 거리·공격 간격으로 다음 공격 준비.</summary>
     public class MonsterAttackTransition : ITransitionRule
     {
         private readonly MonsterAttackHandler _attack;

@@ -2,7 +2,7 @@ namespace ProjectRE
 {
     using System;
 
-    /// <summary>攻撃結果確認後、次の攻撃・追跡・復帰先を選択。</summary>
+    /// <summary>공격 결과 확인 후 다음 공격·추적·복귀 상태 선택.</summary>
     public class MonsterAttackEndTransition : ITransitionRule
     {
         private readonly MonsterAttackHandler _attack;
