@@ -8,7 +8,7 @@
 
 ## 1. 작업 입력과 소스 확인
 
-- 먼저 `Docs/FSM/ProjectSkill/AGENTS.md`, `Plan_Writing_Guide.md`와 Git 변경사항을 확인한다. 사용자 수정·삭제·미저장 Scene을 보존한다.
+- 먼저 [AGENTS.md](../../Skill/AGENTS.md), [Plan_Guide.md](../../Skill/Plan_Guide.md)와 Git 변경사항을 확인한다. 사용자 수정·삭제·미저장 Scene을 보존한다.
 - 지정한 AnimationClip의 Sprite 순서·프레임률·길이·Loop·기존 Event·바인딩 경로·공유 사용처를 확인한다. Sprite만 지정했다면 기존 Slice·pivot·PPU·Sprite ID를 보존하며 필요한 Clip을 만든다.
 - 기존 모션 교체인지, 콤보 단계 추가인지, 별도로 선택할 새 공격인지 구분한다. 별도 공격의 발동 입력·선택 조건이 없으면 먼저 확인한다. 현재 A 입력은 지상 GroundCombo·공중 AirAttack만 선택한다.
 - 타격 시점·횟수, 피해·범위·Stamina, 이동 유지·종료 모션을 확인한다. 모션만 보고 피해 방식이나 새 조작키를 임의로 확정하지 않는다. 미지정 수치는 유사 공격의 초기안을 제시하고 결과를 바꾸는 결정만 확인한다.

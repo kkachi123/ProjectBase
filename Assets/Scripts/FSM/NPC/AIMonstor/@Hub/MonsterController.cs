@@ -22,6 +22,7 @@ namespace ProjectRE
         private PlayerDetector _detector;
         private Collider2D _bodyCollider;
         private MonsterTargetHandler _target;
+        private TestPlayerManager _playerManager;
         // 최초 Start 전의 OnEnable·OnDisable만 구분.
         private bool _started;
 
@@ -38,12 +39,10 @@ namespace ProjectRE
             _bodyCollider = GetComponent<Collider2D>();
         }
 
-        /// <summary>최초 위치 기록·Player 주입·전략 구성 후 전환 이벤트 연결.</summary>
+        /// <summary>대상 유무와 무관하게 최초 위치·전략·FSM 구성 후 Player 연결.</summary>
         protected override void Start()
         {
             _target = new MonsterTargetHandler(_detector, _bodyCollider, _behaviorData.MaxTargetHeightDifference);
-            if (!BindPlayer())
-                return;
             _attackHandler.Initialize(_motor, _movement, _target, _monsterAnimator, _combatHandler, _behaviorData.ArrivalDistance);
             _states = new MonsterStateFactory().CreateStates(new MonsterStateFactoryData
             {
@@ -60,23 +59,47 @@ namespace ProjectRE
             });
             base.Start();
             _started = true;
+            ConnectPlayer();
             ChangeState(Health.IsDead.Value ? typeof(DeathState) : typeof(MonsterPatrolWaitState));
         }
 
-        /// <summary>씬 Player를 시작·재활성화 때만 확보.</summary>
-        private bool BindPlayer()
+        /// <summary>직접 배치 Player 우선 사용. 그 외에는 생성·등록 이벤트 연결.</summary>
+        private void ConnectPlayer()
         {
-            var manager = ScenePlayerManager.Instance;
-            if (manager == null || manager.Player == null)
+            ScenePlayerManager sceneManager = ScenePlayerManager.Instance;
+            if (sceneManager != null && sceneManager.Player != null)
             {
-                Debug.LogError($"{name}: ScenePlayerManager와 Inspector Player 할당 필요.", this);
-                enabled = false;
-                return false;
+                BindPlayer(sceneManager.Player);
+                return;
             }
-            var player = manager.Player;
+
+            _playerManager = Managers.Instance?.Player;
+            if (_playerManager != null)
+            {
+                _playerManager.OnPlayerChanged += BindPlayer;
+                BindPlayer(_playerManager.CurrentPlayer);
+            }
+        }
+
+        /// <summary>등록·해제 시 대상 참조와 인식 결과 즉시 갱신.</summary>
+        private void BindPlayer(PlayerController player)
+        {
+            if (player == null)
+            {
+                _target.Clear();
+                return;
+            }
             _target.BindPlayer(player.Health, player.GetComponent<Collider2D>());
             _target.UpdateTarget();
-            return true;
+        }
+
+        /// <summary>등록 이벤트 구독 해제.</summary>
+        private void DisconnectPlayer()
+        {
+            if (_playerManager == null)
+                return;
+            _playerManager.OnPlayerChanged -= BindPlayer;
+            _playerManager = null;
         }
 
         /// <summary>대상 판정 갱신 후 현재 State 전이·행동 실행.</summary>
@@ -96,8 +119,9 @@ namespace ProjectRE
         /// <summary>HomeX·공격 간격 보존 후 대상 재주입·행동 재개.</summary>
         private void OnEnable()
         {
-            if (!_started || !BindPlayer())
+            if (!_started)
                 return;
+            ConnectPlayer();
             ChangeState(Health.IsDead.Value ? typeof(DeathState)
                 : _target.HasValidTarget ? typeof(MonsterChaseState) : typeof(MonsterPatrolWaitState));
         }
@@ -107,6 +131,7 @@ namespace ProjectRE
         {
             if (!_started)
                 return;
+            DisconnectPlayer();
             AgentStateBase exitingState = _currentState;
             _currentState = null;
             exitingState?.Exit();

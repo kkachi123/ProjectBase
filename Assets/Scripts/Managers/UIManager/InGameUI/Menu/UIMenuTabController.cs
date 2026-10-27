@@ -1,4 +1,4 @@
-﻿namespace ProjectRE
+﻿﻿namespace ProjectRE
 {
 using System.Collections.Generic;
 using UnityEngine;
@@ -18,15 +18,11 @@ public class UIMenuTabController : MonoBehaviour
 
     public bool IsOpen { get; private set; }
 
-    private void EnsureInit()
-    {
-        if (_tabImages != null) return;
-        Initialize();
-    }
-
     public void OpenMenu()
     {
-        EnsureInit();
+        if (IsOpen) return;
+
+        Initialize();
         _content.SetActive(true);
         IsOpen = true;
         _screens[_activeIndex].OnShow();
@@ -35,6 +31,8 @@ public class UIMenuTabController : MonoBehaviour
 
     public void CloseMenu()
     {
+        if (!IsOpen) return;
+
         _screens[_activeIndex].OnHide();
         _content.SetActive(false);
         IsOpen = false;
@@ -47,8 +45,9 @@ public class UIMenuTabController : MonoBehaviour
         else OpenMenu();
     }
 
-    public void Initialize()
+    private void Initialize()
     {
+        if (_tabImages != null) return;
         _tabImages = new Image[_tabs.Count];
         for (int i = 0; i < _tabs.Count; i++)
         {
@@ -67,12 +66,12 @@ public class UIMenuTabController : MonoBehaviour
 
         if (prevIndex >= 0 && prevIndex < _screens.Count)
         {
-            _screens[prevIndex].OnHide();
+            if (IsOpen) _screens[prevIndex].OnHide();
             if (_tabImages[prevIndex]) _tabImages[prevIndex].sprite = TabInactive;
         }
 
         _activeIndex = index;
-        _screens[_activeIndex].OnShow();
+        if (IsOpen) _screens[_activeIndex].OnShow();
         if (_tabImages[_activeIndex]) _tabImages[_activeIndex].sprite = TabActive;
     }
 }

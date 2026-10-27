@@ -1,6 +1,7 @@
 ﻿namespace ProjectRE
 {
 using System;
+using System.Collections;
 using UnityEngine;
 using GridMapSystem;
 
@@ -21,48 +22,63 @@ public class AdventureRunManager : MonoBehaviour
     public RunState State { get; private set; } = RunState.None;
     public GeneratedMapInfo CurrentMapInfo { get; private set; }
 
-    public void StartRun()
+    // 맵·Player 생성 후 최초 상태 진입을 확인하고 플레이 시작.
+    public IEnumerator StartRun()
     {
-        if (State == RunState.Starting) return;
+        if (State == RunState.Starting) yield break;
 
         State = RunState.Starting;
 
         if (Managers.Instance.Map == null)
         {
-            Debug.LogError("[AdventureRunManager] MapManager is missing.");
-            State = RunState.Failed;
-            return;
+            FailStartRun("MapManager is missing.");
+            yield break;
         }
         // Map, Player 생성. 
-        Managers.Instance.Game.Reset();
         CurrentMapInfo = Managers.Instance.Map.GenerateMap();
 
         if (CurrentMapInfo == null)
         {
-            Debug.LogError("[AdventureRunManager] Failed to generate map.");
-            State = RunState.Failed;
-            return;
+            FailStartRun("Failed to generate map.");
+            yield break;
         }
 
         if (_playerSpawnManager == null)
         {
-            Debug.LogError("[AdventureRunManager] PlayerSpawnManager is missing.");
-            State = RunState.Failed;
-            return;
+            FailStartRun("PlayerSpawnManager is missing.");
+            yield break;
         }
 
         PlayerController player = _playerSpawnManager.Spawn(CurrentMapInfo.playerSpawnPosition);
         if (player == null)
         {
-            State = RunState.Failed;
-            return;
+            FailStartRun("Failed to spawn Player.");
+            yield break;
         }
 
+        // 생성 프레임의 Awake 이후 다음 프레임에서 Start 완료 확인.
+        yield return null;
+        if (player == null || !player.isActiveAndEnabled || !player.IsReady)
+        {
+            FailStartRun("Player initialization did not complete.");
+            yield break;
+        }
+
+        _playerSpawnManager.RegisterCurrentPlayer();
         _notifyDialogue?.RegisterDialogue(Managers.Instance.UI.InGameUI?.Dialogue);
         Managers.Instance.Camera?.BindTarget(player.transform);
         PrepareLighting();
 
+        Managers.Instance.Game.Reset();
         State = RunState.Playing;
+    }
+
+    // 시작 실패 시 부분 생성물 정리. Title 복귀는 현재 씬 전환에서 처리.
+    private void FailStartRun(string message)
+    {
+        Debug.LogError($"[AdventureRunManager] {message}");
+        ClearRunObjects();
+        State = RunState.Failed;
     }
 
     private void PrepareLighting()

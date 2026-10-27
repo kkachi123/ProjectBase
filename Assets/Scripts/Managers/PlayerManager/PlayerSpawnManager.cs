@@ -20,9 +20,11 @@ public class PlayerSpawnManager : MonoBehaviour
         }
 
         CurrentPlayer = Instantiate(_playerPrefab, position, Quaternion.identity, _playerParent);
-        Managers.Instance.Player.RegisterPlayer(CurrentPlayer);
         return CurrentPlayer;
     }
+
+    // 최초 상태 진입을 마친 Player 등록.
+    public void RegisterCurrentPlayer() => Managers.Instance.Player.RegisterPlayer(CurrentPlayer);
 
     public void MoveCurrentPlayer(Vector3 position)
     {

@@ -4,7 +4,7 @@
 
 ## 1. 작업 전 확인
 
-- AGENTS.md와 Plan_Writing_Guide.md를 읽고 사용자 변경을 보존한다.
+- [AGENTS.md](../../Skill/AGENTS.md)와 [Plan_Guide.md](../../Skill/Plan_Guide.md)를 읽고 사용자 변경을 보존한다.
 - 종 이름, Sprite·Idle/Move/Attack/Hit/Death 모션, Stat·Motor·행동·공격 수치, 장착 전략, 검증 씬을 확인한다.
 - MonsterController·MonsterStateFactory·MonsterTargetHandler·MonsterAttackHandler와 MonsterAttackSO·파생 SO를 읽는다.
 - 연결 예시는 BasicMonster.prefab과 Goblin.prefab. 변경 전후 구조·검증 이력은 [리팩토링 로그](../Refactoring_Log/FSM_Refactoring_Source_Log.md) 4.10~4.11절 참고.

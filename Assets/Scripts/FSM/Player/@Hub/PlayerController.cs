@@ -4,6 +4,7 @@
     [RequireComponent(typeof(AgentImpactHandler))]
     [RequireComponent(typeof(PlayerAnimator))]
     [RequireComponent(typeof(PlayerInput), typeof(AgentMeleeHitHandler2D))]
+    [RequireComponent(typeof(AgentDashHandler2D), typeof(WallDetector))]
     /// <summary>
     /// Player 전용 컴포넌트·공격 Handler·FSM 초기화.
     /// </summary>
@@ -19,6 +20,7 @@
         protected override GroundedMotorData MovementData => _motorData;
 
         public Stamina Stamina { get; private set; }
+        public bool IsReady { get; private set; }
 
         private PlayerInput _playerInput;
         private AgentDashHandler2D _dashHandler;
@@ -67,6 +69,7 @@
         {
             base.Start();
             ChangeState(typeof(GroundedState));
+            IsReady = _currentState is GroundedState;
         }
 
         /// <summary>현재 State 종료 후 개체별 공격 SO 복제본 제거.</summary>

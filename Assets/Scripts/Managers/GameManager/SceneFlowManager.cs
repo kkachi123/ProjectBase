@@ -39,10 +39,18 @@ public class SceneFlowManager : MonoBehaviour
         Time.timeScale = 1f;
         if (nextState == SceneFlowState.InGame)
         {
-            if (Managers.Instance.AdventureRun != null)
-                Managers.Instance.AdventureRun.StartRun();
-            else
-                Managers.Instance.Game.Reset();
+            AdventureRunManager run = Managers.Instance.AdventureRun;
+            if (run != null)
+                yield return run.StartRun();
+
+            if (run == null || run.State != AdventureRunManager.RunState.Playing)
+            {
+                if (run == null)
+                    Debug.LogError("[SceneFlowManager] AdventureRunManager is missing.");
+                // Loading 재진입 없이 현재 전환에서 실패 복귀 완료.
+                yield return SceneManager.LoadSceneAsync(_titleScene);
+                nextState = SceneFlowState.Title;
+            }
         }
         State = nextState;
         overlay.ShowLoading(false);
