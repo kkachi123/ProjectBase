@@ -3,7 +3,6 @@
 using System;
 using System.Collections;
 using UnityEngine;
-using GridMapSystem;
 
 public class AdventureRunManager : MonoBehaviour
 {
@@ -25,7 +24,7 @@ public class AdventureRunManager : MonoBehaviour
     // 맵·Player 생성 후 최초 상태 진입을 확인하고 플레이 시작.
     public IEnumerator StartRun()
     {
-        if (State == RunState.Starting) yield break;
+        if (State == RunState.Starting || State == RunState.Playing) yield break;
 
         State = RunState.Starting;
 
@@ -39,7 +38,7 @@ public class AdventureRunManager : MonoBehaviour
 
         if (CurrentMapInfo == null)
         {
-            FailStartRun("Failed to generate map.");
+            FailStartRun("Failed to generate map.", clearMap: false);
             yield break;
         }
 
@@ -74,10 +73,10 @@ public class AdventureRunManager : MonoBehaviour
     }
 
     // 시작 실패 시 부분 생성물 정리. Title 복귀는 현재 씬 전환에서 처리.
-    private void FailStartRun(string message)
+    private void FailStartRun(string message, bool clearMap = true)
     {
         Debug.LogError($"[AdventureRunManager] {message}");
-        ClearRunObjects();
+        if (clearMap) ClearRunObjects();
         State = RunState.Failed;
     }
 

@@ -1607,7 +1607,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _titleScene: Title
-  _gameScene: InGame
+  _gameScene: InGameChunk
   _fadeTime: 0.5
 --- !u!4 &1135761945
 Transform:
@@ -2030,8 +2030,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e902de807d12c8c47bd63177e186c74b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _generationSettings: {fileID: 11400000, guid: ba1f8c6c3f10d734b9766bd8560bebae, type: 2}
+  _planningSettings: {fileID: 11400000, guid: 9e1eeaecd3455b943bd49094f7a2f5a7, type: 2}
+  _goalPrefab: {fileID: 687906260858188891, guid: 38816fcc9fa5f1d4a81dbfdd0e8662fe, type: 3}
   _generateOnStart: 0
+  _useRandomSeed: 1
+  _seed: 0
 --- !u!1 &1782603996
 GameObject:
   m_ObjectHideFlags: 0
