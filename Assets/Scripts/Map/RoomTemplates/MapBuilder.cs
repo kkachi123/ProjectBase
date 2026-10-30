@@ -3,6 +3,7 @@ namespace ProjectRE.MapGeneration
     using System;
     using System.Collections.Generic;
     using UnityEngine;
+    using UnityEngine.Tilemaps;
 
     public sealed class MapBuildResult
     {
@@ -22,7 +23,8 @@ namespace ProjectRE.MapGeneration
     public static class MapBuilder
     {
         public static MapBuildResult Build(MapPlan plan, RoomTemplateCatalog catalog,
-            GameObject goalPrefab, MapBuildContext context = null)
+            GameObject goalPrefab, MapBuildContext context = null, TileBase visualGround = null,
+            Material visualGroundMaterial = null)
         {
             if (catalog == null || goalPrefab == null) return MapBuildResult.Failed("카탈로그 또는 Goal 프리팹이 없습니다.");
             if (context == null) context = new MapBuildContext();
@@ -52,6 +54,7 @@ namespace ProjectRE.MapGeneration
                 root.SetActive(false);
                 root.transform.SetPositionAndRotation(Vector3.zero, Quaternion.identity);
                 root.transform.localScale = Vector3.one;
+                var terrainMaps = new List<MapVisualBuilder.TerrainMap>();
                 foreach (MapRoomPlan room in plan.Rooms)
                 {
                     GameObject instance = context.InstantiatePrefab(prefabs[room.TemplateId].gameObject, root.transform);
@@ -62,6 +65,8 @@ namespace ProjectRE.MapGeneration
                     instance.transform.localScale = Vector3.one;
                     instance.name = $"Room ({room.Cell.x}, {room.Cell.y}) {room.TemplateId}";
                     var template = instance.GetComponent<RoomTemplate>();
+                    var roomOrigin = new Vector3Int(room.Cell.x * RoomTemplate.RoomSize, -room.Cell.y * RoomTemplate.RoomSize, 0);
+                    if (visualGround != null) terrainMaps.Add(new MapVisualBuilder.TerrainMap(template.FixedGeometry, roomOrigin));
                     foreach (RoomTerrainSelection selection in room.Terrain)
                     {
                         RoomTerrainVariation variation = null;
@@ -80,6 +85,11 @@ namespace ProjectRE.MapGeneration
                             patternInstance.transform.localPosition = new Vector3(region.xMin, region.yMin, 0);
                             patternInstance.transform.localRotation = Quaternion.identity;
                             patternInstance.transform.localScale = Vector3.one;
+                            if (visualGround != null)
+                            {
+                                var patternMap = patternInstance.GetComponentInChildren<Tilemap>(true);
+                                terrainMaps.Add(new MapVisualBuilder.TerrainMap(patternMap, roomOrigin + new Vector3Int(region.xMin, region.yMin, 0)));
+                            }
                         }
                         if (selection.FilledCells.Count > 0)
                         {
@@ -116,6 +126,7 @@ namespace ProjectRE.MapGeneration
                 goal.transform.SetParent(root.transform, false);
                 goal.transform.localPosition = plan.Goal;
                 goal.transform.localRotation = Quaternion.identity;
+                if (visualGround != null) MapVisualBuilder.Build(root, terrainMaps, visualGround, context, visualGroundMaterial);
                 return MapBuildResult.Succeeded(root, plan);
             }
             catch (Exception exception)

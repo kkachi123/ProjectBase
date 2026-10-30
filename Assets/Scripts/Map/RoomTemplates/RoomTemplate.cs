@@ -67,6 +67,8 @@ namespace ProjectRE.MapGeneration
         public const int VerticalOpeningStart = 13;
 
         [SerializeField] private string _templateId;
+        [Tooltip("같은 지형 구조의 Variant가 공유하는 Base 식별자입니다. 비어 있으면 템플릿 ID를 사용합니다.")]
+        [SerializeField] private string _baseGroupId;
         [SerializeField] private RoomType _roomType;
         [SerializeField] private RoomOpening _openings;
         [SerializeField] private Tilemap _fixedGeometry;
@@ -90,8 +92,12 @@ namespace ProjectRE.MapGeneration
         [SerializeField] private Transform _optionalTarget;
 
         public string TemplateId => _templateId;
+        public string BaseGroupId => string.IsNullOrWhiteSpace(_baseGroupId) ? _templateId : _baseGroupId;
         public RoomType Type => _roomType;
-        public RoomOpening Openings => _openings;
+        // Unity의 Flags Inspector는 Everything을 -1로 직렬화한다.
+        public RoomOpening Openings => _openings == (RoomOpening)(-1)
+            ? RoomOpening.North | RoomOpening.East | RoomOpening.South | RoomOpening.West
+            : _openings;
         public Tilemap FixedGeometry => _fixedGeometry;
         public IReadOnlyList<RoomPassage> Passages => _passages;
         public bool PassagesVerified => _passagesVerified;

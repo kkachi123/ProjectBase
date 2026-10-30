@@ -24,11 +24,20 @@ namespace ProjectRE.MapGeneration
             }
 
             var ids = new HashSet<string>(StringComparer.Ordinal);
+            var groups = new Dictionary<string, (RoomType type, RoomOpening openings)>(StringComparer.Ordinal);
             foreach (RoomTemplateSnapshot template in templates)
             {
                 if (template == null) { errors.Add("템플릿이 null입니다."); continue; }
                 if (string.IsNullOrWhiteSpace(template.Id) || !ids.Add(template.Id))
                     errors.Add($"비어 있거나 중복된 템플릿 ID: {template.Id}");
+                if (string.IsNullOrWhiteSpace(template.BaseGroupId))
+                    errors.Add($"Base 그룹 ID가 비어 있습니다: {template.Id}");
+                else if (groups.TryGetValue(template.BaseGroupId, out var group))
+                {
+                    if (group.type != template.Type || group.openings != template.Openings)
+                        errors.Add($"Base 그룹의 방 유형 또는 출입구가 다릅니다: {template.BaseGroupId}");
+                }
+                else groups.Add(template.BaseGroupId, (template.Type, template.Openings));
                 if (!Enum.IsDefined(typeof(RoomType), template.Type) || (template.Openings & ~AllOpenings) != 0 ||
                     !RoomDirection.MatchesType(template.Type, template.Openings))
                     errors.Add($"잘못된 방 유형 또는 출입구: {template.Id}");
@@ -76,7 +85,8 @@ namespace ProjectRE.MapGeneration
                     var options = new HashSet<string>(StringComparer.Ordinal);
                     foreach (ContentOptionSnapshot option in slot.Options)
                     {
-                        if (option == null || string.IsNullOrWhiteSpace(option.Id) || !options.Add(option.Id) || option.Weight <= 0)
+                        if (option == null || string.IsNullOrWhiteSpace(option.Id) || !options.Add(option.Id) || option.Weight <= 0 ||
+                            option.Kind == ContentKind.Unspecified || !Enum.IsDefined(typeof(ContentKind), option.Kind))
                         { errors.Add($"잘못된 콘텐츠 선택지: {template.Id}"); continue; }
                         total += option.Weight;
                     }
@@ -119,7 +129,12 @@ namespace ProjectRE.MapGeneration
                         for (int j = 0; j < actual.FilledCells.Count; j++)
                             if (actual.FilledCells[j] != wanted.FilledCells[j]) errors.Add($"확률 셀이 일치하지 않습니다: {room.Cell}");
                     }
-                    var expectedContent = room.IsOptional ? RoomContentPlanner.Select(plan.Seed, room.Cell, template) : Array.Empty<ContentSelection>();
+                    int pathIndex = -1;
+                    for (int i = 0; i < plan.Path.Count; i++) if (plan.Path[i] == room.Cell) { pathIndex = i; break; }
+                    bool mainPath = pathIndex > 0 && pathIndex < plan.Path.Count - 1;
+                    var expectedContent = room.IsOptional || mainPath
+                        ? RoomContentPlanner.Select(plan.Seed, room.Cell, template, room.IsOptional ? ContentRoomRole.Optional : ContentRoomRole.MainPath)
+                        : Array.Empty<ContentSelection>();
                     if (room.Content.Count != expectedContent.Count) errors.Add($"콘텐츠 선택 개수가 다릅니다: {room.Cell}");
                     else for (int i = 0; i < expectedContent.Count; i++)
                         if (room.Content[i] == null || room.Content[i].SlotIndex != expectedContent[i].SlotIndex ||

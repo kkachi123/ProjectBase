@@ -11,6 +11,7 @@ namespace ProjectRE.MapGeneration
         private readonly ReadOnlyCollection<RoomPassage> _passages;
 
         public string Id { get; }
+        public string BaseGroupId { get; }
         public RoomType Type { get; }
         public RoomOpening Openings { get; }
         public bool PassagesVerified { get; }
@@ -31,9 +32,10 @@ namespace ProjectRE.MapGeneration
             bool hasGoal = false, Vector3 goal = default,
             RoomOpening verifiedStartExits = RoomOpening.None, RoomOpening verifiedGoalEntries = RoomOpening.None,
             IEnumerable<RoomTerrainSnapshot> terrain = null, RoomOpening verifiedDeadEndReturns = RoomOpening.None,
-            IEnumerable<ContentSlotSnapshot> content = null)
+            IEnumerable<ContentSlotSnapshot> content = null, string baseGroupId = null)
         {
             Id = id;
+            BaseGroupId = string.IsNullOrWhiteSpace(baseGroupId) ? id : baseGroupId;
             Type = type;
             Openings = openings;
             _passages = new List<RoomPassage>(passages ?? Array.Empty<RoomPassage>()).AsReadOnly();

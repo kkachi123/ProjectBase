@@ -222,7 +222,8 @@ namespace ProjectRE.MapGeneration
                 var ids = new HashSet<string>(System.StringComparer.Ordinal);
                 foreach (RoomContentOption option in slot.options)
                 {
-                    if (option == null || string.IsNullOrWhiteSpace(option.id) || !ids.Add(option.id) || option.prefab == null || option.weight <= 0)
+                    if (option == null || string.IsNullOrWhiteSpace(option.id) || !ids.Add(option.id) || option.prefab == null || option.weight <= 0 ||
+                        option.kind == ContentKind.Unspecified || !System.Enum.IsDefined(typeof(ContentKind), option.kind))
                     { errors.Add("콘텐츠 ID, 프리팹 또는 가중치가 올바르지 않습니다."); continue; }
                     total += option.weight;
                     var prefab = option.prefab;

@@ -1,6 +1,7 @@
 namespace ProjectRE.MapGeneration
 {
     using UnityEngine;
+    using UnityEngine.Tilemaps;
 
     /// <summary>맵 생성에 필요한 제작 카탈로그와 격자 설정.</summary>
     [CreateAssetMenu(fileName = "MapPlanningSettings", menuName = "Map/Planning Settings")]
@@ -10,11 +11,15 @@ namespace ProjectRE.MapGeneration
         [SerializeField] private int _width = 4;
         [SerializeField] private int _height = 4;
         [SerializeField] private int _maxAttempts = 32;
+        [SerializeField] private TileBase _visualGround;
+        [SerializeField] private Material _visualGroundMaterial;
 
         public RoomTemplateCatalog Catalog => _catalog;
         public int Width => _width;
         public int Height => _height;
         public int MaxAttempts => _maxAttempts;
+        public TileBase VisualGround => _visualGround;
+        public Material VisualGroundMaterial => _visualGroundMaterial;
 
         public MapPlanningResult CreatePlan(int seed)
         {

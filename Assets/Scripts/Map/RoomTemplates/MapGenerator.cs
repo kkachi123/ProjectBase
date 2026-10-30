@@ -14,7 +14,8 @@ namespace ProjectRE.MapGeneration
                 return MapBuildResult.Failed($"seed={seed}: {error}");
             var planning = MapPlanner.Create(settings.Width, settings.Height, seed, settings.MaxAttempts, snapshots);
             if (!planning.Success) return MapBuildResult.Failed(planning.Error);
-            return MapBuilder.Build(planning.Plan, settings.Catalog, goalPrefab, context);
+            return MapBuilder.Build(planning.Plan, settings.Catalog, goalPrefab, context, settings.VisualGround,
+                settings.VisualGroundMaterial);
         }
     }
 }

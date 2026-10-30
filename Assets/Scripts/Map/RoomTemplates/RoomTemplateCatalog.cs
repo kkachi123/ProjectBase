@@ -48,7 +48,7 @@ namespace ProjectRE.MapGeneration
                 foreach (RoomContentSlot slot in template.ContentSettings)
                 {
                     var options = new List<ContentOptionSnapshot>();
-                    foreach (RoomContentOption option in slot.options) options.Add(new ContentOptionSnapshot(option.id, option.weight));
+                    foreach (RoomContentOption option in slot.options) options.Add(new ContentOptionSnapshot(option.id, option.weight, option.kind));
                     content.Add(new ContentSlotSnapshot(slot.slotIndex, slot.emptyWeight, options));
                 }
                 content.Sort((a, b) => a.SlotIndex.CompareTo(b.SlotIndex));
@@ -56,7 +56,8 @@ namespace ProjectRE.MapGeneration
                     template.Passages, template.PassagesVerified,
                     hasStart, hasStart ? template.transform.InverseTransformPoint(template.PlayerStart.position) : default,
                     hasGoal, hasGoal ? template.transform.InverseTransformPoint(template.Goal.position) : default,
-                    template.VerifiedStartExits, template.VerifiedGoalEntries, terrain, template.VerifiedDeadEndReturns, content));
+                    template.VerifiedStartExits, template.VerifiedGoalEntries, terrain, template.VerifiedDeadEndReturns, content,
+                    template.BaseGroupId));
             }
             result.Sort((a, b) => string.CompareOrdinal(a.Id, b.Id));
             snapshots = result.AsReadOnly();

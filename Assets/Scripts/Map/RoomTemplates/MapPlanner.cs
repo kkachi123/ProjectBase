@@ -52,6 +52,7 @@ namespace ProjectRE.MapGeneration
             var indexes = new Dictionary<Vector2Int, int>();
             for (int i = 0; i < path.Count; i++) indexes.Add(path[i], i);
             var rooms = new List<MapRoomPlan>(width * height);
+            var variantRandom = new StableRandom(MixSeed(seed, 0x91E10DA5u));
             Vector3 start = default, goal = default;
 
             for (int y = 0; y < height; y++)
@@ -80,13 +81,24 @@ namespace ProjectRE.MapGeneration
                     error = $"후보 없음: cell={cell}, openings={openings}, entry={entry}, exit={exit}, start={isStart}, goal={isGoal}";
                     return false;
                 }
-                RoomTemplateSnapshot chosen = candidates[random.Next(candidates.Count)];
+                RoomTemplateSnapshot chosen = ChooseGrouped(candidates, random, variantRandom);
                 rooms.Add(new MapRoomPlan(cell, chosen.Id, chosen.Type, openings, entry, exit,
                     RoomTerrainPlanner.Select(seed, cell, chosen)));
                 if (isStart) start = RoomDirection.Origin(cell) + chosen.PlayerStart;
                 if (isGoal) goal = RoomDirection.Origin(cell) + chosen.Goal;
             }
             AddOptionalRoom(width, height, seed, path, indexes, templates, rooms);
+            var byId = new Dictionary<string, RoomTemplateSnapshot>(StringComparer.Ordinal);
+            foreach (var template in templates) byId.Add(template.Id, template);
+            for (int i = 0; i < rooms.Count; i++)
+            {
+                var room = rooms[i];
+                bool mainPath = indexes.TryGetValue(room.Cell, out int pathIndex) && pathIndex > 0 && pathIndex < path.Count - 1;
+                if (!room.IsOptional && !mainPath) continue;
+                var role = room.IsOptional ? ContentRoomRole.Optional : ContentRoomRole.MainPath;
+                rooms[i] = new MapRoomPlan(room.Cell, room.TemplateId, room.Type, room.Openings, room.Entry, room.Exit,
+                    room.Terrain, room.Branch, room.IsOptional, RoomContentPlanner.Select(seed, room.Cell, byId[room.TemplateId], role));
+            }
             plan = new MapPlan(width, height, seed, rooms, path, start, goal);
             error = null;
             return true;
@@ -119,15 +131,60 @@ namespace ProjectRE.MapGeneration
                 }
             }
             if (choices.Count == 0) return;
-            uint hash = unchecked(((uint)seed ^ 0x6A09E667u) * 1664525u + 1013904223u);
-            var choice = choices[(int)(((ulong)hash * (uint)choices.Count) >> 32)];
-            MapRoomPlan oldMain = rooms[choice.mainIndex], oldSide = rooms[choice.sideIndex];
-            RoomOpening back = RoomDirection.Opposite(choice.direction);
-            rooms[choice.mainIndex] = new MapRoomPlan(oldMain.Cell, choice.main.Id, choice.main.Type, choice.main.Openings,
-                oldMain.Entry, oldMain.Exit, RoomTerrainPlanner.Select(seed, oldMain.Cell, choice.main), choice.direction);
-            rooms[choice.sideIndex] = new MapRoomPlan(oldSide.Cell, choice.side.Id, choice.side.Type, choice.side.Openings,
-                back, back, RoomTerrainPlanner.Select(seed, oldSide.Cell, choice.side), isOptional: true,
-                content: RoomContentPlanner.Select(seed, oldSide.Cell, choice.side));
+            var locations = new List<(int mainIndex, int sideIndex, RoomOpening direction)>();
+            foreach (var candidate in choices)
+            {
+                var location = (candidate.mainIndex, candidate.sideIndex, candidate.direction);
+                if (!locations.Contains(location)) locations.Add(location);
+            }
+            var branchRandom = new StableRandom(unchecked(seed ^ (int)0x6A09E667u));
+            var branchVariantRandom = new StableRandom(MixSeed(seed, 0xBB67AE85u));
+            var chosenLocation = locations[branchRandom.Next(locations.Count)];
+            var mainCandidates = new List<RoomTemplateSnapshot>();
+            var sideCandidates = new List<RoomTemplateSnapshot>();
+            foreach (var candidate in choices)
+            {
+                if (candidate.mainIndex != chosenLocation.mainIndex || candidate.sideIndex != chosenLocation.sideIndex ||
+                    candidate.direction != chosenLocation.direction) continue;
+                if (!mainCandidates.Contains(candidate.main)) mainCandidates.Add(candidate.main);
+                if (!sideCandidates.Contains(candidate.side)) sideCandidates.Add(candidate.side);
+            }
+            RoomTemplateSnapshot chosenMain = ChooseGrouped(mainCandidates, branchRandom, branchVariantRandom);
+            RoomTemplateSnapshot chosenSide = ChooseGrouped(sideCandidates, branchRandom, branchVariantRandom);
+            MapRoomPlan oldMain = rooms[chosenLocation.mainIndex], oldSide = rooms[chosenLocation.sideIndex];
+            RoomOpening back = RoomDirection.Opposite(chosenLocation.direction);
+            rooms[chosenLocation.mainIndex] = new MapRoomPlan(oldMain.Cell, chosenMain.Id, chosenMain.Type, chosenMain.Openings,
+                oldMain.Entry, oldMain.Exit, RoomTerrainPlanner.Select(seed, oldMain.Cell, chosenMain), chosenLocation.direction);
+            rooms[chosenLocation.sideIndex] = new MapRoomPlan(oldSide.Cell, chosenSide.Id, chosenSide.Type, chosenSide.Openings,
+                back, back, RoomTerrainPlanner.Select(seed, oldSide.Cell, chosenSide), isOptional: true);
+        }
+
+        private static RoomTemplateSnapshot ChooseGrouped(List<RoomTemplateSnapshot> candidates,
+            StableRandom groupRandom, StableRandom variantRandom)
+        {
+            var groups = new SortedDictionary<string, List<RoomTemplateSnapshot>>(StringComparer.Ordinal);
+            foreach (RoomTemplateSnapshot candidate in candidates)
+            {
+                if (!groups.TryGetValue(candidate.BaseGroupId, out var variants))
+                    groups.Add(candidate.BaseGroupId, variants = new List<RoomTemplateSnapshot>());
+                variants.Add(candidate);
+            }
+            int groupIndex = groupRandom.Next(groups.Count);
+            foreach (var group in groups.Values)
+                if (groupIndex-- == 0)
+                    return group.Count == 1 ? group[0] : group[variantRandom.Next(group.Count)];
+            throw new InvalidOperationException("Base 그룹을 선택하지 못했습니다.");
+        }
+
+        private static int MixSeed(int seed, uint salt)
+        {
+            uint value = unchecked((uint)seed ^ salt);
+            value ^= value >> 16;
+            value = unchecked(value * 0x7FEB352Du);
+            value ^= value >> 15;
+            value = unchecked(value * 0x846CA68Bu);
+            value ^= value >> 16;
+            return unchecked((int)value);
         }
 
         // System.Random 구현 변경에 영향을 받지 않도록 알고리즘을 고정한다.

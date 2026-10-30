@@ -47,7 +47,7 @@ namespace ProjectRE.MapGeneration.Tests
             var changed = original.Select(t => new RoomTemplateSnapshot(t.Id, t.Type, t.Openings,
                 t.Passages, t.PassagesVerified, t.HasPlayerStart, t.PlayerStart, t.HasGoal, t.Goal,
                 t.VerifiedStartExits, t.VerifiedGoalEntries, t.Terrain, t.VerifiedDeadEndReturns,
-                t.Content.Select(s => new ContentSlotSnapshot(s.SlotIndex, 99, s.Options)))).ToList();
+                t.Content.Select(s => new ContentSlotSnapshot(s.SlotIndex, 99, s.Options)), t.BaseGroupId)).ToList();
             for (int seed = 0; seed < 100; seed++)
             {
                 var a = MapPlanner.Create(4, 4, seed, 32, original);
@@ -62,8 +62,7 @@ namespace ProjectRE.MapGeneration.Tests
             }
         }
 
-        [TestCase(1, "goblin")]
-        [TestCase(2, "item")]
+        [TestCase(0, "item")]
         public void BuilderPlacesSelectedPrefabInOptionalRoom(int seed, string id)
         {
             var settings = AssetDatabase.LoadAssetAtPath<MapPlanningSettings>(SettingsPath);
@@ -91,6 +90,96 @@ namespace ProjectRE.MapGeneration.Tests
         }
 
         [Test]
+        public void FinalRoomRoleControlsContentAndKeepsSeedReproducible()
+        {
+            var settings = AssetDatabase.LoadAssetAtPath<MapPlanningSettings>(SettingsPath);
+            Assert.That(settings.Catalog.TryCreateSnapshot(out var templates, out var error), Is.True, error);
+            var byId = templates.ToDictionary(t => t.Id);
+            var mainKinds = new HashSet<ContentKind>();
+            int optionalItems = 0, optionalEmpty = 0, mainSlots = 0;
+            for (int seed = 0; seed < 500; seed++)
+            {
+                var first = settings.CreatePlan(seed);
+                var again = settings.CreatePlan(seed);
+                Assert.That(first.Success && again.Success, Is.True, $"seed {seed}: {first.Error}");
+                Assert.That(MapPlanValidator.Validate(first.Plan, templates), Is.Empty, $"seed {seed}");
+                for (int i = 0; i < first.Plan.Rooms.Count; i++)
+                {
+                    var room = first.Plan.Rooms[i];
+                    Assert.That(room.Content.Select(c => (c.SlotIndex, c.OptionId)),
+                        Is.EqualTo(again.Plan.Rooms[i].Content.Select(c => (c.SlotIndex, c.OptionId))));
+                    bool onPath = first.Plan.Path.Contains(room.Cell);
+                    bool endpoint = room.Cell == first.Plan.Path[0] || room.Cell == first.Plan.Path[first.Plan.Path.Count - 1];
+                    if ((!onPath && !room.IsOptional) || endpoint) Assert.That(room.Content, Is.Empty);
+                    foreach (var selection in room.Content)
+                    {
+                        if (!room.IsOptional) mainSlots++;
+                        if (selection.OptionId == "") { if (room.IsOptional) optionalEmpty++; continue; }
+                        var kind = byId[room.TemplateId].Content.Single(s => s.SlotIndex == selection.SlotIndex)
+                            .Options.Single(o => o.Id == selection.OptionId).Kind;
+                        if (room.IsOptional)
+                        {
+                            Assert.That(kind, Is.EqualTo(ContentKind.Item).Or.EqualTo(ContentKind.EliteMonster));
+                            if (kind == ContentKind.Item) optionalItems++;
+                        }
+                        else { Assert.That(kind, Is.EqualTo(ContentKind.Item).Or.EqualTo(ContentKind.Monster)); mainKinds.Add(kind); }
+                    }
+                }
+            }
+            Assert.That(mainSlots, Is.GreaterThan(0));
+            Assert.That(mainKinds.Contains(ContentKind.Monster) && mainKinds.Contains(ContentKind.Item), Is.True);
+            Assert.That(optionalItems, Is.GreaterThan(0));
+            Assert.That(optionalEmpty, Is.GreaterThan(0));
+        }
+
+        [Test]
+        public void RoleFilteringCannotSelectOtherRoleEvenWithNoEmptyWeight()
+        {
+            var slot = new ContentSlotSnapshot(0, 0, new[] { new ContentOptionSnapshot("monster", 1, ContentKind.Monster) });
+            var room = new RoomTemplateSnapshot("role-test", RoomType.Horizontal, RoomOpening.East | RoomOpening.West,
+                null, false, content: new[] { slot });
+            Assert.That(RoomContentPlanner.Select(0, Vector2Int.zero, room, ContentRoomRole.Optional).Single().OptionId, Is.Empty);
+            Assert.That(RoomContentPlanner.Select(0, Vector2Int.zero, room, ContentRoomRole.MainPath).Single().OptionId, Is.EqualTo("monster"));
+
+            var eliteSlot = new ContentSlotSnapshot(0, 0, new[] { new ContentOptionSnapshot("elite", 1, ContentKind.EliteMonster) });
+            var eliteRoom = new RoomTemplateSnapshot("elite-role-test", RoomType.Horizontal, RoomOpening.East | RoomOpening.West,
+                null, false, content: new[] { eliteSlot });
+            Assert.That(RoomContentPlanner.Select(0, Vector2Int.zero, eliteRoom, ContentRoomRole.MainPath).Single().OptionId, Is.Empty);
+            Assert.That(RoomContentPlanner.Select(0, Vector2Int.zero, eliteRoom, ContentRoomRole.Optional).Single().OptionId, Is.EqualTo("elite"));
+        }
+
+        [TestCase("goblin")]
+        [TestCase("item")]
+        public void BuilderPlacesMainPathContentInInheritedSlot(string optionId)
+        {
+            var settings = AssetDatabase.LoadAssetAtPath<MapPlanningSettings>(SettingsPath);
+            var goal = AssetDatabase.LoadAssetAtPath<GameObject>(GoalPath);
+            MapPlan selected = null;
+            MapRoomPlan selectedRoom = null;
+            for (int seed = 0; seed < 500 && selected == null; seed++)
+            {
+                var result = settings.CreatePlan(seed);
+                Assert.That(result.Success, Is.True, result.Error);
+                selectedRoom = result.Plan.Rooms.FirstOrDefault(r => !r.IsOptional &&
+                    r.TemplateId == "production.down.west_forest_step" && r.Content.Any(c => c.OptionId == optionId));
+                if (selectedRoom != null) selected = result.Plan;
+            }
+            Assert.That(selected, Is.Not.Null, $"No seed selected {optionId} in WestSouth");
+            var build = MapBuilder.Build(selected, settings.Catalog, goal);
+            Assert.That(build.Success, Is.True, build.Error);
+            try
+            {
+                var room = build.Root.transform.GetChild(selectedRoom.Cell.y * selected.Width + selectedRoom.Cell.x)
+                    .GetComponent<RoomTemplate>();
+                var option = room.ContentSettings.Single().options.Single(o => o.id == optionId);
+                var instance = room.transform.Find(option.prefab.name + "(Clone)");
+                Assert.That(instance, Is.Not.Null);
+                Assert.That(instance.localPosition, Is.EqualTo(new Vector3(7.5f + option.offset.x, 4f + option.offset.y, 0)));
+            }
+            finally { Object.DestroyImmediate(build.Root); }
+        }
+
+        [Test]
         public void ForgedBranchAndUnsafeSlotAreRejected()
         {
             var settings = AssetDatabase.LoadAssetAtPath<MapPlanningSettings>(SettingsPath);
@@ -104,7 +193,7 @@ namespace ProjectRE.MapGeneration.Tests
             var invalid = new MapPlan(plan.Width, plan.Height, plan.Seed, rooms, plan.Path, plan.PlayerStart, plan.Goal);
             Assert.That(MapPlanValidator.Validate(invalid, templates), Is.Not.Empty);
 
-            var prefab = AssetDatabase.LoadAssetAtPath<GameObject>("Assets/Prefabs/Map/RoomTemplates/Planning/CapWest.prefab");
+            var prefab = AssetDatabase.LoadAssetAtPath<GameObject>("Assets/Prefabs/Map/RoomTemplates/Base/CapWest.prefab");
             var room = Object.Instantiate(prefab).GetComponent<RoomTemplate>();
             try
             {
@@ -122,9 +211,9 @@ namespace ProjectRE.MapGeneration.Tests
         [TestCase(ContentSurface.EastWall, 1.2f, 1.2f)]
         public void PlacementRequiresTheRequestedSolidSurface(ContentSurface surface, float xOffset, float yOffset)
         {
-            var prefab = AssetDatabase.LoadAssetAtPath<GameObject>("Assets/Prefabs/Map/RoomTemplates/Planning/CapWest.prefab");
+            var prefab = AssetDatabase.LoadAssetAtPath<GameObject>("Assets/Prefabs/Map/RoomTemplates/Base/CapWest.prefab");
             var room = Object.Instantiate(prefab).GetComponent<RoomTemplate>();
-            var tile = AssetDatabase.LoadAssetAtPath<UnityEngine.Tilemaps.TileBase>("Assets/Prefabs/Map/RoomTemplates/Samples/SampleSolid.asset");
+            var tile = AssetDatabase.LoadAssetAtPath<UnityEngine.Tilemaps.TileBase>("Assets/Prefabs/Map/RoomTemplates/Shared/SampleSolid.asset");
             try
             {
                 var so = new SerializedObject(room);

@@ -6,6 +6,8 @@ namespace ProjectRE.MapGeneration
 
     public enum ContentSurface { Floor, WestWall, EastWall, Ceiling }
     public enum ContentFacing { Right, Left }
+    public enum ContentKind { Unspecified, Item, Monster, EliteMonster }
+    public enum ContentRoomRole { MainPath, Optional }
 
     [Serializable]
     public sealed class RoomContentOption
@@ -14,6 +16,7 @@ namespace ProjectRE.MapGeneration
         public GameObject prefab;
         public int weight = 1;
         public Vector2 offset;
+        public ContentKind kind;
     }
 
     [Serializable]
@@ -31,7 +34,9 @@ namespace ProjectRE.MapGeneration
     {
         public string Id { get; }
         public int Weight { get; }
-        public ContentOptionSnapshot(string id, int weight) { Id = id; Weight = weight; }
+        public ContentKind Kind { get; }
+        public ContentOptionSnapshot(string id, int weight, ContentKind kind = ContentKind.Item)
+        { Id = id; Weight = weight; Kind = kind; }
     }
 
     public sealed class ContentSlotSnapshot
@@ -59,7 +64,8 @@ namespace ProjectRE.MapGeneration
 
     public static class RoomContentPlanner
     {
-        public static IReadOnlyList<ContentSelection> Select(int seed, Vector2Int room, RoomTemplateSnapshot template)
+        public static IReadOnlyList<ContentSelection> Select(int seed, Vector2Int room, RoomTemplateSnapshot template,
+            ContentRoomRole role)
         {
             var result = new List<ContentSelection>();
             foreach (ContentSlotSnapshot slot in template.Content)
@@ -71,7 +77,13 @@ namespace ProjectRE.MapGeneration
                 Add(0xC071E17u); Add(unchecked((uint)slot.SlotIndex));
                 h = unchecked(h * 1664525u + 1013904223u);
                 int total = slot.EmptyWeight;
-                foreach (ContentOptionSnapshot option in slot.Options) total += option.Weight;
+                foreach (ContentOptionSnapshot option in slot.Options)
+                    if (Allowed(option.Kind, role)) total += option.Weight;
+                if (total == 0)
+                {
+                    result.Add(new ContentSelection(slot.SlotIndex, ""));
+                    continue;
+                }
                 int pick = (int)(((ulong)h * (uint)total) >> 32);
                 string selected = "";
                 if (pick >= slot.EmptyWeight)
@@ -79,6 +91,7 @@ namespace ProjectRE.MapGeneration
                     pick -= slot.EmptyWeight;
                     foreach (ContentOptionSnapshot option in slot.Options)
                     {
+                        if (!Allowed(option.Kind, role)) continue;
                         if (pick < option.Weight) { selected = option.Id; break; }
                         pick -= option.Weight;
                     }
@@ -87,5 +100,10 @@ namespace ProjectRE.MapGeneration
             }
             return result.AsReadOnly();
         }
+
+        private static bool Allowed(ContentKind kind, ContentRoomRole role) =>
+            kind == ContentKind.Item ||
+            (role == ContentRoomRole.MainPath && kind == ContentKind.Monster) ||
+            (role == ContentRoomRole.Optional && kind == ContentKind.EliteMonster);
     }
 }
