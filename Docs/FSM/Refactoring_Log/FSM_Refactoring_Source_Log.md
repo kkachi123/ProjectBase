@@ -2,7 +2,7 @@
 
 > PDF 갱신을 위한 단일 원본 문서다. 코드 구조가 바뀌면 먼저 이 문서의 **변경 이력**, **현재 구조**, **검증 상태**를 갱신한다.
 >
-> 대상 범위: Player 직접 입력 FSM과 지상 일반 Monster 판단·행동 FSM. Monster의 이전 BT·Input 구조는 이력으로 보존하고, 현재는 8개 State와 장착형 일반·배후 공격 SO를 사용한다. 최신 공격 구조는 4.11절 기준이며 실제 Play 회귀는 수동 확인 대기다.
+> 대상 범위: Player 직접 입력 FSM과 지상 일반 Monster 판단·행동 FSM. Monster의 이전 BT·Input 구조는 이력으로 보존하고, 현재는 8개 State와 장착형 일반·배후 공격 SO를 사용한다. 최신 공격 구조는 4.11절, Skeleton 확장과 검증 범위는 4.12절을 기준으로 한다.
 
 ## 1. 리팩토링 이전 구조
 
@@ -453,9 +453,20 @@ Player 지상 1·2·3타의 피해·범위·비용과 공중 데이터를 각 �
 
 설정 이전은 Editor API로 수행했다. InGame은 저장·재로드하지 않았고 임시 Migration·Verification 스크립트와 강제 조작은 작성하지 않았다. 최신 검증 결과는 아래 표와 [작업 계획](../Agent_Seperation/Attack_SO_Strategy_Refactoring_Plan.md)에 기록한다. 기존 PDF는 재생성하지 않았다.
 
+### 4.12 Skeleton 지상 Monster 확장
+
+기존 지상 Monster의 행동 FSM과 공격 SO 구조를 Skeleton에 적용했다. `BasicMonster`를 직접 상속한 Variant에 종별 Stat·Motor·Behavior·일반/배후 공격 SO를 연결했으며, Controller·State·Transition은 재사용한다. SO 초기값은 Goblin에서 복사하되 별도 에셋으로 보관한다.
+
+- Skeleton Sprite 시트 복사본을 모션별로 150×150 프레임, PPU 20, 공통 발 Pivot `(75, 49)`로 분할했다. Idle·Move·Hit·Death는 각 4장, Attack1·Attack2는 각 8장이다. 원본 시트의 기존 분할 설정은 유지했다.
+- 종별 Animation Clip 6개와 Animator Override를 만들었다. 두 공격 Clip은 7번째 프레임에 `OnAnimationOnFrame(0)`, 마지막 프레임 중간에 `OnAnimationEnd`를 사용한다. Hit·Death에도 종료 Event를 배치했다.
+- 공용 Animator에 두 번째 공격 슬롯과 `AttackType` 1·2 진입 전이를 추가했다. Grounded·Hit에서 공격 타입을 선택하고 공격 종료 후 Grounded로 복귀한다. Goblin의 두 공격은 기존처럼 타입 1을 사용한다.
+- Collider·감지 범위·타격 범위는 Goblin 설정을 초기값으로 사용한다. Skeleton 모션에 맞는 세부 범위와 밸런스는 추가 확인 대상이다.
+
+Unity에서 Variant 상속·필수 참조·Animator Override·Event 수신 함수와 Missing Script 0을 확인했고 컴파일 실패는 없었다. 사용자 조작 중 Skeleton의 대상 인식·추적, Player 타격에 따른 체력 감소를 관찰했으며, 일반 공격과 배후 공격 재생은 사용자가 정상으로 확인했다. 사망·상실 후 복귀·Goblin 회귀와 공격 SO 실행 상태 독립성은 충분히 검증하지 못했다. InGame 직접 실행 중 기존 Managers 연결과 관련된 InGameUI 초기화·Player 사망 처리 오류가 발생했다.
+
 ## 5. 검증 상태
 
-아래 이전 단계의 완료 기록은 당시 검증 이력이다. 최신 평면 Monster FSM의 Play 회귀는 아직 수행하지 않았다.
+아래 이전 단계의 완료 기록은 당시 검증 이력이다. 최신 Skeleton Play 확인은 4.12절 범위이며 전체 Monster·Player 회귀는 남아 있다.
 
 
 | 항목 | 상태 | 근거 / 남은 확인 |
@@ -522,9 +533,9 @@ ScenePlayerManager가 실제 Player를 참조하는 InGame에서 사용자가 Pl
 ### 보류
 
 - Goblin 시각·공격 타이밍·밸런스 수동 검증과 필요한 수치 조정
-- 새 실제 공격·Animator 분기 확장. 현재 Goblin은 동일 모션의 일반·배후 전략이며 int 공격 요청 방식은 사용하지 않음
+- 추가 공격 동작 확장. Goblin은 일반·배후 전략에 같은 모션을 사용하고 Skeleton은 공용 Animator의 타입 1·2 모션을 사용함
 - 자체 FSM의 최신 순찰·추적·상실 대기·복귀·일반/배후 공격과 Player 회귀 수동 검증
-- ScenePlayerManager의 씬 고정 Player 연결을 Title 등록 흐름·런타임 Player 교체와 연결하는 후속 작업
+- ScenePlayerManager 우선 연결과 Player Manager 등록 대체 흐름의 전체 회귀 검증
 - 비행·낙하·공중 공격·콤보 등 다른 행동 프로필과 다른 Monster 계열의 이행
 - Player prefab의 기존 AgentDashHandler2D 누락과 전체 수동 회귀 확인
 - Player 공격·End 클립 분리 후 실제 종료 이벤트·콤보 분기·잔여 Trigger·피격 중단·공중 복귀 및 종료 포즈 수동 확인. End 추가에 따른 이동·점프 재개 타이밍 조정

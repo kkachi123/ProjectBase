@@ -7,7 +7,7 @@
 - [AGENTS.md](../../Skill/AGENTS.md)와 [Plan_Guide.md](../../Skill/Plan_Guide.md)를 읽고 사용자 변경을 보존한다.
 - 종 이름, Sprite·Idle/Move/Attack/Hit/Death 모션, Stat·Motor·행동·공격 수치, 장착 전략, 검증 씬을 확인한다.
 - MonsterController·MonsterStateFactory·MonsterTargetHandler·MonsterAttackHandler와 MonsterAttackSO·파생 SO를 읽는다.
-- 연결 예시는 BasicMonster.prefab과 Goblin.prefab. 변경 전후 구조·검증 이력은 [리팩토링 로그](../Refactoring_Log/FSM_Refactoring_Source_Log.md) 4.10~4.11절 참고.
+- 연결 예시는 BasicMonster.prefab과 Goblin·Skeleton Variant. 변경 전후 구조·검증 이력은 [리팩토링 로그](../Refactoring_Log/FSM_Refactoring_Source_Log.md) 4.10~4.12절 참고.
 - 현재 기준으로 컴파일·연결 확인까지 완료됐으며 새 FSM의 실제 Play 회귀는 수동 확인 대상이다.
 
 ## 2. 재사용 경계
@@ -17,7 +17,7 @@
 - State: PatrolWait·Patrol·Chase·LostTargetWait·Return·Attack·Hit·Death. 시작 PatrolWait.
 - Factory 순서: 공통 State → 전용 State → Death/Hit/행동 Rule. 실제 전이는 ITransitionRule만 결정.
 - MonsterInput·MonsterBehaviorContext·Blackboard·BT는 추가하지 않음.
-- ScenePlayerManager에 씬의 실제 Player를 할당. 대상은 시작·재활성화 시 주입하며 매 프레임 검색하지 않음.
+- 시작·재활성화 시 유효한 ScenePlayerManager의 Player를 우선 주입한다. 없으면 Managers.Instance.Player의 현재 Player와 등록 이벤트를 사용한다. 어느 쪽도 없으면 대상을 연결하지 않는다.
 - HomeX는 최초 Start 위치. 초기 위치와의 거리로 추적을 중단하지 않음.
 
 ## 3. 공격 장착·확장
@@ -48,12 +48,12 @@ Inspector의 MonsterAttackHandler 목록에 AnimatorAttackType·MonsterAttackSO�
 3. Stat·GroundedMotor·MonsterBehaviorDataSO와 장착 MonsterAttackSO 할당. Basic 템플릿의 비어 있는 Stat·Motor·공격 목록을 완성해야 실제 실행 가능.
 4. PlayerDetector의 반경·offset·obstacleMask와 Collider 설정. Root의 Detector는 하나만 유지.
 5. Visual의 실제 Animator·SpriteRenderer·Proxy 하나를 MonsterAnimator와 Controller에 연결.
-6. AnimatorOverride로 기존 Idle·Move·Attack·Hit·Death Clip 교체. 새 모션 분기는 기반 Animator도 확장.
+6. AnimatorOverride로 Idle·Move·Attack·Hit·Death Clip을 교체한다. 공용 Animator의 AttackType 1·2는 각각 Monster_Attack·Monster_Attack2 슬롯에 대응한다. 장착한 공격의 AnimatorAttackType과 Override 슬롯을 일치시키고, 그 밖의 모션 분기는 기반 Animator를 확장한다.
 7. 타격 Frame Event는 OnAnimationOnFrame(intParameter), 종료는 OnAnimationEnd. Monster 근접 공격의 기존 인자 0 유지.
 8. 공격 모션 시작 전에는 IsAttack을 켜지 않음. 준비 이동은 Grounded/MoveSpeed 사용.
 9. Agent Combat Editor는 MonsterAttackHandler의 장착 원본 SO를 에셋 이름으로 구분하여 편집. Play 중 저장도 현재 실행본에 자동 반영하지 않음. 타격·Gizmo·Scene Handle은 동일 범위 계산 사용.
 
-공격 수치와 로직의 원본은 MonsterAttackSO다. 새 Monster에 StatData.attackDatas를 중복 연결하지 않는다. SO의 AttackDistance는 진입 거리이며 AttackData.size·offset은 실제 타격 범위다. Goblin은 GoblinMeleeAttack.asset·GoblinRearMeleeAttack.asset을 각각 장착하며 모션값은 둘 다 1이다.
+공격 수치와 로직의 원본은 MonsterAttackSO다. 새 Monster에 StatData.attackDatas를 중복 연결하지 않는다. SO의 AttackDistance는 진입 거리이며 AttackData.size·offset은 실제 타격 범위다. Goblin은 일반·배후 공격 모두 모션값 1을 사용하고, Skeleton은 각각 1·2를 사용한다. 다른 몬스터의 초기값을 복사한 경우 실제 모션과 Collider·타격 범위를 Play에서 확인한다.
 
 ## 5. 검증·완료 보고
 
