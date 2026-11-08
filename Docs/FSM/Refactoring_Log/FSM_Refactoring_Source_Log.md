@@ -240,13 +240,15 @@ Animator가 콤보 순서를 관리하도록 단순화한 구조를 유지하면
 | 정상 종료·직접 Exit | 공격 실행 State에 `IsAttack == false → Exit` 전이 존재 | 사용자가 지상 1·2·3타·공중 3타의 직접 Exit 4개 제거. 각 End의 `IsAttack == false → Exit` 및 상위 복귀 경로 유지 |
 | Combo 분기 시점 | 기존 클립 길이에 맞춘 서로 다른 Exit Time·Duration·Offset | 이번 적용 값: Exit Time 1.0, Duration 0, Offset 0, Interruption None. 콤보와 End의 분기 시점 일치 |
 
-정상 흐름은 `Attack1 → Attack2 → Attack3` 또는 각 공격의 `End → OnAnimationEnd → AttackEndTransition → Grounded/Fall`이다. End 재생 중에도 같은 PlayerAttackState를 유지하며, End에서 콤보를 다시 여는 전이는 없다. 종료 시 기존 PlayerAttackState.OnExit가 잔여 Trigger를 정리한다. AttackType은 계속 지상 1·공중 3의 진입점 선택 용도이며, 시각적인 2·3타에 맞춘 공격 데이터·Stamina 정책 변경은 포함하지 않는다.
+정상 흐름은 `Attack1 → Attack2 → Attack3` 또는 각 공격의 `End → OnAnimationEnd → AttackEndTransition → Grounded/Fall`이다. End 재생 중에도 같은 PlayerAttackState를 유지하며, End에서 콤보를 다시 여는 전이는 없다. 현재는 PlayerAttackState.OnExit가 Handler에 종료를 전달하고 지상 공격 SO의 End가 잔여 Trigger를 정리한다. AttackType은 계속 지상 1·공중 3의 진입점 선택 용도이며, 이 Clip 분리 작업에는 공격 데이터·Stamina 정책 변경을 포함하지 않았다.
 
 초기 에셋 구현에서는 외부 FSM 종료 대응용 직접 Exit를 보존했다. 독립 Animator 평가 이후 사용자가 불필요함을 확인해 제거했으며, 현재 구조는 제거 후의 에셋을 기준으로 기록한다. 사용자의 `Hero_Combo1` 그래프 배치 조정도 함께 보존했다.
 
 공격 동작의 C# 구현은 변경하지 않았다. 별도로 사용자가 `AgentController.ChangeState()`의 `Debug.Log`를 주석 처리한 변경은 이번 커밋에 포함한다. 상태 전환 실행 로직은 그대로다.
 
-클립별 최종 값·구현 체크리스트·상세 테스트 항목은 [Plan7](../Combo_Attack/Player_Combo_Attack_Refactoring_Plan7.md)에 기록한다. End2·End3를 실제로 재생하게 되어 이동·점프가 다시 가능한 시점은 해당 종료 이벤트까지 늦어진다. 종료 포즈와 콤보 타이밍은 수동 검증 대상으로 남긴다.
+당시 적용한 Clip은 12 FPS다. Attack1은 3프레임·0.25초·타격 Event 1개, Attack2는 5프레임·약 0.4167초·타격 Event 1개, Attack3는 12프레임·1초·타격 Event 4개이며 종료 Event는 없다. End1·End2는 각 4프레임·약 0.3333초·0.25초 종료 Event 1개, End3는 6프레임·0.5초·약 0.4167초 종료 Event 1개다. End2·End3 재생에 따라 이동·점프가 다시 가능한 시점은 종료 Event까지 늦어진다.
+
+당시 독립 Animator 평가는 단발·2타·3타·빠른 Trigger·End 중 입력·공중 Grounded/Fall 복귀·Hit의 8개 경로를 확인했다. Edit Mode에서 종료 Event는 수동 호출한 평가이며, 이후 사용자가 직접 Exit를 제거한 현재 에셋의 Play 검증을 대신하지 않는다. 실제 입력·종료 포즈·타격·Stamina 등 남은 확인은 [FSM 진행 현황](../FSM_Progress.md)을 따른다.
 
 ### 4.6 Dash State 확장 기반
 
@@ -326,7 +328,7 @@ GetHitTransition의 Dispose는 해당 Rule이 만든 구독만 종료한다. Hea
 
 Unity CLI 컴파일 확인 후 사용자가 현재 시야 기준 추적·상실 대기·복귀·대기 중 재인식 흐름의 정상 동작을 확인했다. Managers 부재로 발생하는 기존 UI·Player 사망 완료 오류는 별도 문제로 남겼다. 런타임 Player 교체·Title 등록 흐름·Boss 패턴·AI 휴면은 이번 범위에 포함하지 않았다.
 
-상세 API·설정·검증 이력은 [MonsterBehaviorContext_Reference.md](E:/Unity/Project/ProjectBase/Docs/FSM/MonsterBehaviorContext_Reference.md)에 기록한다. PDF는 이번 커밋에서 재생성하지 않는다.
+당시 Context 상세 문서는 이후 자체 FSM 전환 과정에서 제거했다. 관련 결정과 검증 이력은 이 절에 보존하며, 현재 구조는 4.10절 이후와 지상 Monster 제작 Guide를 따른다. 당시 PDF는 재생성하지 않았다.
 
 #### 후속 정리: 미사용 Blackboard Target 제거
 
@@ -451,7 +453,7 @@ Player 지상 1·2·3타의 피해·범위·비용과 공중 데이터를 각 �
 
 구형 데이터 SO 6개와 일반 C# 전략·인터페이스·데이터 클래스 8개는 참조 이전 확인 후 meta와 함께 제거했다. Player 역할별 선택·시작 시 비용 판정과 진입당 소비, 지상 Event 유효 단계·공중 다단 타격, Monster 현재/다음 선택 분리·종료 후 간격·FSM 결과 분기는 변경하지 않았다.
 
-설정 이전은 Editor API로 수행했다. InGame은 저장·재로드하지 않았고 임시 Migration·Verification 스크립트와 강제 조작은 작성하지 않았다. 최신 검증 결과는 아래 표와 [작업 계획](../Agent_Seperation/Attack_SO_Strategy_Refactoring_Plan.md)에 기록한다. 기존 PDF는 재생성하지 않았다.
+설정 이전은 Editor API로 수행했다. 당시 InGame은 저장·재로드하지 않았고 임시 Migration·Verification 스크립트와 강제 조작은 작성하지 않았다. 당시 컴파일·Prefab/Scene Missing Script·수치와 Override 보존·구형 참조 제거를 확인했다. 실제 Play와 Combat Editor GUI·SO 복제본 수명은 별도 확인 대상으로 남겼다. 최신 검증 범위는 아래 표와 [FSM 진행 현황](../FSM_Progress.md)을 따른다. 기존 PDF는 재생성하지 않았다.
 
 ### 4.12 Skeleton 지상 Monster 확장
 
