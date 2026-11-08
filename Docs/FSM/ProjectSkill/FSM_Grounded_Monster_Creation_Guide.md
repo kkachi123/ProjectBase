@@ -45,10 +45,10 @@ Inspector의 MonsterAttackHandler 목록에 AnimatorAttackType·MonsterAttackSO�
 
 1. Monster 공용 BasicMonster.prefab의 종별 Variant를 Assets/Prefabs/Monster/{종}.prefab에 생성.
 2. 종별 Animations·ScriptableObjects·Sprites는 Assets/Prefabs/Monster/{종}/ 아래 배치.
-3. Stat·GroundedMotor·MonsterBehaviorDataSO와 장착 MonsterAttackSO 할당. Basic 템플릿의 비어 있는 Stat·Motor·공격 목록을 완성해야 실제 실행 가능.
+3. Stat·GroundedMotor·MonsterBehaviorDataSO와 장착 MonsterAttackSO를 할당한다. Basic 템플릿의 Stat·Motor·Behavior·공격 목록은 비어 있으므로 종별 Variant에서 채운다.
 4. PlayerDetector의 반경·offset·obstacleMask와 Collider 설정. Root의 Detector는 하나만 유지.
 5. Visual의 실제 Animator·SpriteRenderer·Proxy 하나를 MonsterAnimator와 Controller에 연결.
-6. AnimatorOverride로 Idle·Move·Attack·Hit·Death Clip을 교체한다. 공용 Animator의 AttackType 1·2는 각각 Monster_Attack·Monster_Attack2 슬롯에 대응한다. 장착한 공격의 AnimatorAttackType과 Override 슬롯을 일치시키고, 그 밖의 모션 분기는 기반 Animator를 확장한다.
+6. AnimatorOverride로 Idle·Move·Attack·Hit·Death Clip을 교체한다. 공용 Animator와 파라미터 설정 MonsterAnimationData는 Monster/Animations에 둔다. 공용 Animator의 AttackType 1·2는 각각 Monster_Attack·Monster_Attack2 슬롯에 대응한다. 장착한 공격의 AnimatorAttackType과 Override 슬롯을 일치시키고, 그 밖의 모션 분기는 기반 Animator를 확장한다.
 7. 타격 Frame Event는 OnAnimationOnFrame(intParameter), 종료는 OnAnimationEnd. Monster 근접 공격의 기존 인자 0 유지.
 8. 공격 모션 시작 전에는 IsAttack을 켜지 않음. 준비 이동은 Grounded/MoveSpeed 사용.
 9. Agent Combat Editor는 MonsterAttackHandler의 장착 원본 SO를 에셋 이름으로 구분하여 편집. Play 중 저장도 현재 실행본에 자동 반영하지 않음. 타격·Gizmo·Scene Handle은 동일 범위 계산 사용.
