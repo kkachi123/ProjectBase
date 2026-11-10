@@ -80,7 +80,22 @@ MonoBehaviour:
   _contentSlots:
   - {x: 7, y: 5}
   _contentSettings: []
-  _hazards: []
+  _hazards:
+  - id: floor.spikes
+    candidate: {fileID: 4344515566594282367}
+    clearance:
+      x: 9
+      y: 4
+      width: 1
+      height: 1
+    support:
+      x: 9
+      y: 3
+      width: 1
+      height: 1
+    spawnWeight: 1
+    emptyWeight: 1
+    passageVerified: 1
   _playerStart: {fileID: 0}
   _goal: {fileID: 0}
   _verifiedStartExits: 0
@@ -1756,6 +1771,11 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 748863f89a3872c42a84d523e60ed6cb, type: 3}
+--- !u!1 &4344515566594282367 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 7945125645614588601, guid: 748863f89a3872c42a84d523e60ed6cb, type: 3}
+  m_PrefabInstance: {fileID: 5910992439303598534}
+  m_PrefabAsset: {fileID: 0}
 --- !u!4 &6203123900724206143 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 296670348719631353, guid: 748863f89a3872c42a84d523e60ed6cb, type: 3}
