@@ -12,6 +12,9 @@ GameObject:
   - component: {fileID: 8534224629283600602}
   - component: {fileID: 5327935671759164584}
   - component: {fileID: 5076227585056309867}
+  - component: {fileID: 7600438527809504945}
+  - component: {fileID: 681103531068237195}
+  - component: {fileID: 3467917627896315598}
   m_Layer: 0
   m_Name: SpikeHead
   m_TagString: Untagged
@@ -162,3 +165,70 @@ BoxCollider2D:
   m_AutoTiling: 0
   m_Size: {x: 2.53125, y: 2.1125}
   m_EdgeRadius: 0
+--- !u!50 &7600438527809504945
+Rigidbody2D:
+  serializedVersion: 5
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8458445283656262742}
+  m_BodyType: 1
+  m_Simulated: 1
+  m_UseFullKinematicContacts: 0
+  m_UseAutoMass: 0
+  m_Mass: 1
+  m_LinearDamping: 0
+  m_AngularDamping: 0.05
+  m_GravityScale: 0
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_Interpolate: 0
+  m_SleepingMode: 1
+  m_CollisionDetection: 1
+  m_Constraints: 4
+--- !u!114 &681103531068237195
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8458445283656262742}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 199b849b2c6a7f845bb502eb11eed232, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ProjectRE.TrapContactDamage
+  damage: 1
+  targetLayers:
+    serializedVersion: 2
+    m_Bits: 256
+--- !u!114 &3467917627896315598
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8458445283656262742}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c640bfdebf63ff74d9969903657a8c5e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ProjectRE.SpikeHeadTrap
+  direction: 0
+  targetLayers:
+    serializedVersion: 2
+    m_Bits: 256
+  detectionDistance: 4
+  detectionHeight: 2.5
+  warningDuration: 1
+  travelDistance: 3
+  chargeSpeed: 5
+  returnSpeed: 2
+  cooldownDuration: 1
+  warningColor: {r: 1, g: 0.3, b: 0.3, a: 1}
