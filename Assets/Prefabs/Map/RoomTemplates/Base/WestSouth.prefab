@@ -1518,7 +1518,22 @@ MonoBehaviour:
       weight: 1
       offset: {x: 0.5, y: 0.3135}
       kind: 1
-  _hazards: []
+  _hazards:
+  - id: floor.fire
+    candidate: {fileID: 2920332253977694259}
+    clearance:
+      x: 10
+      y: 4
+      width: 1
+      height: 2
+    support:
+      x: 10
+      y: 3
+      width: 1
+      height: 1
+    spawnWeight: 1
+    emptyWeight: 1
+    passageVerified: 1
   _playerStart: {fileID: 0}
   _goal: {fileID: 0}
   _verifiedStartExits: 0
@@ -1656,6 +1671,11 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: a9f5e6e9ec51e154eb191ee0c2670c70, type: 3}
+--- !u!1 &2920332253977694259 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 3564131955845684078, guid: a9f5e6e9ec51e154eb191ee0c2670c70, type: 3}
+  m_PrefabInstance: {fileID: 1869360632222452573}
+  m_PrefabAsset: {fileID: 0}
 --- !u!4 &8419618972175813245 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 7865874641327604000, guid: a9f5e6e9ec51e154eb191ee0c2670c70, type: 3}
