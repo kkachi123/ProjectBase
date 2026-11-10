@@ -12,6 +12,8 @@ GameObject:
   - component: {fileID: 2871403051203227106}
   - component: {fileID: 4424512686775192725}
   - component: {fileID: 6551479628407173440}
+  - component: {fileID: 3377722666355741872}
+  - component: {fileID: 5739204172263458674}
   m_Layer: 0
   m_Name: Fire
   m_TagString: Untagged
@@ -150,7 +152,7 @@ BoxCollider2D:
   m_UsedByEffector: 0
   m_CompositeOperation: 0
   m_CompositeOrder: 0
-  m_Offset: {x: 0, y: 0}
+  m_Offset: {x: 0, y: 0.5}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0.5, y: 0.5}
@@ -160,5 +162,36 @@ BoxCollider2D:
     drawMode: 0
     adaptiveTiling: 0
   m_AutoTiling: 0
-  m_Size: {x: 0.75, y: 1.3}
+  m_Size: {x: 0.75, y: 1}
   m_EdgeRadius: 0
+--- !u!114 &3377722666355741872
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3564131955845684078}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 199b849b2c6a7f845bb502eb11eed232, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ProjectRE.TrapContactDamage
+  damage: 1
+  targetLayers:
+    serializedVersion: 2
+    m_Bits: 256
+--- !u!114 &5739204172263458674
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3564131955845684078}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 28f1e58d74ae5ba4e99e8eb28f9297df, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ProjectRE.FireTrap
+  onDuration: 2
+  offDuration: 2
+  offSprite: {fileID: 21300000, guid: 120f32cc87f098444a7b8ed7d509932b, type: 3}
