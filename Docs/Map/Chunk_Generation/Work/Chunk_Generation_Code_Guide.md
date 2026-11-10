@@ -1,6 +1,6 @@
 # Chunk 내부 조합 코드 구조
 
-이 문서는 선택된 Chunk의 고정 지형, 변형 패턴·확률 셀과 콘텐츠를 계획하고 적용하는 코드를 설명한다. 실제 출입구·영역·슬롯 작성 방법은 [방 템플릿 제작 규격](Room_Template_Authoring_Guide.md)을, Chunk 간 경로와 연결은 [맵 조합 코드 구조](../../Map_Assembly/Map_Assembly_Code_Guide.md)를 참고한다.
+이 문서는 선택된 Chunk의 고정 지형, 변형 패턴·확률 셀과 콘텐츠·함정을 계획하고 적용하는 코드를 설명한다. 실제 출입구·영역·슬롯 작성 방법은 [방 템플릿 제작 규격](Room_Template_Authoring_Guide.md)을, Chunk 간 경로와 연결은 [맵 조합 코드 구조](../../Map_Assembly/Map_Assembly_Code_Guide.md)를 참고한다.
 
 ## 현재 구현 범위
 
@@ -18,18 +18,23 @@ classDiagram
     RoomTerrainVariation *-- RoomTerrainPattern : 패턴 후보
     RoomTerrainVariation *-- RoomChanceCell : 확률 셀
     RoomTemplate *-- RoomContentSlot : 콘텐츠 슬롯
+    RoomTemplate *-- RoomHazardSlot : 함정 후보
     RoomContentSlot *-- RoomContentOption : 콘텐츠 후보
     RoomTemplateCatalog ..> RoomTemplateChecks : 원본 검사
     RoomTemplateCatalog ..> RoomTemplateSnapshot : 계산 데이터 생성
     RoomTemplateSnapshot *-- RoomTerrainSnapshot : 지형 선택지
     RoomTemplateSnapshot *-- ContentSlotSnapshot : 슬롯 선택지
+    RoomTemplateSnapshot *-- RoomHazardSnapshot : 함정 가중치
     ContentSlotSnapshot *-- ContentOptionSnapshot : 후보 ID와 가중치
     MapPlanner ..> RoomTerrainPlanner : 지형 선택
     MapPlanner ..> RoomContentPlanner : 방 역할별 콘텐츠
+    MapPlanner ..> RoomHazardPlanner : 함정 또는 빈 상태
     RoomTerrainPlanner ..> RoomTerrainSelection : 결과
     RoomContentPlanner ..> ContentSelection : 결과
+    RoomHazardPlanner ..> RoomHazardSelection : 결과
     MapRoomPlan *-- RoomTerrainSelection : 방별 지형 선택
     MapRoomPlan *-- ContentSelection : 방별 콘텐츠 선택
+    MapRoomPlan *-- RoomHazardSelection : 방별 함정 선택
     MapBuilder ..> MapRoomPlan : 선택 적용
     MapBuilder ..> RoomTemplate : 원본 프리팹과 설정 조회
     RoomTemplateValidator ..> RoomTemplateChecks : 제작 데이터 검사
@@ -41,10 +46,11 @@ classDiagram
 2. `RoomTemplateCatalog.TryCreateSnapshot()`이 `RoomTemplateChecks`로 원본을 검사하고, 계산에 필요한 ID·확률·가중치를 `RoomTemplateSnapshot`과 내부 스냅샷으로 복사한다. 스냅샷에는 생성할 프리팹 참조를 담지 않는다.
 3. `MapPlanner`가 해당 칸의 방을 고르면 `RoomTerrainPlanner.Select()`가 영역별 패턴 ID와 채울 셀을 선택한다. 결과는 `MapRoomPlan.Terrain`에 저장된다. 지형 선택에는 seed, 방 좌표, 템플릿 ID와 영역 인덱스를 사용한다.
 4. 경로와 선택 방이 확정되면 `RoomContentPlanner.Select()`가 중간 경로 방과 선택 방의 슬롯별 콘텐츠 ID 또는 빈 선택을 정한다. 일반 방에는 아이템·일반 몬스터, 선택 방에는 아이템·엘리트 몬스터가 허용된다. 시작·Goal과 닫힌 방에는 콘텐츠를 선택하지 않는다. 콘텐츠 난수에는 seed, 방 좌표, 템플릿 ID와 슬롯 인덱스를 사용한다.
-5. `MapPlanValidator`가 기록된 지형·콘텐츠 선택을 재계산해 계획과 일치하는지 확인한다. `MapBuilder`는 원본 템플릿에서 ID에 해당하는 패턴·콘텐츠 프리팹을 찾아 배치하고 선택된 확률 셀에 타일을 넣는다.
-6. 그래픽 타일이 설정된 경우 `MapVisualBuilder`가 방과 패턴의 충돌 지형을 수집해 맵 전체의 그래픽 Tilemap에 표시한다. RuleTile은 이웃 셀에 따라 그래픽을 고르며 지형의 점유 여부를 결정하지 않는다.
+5. `RoomHazardPlanner.Select()`가 중간 경로 방과 선택 방의 함정 후보별 생성 또는 빈 상태를 독립 난수로 정한다. seed·방 좌표·템플릿 ID·후보 ID를 사용하며 결과는 `MapRoomPlan.Hazards`에 저장된다.
+6. `MapPlanValidator`가 기록된 지형·콘텐츠·함정 선택을 재계산해 계획과 일치하는지 확인한다. `MapBuilder`는 패턴·콘텐츠 프리팹을 배치하고 확률 셀을 채우며, 선택된 방의 비활성 함정 후보를 활성화한다.
+7. 그래픽 타일이 설정된 경우 `MapVisualBuilder`가 방과 패턴의 충돌 지형을 수집해 맵 전체의 그래픽 Tilemap에 표시한다. RuleTile은 이웃 셀에 따라 그래픽을 고르며 지형의 점유 여부를 결정하지 않는다.
 
-지형·콘텐츠 선택 난수는 주 경로·방 선택과 분리된다. 단, 카탈로그나 템플릿 ID 등의 입력을 변경하면 기존 seed의 결과가 달라질 수 있다.
+지형·콘텐츠·함정 선택 난수는 주 경로·방 선택과 분리된다. 단, 카탈로그나 템플릿 ID 등의 입력을 변경하면 기존 seed의 결과가 달라질 수 있다.
 
 ## 클래스와 소스
 
@@ -59,6 +65,7 @@ classDiagram
 | `RoomTemplateCatalog`, `RoomTemplateSnapshot` | [RoomTemplateCatalog.cs](../../../../Assets/Scripts/Map/RoomTemplates/RoomTemplateCatalog.cs), [RoomTemplateSnapshot.cs](../../../../Assets/Scripts/Map/RoomTemplates/RoomTemplateSnapshot.cs) | 프리팹 목록을 검사하고 계산용 방 데이터를 만든다. |
 | `RoomTerrainSnapshot`, `RoomTerrainPlanner`, `RoomTerrainSelection` | [RoomTerrainPlan.cs](../../../../Assets/Scripts/Map/RoomTemplates/RoomTerrainPlan.cs) | 지형 선택지의 복사본, 선택 계산과 확정된 패턴·셀을 담당한다. |
 | `ContentOptionSnapshot`, `ContentSlotSnapshot`, `RoomContentPlanner`, `ContentSelection` | [RoomContent.cs](../../../../Assets/Scripts/Map/RoomTemplates/RoomContent.cs) | 콘텐츠 선택지의 복사본, 가중치 계산과 확정된 슬롯 결과를 담당한다. |
+| `RoomHazardSlot`, `RoomHazardSnapshot`, `RoomHazardPlanner`, `RoomHazardSelection` | [RoomHazard.cs](../../../../Assets/Scripts/Map/RoomTemplates/RoomHazard.cs) | 함정 후보와 공간, 계산용 가중치, 생성 여부 선택과 결과를 담당한다. |
 | `MapPlanner`, `MapRoomPlan`, `MapPlanValidator` | [MapPlanner.cs](../../../../Assets/Scripts/Map/RoomTemplates/MapPlanner.cs), [MapPlan.cs](../../../../Assets/Scripts/Map/RoomTemplates/MapPlan.cs), [MapPlanValidator.cs](../../../../Assets/Scripts/Map/RoomTemplates/MapPlanValidator.cs) | 내부 선택을 요청·기록하고 완성 계획을 검증한다. |
 | `MapBuilder`, `MapVisualBuilder` | [MapBuilder.cs](../../../../Assets/Scripts/Map/RoomTemplates/MapBuilder.cs), [MapVisualBuilder.cs](../../../../Assets/Scripts/Map/RoomTemplates/MapVisualBuilder.cs) | 확정된 내부 선택을 생성하고 선택적 공통 지형 그래픽을 만든다. |
 
@@ -70,4 +77,4 @@ classDiagram
 4. `MapBuilder.Build()`에서 패턴 프리팹·확률 셀·콘텐츠 프리팹을 적용하는 부분을 읽는다. 그래픽과 Collider의 분리는 `MapVisualBuilder`에서 확인한다.
 5. [RoomTerrainTests.cs](../../../../Assets/Tests/EditMode/MapGeneration/RoomTerrainTests.cs), [OptionalRoomTests.cs](../../../../Assets/Tests/EditMode/MapGeneration/OptionalRoomTests.cs), [MapVisualBuilderTests.cs](../../../../Assets/Tests/EditMode/MapGeneration/MapVisualBuilderTests.cs)를 참고한다.
 
-`Passages Verified`, `Combinations Verified`와 시작·Goal·왕복 방향은 실제 Player로 확인한 뒤 제작자가 기록한다. 지형이나 관련 조건을 변경해도 표시가 자동 해제되지 않으며, 정적 검사만으로 Player 통과가 보장되지는 않는다.
+`Passages Verified`, `Combinations Verified`, 함정의 `passageVerified`와 시작·Goal·왕복 방향은 실제 Player로 확인한 뒤 제작자가 기록한다. 지형이나 함정 발사 조건을 변경해도 표시가 자동 해제되지 않으며, 정적 검사만으로 투사체 범위나 Player 통과가 보장되지는 않는다. 함정 선택·안전 검사와 빌드 예시는 [RoomHazardTests.cs](../../../../Assets/Tests/EditMode/MapGeneration/RoomHazardTests.cs)를 참고한다.

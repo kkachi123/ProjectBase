@@ -25,6 +25,7 @@ namespace ProjectRE.MapGeneration
         public IReadOnlyList<RoomPassage> Passages => _passages;
         public IReadOnlyList<RoomTerrainSnapshot> Terrain { get; }
         public IReadOnlyList<ContentSlotSnapshot> Content { get; }
+        public IReadOnlyList<RoomHazardSnapshot> Hazards { get; }
 
         public RoomTemplateSnapshot(string id, RoomType type, RoomOpening openings,
             IEnumerable<RoomPassage> passages, bool passagesVerified,
@@ -32,7 +33,8 @@ namespace ProjectRE.MapGeneration
             bool hasGoal = false, Vector3 goal = default,
             RoomOpening verifiedStartExits = RoomOpening.None, RoomOpening verifiedGoalEntries = RoomOpening.None,
             IEnumerable<RoomTerrainSnapshot> terrain = null, RoomOpening verifiedDeadEndReturns = RoomOpening.None,
-            IEnumerable<ContentSlotSnapshot> content = null, string baseGroupId = null)
+            IEnumerable<ContentSlotSnapshot> content = null, string baseGroupId = null,
+            IEnumerable<RoomHazardSnapshot> hazards = null)
         {
             Id = id;
             BaseGroupId = string.IsNullOrWhiteSpace(baseGroupId) ? id : baseGroupId;
@@ -49,6 +51,7 @@ namespace ProjectRE.MapGeneration
             VerifiedDeadEndReturns = verifiedDeadEndReturns;
             Terrain = new List<RoomTerrainSnapshot>(terrain ?? Array.Empty<RoomTerrainSnapshot>()).AsReadOnly();
             Content = new List<ContentSlotSnapshot>(content ?? Array.Empty<ContentSlotSnapshot>()).AsReadOnly();
+            Hazards = new List<RoomHazardSnapshot>(hazards ?? Array.Empty<RoomHazardSnapshot>()).AsReadOnly();
         }
 
         public bool Supports(RoomOpening entry, RoomOpening exit)

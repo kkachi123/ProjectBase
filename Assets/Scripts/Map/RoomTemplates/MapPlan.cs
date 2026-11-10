@@ -16,10 +16,12 @@ namespace ProjectRE.MapGeneration
         public RoomOpening Branch { get; }
         public bool IsOptional { get; }
         public IReadOnlyList<ContentSelection> Content { get; }
+        public IReadOnlyList<RoomHazardSelection> Hazards { get; }
 
         public MapRoomPlan(Vector2Int cell, string templateId, RoomType type,
             RoomOpening openings, RoomOpening entry, RoomOpening exit, IEnumerable<RoomTerrainSelection> terrain = null,
-            RoomOpening branch = RoomOpening.None, bool isOptional = false, IEnumerable<ContentSelection> content = null)
+            RoomOpening branch = RoomOpening.None, bool isOptional = false, IEnumerable<ContentSelection> content = null,
+            IEnumerable<RoomHazardSelection> hazards = null)
         {
             Cell = cell;
             TemplateId = templateId;
@@ -31,6 +33,7 @@ namespace ProjectRE.MapGeneration
             Branch = branch;
             IsOptional = isOptional;
             Content = new List<ContentSelection>(content ?? System.Array.Empty<ContentSelection>()).AsReadOnly();
+            Hazards = new List<RoomHazardSelection>(hazards ?? System.Array.Empty<RoomHazardSelection>()).AsReadOnly();
         }
     }
 

@@ -97,7 +97,8 @@ namespace ProjectRE.MapGeneration
                 if (!room.IsOptional && !mainPath) continue;
                 var role = room.IsOptional ? ContentRoomRole.Optional : ContentRoomRole.MainPath;
                 rooms[i] = new MapRoomPlan(room.Cell, room.TemplateId, room.Type, room.Openings, room.Entry, room.Exit,
-                    room.Terrain, room.Branch, room.IsOptional, RoomContentPlanner.Select(seed, room.Cell, byId[room.TemplateId], role));
+                    room.Terrain, room.Branch, room.IsOptional, RoomContentPlanner.Select(seed, room.Cell, byId[room.TemplateId], role),
+                    RoomHazardPlanner.Select(seed, room.Cell, byId[room.TemplateId]));
             }
             plan = new MapPlan(width, height, seed, rooms, path, start, goal);
             error = null;

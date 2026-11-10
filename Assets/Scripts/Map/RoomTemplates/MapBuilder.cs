@@ -28,7 +28,7 @@ namespace ProjectRE.MapGeneration
         {
             if (catalog == null || goalPrefab == null) return MapBuildResult.Failed("카탈로그 또는 Goal 프리팹이 없습니다.");
             if (context == null) context = new MapBuildContext();
-            if (context.CreateRoot == null || context.InstantiatePrefab == null || context.DestroyObject == null)
+            if (context.CreateRoot == null || context.InstantiatePrefab == null || context.DestroyObject == null || context.SetActive == null)
                 return MapBuildResult.Failed("맵 생성 컨텍스트가 올바르지 않습니다.");
 
             if (!catalog.TryCreateSnapshot(out var snapshots, out string catalogError))
@@ -119,6 +119,15 @@ namespace ProjectRE.MapGeneration
                         Vector3 scale = content.transform.localScale;
                         scale.x = Mathf.Abs(scale.x) * (slot.facing == ContentFacing.Left ? -1 : 1);
                         content.transform.localScale = scale;
+                    }
+                    foreach (RoomHazardSelection selection in room.Hazards)
+                    {
+                        if (!selection.Spawn) continue;
+                        RoomHazardSlot slot = null;
+                        foreach (RoomHazardSlot candidate in template.Hazards)
+                            if (candidate.id == selection.Id) { slot = candidate; break; }
+                        if (slot == null || slot.candidate == null) throw new InvalidOperationException($"함정 후보를 찾을 수 없습니다: {selection.Id}");
+                        context.SetActive(slot.candidate, true);
                     }
                 }
                 GameObject goal = context.InstantiatePrefab(goalPrefab, root.transform);

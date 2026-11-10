@@ -156,6 +156,7 @@ namespace ProjectRE.MapGeneration
                     errors.Add($"콘텐츠 슬롯이 고정 지형과 겹칩니다: {slot}");
             }
             ValidateContent(template, map, room, errors);
+            ValidateHazards(template, map, room, errors);
 
             if (template.PlayerStart != null && !template.PlayerStart.IsChildOf(template.transform))
                 errors.Add("Player 시작 마커가 방 내부에 없습니다.");
@@ -178,6 +179,49 @@ namespace ProjectRE.MapGeneration
             CheckMarker(template, template.OptionalTarget, "선택 방 목표", errors);
             return errors;
         }
+
+        private static void ValidateHazards(RoomTemplate template, Tilemap map, RectInt room, List<string> errors)
+        {
+            var ids = new HashSet<string>(System.StringComparer.Ordinal);
+            var candidates = new HashSet<GameObject>();
+            var areas = new List<RectInt>();
+            foreach (RoomHazardSlot slot in template.Hazards)
+            {
+                if (slot == null || string.IsNullOrWhiteSpace(slot.id) || !ids.Add(slot.id) ||
+                    slot.candidate == null || slot.candidate == template.gameObject || !candidates.Add(slot.candidate) ||
+                    !slot.candidate.transform.IsChildOf(template.transform) || slot.candidate.activeSelf || !slot.passageVerified)
+                { errors.Add("함정 후보 ID, 연결, 기본 상태 또는 통과 검증이 올바르지 않습니다."); continue; }
+                long weight = (long)slot.spawnWeight + slot.emptyWeight;
+                if (slot.spawnWeight < 0 || slot.emptyWeight < 0 || weight <= 0 || weight > 1000000)
+                    errors.Add($"함정 가중치가 올바르지 않습니다: {slot.id}");
+                RectInt area = slot.clearance, support = slot.support;
+                if (!ValidArea(area, room) || !ValidArea(support, room) || area.Overlaps(support))
+                { errors.Add($"함정 공간 또는 지지면이 올바르지 않습니다: {slot.id}"); continue; }
+                Vector3 local = template.transform.InverseTransformPoint(slot.candidate.transform.position);
+                if (!area.Contains(new Vector2Int(Mathf.FloorToInt(local.x), Mathf.FloorToInt(local.y))))
+                    errors.Add($"함정 후보가 설정된 공간 밖입니다: {slot.id}");
+                foreach (RectInt other in areas) if (area.Overlaps(other)) errors.Add($"함정 공간이 겹칩니다: {slot.id}");
+                areas.Add(area);
+                foreach (RectInt region in template.ProtectedRegions)
+                    if (area.Overlaps(region) || support.Overlaps(region)) errors.Add($"함정이 보호 구역과 겹칩니다: {slot.id}");
+                foreach (RectInt region in template.VariationRegions)
+                    if (area.Overlaps(region) || support.Overlaps(region)) errors.Add($"함정이 변형 영역과 겹칩니다: {slot.id}");
+                foreach (RoomContentSlot content in template.ContentSettings)
+                    if (content != null && (area.Overlaps(content.clearance) || support.Overlaps(content.clearance)))
+                        errors.Add($"함정이 콘텐츠 공간과 겹칩니다: {slot.id}");
+                foreach (RoomOpening side in Sides)
+                    if (area.Overlaps(RoomTemplate.OpeningCells(side))) errors.Add($"함정이 출입구와 겹칩니다: {slot.id}");
+                if (map == null) continue;
+                foreach (Vector2Int p in area.allPositionsWithin)
+                    if (map.HasTile(new Vector3Int(p.x, p.y, 0))) errors.Add($"함정 공간에 고정 지형이 있습니다: {slot.id} {p}");
+                foreach (Vector2Int p in support.allPositionsWithin)
+                    if (!map.HasTile(new Vector3Int(p.x, p.y, 0)) || map.GetColliderType(new Vector3Int(p.x, p.y, 0)) != Tile.ColliderType.Grid)
+                        errors.Add($"함정 지지면에 전체 셀 충돌이 없습니다: {slot.id} {p}");
+            }
+        }
+
+        private static bool ValidArea(RectInt area, RectInt room) =>
+            area.width > 0 && area.height > 0 && room.Contains(area.min) && area.xMax <= room.xMax && area.yMax <= room.yMax;
 
         private static void ValidateContent(RoomTemplate template, Tilemap map, RectInt room, List<string> errors)
         {

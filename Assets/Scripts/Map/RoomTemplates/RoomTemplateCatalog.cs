@@ -52,12 +52,16 @@ namespace ProjectRE.MapGeneration
                     content.Add(new ContentSlotSnapshot(slot.slotIndex, slot.emptyWeight, options));
                 }
                 content.Sort((a, b) => a.SlotIndex.CompareTo(b.SlotIndex));
+                var hazards = new List<RoomHazardSnapshot>();
+                foreach (RoomHazardSlot slot in template.Hazards)
+                    hazards.Add(new RoomHazardSnapshot(slot.id, slot.spawnWeight, slot.emptyWeight));
+                hazards.Sort((a, b) => string.CompareOrdinal(a.Id, b.Id));
                 result.Add(new RoomTemplateSnapshot(template.TemplateId, template.Type, template.Openings,
                     template.Passages, template.PassagesVerified,
                     hasStart, hasStart ? template.transform.InverseTransformPoint(template.PlayerStart.position) : default,
                     hasGoal, hasGoal ? template.transform.InverseTransformPoint(template.Goal.position) : default,
                     template.VerifiedStartExits, template.VerifiedGoalEntries, terrain, template.VerifiedDeadEndReturns, content,
-                    template.BaseGroupId));
+                    template.BaseGroupId, hazards));
             }
             result.Sort((a, b) => string.CompareOrdinal(a.Id, b.Id));
             snapshots = result.AsReadOnly();

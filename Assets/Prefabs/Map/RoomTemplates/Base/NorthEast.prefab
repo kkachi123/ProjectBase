@@ -1618,6 +1618,22 @@ MonoBehaviour:
   _contentSlots:
   - {x: 7, y: 5}
   _contentSettings: []
+  _hazards:
+  - id: west.arrow
+    candidate: {fileID: 3600165176526243880}
+    clearance:
+      x: 1
+      y: 4
+      width: 16
+      height: 2
+    support:
+      x: 0
+      y: 4
+      width: 1
+      height: 2
+    spawnWeight: 1
+    emptyWeight: 1
+    passageVerified: 1
   _playerStart: {fileID: 0}
   _goal: {fileID: 0}
   _verifiedStartExits: 0
@@ -1751,6 +1767,11 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: ed0c06169bd3d554b9faab153e93e8dd, type: 3}
+--- !u!1 &3600165176526243880 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 1892606650732179297, guid: ed0c06169bd3d554b9faab153e93e8dd, type: 3}
+  m_PrefabInstance: {fileID: 3149626511279712073}
+  m_PrefabAsset: {fileID: 0}
 --- !u!4 &8494308137996630375 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 6797163981309304366, guid: ed0c06169bd3d554b9faab153e93e8dd, type: 3}

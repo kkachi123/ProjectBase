@@ -81,6 +81,7 @@ namespace ProjectRE.MapGeneration
         [SerializeField] private List<RoomTerrainVariation> _terrainVariations = new();
         [SerializeField] private List<Vector2Int> _contentSlots = new();
         [SerializeField] private List<RoomContentSlot> _contentSettings = new();
+        [SerializeField] private List<RoomHazardSlot> _hazards = new();
         [SerializeField] private Transform _playerStart;
         [SerializeField] private Transform _goal;
         [Tooltip("Player 시작 마커에서 출입구까지 실제 이동으로 확인한 방향입니다.")]
@@ -106,6 +107,7 @@ namespace ProjectRE.MapGeneration
         public IReadOnlyList<RoomTerrainVariation> TerrainVariations => _terrainVariations;
         public IReadOnlyList<Vector2Int> ContentSlots => _contentSlots;
         public IReadOnlyList<RoomContentSlot> ContentSettings => _contentSettings;
+        public IReadOnlyList<RoomHazardSlot> Hazards => _hazards;
         public Transform PlayerStart => _playerStart;
         public Transform Goal => _goal;
         public RoomOpening VerifiedStartExits => _verifiedStartExits;

@@ -92,6 +92,14 @@ namespace ProjectRE.MapGeneration
                     }
                     if (total <= 0 || total > 1000000) errors.Add($"잘못된 콘텐츠 가중치: {template.Id}");
                 }
+                var hazards = new HashSet<string>(StringComparer.Ordinal);
+                foreach (RoomHazardSnapshot slot in template.Hazards)
+                {
+                    if (slot == null || string.IsNullOrWhiteSpace(slot.Id) || !hazards.Add(slot.Id) ||
+                        slot.SpawnWeight < 0 || slot.EmptyWeight < 0 ||
+                        (long)slot.SpawnWeight + slot.EmptyWeight <= 0 || (long)slot.SpawnWeight + slot.EmptyWeight > 1000000)
+                        errors.Add($"잘못된 함정 후보 또는 가중치: {template.Id}");
+                }
             }
             return errors;
         }
@@ -140,6 +148,14 @@ namespace ProjectRE.MapGeneration
                         if (room.Content[i] == null || room.Content[i].SlotIndex != expectedContent[i].SlotIndex ||
                             room.Content[i].OptionId != expectedContent[i].OptionId)
                             errors.Add($"콘텐츠 선택이 일치하지 않습니다: {room.Cell}");
+                    var expectedHazards = room.IsOptional || mainPath
+                        ? RoomHazardPlanner.Select(plan.Seed, room.Cell, template)
+                        : Array.Empty<RoomHazardSelection>();
+                    if (room.Hazards.Count != expectedHazards.Count) errors.Add($"함정 선택 개수가 다릅니다: {room.Cell}");
+                    else for (int i = 0; i < expectedHazards.Count; i++)
+                        if (room.Hazards[i] == null || room.Hazards[i].Id != expectedHazards[i].Id ||
+                            room.Hazards[i].Spawn != expectedHazards[i].Spawn)
+                            errors.Add($"함정 선택이 일치하지 않습니다: {room.Cell}");
                 }
             }
             if (optionalCount > 1) errors.Add("선택 방은 최대 하나여야 합니다.");

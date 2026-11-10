@@ -82,6 +82,12 @@ namespace ProjectRE.MapGeneration.Editor
                 },
                 AddComponent = (target, type) => Undo.AddComponent(target, type),
                 RecordComponent = target => Undo.RecordObject(target, "Set map positions"),
+                SetActive = (target, active) =>
+                {
+                    Undo.RecordObject(target, "Set hazard state");
+                    target.SetActive(active);
+                    PrefabUtility.RecordPrefabInstancePropertyModifications(target);
+                },
                 DestroyObject = target => Undo.DestroyObjectImmediate(target),
             };
             if (!RoomMapFactory.TryCreate(_settings, _seed, _goalPrefab, context, out var info, out var plan, out string error))

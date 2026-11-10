@@ -31,6 +31,7 @@ classDiagram
     MapPlanner ..> RoomDirection : 방향과 좌표
     MapPlanner ..> RoomTerrainPlanner : 내부 지형 선택
     MapPlanner ..> RoomContentPlanner : 방 역할별 콘텐츠
+    MapPlanner ..> RoomHazardPlanner : 함정 생성 여부
     MapPlanner ..> MapPlan : 계획 생성
     MapPlan *-- MapRoomPlan : 방별 계획
     MapBuilder ..> MapPlanValidator : 생성 전 검사
@@ -57,7 +58,7 @@ classDiagram
 1. `MapGenerator.Generate()`가 설정과 카탈로그를 확인하고 `RoomTemplateCatalog.TryCreateSnapshot()`으로 원본 프리팹을 검사한다.
 2. `MapPlanner.Create()`가 입력을 검사한 뒤 seed로 맨 위 행에서 시작하는 주 경로를 만든다. 각 행에서는 한 방향으로 이동하거나 다음 행으로 내려간다.
 3. 경로의 각 칸에서 출입구·검증된 통과 방향·시작과 Goal 조건에 맞는 후보를 걸러낸 뒤 Base 그룹과 그 안의 템플릿을 순서대로 선택한다. 경로 밖은 출입구가 없는 `Side` 방으로 채운다. 이때 `RoomTerrainPlanner`가 해당 방의 내부 선택을 기록한다.
-4. 조건을 만족하는 분기와 막다른 방이 있으면 연결 위치를 고른 뒤 각 방의 Base 그룹과 템플릿을 선택한다. 후보가 없으면 선택 방 없이 진행한다. 이후 확정된 중간 경로 방과 선택 방에 대해 `RoomContentPlanner`가 역할별 콘텐츠를 선택한다.
+4. 조건을 만족하는 분기와 막다른 방이 있으면 연결 위치를 고른 뒤 각 방의 Base 그룹과 템플릿을 선택한다. 후보가 없으면 선택 방 없이 진행한다. 이후 확정된 중간 경로 방과 선택 방에 대해 `RoomContentPlanner`가 역할별 콘텐츠를, `RoomHazardPlanner`가 함정 생성 여부를 선택한다.
 5. `MapPlanValidator`가 경로·이웃 출입구·마커·분기와 기록된 내부 선택을 검사한다. 실패하면 최대 시도 횟수까지 다시 계획하고, 끝내 실패하면 seed와 사유를 반환한다.
 
 같은 설정·카탈로그·코드와 seed에서는 같은 계획을 만든다. Base 그룹과 템플릿을 ID 순서로 정렬하며 그룹 선택과 Variant 선택은 별도 난수를 사용한다. 같은 그룹에 Variant를 추가해도 해당 그룹의 선택 비중은 늘지 않는다. 지형·콘텐츠 선택도 별도 난수를 사용한다. 그룹 선택 도입이나 카탈로그·ID 변경 후에는 이전 seed의 결과가 달라질 수 있다.
