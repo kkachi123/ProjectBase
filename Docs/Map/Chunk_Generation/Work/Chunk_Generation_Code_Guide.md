@@ -66,8 +66,9 @@ classDiagram
 | `RoomTerrainSnapshot`, `RoomTerrainPlanner`, `RoomTerrainSelection` | [RoomTerrainPlan.cs](../../../../Assets/Scripts/Map/RoomTemplates/RoomTerrainPlan.cs) | 지형 선택지의 복사본, 선택 계산과 확정된 패턴·셀을 담당한다. |
 | `ContentOptionSnapshot`, `ContentSlotSnapshot`, `RoomContentPlanner`, `ContentSelection` | [RoomContent.cs](../../../../Assets/Scripts/Map/RoomTemplates/RoomContent.cs) | 콘텐츠 선택지의 복사본, 가중치 계산과 확정된 슬롯 결과를 담당한다. |
 | `RoomHazardSlot`, `RoomHazardSnapshot`, `RoomHazardPlanner`, `RoomHazardSelection` | [RoomHazard.cs](../../../../Assets/Scripts/Map/RoomTemplates/RoomHazard.cs) | 함정 후보와 공간, 계산용 가중치, 생성 여부 선택과 결과를 담당한다. |
-| `TrapContactDamage` | [TrapContactDamage.cs](../../../../Assets/Scripts/Trap/TrapContactDamage.cs) | 대상 레이어의 접촉 진입마다 피해를 주고 한 대상의 여러 Collider를 중복 집계하지 않는다. Spikes와 Fire에 연결돼 있다. |
+| `TrapContactDamage` | [TrapContactDamage.cs](../../../../Assets/Scripts/Trap/TrapContactDamage.cs) | 대상 레이어의 접촉 진입마다 피해를 주고 한 대상의 여러 Collider를 중복 집계하지 않는다. Spikes·Fire·Saw에 연결돼 있다. |
 | `FireTrap` | [FireTrap.cs](../../../../Assets/Scripts/Trap/FireTrap.cs) | 점화·소화 시간을 관리하고 불꽃 Sprite·Animator·접촉 피해와 Collider를 전환한다. |
+| `SawPatrol` | [SawPatrol.cs](../../../../Assets/Scripts/Trap/SawPatrol.cs) | 물리 갱신에서 톱니를 시작점과 지정된 거리 사이로 왕복시킨다. 재활성화하면 처음 위치로 돌아간다. |
 | `MapPlanner`, `MapRoomPlan`, `MapPlanValidator` | [MapPlanner.cs](../../../../Assets/Scripts/Map/RoomTemplates/MapPlanner.cs), [MapPlan.cs](../../../../Assets/Scripts/Map/RoomTemplates/MapPlan.cs), [MapPlanValidator.cs](../../../../Assets/Scripts/Map/RoomTemplates/MapPlanValidator.cs) | 내부 선택을 요청·기록하고 완성 계획을 검증한다. |
 | `MapBuilder`, `MapVisualBuilder` | [MapBuilder.cs](../../../../Assets/Scripts/Map/RoomTemplates/MapBuilder.cs), [MapVisualBuilder.cs](../../../../Assets/Scripts/Map/RoomTemplates/MapVisualBuilder.cs) | 확정된 내부 선택을 생성하고 선택적 공통 지형 그래픽을 만든다. |
 
