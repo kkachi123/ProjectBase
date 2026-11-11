@@ -6,7 +6,7 @@
 
 방별 진행 조건과 임시 표시·효과는 [방별 진행 조건 계획](../Map/Chunk_Generation/Work/Room_Progression_Plan.md)에 따라 제작한다. 목표 로직이 구현된 뒤 실제 상태 조회·변경 알림과 수명 주기를 확인하고 HUD에 연결한다. UI가 목표 완료나 출구 잠금의 판단을 담당하지 않도록 한다. 기존 `InGameUI`·`UIHUD`와 실제 Prefab·Scene 구성을 확인하고 프로젝트 UI 작업 방식에 맞춰 구현한다.
 
-현재 시제품의 `RoomObjectiveController`는 목표 목록·진행 수·방 체류 상태와 `Changed` 이벤트를 제공한다. 아직 실제 맵의 현재 방 선택과 랜덤 콘텐츠에는 연결되지 않았으므로 UI 작업 시 최종 연결 구조를 다시 확인한다.
+`RoomObjectiveController`는 목표 목록·진행 수·방 체류 상태와 `Changed` 이벤트를 제공한다. 현재 대표 `WestSouth` 방에는 실제 생성된 목표와 임시 표시가 연결돼 있다. UI 작업 시 여러 방에서 현재 방을 선택하는 방법과 최종 연결 구조를 확인한다.
 
 ## 검증 기준
 

@@ -11,6 +11,8 @@ namespace ProjectRE
         private IDisposable subscription;
         private bool started;
 
+        public void SetTarget(Health value) => target = value;
+
         private void Start()
         {
             started = true;

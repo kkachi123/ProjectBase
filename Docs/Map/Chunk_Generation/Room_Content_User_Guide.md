@@ -6,7 +6,7 @@
 
 Title에서 게임을 시작하면 설정된 카탈로그에서 방을 고르고, 각 방에 미리 설정된 패턴·확률 셀·콘텐츠·함정의 선택 결과를 자동으로 적용한다. 위치, 후보 프리팹, 타일과 확률은 방을 만들 때 직접 설정한다. 등록되지 않은 몬스터나 함정이 자동으로 추가되지는 않는다.
 
-방별 목표·출구 잠금은 별도 시제품으로 검증 중이며 현재 게임 시작 시 자동 적용되지 않는다. 진행 상태는 [진행 현황](Chunk_Generation_Progress.md)을 참고한다.
+방별 목표·출구 잠금은 현재 `WestSouth` Base와 상속 Variant에 설정돼 있다. 게임 시작 시 이 방이 주 경로의 중간 방으로 선택되면 목표 후보와 콘텐츠 생성 결과를 적용한다. 다른 방의 확장 및 검증 상태는 [진행 현황](Chunk_Generation_Progress.md)을 참고한다.
 
 현재 Title 씬의 `MapManager`는 [MapPlanningSettings](../../../Assets/Prefabs/@Data/Map/MapPlanningSettings.asset)와 연결돼 있고, 이 설정의 [RoomTemplateCatalog](../../../Assets/Prefabs/@Data/Map/RoomTemplateCatalog.asset)에 실제 사용할 방 Variant가 등록돼 있다. 기본 맵 크기는 4×4다. `MapManager`의 **Use Random Seed**가 켜져 있어 새 Run의 seed를 자동으로 정한다. 끄면 **Seed**에 지정한 값을 사용한다. 같은 설정·카탈로그·코드와 seed의 결과는 재현되지만, 입력 설정이나 템플릿 ID가 바뀌면 달라질 수 있다.
 
@@ -60,6 +60,19 @@ Horizontal의 현재 설정은 영역 `(3, 10)` 크기 `4×3`, 발판 패턴 또
 WestSouth에는 고블린·아이템·빈 상태의 가중치가 각각 1이다. 이 일반 방 슬롯에서는 각각 1/3이며 한 슬롯에서 고블린과 아이템이 동시에 나오지는 않는다. 선택 방은 일반 몬스터 후보를 제외한다. 엘리트 몬스터는 아직 연결되지 않았다.
 
 콘텐츠 공간은 고정 지형·보호 영역·출입구·다른 슬롯과 겹치지 않아야 한다. 공간과 지지면은 변형 영역과 겹칠 수 없고, 지지면은 전체 셀이 충돌하는 Grid 타입 고정 타일이어야 한다. 후보는 루트에 활성 BoxCollider2D 또는 CapsuleCollider2D 하나가 있어야 하며 지정한 공간과 지지면에 맞아야 한다.
+
+## 방별 진행 목표 설정
+
+예시: [WestSouth Base](../../../Assets/Prefabs/Map/RoomTemplates/Base/WestSouth.prefab)의 자식 **RoomObjectives**에 있는 `Room Objective Setup` 컴포넌트다.
+
+| 항목 | 의미 |
+| --- | --- |
+| **Controller** | 선택된 목표와 출구를 관리하는 `Room Objective Controller`다. |
+| **Triggers** | 방 안에 배치한 지점·스위치 목표 후보 목록이다. 고유 `Id`, 후보 `Objective`와 출현 확률 `Chance`를 지정한다. 후보별 출현 여부는 seed와 방 좌표에 따라 결정된다. |
+| **Monster Slots** | 목표 몬스터 후보를 둘 `Content Slots`의 번호다. 해당 슬롯에서 실제 몬스터가 선택된 경우에만 처치 목표로 추가하며 아이템과 빈 상태는 제외한다. |
+| **Gates** | 출구 방향과 잠금 오브젝트를 연결한다. 잠금 오브젝트의 루트에는 활성 일반 Collider가 필요하다. 맵의 진행 방향에 해당하는 문만 사용한다. |
+
+WestSouth는 지점과 스위치를 각각 50% 확률로 선택하고 0번 콘텐츠 슬롯의 몬스터를 목표로 사용한다. 주 경로의 남쪽 출구만 잠그며 선택된 목표가 없으면 열려 있다. 후보 추가나 위치·출구 변경 후에는 각 목표 조합과 실제 Player의 통과를 다시 확인한다. 정식 목표 UI는 별도 UI 작업에서 제작한다.
 
 ## 함정 설정
 

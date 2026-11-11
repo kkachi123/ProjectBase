@@ -39,7 +39,7 @@ Chunk 원본·카탈로그 → 맵 경로와 Chunk 선택 → Chunk 내부 선�
 | `RoomContentSlot`, `RoomContentOption`, `RoomContentPlanner`, `ContentSelection` | 콘텐츠 슬롯과 후보를 정의하고 선택 결과를 기록한다. |
 | `RoomHazardSlot`, `RoomHazardPlanner`, `RoomHazardSelection` | 함정 후보와 설치 조건을 정의하고 생성 여부를 기록한다. |
 | `MapPlanner`, `MapBuilder` | 각각 내부 선택을 요청하고 확정된 선택을 실제 Chunk에 적용한다. |
-| `RoomObjective`, `RoomTriggerObjective`, `RoomMonsterObjective`, `RoomObjectiveController`, `RoomPresenceSensor` | 별도 시제품의 목표 완료·집계·출구와 방 진입을 담당한다. 실제 맵 생성과 랜덤 콘텐츠는 아직 연결되지 않았다. |
+| `RoomObjectiveSetup`, `RoomObjective`, `RoomTriggerObjective`, `RoomMonsterObjective`, `RoomObjectiveController`, `RoomPresenceSensor` | 실제 생성된 콘텐츠와 트리거 후보를 방 목표에 연결하고, 완료·집계·출구와 방 진입을 담당한다. 현재 대표 방에 설정돼 있다. |
 
 현재 내부 지형 변형은 가로방의 고정 발판과 다층 방의 낙하 발판에 설정돼 있다. 검증 범위는 [진행 현황](Chunk_Generation/Chunk_Generation_Progress.md)을 따른다. 콘텐츠 선택은 주 경로의 중간 방과 선택 방에 적용되며, 실제 배치는 슬롯이 설정된 방에서만 일어난다.
 

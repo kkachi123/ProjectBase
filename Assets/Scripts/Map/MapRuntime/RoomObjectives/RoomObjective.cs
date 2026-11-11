@@ -14,6 +14,8 @@ namespace ProjectRE
         public bool IsComplete { get; private set; }
         public event Action<RoomObjective> Completed;
 
+        public void SetDescription(string value) => description = value;
+
         protected void Complete()
         {
             if (IsComplete) return;

@@ -1,6 +1,7 @@
 namespace ProjectRE.MapGeneration.Tests
 {
     using System;
+    using System.Collections.Generic;
     using System.Reflection;
     using NUnit.Framework;
     using UnityEditor;
@@ -9,6 +10,103 @@ namespace ProjectRE.MapGeneration.Tests
 
     public sealed class RoomMapPreviewTests
     {
+        [TestCase(RoomOpening.North)]
+        [TestCase(RoomOpening.East)]
+        [TestCase(RoomOpening.South)]
+        [TestCase(RoomOpening.West)]
+        public void ObjectiveSetupLocksOnlyThePlannedExit(RoomOpening exit)
+        {
+            var root = new GameObject("room");
+            root.SetActive(false);
+            try
+            {
+                root.AddComponent<Grid>();
+                var room = root.AddComponent<RoomTemplate>();
+                var roomData = new SerializedObject(room);
+                roomData.FindProperty("_templateId").stringValue = "test";
+                roomData.ApplyModifiedPropertiesWithoutUndo();
+                var group = new GameObject("objectives");
+                group.transform.SetParent(root.transform, false);
+                var controller = group.AddComponent(Type.GetType("ProjectRE.RoomObjectiveController, Assembly-CSharp"));
+                var setup = group.AddComponent(Type.GetType("ProjectRE.RoomObjectiveSetup, Assembly-CSharp"));
+                var target = new GameObject("trigger");
+                target.transform.SetParent(group.transform, false);
+                target.AddComponent<BoxCollider2D>().isTrigger = true;
+                var trigger = target.AddComponent(Type.GetType("ProjectRE.RoomTriggerObjective, Assembly-CSharp"));
+                target.SetActive(false);
+                var serialized = new SerializedObject(setup);
+                serialized.FindProperty("controller").objectReferenceValue = controller;
+                var triggers = serialized.FindProperty("triggers");
+                triggers.arraySize = 1;
+                triggers.GetArrayElementAtIndex(0).FindPropertyRelative("id").stringValue = "always";
+                triggers.GetArrayElementAtIndex(0).FindPropertyRelative("objective").objectReferenceValue = trigger;
+                triggers.GetArrayElementAtIndex(0).FindPropertyRelative("chance").intValue = 100;
+                var gates = serialized.FindProperty("gates");
+                var directions = new[] { RoomOpening.North, RoomOpening.East, RoomOpening.South, RoomOpening.West };
+                var gateObjects = new List<GameObject>();
+                gates.arraySize = directions.Length;
+                for (int i = 0; i < directions.Length; i++)
+                {
+                    var gate = new GameObject(directions[i].ToString());
+                    gate.transform.SetParent(group.transform, false);
+                    gate.AddComponent<BoxCollider2D>();
+                    gate.SetActive(false);
+                    gateObjects.Add(gate);
+                    gates.GetArrayElementAtIndex(i).FindPropertyRelative("direction").intValue = (int)directions[i];
+                    gates.GetArrayElementAtIndex(i).FindPropertyRelative("gate").objectReferenceValue = gate;
+                }
+                serialized.ApplyModifiedPropertiesWithoutUndo();
+                var entry = exit == RoomOpening.West ? RoomOpening.East : RoomOpening.West;
+                var plan = new MapRoomPlan(Vector2Int.zero, "test", RoomType.Horizontal, entry | exit, entry, exit);
+                setup.GetType().GetMethod("Configure").Invoke(setup,
+                    new object[] { new BuiltRoom(plan, room, new Dictionary<int, GameObject>()), 42, new MapBuildContext() });
+                for (int i = 0; i < directions.Length; i++)
+                    Assert.That(gateObjects[i].activeSelf, Is.EqualTo(directions[i] == exit));
+                Assert.That(target.activeSelf, Is.True);
+            }
+            finally { UnityEngine.Object.DestroyImmediate(root); }
+        }
+
+        [Test]
+        public void ObjectiveCandidatesFollowSpawnedContentAndSeed()
+        {
+            var factory = Type.GetType("ProjectRE.RoomMapFactory, Assembly-CSharp");
+            var settings = AssetDatabase.LoadAssetAtPath<MapPlanningSettings>("Assets/Prefabs/@Data/Map/MapPlanningSettings.asset");
+            var goal = AssetDatabase.LoadAssetAtPath<GameObject>("Assets/Prefabs/Map/GridChunk/@BackGroundPrefab/GoalTrigger/EndLight-EndTrigger.prefab");
+            Assert.That(factory, Is.Not.Null);
+            string Generate(int seed)
+            {
+                object[] args = { settings, seed, goal, new MapBuildContext(), null, null, null };
+                Assert.That(factory.GetMethod("TryCreate").Invoke(null, args), Is.EqualTo(true), args[6]?.ToString());
+                var root = ((Component)args[4]).gameObject;
+                try
+                {
+                    var room = Array.Find(root.GetComponentsInChildren<RoomTemplate>(true),
+                        item => item.TemplateId == "production.down.west_forest_step");
+                    Assert.That(room, Is.Not.Null);
+                    var setup = room.transform.Find("RoomObjectives");
+                    Assert.That(setup, Is.Not.Null);
+                    var controller = setup.GetComponent("RoomObjectiveController");
+                    int count = (int)controller.GetType().GetProperty("TotalCount").GetValue(controller);
+                    var triggerType = Type.GetType("ProjectRE.RoomTriggerObjective, Assembly-CSharp");
+                    var triggers = setup.GetComponentsInChildren(triggerType, true);
+                    int activeTriggers = 0;
+                    foreach (Component trigger in triggers) if (trigger.gameObject.activeSelf) activeTriggers++;
+                    int monsters = setup.GetComponents(Type.GetType("ProjectRE.RoomMonsterObjective, Assembly-CSharp")).Length;
+                    Assert.That(count, Is.EqualTo(activeTriggers + monsters));
+                    Assert.That(setup.Find("SouthGate").gameObject.activeSelf, Is.EqualTo(count > 0));
+                    var monster = room.GetComponentInChildren(Type.GetType("ProjectRE.MonsterController, Assembly-CSharp"), true);
+                    Assert.That(monsters, Is.EqualTo(monster == null ? 0 : 1));
+                    return $"{activeTriggers}:{monsters}:{count}:{setup.Find("SouthGate").gameObject.activeSelf}";
+                }
+                finally { UnityEngine.Object.DestroyImmediate(root); }
+            }
+            foreach (int seed in new[] { 0, 3, 7 }) Assert.That(Generate(seed), Is.EqualTo(Generate(seed)));
+            Assert.That(Generate(0), Is.EqualTo("0:1:1:True"));
+            Assert.That(Generate(3), Is.EqualTo("0:0:0:False"));
+            Assert.That(Generate(7), Is.EqualTo("2:1:3:True"));
+        }
+
         [Test]
         public void PreviewWithTerrainVisualRestoresItsTilesAndSourceRenderersAfterUndoRedo()
         {

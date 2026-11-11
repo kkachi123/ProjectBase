@@ -11,12 +11,24 @@ namespace ProjectRE.MapGeneration
         public GameObject Root { get; }
         public MapPlan Plan { get; }
         public string Error { get; }
+        public IReadOnlyList<BuiltRoom> Rooms { get; }
 
-        private MapBuildResult(GameObject root, MapPlan plan, string error)
-        { Root = root; Plan = plan; Error = error; }
+        private MapBuildResult(GameObject root, MapPlan plan, string error, IReadOnlyList<BuiltRoom> rooms)
+        { Root = root; Plan = plan; Error = error; Rooms = rooms; }
 
-        public static MapBuildResult Succeeded(GameObject root, MapPlan plan) => new(root, plan, null);
-        public static MapBuildResult Failed(string error) => new(null, null, error);
+        public static MapBuildResult Succeeded(GameObject root, MapPlan plan, IReadOnlyList<BuiltRoom> rooms) => new(root, plan, null, rooms);
+        public static MapBuildResult Failed(string error) => new(null, null, error, Array.Empty<BuiltRoom>());
+    }
+
+    /// <summary>확정된 방과 생성된 콘텐츠를 런타임 연결 단계에 전달한다.</summary>
+    public sealed class BuiltRoom
+    {
+        public MapRoomPlan Plan { get; }
+        public RoomTemplate Template { get; }
+        public IReadOnlyDictionary<int, GameObject> Content { get; }
+
+        public BuiltRoom(MapRoomPlan plan, RoomTemplate template, IReadOnlyDictionary<int, GameObject> content)
+        { Plan = plan; Template = template; Content = content; }
     }
 
     /// <summary>검증된 계획을 비활성 루트에 생성한다. 기존 맵은 다루지 않는다.</summary>
@@ -55,6 +67,7 @@ namespace ProjectRE.MapGeneration
                 root.transform.SetPositionAndRotation(Vector3.zero, Quaternion.identity);
                 root.transform.localScale = Vector3.one;
                 var terrainMaps = new List<MapVisualBuilder.TerrainMap>();
+                var builtRooms = new List<BuiltRoom>();
                 foreach (MapRoomPlan room in plan.Rooms)
                 {
                     GameObject instance = context.InstantiatePrefab(prefabs[room.TemplateId].gameObject, root.transform);
@@ -65,6 +78,7 @@ namespace ProjectRE.MapGeneration
                     instance.transform.localScale = Vector3.one;
                     instance.name = $"Room ({room.Cell.x}, {room.Cell.y}) {room.TemplateId}";
                     var template = instance.GetComponent<RoomTemplate>();
+                    var builtContent = new Dictionary<int, GameObject>();
                     var roomOrigin = new Vector3Int(room.Cell.x * RoomTemplate.RoomSize, -room.Cell.y * RoomTemplate.RoomSize, 0);
                     if (visualGround != null) terrainMaps.Add(new MapVisualBuilder.TerrainMap(template.FixedGeometry, roomOrigin));
                     foreach (RoomTerrainSelection selection in room.Terrain)
@@ -120,6 +134,7 @@ namespace ProjectRE.MapGeneration
                         Vector3 scale = content.transform.localScale;
                         scale.x = Mathf.Abs(scale.x) * (slot.facing == ContentFacing.Left ? -1 : 1);
                         content.transform.localScale = scale;
+                        builtContent.Add(selection.SlotIndex, content);
                     }
                     foreach (RoomHazardSelection selection in room.Hazards)
                     {
@@ -130,6 +145,7 @@ namespace ProjectRE.MapGeneration
                         if (slot == null || slot.candidate == null) throw new InvalidOperationException($"함정 후보를 찾을 수 없습니다: {selection.Id}");
                         context.SetActive(slot.candidate, true);
                     }
+                    builtRooms.Add(new BuiltRoom(room, template, builtContent));
                 }
                 GameObject goal = context.InstantiatePrefab(goalPrefab, root.transform);
                 if (goal == null) throw new InvalidOperationException("Goal 생성 실패");
@@ -137,7 +153,7 @@ namespace ProjectRE.MapGeneration
                 goal.transform.localPosition = plan.Goal;
                 goal.transform.localRotation = Quaternion.identity;
                 if (visualGround != null) MapVisualBuilder.Build(root, terrainMaps, visualGround, context, visualGroundMaterial);
-                return MapBuildResult.Succeeded(root, plan);
+                return MapBuildResult.Succeeded(root, plan, builtRooms.AsReadOnly());
             }
             catch (Exception exception)
             {

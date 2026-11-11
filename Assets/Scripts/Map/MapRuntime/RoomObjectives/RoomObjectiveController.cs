@@ -18,6 +18,16 @@ namespace ProjectRE
         public bool IsComplete => CompletedCount == TotalCount;
         public event Action Changed;
 
+        public void Configure(IReadOnlyList<RoomObjective> selected, GameObject gate)
+        {
+            if (isActiveAndEnabled) throw new InvalidOperationException("비활성 방에서 목표를 구성해야 합니다.");
+            objectives = new RoomObjective[selected.Count];
+            for (int i = 0; i < selected.Count; i++)
+                objectives[i] = selected[i] ?? throw new ArgumentException("목표에 null을 포함할 수 없습니다.");
+            exitGate = gate;
+            Refresh();
+        }
+
         private void OnEnable()
         {
             foreach (var objective in objectives)
