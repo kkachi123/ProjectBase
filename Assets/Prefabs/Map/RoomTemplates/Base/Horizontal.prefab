@@ -1514,9 +1514,45 @@ CompositeCollider2D:
   m_EdgeRadius: 0
   m_ColliderPaths:
   - m_Collider: {fileID: 2951363947872672199}
-    m_ColliderPaths: []
+    m_ColliderPaths:
+    - - X: 10000000
+        Y: 190000000
+      - X: 190000000
+        Y: 190000000
+      - X: 190000000
+        Y: 80000000
+      - X: 200000000
+        Y: 80000000
+      - X: 200000000
+        Y: 200000000
+      - X: 0
+        Y: 200000000
+      - X: 0
+        Y: 80000000
+      - X: 10000000
+        Y: 80000000
+    - - X: 200000000
+        Y: 40000000
+      - X: 0
+        Y: 40000000
+      - X: 0
+        Y: 0
+      - X: 200000000
+        Y: 0
   m_CompositePaths:
-    m_Paths: []
+    m_Paths:
+    - - {x: 0.99997073, y: 8}
+      - {x: 1.0000294, y: 19}
+      - {x: 19, y: 18.999971}
+      - {x: 19.000029, y: 8}
+      - {x: 20, y: 8.00003}
+      - {x: 19.999971, y: 20}
+      - {x: 0, y: 19.999971}
+      - {x: 0.000029300001, y: 8}
+    - - {x: 19.999971, y: 0}
+      - {x: 19.999971, y: 4}
+      - {x: 0, y: 3.999971}
+      - {x: 0.000029300001, y: 0}
   m_VertexDistance: 0.0005
   m_OffsetDistance: 0.00005
   m_UseDelaunayMesh: 0
@@ -1616,6 +1652,7 @@ MonoBehaviour:
   _contentSlots:
   - {x: 7, y: 5}
   _contentSettings: []
+  _hazards: []
   _playerStart: {fileID: 3523829116053382161}
   _goal: {fileID: 7227613610447728189}
   _verifiedStartExits: 0
