@@ -1,6 +1,6 @@
 # Room Template 사용 관계 조사
 
-기준 위치는 [RoomTemplates](../../../../Assets/Prefabs/Map/RoomTemplates/)다. 카탈로그의 직렬화된 GUID, 프리팹의 출입구·검증 표시, 씬 참조와 코드의 에셋 경로를 대조했다. 카탈로그 등록은 **생성 후보**라는 뜻이며 모든 seed에서 해당 방이 선택된다는 뜻은 아니다.
+기준 위치는 [RoomTemplates](../../../../Assets/Prefabs/Map/RoomTemplates/)다. 카탈로그의 직렬화된 GUID, 프리팹의 출입구·검증 표시, 씬 참조와 코드의 에셋 경로를 대조했다. 아래 목록은 정리 작업 당시의 조사 결과이며, 이후 추가된 다층 방 등 현재 상태는 [진행 현황](../Chunk_Generation_Progress.md)과 실제 카탈로그를 따른다. 카탈로그 등록은 **생성 후보**라는 뜻이며 모든 seed에서 해당 방이 선택된다는 뜻은 아니다.
 
 ## 설정과 카탈로그
 

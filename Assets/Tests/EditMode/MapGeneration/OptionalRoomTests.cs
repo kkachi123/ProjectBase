@@ -80,7 +80,8 @@ namespace ProjectRE.MapGeneration.Tests
                 var slot = instance.ContentSettings.Single();
                 var option = slot.options.Single(o => o.id == id);
                 var matching = instance.GetComponentsInChildren<Collider2D>(true)
-                    .Where(c => c.transform.parent == instance.transform && c.gameObject != instance.FixedGeometry.gameObject).ToArray();
+                    .Where(c => c.transform.parent == instance.transform && c.gameObject != instance.FixedGeometry.gameObject &&
+                        instance.Hazards.All(h => h.candidate != c.gameObject)).ToArray();
                 Assert.That(matching.Length, Is.EqualTo(1));
                 Assert.That(matching[0].transform.localPosition,
                     Is.EqualTo(new Vector3(7.5f + option.offset.x, 4f + option.offset.y, 0)));
