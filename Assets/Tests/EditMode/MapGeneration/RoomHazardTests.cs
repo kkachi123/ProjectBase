@@ -75,7 +75,11 @@ namespace ProjectRE.MapGeneration.Tests
                 {
                     var cell = pair.Value.room.Cell;
                     var room = built.Root.transform.GetChild(cell.y * pair.Value.plan.Width + cell.x).GetComponent<RoomTemplate>();
-                    Assert.That(room.Hazards.Single().candidate.activeSelf, Is.EqualTo(pair.Key));
+                    foreach (var selection in pair.Value.room.Hazards)
+                    {
+                        var slot = room.Hazards.Single(h => h.id == selection.Id);
+                        Assert.That(slot.candidate.activeSelf, Is.EqualTo(selection.Spawn), selection.Id);
+                    }
                 }
                 finally { UnityEngine.Object.DestroyImmediate(built.Root); }
             }
