@@ -12,8 +12,8 @@
 - [x] **Base·Nova Variant 전환:** Base를 상속한 Nova Variant를 기본 카탈로그에 등록하고 씬·에디터·테스트 연결을 확인했다. 현재 카탈로그에는 다층 대표 방을 포함해 18개가 있다.
 - [x] **방 역할별 콘텐츠 배치:** 일반 경로 방과 선택 방의 후보 종류를 구분하고 대표 방에서 생성·이동·아이템 획득을 확인했다. 일반 방 슬롯은 현재 대표 Base 한 종류에 설정돼 있으며 엘리트 몬스터는 제작 후 연결한다.
 - [x] **그래픽과 내부 조합 확인:** 수관 이음새와 대표 인접 방의 반복 배치를 정리하고, 두 가로 Variant의 내부 지형 조합과 대표 연결을 임시 화면으로 확인했다. 실제 게임 조명과 모든 방 연결은 미검증이며 작은 확률 셀의 대비와 같은 방의 연속 배치는 추가 확인이 필요하다.
-- [ ] **방 구조와 함정 배치:** 화살 함정·투사체 풀과 Spikes·Fire·Saw·SpikeHead·SpikedBall·FallingPlatform을 구현하고 대표 방에 확률 배치했다. 다층 방에서 가시·가시 공·낙하 발판의 동시 배치는 무피해 통과를 추가 확인해야 한다. 용암의 에셋·동작과 나머지 검증은 [세부 단계](Chunk_Generation/Chunk_Generation_Progress.md)를 참고한다.
-- [ ] **방별 진행 조건:** 일부 방에서 실제 생성된 트리거·몬스터 목표를 완료하면 주 경로 출구를 연다. 함정 작업 이후 [세부 계획](Chunk_Generation/Work/Room_Progression_Plan.md)에 따라 진행한다.
+- [ ] **방 구조와 함정 배치:** 화살 함정·투사체 풀과 Spikes·Fire·Saw·SpikeHead·SpikedBall·FallingPlatform을 구현하고 대표 방에 확률 배치했다. 다층 방에서 가시·가시 공·낙하 발판의 동시 배치는 무피해 통과를 추가 확인해야 한다. 용암은 보류하며 [세부 단계](Chunk_Generation/Chunk_Generation_Progress.md)를 참고한다.
+- [ ] **방별 진행 조건:** 일부 방에서 실제 생성된 트리거·몬스터 목표를 완료하면 주 경로 출구를 연다. 임시 표시·효과를 사용해 [세부 계획](Chunk_Generation/Work/Room_Progression_Plan.md)에 따라 진행하며, 정식 목표 UI는 [UI 작업](../UI/UI_Progress.md)으로 이월한다.
 - [ ] **난이도별 출현 확률:** 마지막 단계에서 난이도 설정에 따라 몬스터·아이템·함정의 슬롯별 출현 확률을 조절한다.
 
 세부 완료 상태, 남은 확인과 다음 작업은 [Chunk 내부 생성 진행 현황](Chunk_Generation/Chunk_Generation_Progress.md)을 기준으로 한다.
