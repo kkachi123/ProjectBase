@@ -13,6 +13,7 @@
 - [NovaDevs 그래픽 설계](Work/NovaDevs_Level_Art_Design.md): 에셋과 지형 그래픽의 구성이다.
 - [지형·배경·장식 제작 규칙](Work/Room_Art_Authoring_Guide.md): 방의 그래픽을 배치하고 확인하는 방법이다.
 - [타일·그래픽 작업 지침](Work/Room_Tile_Visual_Plan.md): AI가 작업할 때 따르는 작업 방법과 검증 기준이다.
+- [방별 진행 조건 계획](Work/Room_Progression_Plan.md): 목표·출구 잠금과 검증 순서다.
 - [Images](Work/Images/): 설명서와 작업 이력에서 함께 참조하는 이미지다.
 
 전체 맵 조합과 코드의 개요는 [맵 생성 코드 안내](../Map_Code_Architecture_Guide.md), 작업 이력은 [맵 제작·리팩토링 로그](../Map_Refactoring_Log.md)를 참고한다.
