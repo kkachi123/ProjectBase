@@ -1,7 +1,12 @@
 # Chunk 내부 생성 문서
 
+사용자가 직접 확인하는 사용법·설정법과 진행 현황은 이 폴더에 둔다. AI 작업에 필요한 상세 코드 구조·제작 규칙·조사 자료와 이미지는 `Work/`에 둔다. 새 문서도 이 기준으로 배치한다.
+
 - [Chunk 내부 생성 진행 현황](Chunk_Generation_Progress.md): 완료한 단계, 남은 작업과 검증 범위다.
-- [방 내부 생성 설정과 확인 방법](Work/Room_Content_User_Guide.md): Unity에서 지형·콘텐츠·함정을 설정하고 생성 결과를 확인하는 방법이다.
+- [방 내부 생성 설정과 확인 방법](Room_Content_User_Guide.md): Unity에서 지형·콘텐츠·함정을 설정하고 생성 결과를 확인하는 방법이다.
+
+## AI 작업용 자료
+
 - [내부 조합 코드 구조](Work/Chunk_Generation_Code_Guide.md): 내부 조합의 클래스와 실행 흐름이다.
 - [Room Template 제작 규격](Work/Room_Template_Authoring_Guide.md): 방 템플릿과 지형·콘텐츠 설정 방법이다.
 - [Room Template 사용 관계 조사](Work/Room_Template_Inventory.md): 카탈로그·방·공용 에셋의 사용 관계와 폴더 구성이다.

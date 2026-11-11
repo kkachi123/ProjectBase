@@ -1,16 +1,16 @@
 # 방 내부 생성 설정과 확인 방법
 
-방 프리팹의 지형·몬스터·아이템·함정 설정을 확인하고 수정하는 방법이다. 더 자세한 제작 조건은 [방 템플릿 제작 규격](Room_Template_Authoring_Guide.md), 진행 상황은 [Chunk 내부 생성 진행 현황](../Chunk_Generation_Progress.md)을 참고한다.
+방 프리팹의 지형·몬스터·아이템·함정 설정을 확인하고 수정하는 방법이다. 더 자세한 제작 조건은 [방 템플릿 제작 규격](Work/Room_Template_Authoring_Guide.md), 진행 상황은 [Chunk 내부 생성 진행 현황](Chunk_Generation_Progress.md)을 참고한다.
 
 ## 게임 시작 시 적용 방식
 
 Title에서 게임을 시작하면 설정된 카탈로그에서 방을 고르고, 각 방에 미리 설정된 패턴·확률 셀·콘텐츠·함정의 선택 결과를 자동으로 적용한다. 위치, 후보 프리팹, 타일과 확률은 방을 만들 때 직접 설정한다. 등록되지 않은 몬스터나 함정이 자동으로 추가되지는 않는다.
 
-현재 Title 씬의 `MapManager`는 [MapPlanningSettings](../../../../Assets/Prefabs/@Data/Map/MapPlanningSettings.asset)와 연결돼 있고, 이 설정의 [RoomTemplateCatalog](../../../../Assets/Prefabs/@Data/Map/RoomTemplateCatalog.asset)에 실제 사용할 방 Variant가 등록돼 있다. 기본 맵 크기는 4×4다. `MapManager`의 **Use Random Seed**가 켜져 있어 새 Run의 seed를 자동으로 정한다. 끄면 **Seed**에 지정한 값을 사용한다. 같은 설정·카탈로그·코드와 seed의 결과는 재현되지만, 입력 설정이나 템플릿 ID가 바뀌면 달라질 수 있다.
+현재 Title 씬의 `MapManager`는 [MapPlanningSettings](../../../Assets/Prefabs/@Data/Map/MapPlanningSettings.asset)와 연결돼 있고, 이 설정의 [RoomTemplateCatalog](../../../Assets/Prefabs/@Data/Map/RoomTemplateCatalog.asset)에 실제 사용할 방 Variant가 등록돼 있다. 기본 맵 크기는 4×4다. `MapManager`의 **Use Random Seed**가 켜져 있어 새 Run의 seed를 자동으로 정한다. 끄면 **Seed**에 지정한 값을 사용한다. 같은 설정·카탈로그·코드와 seed의 결과는 재현되지만, 입력 설정이나 템플릿 ID가 바뀌면 달라질 수 있다.
 
 ## 방 설정 열기
 
-1. Project 창에서 [Base 방 프리팹 폴더](../../../../Assets/Prefabs/Map/RoomTemplates/Base/)의 방을 열고 루트 오브젝트를 선택한다.
+1. Project 창에서 [Base 방 프리팹 폴더](../../../Assets/Prefabs/Map/RoomTemplates/Base/)의 방을 열고 루트 오브젝트를 선택한다.
 2. Inspector의 **Room Template** 컴포넌트에서 `Variation Regions`, `Terrain Variations`, `Content Slots`, `Content Settings`, `Hazards`를 확인한다.
 3. Scene 뷰에서 **Gizmos**를 켜면 회색은 방 경계, 초록색은 출입구, 청록색은 변형 영역, 빨간색은 보호 영역, 노란색은 콘텐츠 슬롯 기준점이다. 확률 셀과 함정 위험 공간은 별도로 그려지지 않으므로 Inspector 값을 확인한다.
 
@@ -18,7 +18,7 @@ Title에서 게임을 시작하면 설정된 카탈로그에서 방을 고르고
 
 ## 랜덤 지형 설정
 
-예시: [Horizontal Base](../../../../Assets/Prefabs/Map/RoomTemplates/Base/Horizontal.prefab)의 `Room Template`.
+예시: [Horizontal Base](../../../Assets/Prefabs/Map/RoomTemplates/Base/Horizontal.prefab)의 `Room Template`.
 
 1. **Variation Regions**에 변형할 사각형의 `X`, `Y`, `Width`, `Height`를 지정한다. 첫 번째 영역의 번호는 `0`이다. 영역은 방 경계·보호 영역·다른 변형 영역과 겹치지 않아야 하고, 사용하는 영역에는 고정 타일이 없어야 한다.
 2. **Terrain Variations**에 항목을 추가하고 `Region Index`로 위 영역 번호를 연결한다. `Allow Empty Pattern`을 켜면 아무 패턴도 놓지 않는 선택지를 포함한다.
@@ -29,7 +29,7 @@ Horizontal의 현재 설정은 영역 `(3, 10)` 크기 `4×3`, 발판 패턴 또
 
 ## 몬스터·아이템 설정
 
-예시: [WestSouth Base](../../../../Assets/Prefabs/Map/RoomTemplates/Base/WestSouth.prefab).
+예시: [WestSouth Base](../../../Assets/Prefabs/Map/RoomTemplates/Base/WestSouth.prefab).
 
 1. **Content Slots**에 배치 기준 셀을 추가한다. 좌표만 추가해서는 프리팹이 생성되지 않는다.
 2. **Content Settings**에 설정을 추가하고 `Slot Index`로 기준점 번호를 연결한다. `Clearance`에는 콘텐츠를 놓을 빈 공간의 좌표와 크기, `Surface`에는 지지면, `Facing`에는 방향을 지정한다.
