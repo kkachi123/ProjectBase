@@ -69,7 +69,7 @@ classDiagram
 | `TrapContactDamage` | [TrapContactDamage.cs](../../../../Assets/Scripts/Trap/TrapContactDamage.cs) | 대상 레이어의 접촉 진입마다 피해를 주고 한 대상의 여러 Collider를 중복 집계하지 않는다. Spikes·Fire·Saw·SpikeHead에 연결돼 있다. |
 | `FireTrap` | [FireTrap.cs](../../../../Assets/Scripts/Trap/FireTrap.cs) | 점화·소화 시간을 관리하고 불꽃 Sprite·Animator·접촉 피해와 Collider를 전환한다. |
 | `SawPatrol` | [SawPatrol.cs](../../../../Assets/Scripts/Trap/SawPatrol.cs) | 물리 갱신에서 톱니를 시작점과 지정된 거리 사이로 왕복시킨다. 재활성화하면 처음 위치로 돌아간다. |
-| `SpikeHeadTrap` | [SpikeHeadTrap.cs](../../../../Assets/Scripts/Trap/SpikeHeadTrap.cs) | 정면 Player 감지, 돌진 예고·왕복 이동·재작동 대기를 처리한다. 접촉 피해는 `TrapContactDamage`에 맡긴다. |
+| `SpikeHeadTrap` | [SpikeHeadTrap.cs](../../../../Assets/Scripts/Trap/SpikeHeadTrap.cs) | 아래 Player 감지, 낙하 예고·지형 또는 거리 제한에 따른 정지·복귀·재작동 대기를 처리한다. 접촉 피해는 `TrapContactDamage`에 맡긴다. |
 | `MapPlanner`, `MapRoomPlan`, `MapPlanValidator` | [MapPlanner.cs](../../../../Assets/Scripts/Map/RoomTemplates/MapPlanner.cs), [MapPlan.cs](../../../../Assets/Scripts/Map/RoomTemplates/MapPlan.cs), [MapPlanValidator.cs](../../../../Assets/Scripts/Map/RoomTemplates/MapPlanValidator.cs) | 내부 선택을 요청·기록하고 완성 계획을 검증한다. |
 | `MapBuilder`, `MapVisualBuilder` | [MapBuilder.cs](../../../../Assets/Scripts/Map/RoomTemplates/MapBuilder.cs), [MapVisualBuilder.cs](../../../../Assets/Scripts/Map/RoomTemplates/MapVisualBuilder.cs) | 확정된 내부 선택을 생성하고 선택적 공통 지형 그래픽을 만든다. |
 
