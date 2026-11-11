@@ -6,6 +6,8 @@
 
 Title에서 게임을 시작하면 설정된 카탈로그에서 방을 고르고, 각 방에 미리 설정된 패턴·확률 셀·콘텐츠·함정의 선택 결과를 자동으로 적용한다. 위치, 후보 프리팹, 타일과 확률은 방을 만들 때 직접 설정한다. 등록되지 않은 몬스터나 함정이 자동으로 추가되지는 않는다.
 
+방별 목표·출구 잠금은 별도 시제품으로 검증 중이며 현재 게임 시작 시 자동 적용되지 않는다. 진행 상태는 [진행 현황](Chunk_Generation_Progress.md)을 참고한다.
+
 현재 Title 씬의 `MapManager`는 [MapPlanningSettings](../../../Assets/Prefabs/@Data/Map/MapPlanningSettings.asset)와 연결돼 있고, 이 설정의 [RoomTemplateCatalog](../../../Assets/Prefabs/@Data/Map/RoomTemplateCatalog.asset)에 실제 사용할 방 Variant가 등록돼 있다. 기본 맵 크기는 4×4다. `MapManager`의 **Use Random Seed**가 켜져 있어 새 Run의 seed를 자동으로 정한다. 끄면 **Seed**에 지정한 값을 사용한다. 같은 설정·카탈로그·코드와 seed의 결과는 재현되지만, 입력 설정이나 템플릿 ID가 바뀌면 달라질 수 있다.
 
 ## 방 설정 열기

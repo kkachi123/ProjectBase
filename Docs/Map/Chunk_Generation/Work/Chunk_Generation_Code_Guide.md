@@ -8,6 +8,8 @@
 
 현재 내부 지형 변형은 `sample.horizontal`에서 발판 패턴 또는 빈 패턴과 확률 셀 한 개로 설정·검증했다. `NovaPrototype` 방 14개에는 내부 지형 변형이 설정되지 않았다. 예를 들어 새 선택 방의 콘텐츠는 바뀔 수 있지만 그 방의 고정 지형과 배경은 바뀌지 않는다.
 
+방 목표는 별도 시제품 단계다. [시제품 프리팹](../../../../Assets/Prefabs/Map/RoomTemplates/Prototype/RoomObjectives_Horizontal_Prototype.prefab)은 게임 시작 시 자동 생성되지 않는다. 랜덤 콘텐츠와의 연결은 [다음 단계](Room_Progression_Plan.md)에서 수행한다.
+
 ## 클래스 관계
 
 화살표는 호출하거나 사용하는 관계이고 `*--`는 데이터 포함 관계다. 맵 계획과 씬 생성은 내부 선택의 호출·적용 지점으로 표시한다.
@@ -70,6 +72,8 @@ classDiagram
 | `FireTrap` | [FireTrap.cs](../../../../Assets/Scripts/Trap/FireTrap.cs) | 점화·소화 시간을 관리하고 불꽃 Sprite·Animator·접촉 피해와 Collider를 전환한다. |
 | `SawPatrol` | [SawPatrol.cs](../../../../Assets/Scripts/Trap/SawPatrol.cs) | 물리 갱신에서 톱니를 시작점과 지정된 거리 사이로 왕복시킨다. 재활성화하면 처음 위치로 돌아간다. |
 | `SpikeHeadTrap` | [SpikeHeadTrap.cs](../../../../Assets/Scripts/Trap/SpikeHeadTrap.cs) | 아래 Player 감지, 낙하 예고·지형 또는 거리 제한에 따른 정지·복귀·재작동 대기를 처리한다. 접촉 피해는 `TrapContactDamage`에 맡긴다. |
+| `RoomObjective`, `RoomTriggerObjective`, `RoomMonsterObjective` | [RoomObjectives](../../../../Assets/Scripts/Map/MapRuntime/RoomObjectives/) | 목표의 완료 이벤트, 지점·스위치 조건 및 지정 몬스터의 `Health.IsDead` 구독을 담당한다. |
+| `RoomObjectiveController`, `RoomPresenceSensor`, `RoomObjectivePrototypeDisplay` | [RoomObjectives](../../../../Assets/Scripts/Map/MapRuntime/RoomObjectives/) | 목표를 집계해 문을 제어하고 Player 체류와 임시 목표 표시를 연결한다. 정식 UI는 별도 작업이다. |
 | `MapPlanner`, `MapRoomPlan`, `MapPlanValidator` | [MapPlanner.cs](../../../../Assets/Scripts/Map/RoomTemplates/MapPlanner.cs), [MapPlan.cs](../../../../Assets/Scripts/Map/RoomTemplates/MapPlan.cs), [MapPlanValidator.cs](../../../../Assets/Scripts/Map/RoomTemplates/MapPlanValidator.cs) | 내부 선택을 요청·기록하고 완성 계획을 검증한다. |
 | `MapBuilder`, `MapVisualBuilder` | [MapBuilder.cs](../../../../Assets/Scripts/Map/RoomTemplates/MapBuilder.cs), [MapVisualBuilder.cs](../../../../Assets/Scripts/Map/RoomTemplates/MapVisualBuilder.cs) | 확정된 내부 선택을 생성하고 선택적 공통 지형 그래픽을 만든다. |
 
