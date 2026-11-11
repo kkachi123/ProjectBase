@@ -118,6 +118,13 @@ namespace ProjectRE.MapGeneration
                 {
                     if (pattern == null || string.IsNullOrWhiteSpace(pattern.id) || !patternIds.Add(pattern.id) || pattern.prefab == null)
                     { errors.Add("패턴 ID가 비어 있거나 중복되었거나 프리팹이 없습니다."); continue; }
+                    if (!System.Enum.IsDefined(typeof(RoomTerrainPatternKind), pattern.kind))
+                    { errors.Add($"알 수 없는 패턴 종류: {pattern.id}"); continue; }
+                    if (pattern.kind == RoomTerrainPatternKind.Platform)
+                    {
+                        ValidatePlatformPattern(pattern, region, cells, map, errors);
+                        continue;
+                    }
                     var maps = pattern.prefab.GetComponentsInChildren<Tilemap>(true);
                     Grid patternGrid = pattern.prefab.GetComponent<Grid>();
                     if (!pattern.prefab.activeSelf || patternGrid == null || patternGrid.cellSize != Vector3.one ||
@@ -178,6 +185,31 @@ namespace ProjectRE.MapGeneration
                 errors.Add("선택 방 목표 마커가 방 내부에 없습니다.");
             CheckMarker(template, template.OptionalTarget, "선택 방 목표", errors);
             return errors;
+        }
+
+        private static void ValidatePlatformPattern(RoomTerrainPattern pattern, RectInt region,
+            HashSet<Vector2Int> chanceCells, Tilemap map, List<string> errors)
+        {
+            GameObject prefab = pattern.prefab;
+            var box = prefab.GetComponent<BoxCollider2D>();
+            var body = prefab.GetComponent<Rigidbody2D>();
+            var colliders = prefab.GetComponentsInChildren<Collider2D>(true);
+            if (!prefab.activeSelf || prefab.transform.localScale != Vector3.one ||
+                prefab.transform.localRotation != Quaternion.identity || box == null || !box.enabled || box.isTrigger ||
+                body == null || body.bodyType != RigidbodyType2D.Kinematic || colliders.Length != 1 ||
+                prefab.GetComponentInChildren<Tilemap>(true) != null || (map != null && prefab.layer != map.gameObject.layer))
+            { errors.Add($"플랫폼 패턴의 물리 또는 레이어 구성이 잘못됐습니다: {pattern.id}"); return; }
+
+            Vector2 center = new Vector2(region.xMin, region.yMin) + pattern.offset + box.offset;
+            Vector2 half = box.size * .5f;
+            if (float.IsNaN(center.x) || float.IsNaN(center.y) || float.IsInfinity(center.x) || float.IsInfinity(center.y) ||
+                box.size.x <= 0 || box.size.y <= 0 || center.x - half.x < region.xMin || center.x + half.x > region.xMax ||
+                center.y - half.y < region.yMin || center.y + half.y > region.yMax)
+            { errors.Add($"플랫폼 충돌체가 변형 영역 밖입니다: {pattern.id}"); return; }
+            var bounds = new Rect(center - half, box.size);
+            foreach (Vector2Int cell in chanceCells)
+                if (bounds.Overlaps(new Rect(cell.x, cell.y, 1, 1)))
+                    errors.Add($"플랫폼과 확률 셀이 겹칩니다: {pattern.id} {cell}");
         }
 
         private static void ValidateHazards(RoomTemplate template, Tilemap map, RectInt room, List<string> errors)

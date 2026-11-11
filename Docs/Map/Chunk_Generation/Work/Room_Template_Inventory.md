@@ -80,7 +80,7 @@
 ## 공용 에셋과 직접 참조
 
 - [SampleSolid.asset](../../../../Assets/Prefabs/Map/RoomTemplates/Shared/SampleSolid.asset)과 [SampleSolid.png](../../../../Assets/Prefabs/Map/RoomTemplates/Shared/SampleSolid.png)는 Base와 NovaPrototype의 충돌 지형에 사용되며 Nova Variant도 부모 지형을 상속한다. `OptionalRoomTests`도 타일을 경로로 직접 읽는다.
-- [Legacy_EW1_Platform](../../../../Assets/Prefabs/Map/RoomTemplates/Patterns/Legacy_EW1_Platform.prefab)은 `Base/Horizontal`이 지형 패턴으로 참조한다. 카탈로그에 직접 등록된 방은 아니지만 내부 조합에 사용된다.
+- [Terrain_Platform](../../../../Assets/Prefabs/Map/RoomTemplates/Patterns/Terrain_Platform.prefab)은 `Base/Horizontal`이 지형 패턴으로 참조한다. 카탈로그에 직접 등록된 방은 아니지만 내부 조합에 사용된다.
 - [RoomTemplateMovementSample](../../../../Assets/Scenes/Tests/RoomTemplateMovementSample.unity)은 `Horizontal`, `Down`, `DownThrough`, `Arrival` Base 프리팹을 직접 참조한다.
 - [RoomTerrainTests](../../../../Assets/Tests/EditMode/MapGeneration/RoomTerrainTests.cs)는 `Base/DownThrough`, `Base/Horizontal`을, [OptionalRoomTests](../../../../Assets/Tests/EditMode/MapGeneration/OptionalRoomTests.cs)는 `Base/CapWest`와 `Shared/SampleSolid.asset`을 경로로 직접 읽는다.
 - [MapVisualIntegrationTests](../../../../Assets/Tests/EditMode/MapGeneration/MapVisualIntegrationTests.cs)는 기본 설정과 `NovaVariants` 프리팹 및 seed별 결과를 사용한다. [RoomMapPreviewTests](../../../../Assets/Tests/EditMode/MapGeneration/RoomMapPreviewTests.cs)도 기본 설정과 특정 방 ID를 사용한다. 경로·ID 또는 카탈로그 구성이 바뀌면 테스트의 기대 결과를 살펴야 한다.

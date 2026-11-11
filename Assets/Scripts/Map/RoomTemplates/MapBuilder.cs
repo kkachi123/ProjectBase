@@ -76,16 +76,17 @@ namespace ProjectRE.MapGeneration
                         RectInt region = template.VariationRegions[selection.RegionIndex];
                         if (!string.IsNullOrEmpty(selection.PatternId))
                         {
-                            GameObject patternPrefab = null;
+                            RoomTerrainPattern selectedPattern = null;
                             foreach (RoomTerrainPattern pattern in variation.patterns)
-                                if (pattern.id == selection.PatternId) { patternPrefab = pattern.prefab; break; }
-                            if (patternPrefab == null) throw new InvalidOperationException($"패턴을 찾을 수 없습니다: {selection.PatternId}");
-                            GameObject patternInstance = context.InstantiatePrefab(patternPrefab, instance.transform);
+                                if (pattern.id == selection.PatternId) { selectedPattern = pattern; break; }
+                            if (selectedPattern == null || selectedPattern.prefab == null) throw new InvalidOperationException($"패턴을 찾을 수 없습니다: {selection.PatternId}");
+                            GameObject patternInstance = context.InstantiatePrefab(selectedPattern.prefab, instance.transform);
                             if (patternInstance == null) throw new InvalidOperationException($"패턴 생성 실패: {selection.PatternId}");
-                            patternInstance.transform.localPosition = new Vector3(region.xMin, region.yMin, 0);
+                            Vector2 offset = selectedPattern.kind == RoomTerrainPatternKind.Platform ? selectedPattern.offset : Vector2.zero;
+                            patternInstance.transform.localPosition = new Vector3(region.xMin + offset.x, region.yMin + offset.y, 0);
                             patternInstance.transform.localRotation = Quaternion.identity;
                             patternInstance.transform.localScale = Vector3.one;
-                            if (visualGround != null)
+                            if (visualGround != null && selectedPattern.kind == RoomTerrainPatternKind.Tilemap)
                             {
                                 var patternMap = patternInstance.GetComponentInChildren<Tilemap>(true);
                                 terrainMaps.Add(new MapVisualBuilder.TerrainMap(patternMap, roomOrigin + new Vector3Int(region.xMin, region.yMin, 0)));

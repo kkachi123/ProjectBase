@@ -41,6 +41,6 @@ Chunk 원본·카탈로그 → 맵 경로와 Chunk 선택 → Chunk 내부 선�
 | `MapPlanner`, `MapBuilder` | 각각 내부 선택을 요청하고 확정된 선택을 실제 Chunk에 적용한다. |
 | `RoomObjective`, `RoomTriggerObjective`, `RoomMonsterObjective`, `RoomObjectiveController`, `RoomPresenceSensor` | 별도 시제품의 목표 완료·집계·출구와 방 진입을 담당한다. 실제 맵 생성과 랜덤 콘텐츠는 아직 연결되지 않았다. |
 
-현재 내부 지형 변형은 샘플 가로방 한 곳에서 설정·검증됐으며, Nova 시제품 방의 내부 지형은 고정돼 있다. 콘텐츠 선택은 주 경로의 중간 방과 선택 방에 적용되며, 실제 배치는 슬롯이 설정된 방에서만 일어난다.
+현재 내부 지형 변형은 가로방의 고정 발판과 다층 방의 낙하 발판에 설정돼 있다. 검증 범위는 [진행 현황](Chunk_Generation/Chunk_Generation_Progress.md)을 따른다. 콘텐츠 선택은 주 경로의 중간 방과 선택 방에 적용되며, 실제 배치는 슬롯이 설정된 방에서만 일어난다.
 
 문서의 구분은 책임을 설명하기 위한 것이다. 실제 생성 계산 코드는 [RoomTemplates](../../Assets/Scripts/Map/RoomTemplates/)에 함께 있으며, 런타임 연결 코드는 [MapRuntime](../../Assets/Scripts/Map/MapRuntime/) 등에 있다.

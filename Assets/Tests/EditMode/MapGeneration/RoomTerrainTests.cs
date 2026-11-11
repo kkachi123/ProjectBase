@@ -65,7 +65,7 @@ namespace ProjectRE.MapGeneration.Tests
                     for (int i = 0; i < plan.Plan.Rooms.Count; i++)
                     {
                         MapRoomPlan room = plan.Plan.Rooms[i];
-                        if (room.Terrain.Count == 0) continue;
+                        if (room.Terrain.Count == 0 || !room.TemplateId.StartsWith("production.horizontal.")) continue;
                         var instance = result.Root.transform.GetChild(i).GetComponent<RoomTemplate>();
                         RoomTerrainSelection selected = room.Terrain[0];
                         Assert.That(instance.transform.childCount, Is.GreaterThanOrEqualTo(1));
@@ -78,6 +78,54 @@ namespace ProjectRE.MapGeneration.Tests
                 finally { Object.DestroyImmediate(result.Root); }
             }
             Assert.That(combinations.Count, Is.EqualTo(4), "실제 카탈로그의 네 조합이 모두 생성돼야 합니다.");
+        }
+
+        [Test]
+        public void FallingPlatformPatternBuildsBothStatesAndRejectsAnOutOfBoundsCollider()
+        {
+            var settings = AssetDatabase.LoadAssetAtPath<MapPlanningSettings>(SettingsPath);
+            var goal = AssetDatabase.LoadAssetAtPath<GameObject>(GoalPath);
+            var source = AssetDatabase.LoadAssetAtPath<GameObject>("Assets/Prefabs/Map/RoomTemplates/Base/NorthWest_Tiered.prefab");
+            var copy = Object.Instantiate(source).GetComponent<RoomTemplate>();
+            try
+            {
+                var pattern = copy.TerrainVariations[0].patterns[0];
+                Assert.That(pattern.kind, Is.EqualTo(RoomTerrainPatternKind.Platform));
+                Assert.That(copy.Hazards.Any(h => h.id == "platform.falling"), Is.False);
+                Assert.That(RoomTemplateChecks.Validate(copy), Is.Empty);
+                pattern.offset = new Vector2(-1, -1);
+                Assert.That(RoomTemplateChecks.Validate(copy).Any(e => e.Contains("플랫폼 충돌체가 변형 영역 밖")), Is.True);
+            }
+            finally { Object.DestroyImmediate(copy.gameObject); }
+
+            var states = new HashSet<bool>();
+            for (int seed = 0; seed < 300 && states.Count < 2; seed++)
+            {
+                var plan = settings.CreatePlan(seed);
+                Assert.That(plan.Success, Is.True, plan.Error);
+                var planned = plan.Plan.Rooms.FirstOrDefault(r => r.TemplateId == "production.arrival.tiered_gallery");
+                if (planned == null) continue;
+                var selected = planned.Terrain[0];
+                var repeat = settings.CreatePlan(seed);
+                var repeated = repeat.Plan.Rooms.Single(r => r.Cell == planned.Cell);
+                Assert.That(repeated.Terrain[0].PatternId, Is.EqualTo(selected.PatternId));
+                var build = MapBuilder.Build(plan.Plan, settings.Catalog, goal, visualGround: settings.VisualGround,
+                    visualGroundMaterial: settings.VisualGroundMaterial);
+                Assert.That(build.Success, Is.True, build.Error);
+                try
+                {
+                    var room = build.Root.GetComponentsInChildren<RoomTemplate>(true)
+                        .Single(r => r.transform.localPosition == new Vector3(planned.Cell.x * 20, -planned.Cell.y * 20, 0));
+                    var platforms = room.GetComponentsInChildren<MonoBehaviour>(true)
+                        .Where(c => c != null && c.GetType().Name == "FallingPlatform").ToArray();
+                    bool spawned = !string.IsNullOrEmpty(selected.PatternId);
+                    Assert.That(platforms.Length, Is.EqualTo(spawned ? 1 : 0));
+                    if (spawned) Assert.That(platforms[0].transform.localPosition, Is.EqualTo(new Vector3(16.5f, 6.2f, 0)));
+                    states.Add(spawned);
+                }
+                finally { Object.DestroyImmediate(build.Root); }
+            }
+            Assert.That(states.Count, Is.EqualTo(2), "발판 생성과 빈 패턴 모두 실제 맵에서 확인해야 합니다.");
         }
 
         [Test]

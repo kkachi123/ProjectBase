@@ -39,7 +39,8 @@
 - `Variation Regions`는 내부 패턴과 확률 셀을 적용할 영역이다. 방 경계와 떨어뜨리고 서로 겹치지 않게 둔다. 사용 중인 영역에는 고정 지형이 없어야 한다.
 - `Protected Regions`는 필수 통로·착지면 주변에서 변형을 금지할 영역이다. 변형 영역과 겹치지 않아야 한다. 영역 위치가 실제 이동을 보장하는지는 제작자가 확인한다.
 - `Terrain Variations`에서 변형 영역의 인덱스, 빈 패턴 허용 여부, 패턴 ID와 프리팹, 확률 셀의 방 내부 좌표·타일·확률(0~100)을 지정한다. 패턴은 영역의 왼쪽 아래를 기준으로 배치되며, 서로 다른 패턴은 같은 영역의 대안이다. 패턴의 타일은 영역 밖이나 확률 셀과 겹칠 수 없다.
-- 패턴 프리팹은 셀 크기 1인 Grid 루트와 위치·회전 0, 크기 1인 단일 자식 Tilemap 및 활성 TilemapCollider2D로 구성한다. Tilemap은 고정 지형과 같은 레이어를 사용하며, Collider는 그 Tilemap의 TilemapCollider2D와 CompositeCollider2D만 허용한다. 타일 좌표는 영역의 왼쪽 아래를 `(0,0)`으로 사용한다.
+- `Tilemap` 패턴은 셀 크기 1인 Grid 루트와 위치·회전 0, 크기 1인 단일 자식 Tilemap 및 활성 TilemapCollider2D로 구성한다. Tilemap은 고정 지형과 같은 레이어를 사용하며, Collider는 그 Tilemap의 TilemapCollider2D와 CompositeCollider2D만 허용한다. 타일 좌표는 영역의 왼쪽 아래를 `(0,0)`으로 사용한다.
+- `Platform` 패턴은 활성 프리팹 루트에 Kinematic Rigidbody2D와 비 Trigger BoxCollider2D 하나를 두고 고정 지형과 같은 레이어를 사용한다. 영역의 왼쪽 아래에서 `Offset`만큼 떨어진 위치에 생성되며 초기 Collider는 영역 안에 있어야 한다. 실제 이동 범위와 다른 함정·지형 조합은 Player로 확인한다.
 - `Combinations Verified`는 해당 방에서 패턴과 확률 셀의 모든 조합을 실제 Player의 기록된 각 통과 방향과 시작·Goal 연결에 대해 확인한 뒤 켠다. 검증되지 않은 설정은 카탈로그 검사에서 실패한다. 패턴, 확률 셀, 지형, 통로 또는 보호 영역을 수정하면 이 표시를 지우고 다시 확인한다. 표시는 자동으로 해제되지 않는다.
 - `Content Slots`에 기준 셀을 넣고 `Content Settings`에 슬롯 인덱스, 충돌 여유 공간(`Clearance`), 설치면, 좌우 방향과 선택지를 지정한다. 선택지는 ID, 프리팹, 양의 가중치, 기준 셀의 `(x+0.5, y)`에서의 위치 오프셋을 가진다. `Empty Weight`는 아무것도 배치하지 않을 가중치다.
 - 콘텐츠의 루트에는 활성 BoxCollider2D 또는 CapsuleCollider2D 하나가 필요하다. 지정된 방향의 Collider가 여유 공간 안에 들어가고 설치면에 닿아야 한다. 지지면은 전체 셀이 충돌하는 Grid 타입 타일이어야 하며, 여유 공간·지지면은 변형 영역과 겹치지 않는다. 여유 공간은 고정 지형·다른 슬롯·보호 영역·출입구와 겹치지 않는다.
@@ -48,7 +49,7 @@
 - `Player Start`와 `Goal`은 서로 독립된 위치 마커다. 마커 자체가 Player나 GoalTrigger를 생성하지 않는다.
 - 프리팹을 선택하면 Scene 뷰에서 회색 방 경계, 초록색 출입구, 청록색 변형 영역, 빨간색 보호 영역, 노란색 콘텐츠 슬롯을 확인할 수 있다.
 
-현재 `sample.horizontal`과 이를 상속하는 가로 Variant는 `(3,10)`의 변형 영역에 `Legacy_EW1_Platform` 또는 빈 패턴을 선택하고 `(3,12)` 셀을 50% 확률로 채운다. Base의 네 조합에 대한 서→동·동→서 통과를 실제 Player로 확인했다. 다른 Base에는 아직 지형 변형이 설정되지 않았다.
+현재 `sample.horizontal`과 이를 상속하는 가로 Variant는 `(3,10)`의 변형 영역에 `Terrain_Platform` 또는 빈 패턴을 선택하고 `(3,12)` 셀을 50% 확률로 채운다. `NorthWest_Tiered`는 `(15,4)` 크기 `3×3` 영역에서 낙하 발판 또는 빈 패턴을 선택한다. 실제 검증 범위는 [진행 현황](../Chunk_Generation_Progress.md)을 따른다.
 
 ## 샘플과 검사
 
@@ -125,7 +126,7 @@
 
 | 전환 결과 | 원본 | 적용 내용 |
 | --- | --- | --- |
-| [Legacy_EW1_Platform](../../../../Assets/Prefabs/Map/RoomTemplates/Patterns/Legacy_EW1_Platform.prefab) | `E-W 1`의 x=4~8, y=14~16 | 발판을 독립 패턴으로 분리해 `sample.horizontal`의 변형 영역에서 사용한다. |
+| [Terrain_Platform](../../../../Assets/Prefabs/Map/RoomTemplates/Patterns/Terrain_Platform.prefab) | `E-W 1`의 x=4~8, y=14~16 | 발판을 독립 패턴으로 분리해 `sample.horizontal`의 변형 영역에서 사용한다. |
 
 공용 타일과 장식 프리팹은 새 템플릿 제작에 사용할 수 있다.
 

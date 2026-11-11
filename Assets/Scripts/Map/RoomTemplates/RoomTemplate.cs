@@ -30,11 +30,16 @@ namespace ProjectRE.MapGeneration
         public RoomOpening exit;
     }
 
+    public enum RoomTerrainPatternKind { Tilemap, Platform }
+
     [Serializable]
     public sealed class RoomTerrainPattern
     {
         public string id;
         public GameObject prefab;
+        public RoomTerrainPatternKind kind;
+        [Tooltip("변형 영역의 왼쪽 아래를 기준으로 한 플랫폼 위치입니다.")]
+        public Vector2 offset;
     }
 
     [Serializable]

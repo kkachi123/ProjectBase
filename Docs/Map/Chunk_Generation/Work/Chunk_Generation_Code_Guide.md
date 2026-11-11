@@ -6,7 +6,7 @@
 
 `RoomTemplate`은 미리 제작한 기본 방을 보관한다. 생성 시 등록된 변형 영역마다 패턴 하나 또는 빈 패턴을 고르고, 지정된 확률 셀의 타일 채움 여부를 결정한다. 임의의 모든 셀을 자동으로 채우지는 않는다. 콘텐츠는 주 경로의 중간 방과 선택 방에서 최종 방 역할에 맞게 결정한다.
 
-현재 내부 지형 변형은 `sample.horizontal`에서 발판 패턴 또는 빈 패턴과 확률 셀 한 개로 설정·검증했다. `NovaPrototype` 방 14개에는 내부 지형 변형이 설정되지 않았다. 예를 들어 새 선택 방의 콘텐츠는 바뀔 수 있지만 그 방의 고정 지형과 배경은 바뀌지 않는다.
+내부 지형 변형은 `sample.horizontal`의 고정 발판 패턴과 확률 셀, `NorthWest_Tiered`의 낙하 발판 패턴에 설정돼 있다. 기존 `NovaPrototype` 방들은 독립 시제품이며 실제 카탈로그의 Variant는 Base 설정을 상속한다. 검증 범위는 [진행 현황](../Chunk_Generation_Progress.md)을 따른다.
 
 방 목표는 별도 시제품 단계다. [시제품 프리팹](../../../../Assets/Prefabs/Map/RoomTemplates/Prototype/RoomObjectives_Horizontal_Prototype.prefab)은 게임 시작 시 자동 생성되지 않는다. 랜덤 콘텐츠와의 연결은 [다음 단계](Room_Progression_Plan.md)에서 수행한다.
 
@@ -50,7 +50,7 @@ classDiagram
 4. 경로와 선택 방이 확정되면 `RoomContentPlanner.Select()`가 중간 경로 방과 선택 방의 슬롯별 콘텐츠 ID 또는 빈 선택을 정한다. 일반 방에는 아이템·일반 몬스터, 선택 방에는 아이템·엘리트 몬스터가 허용된다. 시작·Goal과 닫힌 방에는 콘텐츠를 선택하지 않는다. 콘텐츠 난수에는 seed, 방 좌표, 템플릿 ID와 슬롯 인덱스를 사용한다.
 5. `RoomHazardPlanner.Select()`가 중간 경로 방과 선택 방의 함정 후보별 생성 또는 빈 상태를 독립 난수로 정한다. seed·방 좌표·템플릿 ID·후보 ID를 사용하며 결과는 `MapRoomPlan.Hazards`에 저장된다.
 6. `MapPlanValidator`가 기록된 지형·콘텐츠·함정 선택을 재계산해 계획과 일치하는지 확인한다. `MapBuilder`는 패턴·콘텐츠 프리팹을 배치하고 확률 셀을 채우며, 선택된 방의 비활성 함정 후보를 활성화한다.
-7. 그래픽 타일이 설정된 경우 `MapVisualBuilder`가 방과 패턴의 충돌 지형을 수집해 맵 전체의 그래픽 Tilemap에 표시한다. RuleTile은 이웃 셀에 따라 그래픽을 고르며 지형의 점유 여부를 결정하지 않는다.
+7. 그래픽 타일이 설정된 경우 `MapVisualBuilder`가 방과 Tilemap 패턴의 충돌 지형을 수집해 맵 전체의 그래픽 Tilemap에 표시한다. 플랫폼 패턴은 별도 오브젝트로 생성되어 자체 Sprite와 동작을 사용한다. RuleTile은 이웃 셀에 따라 그래픽을 고르며 지형의 점유 여부를 결정하지 않는다.
 
 지형·콘텐츠·함정 선택 난수는 주 경로·방 선택과 분리된다. 단, 카탈로그나 템플릿 ID 등의 입력을 변경하면 기존 seed의 결과가 달라질 수 있다.
 
