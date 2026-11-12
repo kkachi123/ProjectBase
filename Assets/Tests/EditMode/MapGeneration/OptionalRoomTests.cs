@@ -87,6 +87,51 @@ namespace ProjectRE.MapGeneration.Tests
         }
 
         [Test]
+        public void CatalogVariantsUseTheirBasesAndAppearInConnectedPlans()
+        {
+            var settings = AssetDatabase.LoadAssetAtPath<MapPlanningSettings>(SettingsPath);
+            var expected = new Dictionary<string, string>
+            {
+                ["nova.variant.optional_capeast_ruins"] = "CapEast",
+                ["nova.variant.optional_capwest_ruins"] = "CapWest",
+                ["nova.variant.junction_fourway_ruins"] = "DownThrough",
+            };
+            foreach (var pair in expected)
+            {
+                var room = settings.Catalog.Templates.Single(r => r.TemplateId == pair.Key);
+                Assert.That(PrefabUtility.GetCorrespondingObjectFromSource(room.gameObject).name, Is.EqualTo(pair.Value));
+                Assert.That(room.PlayerStart, Is.Null);
+                Assert.That(room.Goal, Is.Null);
+                Assert.That(RoomTemplateChecks.Validate(room), Is.Empty);
+                if (pair.Value.StartsWith("Cap"))
+                {
+                    Assert.That(room.OptionalTarget, Is.Not.Null);
+                    Assert.That(room.VerifiedDeadEndReturns, Is.EqualTo(room.Openings));
+                    Assert.That(room.ContentSettings.SelectMany(s => s.options).All(o => o.kind == ContentKind.Item), Is.True);
+                }
+                else Assert.That(room.PassagesVerified, Is.True);
+            }
+            var seen = new HashSet<string>();
+            int fourWay = 0;
+            for (int seed = 0; seed < 1000; seed++)
+            {
+                var plan = settings.CreatePlan(seed);
+                Assert.That(plan.Success, Is.True, $"seed {seed}: {plan.Error}");
+                foreach (var room in plan.Plan.Rooms)
+                {
+                    if (expected.ContainsKey(room.TemplateId)) seen.Add(room.TemplateId);
+                    if (room.TemplateId != "nova.variant.junction_fourway_ruins") continue;
+                    fourWay++;
+                    Assert.That(room.Branch, Is.EqualTo(RoomOpening.East | RoomOpening.West));
+                    foreach (var direction in new[] { RoomOpening.East, RoomOpening.West })
+                        Assert.That(plan.Plan.Rooms.Any(r => r.IsOptional && r.Cell == room.Cell + RoomDirection.Offset(direction)), Is.True);
+                }
+            }
+            Assert.That(seen, Is.EquivalentTo(expected.Keys));
+            Assert.That(fourWay, Is.GreaterThan(0));
+        }
+
+        [Test]
         public void ContentWeightsDoNotAlterRouteBranchOrTerrain()
         {
             var settings = AssetDatabase.LoadAssetAtPath<MapPlanningSettings>(SettingsPath);

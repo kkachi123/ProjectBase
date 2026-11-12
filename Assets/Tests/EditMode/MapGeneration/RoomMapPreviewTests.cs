@@ -178,6 +178,18 @@ namespace ProjectRE.MapGeneration.Tests
         {
             Scene scene = SceneManager.GetActiveScene();
             int initialRoots = scene.rootCount;
+            var settings = AssetDatabase.LoadAssetAtPath<MapPlanningSettings>("Assets/Prefabs/@Data/Map/MapPlanningSettings.asset");
+            int itemSeed = -1;
+            Vector2Int itemCell = default;
+            for (int candidateSeed = 0; candidateSeed < 1000 && itemSeed < 0; candidateSeed++)
+            {
+                var candidate = settings.CreatePlan(candidateSeed);
+                Assert.That(candidate.Success, Is.True, candidate.Error);
+                foreach (var room in candidate.Plan.Rooms)
+                foreach (var content in room.Content)
+                    if (room.IsOptional && content.OptionId == "item") { itemSeed = candidateSeed; itemCell = room.Cell; break; }
+            }
+            Assert.That(itemSeed, Is.GreaterThanOrEqualTo(0));
             EditorWindow window = null;
             try
             {
@@ -197,22 +209,22 @@ namespace ProjectRE.MapGeneration.Tests
                 Assert.That(first != null && first.activeSelf, Is.True);
                 Assert.That(first.GetComponent("GeneratedMapInfo"), Is.Not.Null);
                 AssertTerrain(first);
-                seed.SetValue(window, 0);
+                seed.SetValue(window, itemSeed);
                 generate.Invoke(window, null);
                 Assert.That(scene.rootCount, Is.EqualTo(initialRoots + 1));
-                AssertItem((GameObject)owner.GetValue(window));
+                AssertItem((GameObject)owner.GetValue(window), itemCell);
 
                 Undo.PerformUndo();
                 AssertOwnedRoot(scene, owner, window);
                 AssertTerrain((GameObject)owner.GetValue(window));
                 Undo.PerformRedo();
                 AssertOwnedRoot(scene, owner, window);
-                AssertItem((GameObject)owner.GetValue(window));
+                AssertItem((GameObject)owner.GetValue(window), itemCell);
                 clear.Invoke(window, null);
                 Assert.That(scene.rootCount, Is.EqualTo(initialRoots));
                 Undo.PerformUndo();
                 AssertOwnedRoot(scene, owner, window);
-                AssertItem((GameObject)owner.GetValue(window));
+                AssertItem((GameObject)owner.GetValue(window), itemCell);
             }
             finally
             {
@@ -227,10 +239,10 @@ namespace ProjectRE.MapGeneration.Tests
             }
         }
 
-        private static void AssertItem(GameObject root)
+        private static void AssertItem(GameObject root, Vector2Int cell)
         {
             var room = Array.Find(root.GetComponentsInChildren<RoomTemplate>(true),
-                candidate => candidate.TemplateId == "production.optional.ruined_court_west" && candidate.transform.localPosition == new Vector3(60, -40, 0));
+                candidate => candidate.transform.localPosition == new Vector3(cell.x * 20, -cell.y * 20, 0));
             Assert.That(room, Is.Not.Null);
             var components = room.GetComponentsInChildren<MonoBehaviour>(true);
             Assert.That(Array.Exists(components, component => component != null && component.GetType().Name == "ItemPickup"), Is.True);

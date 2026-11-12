@@ -134,6 +134,18 @@ namespace ProjectRE.MapGeneration.Tests
         {
             Scene scene = SceneManager.GetActiveScene();
             int initialRoots = scene.rootCount;
+            var settings = AssetDatabase.LoadAssetAtPath<MapPlanningSettings>(SettingsPath);
+            MapRoomPlan selected = null;
+            string hazardId = null;
+            int selectedSeed = -1;
+            for (int seed = 0; seed < 1000 && selected == null; seed++)
+            {
+                var plan = settings.CreatePlan(seed);
+                Assert.That(plan.Success, Is.True, plan.Error);
+                selected = plan.Plan.Rooms.FirstOrDefault(r => r.Hazards.Any(h => h.Spawn));
+                if (selected != null) { selectedSeed = seed; hazardId = selected.Hazards.First(h => h.Spawn).Id; }
+            }
+            Assert.That(selected, Is.Not.Null);
             EditorWindow window = null;
             try
             {
@@ -141,12 +153,13 @@ namespace ProjectRE.MapGeneration.Tests
                 window = (EditorWindow)ScriptableObject.CreateInstance(type);
                 type.GetMethod("CreateGUI").Invoke(window, null);
                 const BindingFlags flags = BindingFlags.Instance | BindingFlags.NonPublic;
-                type.GetField("_settings", flags).SetValue(window, AssetDatabase.LoadAssetAtPath<MapPlanningSettings>(SettingsPath));
-                type.GetField("_seed", flags).SetValue(window, 0);
+                type.GetField("_settings", flags).SetValue(window, settings);
+                type.GetField("_seed", flags).SetValue(window, selectedSeed);
                 var owner = type.GetField("_previewRoot", flags);
                 type.GetMethod("Generate", flags).Invoke(window, null);
                 bool Active() => ((GameObject)owner.GetValue(window)).GetComponentsInChildren<RoomTemplate>(true)
-                    .Single(r => r.transform.localPosition == new Vector3(20, -40, 0)).Hazards.Single().candidate.activeSelf;
+                    .Single(r => r.transform.localPosition == new Vector3(selected.Cell.x * 20, -selected.Cell.y * 20, 0))
+                    .Hazards.Single(h => h.id == hazardId).candidate.activeSelf;
                 Assert.That(Active(), Is.True);
                 Undo.PerformUndo();
                 Assert.That(scene.rootCount, Is.EqualTo(initialRoots));

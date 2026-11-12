@@ -1,6 +1,7 @@
 namespace ProjectRE.MapGeneration.Tests
 {
     using System.Collections.Generic;
+    using System.Linq;
     using NUnit.Framework;
     using UnityEditor;
     using UnityEngine;
@@ -258,15 +259,26 @@ namespace ProjectRE.MapGeneration.Tests
         {
             var settings = AssetDatabase.LoadAssetAtPath<MapPlanningSettings>(SettingsPath);
             var goal = AssetDatabase.LoadAssetAtPath<GameObject>(GoalPath);
-            var result = MapGenerator.Generate(settings, 1, goal);
+            MapPlan plan = null;
+            MapRoomPlan upperPlan = null;
+            for (int seed = 0; seed < 1000 && plan == null; seed++)
+            {
+                var candidate = settings.CreatePlan(seed);
+                Assert.That(candidate.Success, Is.True, candidate.Error);
+                upperPlan = candidate.Plan.Rooms.FirstOrDefault(r => r.TemplateId == "production.downthrough.ruined_shaft" &&
+                    candidate.Plan.Rooms.Any(other => other.TemplateId == r.TemplateId && other.Cell == r.Cell + Vector2Int.up));
+                if (upperPlan != null) plan = candidate.Plan;
+            }
+            Assert.That(plan, Is.Not.Null);
+            var result = MapBuilder.Build(plan, settings.Catalog, goal);
             try
             {
                 Assert.That(result.Success, Is.True, result.Error);
                 var rooms = result.Root.GetComponentsInChildren<RoomTemplate>(true);
                 var upper = System.Array.Find(rooms, room => room.TemplateId == "production.downthrough.ruined_shaft" &&
-                    room.transform.localPosition == new Vector3(40, -20, 0));
+                    room.transform.localPosition == new Vector3(upperPlan.Cell.x * 20, -upperPlan.Cell.y * 20, 0));
                 var lower = System.Array.Find(rooms, room => room.TemplateId == "production.downthrough.ruined_shaft" &&
-                    room.transform.localPosition == new Vector3(40, -40, 0));
+                    room.transform.localPosition == new Vector3(upperPlan.Cell.x * 20, -(upperPlan.Cell.y + 1) * 20, 0));
                 Assert.That(upper, Is.Not.Null);
                 Assert.That(lower, Is.Not.Null);
                 foreach (var room in new[] { upper, lower })
@@ -292,7 +304,15 @@ namespace ProjectRE.MapGeneration.Tests
         {
             var settings = AssetDatabase.LoadAssetAtPath<MapPlanningSettings>(SettingsPath);
             var goal = AssetDatabase.LoadAssetAtPath<GameObject>(GoalPath);
-            var result = MapGenerator.Generate(settings, 0, goal);
+            MapPlan plan = null;
+            for (int seed = 0; seed < 1000 && plan == null; seed++)
+            {
+                var candidate = settings.CreatePlan(seed);
+                Assert.That(candidate.Success, Is.True, candidate.Error);
+                if (candidate.Plan.Rooms.Any(r => r.TemplateId == "production.arrival.northeast_shrine_atrium")) plan = candidate.Plan;
+            }
+            Assert.That(plan, Is.Not.Null);
+            var result = MapBuilder.Build(plan, settings.Catalog, goal);
             try
             {
                 Assert.That(result.Success, Is.True, result.Error);
