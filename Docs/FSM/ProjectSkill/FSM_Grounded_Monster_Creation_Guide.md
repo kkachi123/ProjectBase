@@ -43,7 +43,7 @@ Inspector의 MonsterAttackHandler 목록에 AnimatorAttackType·MonsterAttackSO�
 
 ## 4. 에셋 연결
 
-1. Monster 공용 BasicMonster.prefab의 종별 Variant를 Assets/Prefabs/Monster/{종}.prefab에 생성.
+1. Monster 공용 BasicMonster.prefab의 종별 Variant를 Assets/Prefabs/Monster/{종}/{종}.prefab에 생성.
 2. 종별 Animations·ScriptableObjects·Sprites는 Assets/Prefabs/Monster/{종}/ 아래 배치.
 3. Stat·GroundedMotor·MonsterBehaviorDataSO와 장착 MonsterAttackSO를 할당한다. Basic 템플릿의 Stat·Motor·Behavior·공격 목록은 비어 있으므로 종별 Variant에서 채운다.
 4. PlayerDetector의 반경·offset·obstacleMask와 Collider 설정. Root의 Detector는 하나만 유지.

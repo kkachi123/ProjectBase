@@ -27,7 +27,7 @@ namespace ProjectRE.MapGeneration.Editor
             if (_settings == null)
                 _settings = AssetDatabase.LoadAssetAtPath<MapPlanningSettings>("Assets/Prefabs/@Data/Map/MapPlanningSettings.asset");
             if (_goalPrefab == null)
-                _goalPrefab = AssetDatabase.LoadAssetAtPath<GameObject>("Assets/Prefabs/Map/GridChunk/@BackGroundPrefab/GoalTrigger/EndLight-EndTrigger.prefab");
+                _goalPrefab = AssetDatabase.LoadAssetAtPath<GameObject>("Assets/Prefabs/Map/Goals/GoalTrigger/EndLight-EndTrigger.prefab");
         }
 
         private void OnDisable() => Undo.undoRedoPerformed -= RestorePreviewReference;

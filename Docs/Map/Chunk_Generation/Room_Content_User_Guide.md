@@ -8,6 +8,8 @@ Title에서 게임을 시작하면 설정된 카탈로그에서 방을 고르고
 
 방별 목표·출구 잠금은 현재 `WestSouth` Base와 상속 Variant에 설정돼 있다. 게임 시작 시 이 방이 주 경로의 중간 방으로 선택되면 목표 후보와 콘텐츠 생성 결과를 적용한다. 다른 방의 확장 및 검증 상태는 [진행 현황](Chunk_Generation_Progress.md)을 참고한다.
 
+낙하 발판은 [맵 플랫폼](../../../Assets/Prefabs/Map/Platforms/FallingPlatform/)에, 함정은 [Trap](../../../Assets/Prefabs/Trap/)에 둔다. 몬스터 프리팹은 각 종류의 `Monster` 하위 폴더에서 확인한다.
+
 현재 Title 씬의 `MapManager`는 [MapPlanningSettings](../../../Assets/Prefabs/@Data/Map/MapPlanningSettings.asset)와 연결돼 있고, 이 설정의 [RoomTemplateCatalog](../../../Assets/Prefabs/@Data/Map/RoomTemplateCatalog.asset)에 실제 사용할 방 Variant가 등록돼 있다. 기본 맵 크기는 4×4다. `MapManager`의 **Use Random Seed**가 켜져 있어 새 Run의 seed를 자동으로 정한다. 끄면 **Seed**에 지정한 값을 사용한다. 같은 설정·카탈로그·코드와 seed의 결과는 재현되지만, 입력 설정이나 템플릿 ID가 바뀌면 달라질 수 있다.
 
 ## 방 설정 열기

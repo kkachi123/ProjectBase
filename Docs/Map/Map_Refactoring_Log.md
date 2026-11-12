@@ -483,3 +483,9 @@
 ### Nova 시제품 정리
 
 - 기본 카탈로그에 등록되지 않은 독립 시제품 14개를 제거했다. 각 시제품에 대응하는 현재 Nova Variant와 Sprite 에셋 종류를 대조했으며, 프리팹 참조는 발견되지 않았다. 지형과 배치가 완전히 같다는 의미는 아니며 기존 Base와 Variant는 유지한다. 과거 검증 기록은 이력으로 남긴다.
+
+### 프리팹 기능별 정리
+
+- `FallingPlatform`은 `Map/Platforms`, Goal은 `Map/Goals`, 기존 배경 오브젝트는 `Map/Environment`, 기존 Bullet 묶음은 `Projectiles/TrapBullet`으로 이동했다. 몬스터별 프리팹을 각 종류 폴더에, 카메라를 `Camera`에 두고 지형 RuleTile을 `Art/Map/Terrain`으로 옮겼다.
+- Unity 에셋 이동 전후 대상 GUID 1,411개를 대조했고 1,000개 seed의 맵 계획·지형·콘텐츠·함정 결과가 같았다. Goal을 직접 불러오는 에디터·테스트 경로와 관련 가이드를 갱신했다. 맵 EditMode 테스트 78개가 통과했다.
+- Title→InGame seed `1`에서 Player 생성과 시작 방 이동을 확인했고 체력 10을 유지했다. 가상 입력을 정리했다. 함정·몬스터·Goal의 전체 플레이 동작을 이번에 재검증한 것은 아니다.

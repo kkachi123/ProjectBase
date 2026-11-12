@@ -75,7 +75,7 @@ namespace ProjectRE.MapGeneration.Tests
         {
             var factory = Type.GetType("ProjectRE.RoomMapFactory, Assembly-CSharp");
             var settings = AssetDatabase.LoadAssetAtPath<MapPlanningSettings>("Assets/Prefabs/@Data/Map/MapPlanningSettings.asset");
-            var goal = AssetDatabase.LoadAssetAtPath<GameObject>("Assets/Prefabs/Map/GridChunk/@BackGroundPrefab/GoalTrigger/EndLight-EndTrigger.prefab");
+            var goal = AssetDatabase.LoadAssetAtPath<GameObject>("Assets/Prefabs/Map/Goals/GoalTrigger/EndLight-EndTrigger.prefab");
             Assert.That(factory, Is.Not.Null);
             string Generate(int seed)
             {

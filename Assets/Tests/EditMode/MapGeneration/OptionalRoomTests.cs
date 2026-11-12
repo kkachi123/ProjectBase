@@ -9,7 +9,7 @@ namespace ProjectRE.MapGeneration.Tests
     public sealed class OptionalRoomTests
     {
         private const string SettingsPath = "Assets/Prefabs/@Data/Map/MapPlanningSettings.asset";
-        private const string GoalPath = "Assets/Prefabs/Map/GridChunk/@BackGroundPrefab/GoalTrigger/EndLight-EndTrigger.prefab";
+        private const string GoalPath = "Assets/Prefabs/Map/Goals/GoalTrigger/EndLight-EndTrigger.prefab";
 
         [Test]
         public void RealBranchesAreReciprocalAndDoNotChangeTheRequiredPath()

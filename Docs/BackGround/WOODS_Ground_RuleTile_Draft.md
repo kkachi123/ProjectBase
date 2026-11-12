@@ -4,7 +4,7 @@
 
 - 대상 후보: `WOODS_Ground_Core` + `WOODS_Ground_Border`
 - 생성 예정 이름: `WOODS_Ground`
-- 저장 예정 경로: `Assets/Prefabs/BackGround/Floor/RuleTiles/WOODS_Ground.asset`
+- 저장 예정 경로: `Assets/Art/Map/Terrain/WOODS_Ground.asset`
 - 권장 기본 Sprite: `Tilesheet - WOODS_1`
 - 현재 단계: **에셋 생성 완료, 런타임 Tilemap 검증 보류**
 
@@ -66,7 +66,7 @@
 
 ## 생성 결과
 
-- 생성 에셋: `Assets/Prefabs/BackGround/Floor/RuleTiles/WOODS_Ground.asset`
+- 생성 에셋: `Assets/Art/Map/Terrain/WOODS_Ground.asset`
 - 규칙 수: 9개 (`WOODS_1, 19, 20, 23, 25, 70, 73, 81, 82`)
 - 기본 Sprite: `WOODS_1`
 - Collider Type: `Sprite` (원본 Tile 설정 보존)

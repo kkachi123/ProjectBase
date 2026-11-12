@@ -9,6 +9,8 @@
 
 ## Chunk Generation — Chunk 내부 생성
 
+현재 [프리팹 및 Chunk 리팩토링](Chunk_Generation/Work/Prefab_Chunk_Refactoring_Plan.md)을 진행한다. 프리팹 정리를 완료했고 다음 단계는 Chunk 설정 분리다. [단계별 진행 현황](Chunk_Generation/Chunk_Generation_Progress.md#프리팹-및-chunk-리팩토링).
+
 - [x] **내부 조합의 기본 기능:** 패턴·확률 셀과 선택 방 콘텐츠의 선택·적용을 구현했다. 내부 지형의 실제 조합 검증은 샘플 방에 한정된다.
 - [x] **Base·Nova Variant 전환:** Base를 상속한 Nova Variant를 기본 카탈로그에 등록하고 씬·에디터·테스트 연결을 확인했다. 현재 카탈로그에는 21개가 있다.
 - [x] **방 역할별 콘텐츠 배치:** 일반 경로 방과 선택 방의 후보 종류를 구분하고 대표 방에서 생성·이동·아이템 획득을 확인했다. 일반 방 슬롯은 현재 대표 Base 한 종류에 설정돼 있으며 엘리트 몬스터는 제작 후 연결한다.
