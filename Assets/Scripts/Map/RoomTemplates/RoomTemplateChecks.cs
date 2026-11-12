@@ -17,6 +17,15 @@ namespace ProjectRE.MapGeneration
                 return errors;
             }
 
+            var terrain = template.Terrain;
+            var content = template.Content;
+            var hazard = template.Hazard;
+            if (terrain == null || content == null || hazard == null)
+            {
+                errors.Add("지형·콘텐츠·함정 설정 컴포넌트가 필요합니다.");
+                return errors;
+            }
+
             if (string.IsNullOrWhiteSpace(template.TemplateId)) errors.Add("템플릿 ID가 비어 있습니다.");
             if (!System.Enum.IsDefined(typeof(RoomType), template.Type)) errors.Add("알 수 없는 방 유형입니다.");
             const RoomOpening all = RoomOpening.North | RoomOpening.East | RoomOpening.South | RoomOpening.West;
@@ -72,35 +81,35 @@ namespace ProjectRE.MapGeneration
             }
 
             var room = new RectInt(0, 0, RoomTemplate.RoomSize, RoomTemplate.RoomSize);
-            for (int i = 0; i < template.VariationRegions.Count; i++)
+            for (int i = 0; i < terrain.VariationRegions.Count; i++)
             {
-                RectInt region = template.VariationRegions[i];
+                RectInt region = terrain.VariationRegions[i];
                 if (region.width <= 0 || region.height <= 0 || !room.Contains(region.min) ||
                     region.xMax > room.xMax || region.yMax > room.yMax)
                     errors.Add($"변형 영역이 방 밖이거나 크기가 없습니다: {region}");
                 if (region.xMin < 1 || region.yMin < 1 || region.xMax > RoomTemplate.RoomSize - 1 || region.yMax > RoomTemplate.RoomSize - 1)
                     errors.Add($"변형 영역은 방 경계와 떨어져 있어야 합니다: {region}");
                 for (int j = 0; j < i; j++)
-                    if (region.Overlaps(template.VariationRegions[j])) errors.Add($"변형 영역이 겹칩니다: {region}");
+                    if (region.Overlaps(terrain.VariationRegions[j])) errors.Add($"변형 영역이 겹칩니다: {region}");
                 foreach (RoomOpening side in Sides)
                     if (region.Overlaps(RoomTemplate.OpeningCells(side)))
                         errors.Add($"변형 영역이 {side} 경계와 겹칩니다: {region}");
-                foreach (RectInt protectedRegion in template.ProtectedRegions)
+                foreach (RectInt protectedRegion in terrain.ProtectedRegions)
                     if (region.Overlaps(protectedRegion)) errors.Add($"변형 영역이 보호 구역과 겹칩니다: {region}");
             }
 
-            foreach (RectInt protectedRegion in template.ProtectedRegions)
+            foreach (RectInt protectedRegion in terrain.ProtectedRegions)
                 if (protectedRegion.width <= 0 || protectedRegion.height <= 0 || !room.Contains(protectedRegion.min) ||
                     protectedRegion.xMax > room.xMax || protectedRegion.yMax > room.yMax)
                     errors.Add($"보호 구역이 방 밖이거나 크기가 없습니다: {protectedRegion}");
 
             var usedRegions = new HashSet<int>();
-            foreach (RoomTerrainVariation variation in template.TerrainVariations)
+            foreach (RoomTerrainVariation variation in terrain.TerrainVariations)
             {
-                if (variation == null || variation.regionIndex < 0 || variation.regionIndex >= template.VariationRegions.Count ||
+                if (variation == null || variation.regionIndex < 0 || variation.regionIndex >= terrain.VariationRegions.Count ||
                     !usedRegions.Add(variation.regionIndex))
                 { errors.Add("변형 설정의 영역이 없거나 중복됩니다."); continue; }
-                RectInt region = template.VariationRegions[variation.regionIndex];
+                RectInt region = terrain.VariationRegions[variation.regionIndex];
                 if (region.width <= 0 || region.height <= 0 || region.xMin < 1 || region.yMin < 1 ||
                     region.xMax > RoomTemplate.RoomSize - 1 || region.yMax > RoomTemplate.RoomSize - 1)
                 { errors.Add("변형 설정의 영역이 올바르지 않습니다."); continue; }
@@ -156,7 +165,7 @@ namespace ProjectRE.MapGeneration
                 }
             }
 
-            foreach (Vector2Int slot in template.ContentSlots)
+            foreach (Vector2Int slot in content.ContentSlots)
             {
                 if (!room.Contains(slot)) errors.Add($"콘텐츠 슬롯이 방 밖입니다: {slot}");
                 else if (map != null && map.HasTile(new Vector3Int(slot.x, slot.y, 0)))
@@ -214,10 +223,13 @@ namespace ProjectRE.MapGeneration
 
         private static void ValidateHazards(RoomTemplate template, Tilemap map, RectInt room, List<string> errors)
         {
+            var terrain = template.Terrain;
+            var content = template.Content;
+            var hazard = template.Hazard;
             var ids = new HashSet<string>(System.StringComparer.Ordinal);
             var candidates = new HashSet<GameObject>();
             var areas = new List<RectInt>();
-            foreach (RoomHazardSlot slot in template.Hazards)
+            foreach (RoomHazardSlot slot in hazard.Hazards)
             {
                 if (slot == null || string.IsNullOrWhiteSpace(slot.id) || !ids.Add(slot.id) ||
                     slot.candidate == null || slot.candidate == template.gameObject || !candidates.Add(slot.candidate) ||
@@ -234,12 +246,12 @@ namespace ProjectRE.MapGeneration
                     errors.Add($"함정 후보가 설정된 공간 밖입니다: {slot.id}");
                 foreach (RectInt other in areas) if (area.Overlaps(other)) errors.Add($"함정 공간이 겹칩니다: {slot.id}");
                 areas.Add(area);
-                foreach (RectInt region in template.ProtectedRegions)
+                foreach (RectInt region in terrain.ProtectedRegions)
                     if (area.Overlaps(region) || support.Overlaps(region)) errors.Add($"함정이 보호 구역과 겹칩니다: {slot.id}");
-                foreach (RectInt region in template.VariationRegions)
+                foreach (RectInt region in terrain.VariationRegions)
                     if (area.Overlaps(region) || support.Overlaps(region)) errors.Add($"함정이 변형 영역과 겹칩니다: {slot.id}");
-                foreach (RoomContentSlot content in template.ContentSettings)
-                    if (content != null && (area.Overlaps(content.clearance) || support.Overlaps(content.clearance)))
+                foreach (RoomContentSlot contentSlot in content.ContentSettings)
+                    if (contentSlot != null && (area.Overlaps(contentSlot.clearance) || support.Overlaps(contentSlot.clearance)))
                         errors.Add($"함정이 콘텐츠 공간과 겹칩니다: {slot.id}");
                 foreach (RoomOpening side in Sides)
                     if (area.Overlaps(RoomTemplate.OpeningCells(side))) errors.Add($"함정이 출입구와 겹칩니다: {slot.id}");
@@ -257,20 +269,22 @@ namespace ProjectRE.MapGeneration
 
         private static void ValidateContent(RoomTemplate template, Tilemap map, RectInt room, List<string> errors)
         {
+            var terrain = template.Terrain;
+            var content = template.Content;
             var indices = new HashSet<int>();
             var usedAreas = new List<RectInt>();
-            foreach (RoomContentSlot slot in template.ContentSettings)
+            foreach (RoomContentSlot slot in content.ContentSettings)
             {
-                if (slot == null || slot.slotIndex < 0 || slot.slotIndex >= template.ContentSlots.Count || !indices.Add(slot.slotIndex))
+                if (slot == null || slot.slotIndex < 0 || slot.slotIndex >= content.ContentSlots.Count || !indices.Add(slot.slotIndex))
                 { errors.Add("콘텐츠 설정의 슬롯이 없거나 중복됩니다."); continue; }
                 RectInt area = slot.clearance;
                 if (area.width <= 0 || area.height <= 0 || !room.Contains(area.min) || area.xMax > room.xMax || area.yMax > room.yMax ||
-                    !area.Contains(template.ContentSlots[slot.slotIndex]) || !System.Enum.IsDefined(typeof(ContentSurface), slot.surface) ||
+                    !area.Contains(content.ContentSlots[slot.slotIndex]) || !System.Enum.IsDefined(typeof(ContentSurface), slot.surface) ||
                     !System.Enum.IsDefined(typeof(ContentFacing), slot.facing))
                 { errors.Add("콘텐츠 공간 또는 방향이 잘못됐습니다."); continue; }
                 foreach (RectInt other in usedAreas) if (area.Overlaps(other)) errors.Add("콘텐츠 슬롯의 충돌 공간이 겹칩니다.");
                 usedAreas.Add(area);
-                foreach (RectInt protectedRegion in template.ProtectedRegions)
+                foreach (RectInt protectedRegion in terrain.ProtectedRegions)
                     if (area.Overlaps(protectedRegion)) errors.Add("콘텐츠 공간이 보호 구역과 겹칩니다.");
                 foreach (RoomOpening side in Sides)
                     if (area.Overlaps(RoomTemplate.OpeningCells(side))) errors.Add("콘텐츠 공간이 출입구와 겹칩니다.");
@@ -282,7 +296,7 @@ namespace ProjectRE.MapGeneration
                     case ContentSurface.WestWall: support = new RectInt(area.xMin - 1, area.yMin, 1, area.height); break;
                     default: support = new RectInt(area.xMax, area.yMin, 1, area.height); break;
                 }
-                foreach (RectInt region in template.VariationRegions)
+                foreach (RectInt region in terrain.VariationRegions)
                     if (area.Overlaps(region) || support.Overlaps(region)) errors.Add("콘텐츠 공간 또는 지지면이 변형 영역과 겹칩니다.");
                 if (map != null)
                 {
@@ -314,7 +328,7 @@ namespace ProjectRE.MapGeneration
                         float.IsNaN(scale.x) || float.IsInfinity(scale.x) || float.IsNaN(scale.y) || float.IsInfinity(scale.y) || scale.y <= 0 || scale.x <= 0)
                     { errors.Add($"콘텐츠 위치 또는 크기가 올바르지 않습니다: {option.id}"); continue; }
                     float sx = Mathf.Abs(scale.x), sy = Mathf.Abs(scale.y), facing = slot.facing == ContentFacing.Left ? -1f : 1f;
-                    Vector2 origin = (Vector2)template.ContentSlots[slot.slotIndex] + new Vector2(.5f, 0) + option.offset;
+                    Vector2 origin = (Vector2)content.ContentSlots[slot.slotIndex] + new Vector2(.5f, 0) + option.offset;
                     Vector2 center = origin + new Vector2(colliders[0].offset.x * sx * facing, colliders[0].offset.y * sy);
                     Vector2 half = new Vector2(size.x * sx, size.y * sy) * .5f;
                     const float epsilon = .02f;

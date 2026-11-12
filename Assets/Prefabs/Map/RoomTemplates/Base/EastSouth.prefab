@@ -73,6 +73,9 @@ GameObject:
   - component: {fileID: 4162222855888588967}
   - component: {fileID: 5352281280999162036}
   - component: {fileID: 825025508153862389}
+  - component: {fileID: 2964303546748269334}
+  - component: {fileID: 5527166463940093417}
+  - component: {fileID: 5916597578609915824}
   m_Layer: 6
   m_Name: EastSouth
   m_TagString: Untagged
@@ -131,6 +134,24 @@ MonoBehaviour:
   - entry: 2
     exit: 4
   _passagesVerified: 1
+  _playerStart: {fileID: 0}
+  _goal: {fileID: 0}
+  _verifiedStartExits: 0
+  _verifiedGoalEntries: 0
+  _verifiedDeadEndReturns: 0
+  _optionalTarget: {fileID: 0}
+--- !u!114 &2964303546748269334
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7032170131130248534}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7ee60f28476203746856bc880e80007e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: ProjectRE.MapGeneration::ProjectRE.MapGeneration.RoomTerrainSettings
   _variationRegions:
   - x: 3
     y: 10
@@ -138,15 +159,34 @@ MonoBehaviour:
     height: 3
   _protectedRegions: []
   _terrainVariations: []
+--- !u!114 &5527166463940093417
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7032170131130248534}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 21a7899ddd4b7e941bb767ecfd32e56b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: ProjectRE.MapGeneration::ProjectRE.MapGeneration.RoomContentSettings
   _contentSlots:
   - {x: 7, y: 5}
   _contentSettings: []
-  _playerStart: {fileID: 0}
-  _goal: {fileID: 0}
-  _verifiedStartExits: 0
-  _verifiedGoalEntries: 0
-  _verifiedDeadEndReturns: 0
-  _optionalTarget: {fileID: 0}
+--- !u!114 &5916597578609915824
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7032170131130248534}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a952c0ae7ee31ec43a9c084376553787, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: ProjectRE.MapGeneration::ProjectRE.MapGeneration.RoomHazardSettings
+  _hazards: []
 --- !u!1 &7704445246243108328
 GameObject:
   m_ObjectHideFlags: 0

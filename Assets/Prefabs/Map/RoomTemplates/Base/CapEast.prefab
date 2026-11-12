@@ -1639,6 +1639,9 @@ GameObject:
   - component: {fileID: 5110148063969130902}
   - component: {fileID: 8866607565304653997}
   - component: {fileID: 7321160808095392475}
+  - component: {fileID: 1682783239427306723}
+  - component: {fileID: 3536055908583188987}
+  - component: {fileID: 8469182213215066791}
   m_Layer: 6
   m_Name: CapEast
   m_TagString: Untagged
@@ -1695,6 +1698,24 @@ MonoBehaviour:
   _fixedGeometry: {fileID: 7522430107887673647}
   _passages: []
   _passagesVerified: 0
+  _playerStart: {fileID: 4894615821325227249}
+  _goal: {fileID: 6469885962459438997}
+  _verifiedStartExits: 2
+  _verifiedGoalEntries: 2
+  _verifiedDeadEndReturns: 2
+  _optionalTarget: {fileID: 6469885962459438997}
+--- !u!114 &1682783239427306723
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8281538533096863456}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7ee60f28476203746856bc880e80007e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: ProjectRE.MapGeneration::ProjectRE.MapGeneration.RoomTerrainSettings
   _variationRegions:
   - x: 3
     y: 10
@@ -1702,6 +1723,18 @@ MonoBehaviour:
     height: 3
   _protectedRegions: []
   _terrainVariations: []
+--- !u!114 &3536055908583188987
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8281538533096863456}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 21a7899ddd4b7e941bb767ecfd32e56b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: ProjectRE.MapGeneration::ProjectRE.MapGeneration.RoomContentSettings
   _contentSlots:
   - {x: 7, y: 4}
   _contentSettings:
@@ -1725,9 +1758,16 @@ MonoBehaviour:
       weight: 1
       offset: {x: 0.5, y: 0.3135}
       kind: 1
-  _playerStart: {fileID: 4894615821325227249}
-  _goal: {fileID: 6469885962459438997}
-  _verifiedStartExits: 2
-  _verifiedGoalEntries: 2
-  _verifiedDeadEndReturns: 2
-  _optionalTarget: {fileID: 6469885962459438997}
+--- !u!114 &8469182213215066791
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8281538533096863456}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a952c0ae7ee31ec43a9c084376553787, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: ProjectRE.MapGeneration::ProjectRE.MapGeneration.RoomHazardSettings
+  _hazards: []

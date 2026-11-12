@@ -73,10 +73,10 @@ namespace ProjectRE
             var slots = new HashSet<int>();
             foreach (int index in monsterSlots)
             {
-                if (index < 0 || index >= room.Template.ContentSlots.Count || !slots.Add(index))
+                if (index < 0 || index >= room.Template.Content.ContentSlots.Count || !slots.Add(index))
                     throw new InvalidOperationException("몬스터 목표 슬롯이 올바르지 않습니다.");
                 RoomContentSlot slot = null;
-                foreach (var candidate in room.Template.ContentSettings)
+                foreach (var candidate in room.Template.Content.ContentSettings)
                     if (candidate.slotIndex == index) { slot = candidate; break; }
                 if (slot == null) throw new InvalidOperationException("몬스터 목표 슬롯에 콘텐츠 설정이 없습니다.");
                 if (!mainRoom || !room.Content.TryGetValue(index, out GameObject content)) continue;

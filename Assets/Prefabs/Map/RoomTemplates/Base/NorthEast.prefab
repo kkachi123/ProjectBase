@@ -1549,6 +1549,9 @@ GameObject:
   - component: {fileID: 872312622720638117}
   - component: {fileID: 3796709586424348529}
   - component: {fileID: 1330420870743675684}
+  - component: {fileID: 7083855807809868526}
+  - component: {fileID: 2991910089968790800}
+  - component: {fileID: 1544268743933917020}
   m_Layer: 6
   m_Name: NorthEast
   m_TagString: Untagged
@@ -1608,6 +1611,24 @@ MonoBehaviour:
   - entry: 1
     exit: 2
   _passagesVerified: 1
+  _playerStart: {fileID: 0}
+  _goal: {fileID: 0}
+  _verifiedStartExits: 0
+  _verifiedGoalEntries: 0
+  _verifiedDeadEndReturns: 0
+  _optionalTarget: {fileID: 0}
+--- !u!114 &7083855807809868526
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5215971926704486631}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7ee60f28476203746856bc880e80007e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: ProjectRE.MapGeneration::ProjectRE.MapGeneration.RoomTerrainSettings
   _variationRegions:
   - x: 3
     y: 10
@@ -1615,9 +1636,33 @@ MonoBehaviour:
     height: 3
   _protectedRegions: []
   _terrainVariations: []
+--- !u!114 &2991910089968790800
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5215971926704486631}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 21a7899ddd4b7e941bb767ecfd32e56b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: ProjectRE.MapGeneration::ProjectRE.MapGeneration.RoomContentSettings
   _contentSlots:
   - {x: 7, y: 5}
   _contentSettings: []
+--- !u!114 &1544268743933917020
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5215971926704486631}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a952c0ae7ee31ec43a9c084376553787, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: ProjectRE.MapGeneration::ProjectRE.MapGeneration.RoomHazardSettings
   _hazards:
   - id: west.arrow
     candidate: {fileID: 3600165176526243880}
@@ -1634,12 +1679,6 @@ MonoBehaviour:
     spawnWeight: 1
     emptyWeight: 1
     passageVerified: 1
-  _playerStart: {fileID: 0}
-  _goal: {fileID: 0}
-  _verifiedStartExits: 0
-  _verifiedGoalEntries: 0
-  _verifiedDeadEndReturns: 0
-  _optionalTarget: {fileID: 0}
 --- !u!1 &6217556308839366226
 GameObject:
   m_ObjectHideFlags: 0

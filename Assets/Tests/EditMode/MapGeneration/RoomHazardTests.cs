@@ -77,7 +77,7 @@ namespace ProjectRE.MapGeneration.Tests
                     var room = built.Root.transform.GetChild(cell.y * pair.Value.plan.Width + cell.x).GetComponent<RoomTemplate>();
                     foreach (var selection in pair.Value.room.Hazards)
                     {
-                        var slot = room.Hazards.Single(h => h.id == selection.Id);
+                        var slot = room.Hazard.Hazards.Single(h => h.id == selection.Id);
                         Assert.That(slot.candidate.activeSelf, Is.EqualTo(selection.Spawn), selection.Id);
                     }
                 }
@@ -112,18 +112,18 @@ namespace ProjectRE.MapGeneration.Tests
                 room.FixedGeometry.SetTile(new Vector3Int(0, 5, 0), null);
                 Assert.That(RoomTemplateChecks.Validate(room).Any(e => e.Contains("함정 지지면")), Is.True);
                 room.FixedGeometry.SetTile(new Vector3Int(0, 5, 0), tile);
-                room.Hazards.Single().candidate.SetActive(true);
+                room.Hazard.Hazards.Single().candidate.SetActive(true);
                 Assert.That(RoomTemplateChecks.Validate(room).Any(e => e.Contains("함정 후보")), Is.True);
-                room.Hazards.Single().candidate.SetActive(false);
-                room.Hazards.Single().passageVerified = false;
+                room.Hazard.Hazards.Single().candidate.SetActive(false);
+                room.Hazard.Hazards.Single().passageVerified = false;
                 Assert.That(RoomTemplateChecks.Validate(room).Any(e => e.Contains("통과 검증")), Is.True);
-                room.Hazards.Single().passageVerified = true;
-                room.Hazards.Single().spawnWeight = 0;
-                room.Hazards.Single().emptyWeight = 0;
+                room.Hazard.Hazards.Single().passageVerified = true;
+                room.Hazard.Hazards.Single().spawnWeight = 0;
+                room.Hazard.Hazards.Single().emptyWeight = 0;
                 Assert.That(RoomTemplateChecks.Validate(room).Any(e => e.Contains("함정 가중치")), Is.True);
-                room.Hazards.Single().spawnWeight = 1;
-                room.Hazards.Single().emptyWeight = 1;
-                room.Hazards.Single().clearance = new RectInt(1, 4, 16, 7);
+                room.Hazard.Hazards.Single().spawnWeight = 1;
+                room.Hazard.Hazards.Single().emptyWeight = 1;
+                room.Hazard.Hazards.Single().clearance = new RectInt(1, 4, 16, 7);
                 Assert.That(RoomTemplateChecks.Validate(room).Any(e => e.Contains("함정이 변형 영역")), Is.True);
             }
             finally { UnityEngine.Object.DestroyImmediate(room.gameObject); }
@@ -159,7 +159,7 @@ namespace ProjectRE.MapGeneration.Tests
                 type.GetMethod("Generate", flags).Invoke(window, null);
                 bool Active() => ((GameObject)owner.GetValue(window)).GetComponentsInChildren<RoomTemplate>(true)
                     .Single(r => r.transform.localPosition == new Vector3(selected.Cell.x * 20, -selected.Cell.y * 20, 0))
-                    .Hazards.Single(h => h.id == hazardId).candidate.activeSelf;
+                    .Hazard.Hazards.Single(h => h.id == hazardId).candidate.activeSelf;
                 Assert.That(Active(), Is.True);
                 Undo.PerformUndo();
                 Assert.That(scene.rootCount, Is.EqualTo(initialRoots));

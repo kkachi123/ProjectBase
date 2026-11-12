@@ -34,7 +34,7 @@ namespace ProjectRE.MapGeneration
                 bool hasStart = template.PlayerStart != null;
                 bool hasGoal = template.Goal != null;
                 var terrain = new List<RoomTerrainSnapshot>();
-                foreach (RoomTerrainVariation variation in template.TerrainVariations)
+                foreach (RoomTerrainVariation variation in template.Terrain.TerrainVariations)
                 {
                     var idsForRegion = new List<string>();
                     var cells = new List<Vector2Int>();
@@ -45,7 +45,7 @@ namespace ProjectRE.MapGeneration
                 }
                 terrain.Sort((a, b) => a.RegionIndex.CompareTo(b.RegionIndex));
                 var content = new List<ContentSlotSnapshot>();
-                foreach (RoomContentSlot slot in template.ContentSettings)
+                foreach (RoomContentSlot slot in template.Content.ContentSettings)
                 {
                     var options = new List<ContentOptionSnapshot>();
                     foreach (RoomContentOption option in slot.options) options.Add(new ContentOptionSnapshot(option.id, option.weight, option.kind));
@@ -53,7 +53,7 @@ namespace ProjectRE.MapGeneration
                 }
                 content.Sort((a, b) => a.SlotIndex.CompareTo(b.SlotIndex));
                 var hazards = new List<RoomHazardSnapshot>();
-                foreach (RoomHazardSlot slot in template.Hazards)
+                foreach (RoomHazardSlot slot in template.Hazard.Hazards)
                     hazards.Add(new RoomHazardSnapshot(slot.id, slot.spawnWeight, slot.emptyWeight));
                 hazards.Sort((a, b) => string.CompareOrdinal(a.Id, b.Id));
                 result.Add(new RoomTemplateSnapshot(template.TemplateId, template.Type, template.Openings,

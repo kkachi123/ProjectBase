@@ -7,8 +7,8 @@
 ## 기본 구성
 
 - 방 크기는 20×20 Unity 단위, Grid 셀은 1×1이다. 루트의 기준점은 왼쪽 아래이며 회전 0, 스케일 1이다.
-- 루트에는 `Grid`와 `RoomTemplate`을 둔다. `FixedGeometry`는 루트 바로 아래에 위치 0·회전 0·스케일 1의 Tilemap으로 두고 지형 Collider를 연결한다.
-- `RoomTemplate`은 ID, 방 유형, 열린 출입구, 진입→진출 후보, 변형·보호 영역, 콘텐츠 슬롯과 Player 시작·Goal 마커를 기록한다.
+- 루트에는 `Grid`, `RoomTemplate`, `RoomTerrainSettings`, `RoomContentSettings`, `RoomHazardSettings`를 둔다. `FixedGeometry`는 루트 바로 아래에 위치 0·회전 0·스케일 1의 Tilemap으로 두고 지형 Collider를 연결한다.
+- `RoomTemplate`은 ID, 방 유형, 열린 출입구, 진입→진출 후보와 Player 시작·Goal 마커를 기록한다. 변형·보호 영역은 `RoomTerrainSettings`, 콘텐츠 슬롯은 `RoomContentSettings`, 함정 후보는 `RoomHazardSettings`에서 설정한다.
 - 방 유형은 출입구의 역할을 나타낸다. `Side`는 출입구가 없고, `Horizontal`은 동·서 중 하나 이상, `Down`은 남쪽, `Arrival`은 북쪽이 열려 있어야 한다. `Arrival`에는 남쪽 출입구를 지정하지 않는다.
 
 ## 출입구와 이동 기준

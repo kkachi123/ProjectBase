@@ -49,7 +49,7 @@ namespace ProjectRE.MapGeneration.Tests
                     room.transform.localPosition + new Vector3(-RoomTemplate.RoomSize, 0, 0));
                 Assert.That(west, Is.Not.Null);
                 Assert.That(west.Openings.HasFlag(RoomOpening.East), Is.True);
-                var slot = room.ContentSettings[0];
+                var slot = room.Content.ContentSettings[0];
                 foreach (var option in slot.options)
                 {
                     var instance = room.transform.Find(option.prefab.name + "(Clone)");
@@ -241,7 +241,7 @@ namespace ProjectRE.MapGeneration.Tests
                 Assert.That(room.VerifiedStartExits, Is.EqualTo(RoomOpening.East));
                 Assert.That(room.Goal, Is.Null);
                 Assert.That(room.OptionalTarget, Is.Null);
-                Assert.That(room.ContentSettings, Is.Empty);
+                Assert.That(room.Content.ContentSettings, Is.Empty);
                 Assert.That(room.FixedGeometry.GetColliderType(new Vector3Int(12, 3, 0)), Is.EqualTo(Tile.ColliderType.Grid));
                 var east = System.Array.Find(rooms, candidate => candidate.transform.localPosition ==
                     room.transform.localPosition + new Vector3(RoomTemplate.RoomSize, 0, 0));

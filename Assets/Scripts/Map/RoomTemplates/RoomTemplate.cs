@@ -30,40 +30,10 @@ namespace ProjectRE.MapGeneration
         public RoomOpening exit;
     }
 
-    public enum RoomTerrainPatternKind { Tilemap, Platform }
-
-    [Serializable]
-    public sealed class RoomTerrainPattern
-    {
-        public string id;
-        public GameObject prefab;
-        public RoomTerrainPatternKind kind;
-        [Tooltip("변형 영역의 왼쪽 아래를 기준으로 한 플랫폼 위치입니다.")]
-        public Vector2 offset;
-    }
-
-    [Serializable]
-    public sealed class RoomChanceCell
-    {
-        public Vector2Int cell;
-        public TileBase tile;
-        [Range(0, 100)] public int chance = 50;
-    }
-
-    [Serializable]
-    public sealed class RoomTerrainVariation
-    {
-        public int regionIndex;
-        public bool allowEmptyPattern = true;
-        public List<RoomTerrainPattern> patterns = new();
-        public List<RoomChanceCell> chanceCells = new();
-        [Tooltip("모든 패턴과 확률 셀 조합의 통과 방향을 실제 Player로 검증한 경우에만 활성화합니다.")]
-        public bool combinationsVerified;
-    }
-
     /// <summary>방 하나의 제작 원본. 통로 조합과 지형은 각각 제작자가 지정한다.</summary>
     [DisallowMultipleComponent]
     [RequireComponent(typeof(Grid))]
+    [RequireComponent(typeof(RoomTerrainSettings), typeof(RoomContentSettings), typeof(RoomHazardSettings))]
     public sealed class RoomTemplate : MonoBehaviour
     {
         public const int RoomSize = 20;
@@ -81,12 +51,6 @@ namespace ProjectRE.MapGeneration
         [SerializeField] private List<RoomPassage> _passages = new();
         [Tooltip("기록된 모든 통과 방향을 실제 Player로 확인한 경우에만 활성화합니다.")]
         [SerializeField] private bool _passagesVerified;
-        [SerializeField] private List<RectInt> _variationRegions = new();
-        [SerializeField] private List<RectInt> _protectedRegions = new();
-        [SerializeField] private List<RoomTerrainVariation> _terrainVariations = new();
-        [SerializeField] private List<Vector2Int> _contentSlots = new();
-        [SerializeField] private List<RoomContentSlot> _contentSettings = new();
-        [SerializeField] private List<RoomHazardSlot> _hazards = new();
         [SerializeField] private Transform _playerStart;
         [SerializeField] private Transform _goal;
         [Tooltip("Player 시작 마커에서 출입구까지 실제 이동으로 확인한 방향입니다.")]
@@ -107,12 +71,9 @@ namespace ProjectRE.MapGeneration
         public Tilemap FixedGeometry => _fixedGeometry;
         public IReadOnlyList<RoomPassage> Passages => _passages;
         public bool PassagesVerified => _passagesVerified;
-        public IReadOnlyList<RectInt> VariationRegions => _variationRegions;
-        public IReadOnlyList<RectInt> ProtectedRegions => _protectedRegions;
-        public IReadOnlyList<RoomTerrainVariation> TerrainVariations => _terrainVariations;
-        public IReadOnlyList<Vector2Int> ContentSlots => _contentSlots;
-        public IReadOnlyList<RoomContentSlot> ContentSettings => _contentSettings;
-        public IReadOnlyList<RoomHazardSlot> Hazards => _hazards;
+        public RoomTerrainSettings Terrain => GetComponent<RoomTerrainSettings>();
+        public RoomContentSettings Content => GetComponent<RoomContentSettings>();
+        public RoomHazardSettings Hazard => GetComponent<RoomHazardSettings>();
         public Transform PlayerStart => _playerStart;
         public Transform Goal => _goal;
         public RoomOpening VerifiedStartExits => _verifiedStartExits;
@@ -147,17 +108,6 @@ namespace ProjectRE.MapGeneration
                 Gizmos.DrawWireCube(new Vector3(rect.center.x, rect.center.y), new Vector3(rect.width, rect.height));
             }
 
-            Gizmos.color = Color.cyan;
-            foreach (RectInt region in _variationRegions)
-                Gizmos.DrawWireCube(new Vector3(region.center.x, region.center.y), new Vector3(region.width, region.height));
-
-            Gizmos.color = Color.red;
-            foreach (RectInt region in _protectedRegions)
-                Gizmos.DrawWireCube(new Vector3(region.center.x, region.center.y), new Vector3(region.width, region.height));
-
-            Gizmos.color = Color.yellow;
-            foreach (Vector2Int point in _contentSlots)
-                Gizmos.DrawWireSphere(new Vector3(point.x + 0.5f, point.y + 0.5f), 0.25f);
         }
     }
 }

@@ -489,3 +489,9 @@
 - `FallingPlatform`은 `Map/Platforms`, Goal은 `Map/Goals`, 기존 배경 오브젝트는 `Map/Environment`, 기존 Bullet 묶음은 `Projectiles/TrapBullet`으로 이동했다. 몬스터별 프리팹을 각 종류 폴더에, 카메라를 `Camera`에 두고 지형 RuleTile을 `Art/Map/Terrain`으로 옮겼다.
 - Unity 에셋 이동 전후 대상 GUID 1,411개를 대조했고 1,000개 seed의 맵 계획·지형·콘텐츠·함정 결과가 같았다. Goal을 직접 불러오는 에디터·테스트 경로와 관련 가이드를 갱신했다. 맵 EditMode 테스트 78개가 통과했다.
 - Title→InGame seed `1`에서 Player 생성과 시작 방 이동을 확인했고 체력 10을 유지했다. 가상 입력을 정리했다. 함정·몬스터·Goal의 전체 플레이 동작을 이번에 재검증한 것은 아니다.
+
+### Chunk 설정과 적용 책임 분리
+
+- `RoomTemplate`의 지형·콘텐츠·함정 필드를 각각 `RoomTerrainSettings`, `RoomContentSettings`, `RoomHazardSettings`로 옮기고 `MapBuilder`의 적용 처리를 세 Builder로 나눴다. 방 구조·출입구와 공통 그래픽 Tilemap 방식은 유지한다.
+- `Horizontal` Base와 `Horizontal_Shrine` Variant를 먼저 확인한 뒤 Base 20개와 Variant 21개의 설정을 이전 전후 대조했다. 두 선택 방의 아이템 후보는 새 콘텐츠 컴포넌트의 Variant Override로 이전하고 옛 Override를 제거했다. 41개 방의 설정 지문이 같았고, 최종 카탈로그의 seed `0~999` 계획도 이전과 일치했다.
+- 맵 EditMode 테스트 78개가 통과했다. Title→InGame seed `276`에서 Player를 각 방 입구에 배치해 가로 방의 양방향, 아이템이 생성된 선택 방 왕복, 화염·아이템 방의 서→남 통과를 확인했으며 각 경우 체력은 10이었다. 실제 아이템 획득과 목표 완료는 이번에 재검증하지 않았다. 입력을 복구하고 Play를 종료했다.

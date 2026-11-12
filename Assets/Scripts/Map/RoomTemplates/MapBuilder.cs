@@ -78,73 +78,10 @@ namespace ProjectRE.MapGeneration
                     instance.transform.localScale = Vector3.one;
                     instance.name = $"Room ({room.Cell.x}, {room.Cell.y}) {room.TemplateId}";
                     var template = instance.GetComponent<RoomTemplate>();
-                    var builtContent = new Dictionary<int, GameObject>();
                     var roomOrigin = new Vector3Int(room.Cell.x * RoomTemplate.RoomSize, -room.Cell.y * RoomTemplate.RoomSize, 0);
-                    if (visualGround != null) terrainMaps.Add(new MapVisualBuilder.TerrainMap(template.FixedGeometry, roomOrigin));
-                    foreach (RoomTerrainSelection selection in room.Terrain)
-                    {
-                        RoomTerrainVariation variation = null;
-                        foreach (RoomTerrainVariation candidate in template.TerrainVariations)
-                            if (candidate.regionIndex == selection.RegionIndex) { variation = candidate; break; }
-                        if (variation == null) throw new InvalidOperationException("변형 영역을 찾을 수 없습니다.");
-                        RectInt region = template.VariationRegions[selection.RegionIndex];
-                        if (!string.IsNullOrEmpty(selection.PatternId))
-                        {
-                            RoomTerrainPattern selectedPattern = null;
-                            foreach (RoomTerrainPattern pattern in variation.patterns)
-                                if (pattern.id == selection.PatternId) { selectedPattern = pattern; break; }
-                            if (selectedPattern == null || selectedPattern.prefab == null) throw new InvalidOperationException($"패턴을 찾을 수 없습니다: {selection.PatternId}");
-                            GameObject patternInstance = context.InstantiatePrefab(selectedPattern.prefab, instance.transform);
-                            if (patternInstance == null) throw new InvalidOperationException($"패턴 생성 실패: {selection.PatternId}");
-                            Vector2 offset = selectedPattern.kind == RoomTerrainPatternKind.Platform ? selectedPattern.offset : Vector2.zero;
-                            patternInstance.transform.localPosition = new Vector3(region.xMin + offset.x, region.yMin + offset.y, 0);
-                            patternInstance.transform.localRotation = Quaternion.identity;
-                            patternInstance.transform.localScale = Vector3.one;
-                            if (visualGround != null && selectedPattern.kind == RoomTerrainPatternKind.Tilemap)
-                            {
-                                var patternMap = patternInstance.GetComponentInChildren<Tilemap>(true);
-                                terrainMaps.Add(new MapVisualBuilder.TerrainMap(patternMap, roomOrigin + new Vector3Int(region.xMin, region.yMin, 0)));
-                            }
-                        }
-                        if (selection.FilledCells.Count > 0)
-                        {
-                            if (context.RecordComponent == null) throw new InvalidOperationException("타일 기록 컨텍스트가 없습니다.");
-                            context.RecordComponent(template.FixedGeometry);
-                            foreach (Vector2Int cell in selection.FilledCells)
-                                foreach (RoomChanceCell chance in variation.chanceCells)
-                                    if (chance.cell == cell) { template.FixedGeometry.SetTile(new Vector3Int(cell.x, cell.y, 0), chance.tile); break; }
-                        }
-                    }
-                    foreach (ContentSelection selection in room.Content)
-                    {
-                        if (string.IsNullOrEmpty(selection.OptionId)) continue;
-                        RoomContentSlot slot = null;
-                        foreach (RoomContentSlot candidate in template.ContentSettings)
-                            if (candidate.slotIndex == selection.SlotIndex) { slot = candidate; break; }
-                        if (slot == null) throw new InvalidOperationException("콘텐츠 슬롯을 찾을 수 없습니다.");
-                        RoomContentOption option = null;
-                        foreach (RoomContentOption candidate in slot.options)
-                            if (candidate.id == selection.OptionId) { option = candidate; break; }
-                        if (option == null || option.prefab == null) throw new InvalidOperationException($"콘텐츠를 찾을 수 없습니다: {selection.OptionId}");
-                        GameObject content = context.InstantiatePrefab(option.prefab, instance.transform);
-                        if (content == null) throw new InvalidOperationException($"콘텐츠 생성 실패: {selection.OptionId}");
-                        Vector2Int point = template.ContentSlots[slot.slotIndex];
-                        content.transform.localPosition = new Vector3(point.x + .5f + option.offset.x, point.y + option.offset.y, 0);
-                        content.transform.localRotation = Quaternion.identity;
-                        Vector3 scale = content.transform.localScale;
-                        scale.x = Mathf.Abs(scale.x) * (slot.facing == ContentFacing.Left ? -1 : 1);
-                        content.transform.localScale = scale;
-                        builtContent.Add(selection.SlotIndex, content);
-                    }
-                    foreach (RoomHazardSelection selection in room.Hazards)
-                    {
-                        if (!selection.Spawn) continue;
-                        RoomHazardSlot slot = null;
-                        foreach (RoomHazardSlot candidate in template.Hazards)
-                            if (candidate.id == selection.Id) { slot = candidate; break; }
-                        if (slot == null || slot.candidate == null) throw new InvalidOperationException($"함정 후보를 찾을 수 없습니다: {selection.Id}");
-                        context.SetActive(slot.candidate, true);
-                    }
+                    RoomTerrainBuilder.Apply(room, template, roomOrigin, terrainMaps, visualGround != null, context);
+                    var builtContent = RoomContentBuilder.Build(room, template, context);
+                    RoomHazardBuilder.Apply(room, template.Hazard, context);
                     builtRooms.Add(new BuiltRoom(room, template, builtContent));
                 }
                 GameObject goal = context.InstantiatePrefab(goalPrefab, root.transform);

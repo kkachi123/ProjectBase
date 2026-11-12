@@ -107,7 +107,14 @@ namespace ProjectRE.MapGeneration.Tests
                 {
                     Assert.That(room.OptionalTarget, Is.Not.Null);
                     Assert.That(room.VerifiedDeadEndReturns, Is.EqualTo(room.Openings));
-                    Assert.That(room.ContentSettings.SelectMany(s => s.options).All(o => o.kind == ContentKind.Item), Is.True);
+                    Assert.That(room.Content.ContentSettings.SelectMany(s => s.options).All(o => o.kind == ContentKind.Item), Is.True);
+                    var parentContent = PrefabUtility.GetCorrespondingObjectFromSource(room.Content);
+                    Assert.That(parentContent, Is.Not.Null);
+                    Assert.That(room.Content.ContentSlots, Is.EqualTo(parentContent.ContentSlots));
+                    Assert.That(room.Content.ContentSettings[0].emptyWeight, Is.EqualTo(parentContent.ContentSettings[0].emptyWeight));
+                    Assert.That(PrefabUtility.GetPropertyModifications(room.gameObject)
+                        .Any(m => m.target == parentContent && m.propertyPath.Contains("options")), Is.True,
+                        "아이템 후보는 부모 설정을 복제한 별도 컴포넌트가 아니라 Variant Override여야 합니다.");
                 }
                 else Assert.That(room.PassagesVerified, Is.True);
             }
@@ -176,11 +183,11 @@ namespace ProjectRE.MapGeneration.Tests
             {
                 int index = side.Cell.y * plan.Width + side.Cell.x;
                 var instance = built.Root.transform.GetChild(index).GetComponent<RoomTemplate>();
-                var slot = instance.ContentSettings.Single();
+                var slot = instance.Content.ContentSettings.Single();
                 var option = slot.options.Single(o => o.id == id);
                 var matching = instance.GetComponentsInChildren<Collider2D>(true)
                     .Where(c => c.transform.parent == instance.transform && c.gameObject != instance.FixedGeometry.gameObject &&
-                        instance.Hazards.All(h => h.candidate != c.gameObject)).ToArray();
+                        instance.Hazard.Hazards.All(h => h.candidate != c.gameObject)).ToArray();
                 Assert.That(matching.Length, Is.EqualTo(1));
                 Assert.That(matching[0].transform.localPosition,
                     Is.EqualTo(new Vector3(7.5f + option.offset.x, 4f + option.offset.y, 0)));
@@ -271,7 +278,7 @@ namespace ProjectRE.MapGeneration.Tests
             {
                 var room = build.Root.transform.GetChild(selectedRoom.Cell.y * selected.Width + selectedRoom.Cell.x)
                     .GetComponent<RoomTemplate>();
-                var option = room.ContentSettings.Single().options.Single(o => o.id == optionId);
+                var option = room.Content.ContentSettings.Single().options.Single(o => o.id == optionId);
                 var instance = room.transform.Find(option.prefab.name + "(Clone)");
                 Assert.That(instance, Is.Not.Null);
                 Assert.That(instance.localPosition, Is.EqualTo(new Vector3(7.5f + option.offset.x, 4f + option.offset.y, 0)));
@@ -297,7 +304,7 @@ namespace ProjectRE.MapGeneration.Tests
             var room = Object.Instantiate(prefab).GetComponent<RoomTemplate>();
             try
             {
-                var so = new SerializedObject(room);
+                var so = new SerializedObject(room.Content);
                 so.FindProperty("_contentSettings").GetArrayElementAtIndex(0).FindPropertyRelative("clearance").rectIntValue = new RectInt(7, 5, 1, 2);
                 so.ApplyModifiedPropertiesWithoutUndo();
                 Assert.That(RoomTemplateChecks.Validate(room), Is.Not.Empty);
@@ -316,7 +323,7 @@ namespace ProjectRE.MapGeneration.Tests
             var tile = AssetDatabase.LoadAssetAtPath<UnityEngine.Tilemaps.TileBase>("Assets/Prefabs/Map/RoomTemplates/Shared/SampleSolid.asset");
             try
             {
-                var so = new SerializedObject(room);
+                var so = new SerializedObject(room.Content);
                 so.FindProperty("_contentSlots").GetArrayElementAtIndex(0).vector2IntValue = new Vector2Int(10, 10);
                 var slot = so.FindProperty("_contentSettings").GetArrayElementAtIndex(0);
                 slot.FindPropertyRelative("clearance").rectIntValue = new RectInt(10, 10, 2, 3);

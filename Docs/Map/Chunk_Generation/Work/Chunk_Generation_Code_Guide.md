@@ -16,11 +16,14 @@
 
 ```mermaid
 classDiagram
-    RoomTemplate *-- RoomTerrainVariation : 변형 설정
+    RoomTemplate ..> RoomTerrainSettings : 지형 설정
+    RoomTemplate ..> RoomContentSettings : 콘텐츠 설정
+    RoomTemplate ..> RoomHazardSettings : 함정 설정
+    RoomTerrainSettings *-- RoomTerrainVariation : 변형 설정
     RoomTerrainVariation *-- RoomTerrainPattern : 패턴 후보
     RoomTerrainVariation *-- RoomChanceCell : 확률 셀
-    RoomTemplate *-- RoomContentSlot : 콘텐츠 슬롯
-    RoomTemplate *-- RoomHazardSlot : 함정 후보
+    RoomContentSettings *-- RoomContentSlot : 콘텐츠 슬롯
+    RoomHazardSettings *-- RoomHazardSlot : 함정 후보
     RoomContentSlot *-- RoomContentOption : 콘텐츠 후보
     RoomTemplateCatalog ..> RoomTemplateChecks : 원본 검사
     RoomTemplateCatalog ..> RoomTemplateSnapshot : 계산 데이터 생성
@@ -39,6 +42,9 @@ classDiagram
     MapRoomPlan *-- RoomHazardSelection : 방별 함정 선택
     MapBuilder ..> MapRoomPlan : 선택 적용
     MapBuilder ..> RoomTemplate : 원본 프리팹과 설정 조회
+    MapBuilder ..> RoomTerrainBuilder : 지형 적용
+    MapBuilder ..> RoomContentBuilder : 콘텐츠 생성
+    MapBuilder ..> RoomHazardBuilder : 함정 활성화
     MapBuilder ..> BuiltRoom : 생성된 방과 콘텐츠
     RoomMapFactory ..> RoomObjectiveSetup : 실제 목표 연결
     RoomObjectiveSetup ..> RoomObjectiveController : 목표와 출구 구성
@@ -47,12 +53,12 @@ classDiagram
 
 ## 선택과 적용 순서
 
-1. 제작자는 `RoomTemplate`에 고정 Tilemap, 변형·보호 영역, 패턴 후보, 확률 셀과 콘텐츠 슬롯을 지정한다. 출입구·시작·Goal·선택 방 목표와 검증 표시도 이 원본에 있다.
+1. 제작자는 `RoomTemplate`에 고정 Tilemap·출입구·마커와 검증 표시를 지정한다. 변형·보호 영역, 콘텐츠 슬롯과 함정 후보는 각각 `RoomTerrainSettings`, `RoomContentSettings`, `RoomHazardSettings`에 지정한다.
 2. `RoomTemplateCatalog.TryCreateSnapshot()`이 `RoomTemplateChecks`로 원본을 검사하고, 계산에 필요한 ID·확률·가중치를 `RoomTemplateSnapshot`과 내부 스냅샷으로 복사한다. 스냅샷에는 생성할 프리팹 참조를 담지 않는다.
 3. `MapPlanner`가 해당 칸의 방을 고르면 `RoomTerrainPlanner.Select()`가 영역별 패턴 ID와 채울 셀을 선택한다. 결과는 `MapRoomPlan.Terrain`에 저장된다. 지형 선택에는 seed, 방 좌표, 템플릿 ID와 영역 인덱스를 사용한다.
 4. 경로와 선택 방이 확정되면 `RoomContentPlanner.Select()`가 중간 경로 방과 선택 방의 슬롯별 콘텐츠 ID 또는 빈 선택을 정한다. 일반 방에는 아이템·일반 몬스터, 선택 방에는 아이템·엘리트 몬스터가 허용된다. 시작·Goal과 닫힌 방에는 콘텐츠를 선택하지 않는다. 콘텐츠 난수에는 seed, 방 좌표, 템플릿 ID와 슬롯 인덱스를 사용한다.
 5. `RoomHazardPlanner.Select()`가 중간 경로 방과 선택 방의 함정 후보별 생성 또는 빈 상태를 독립 난수로 정한다. seed·방 좌표·템플릿 ID·후보 ID를 사용하며 결과는 `MapRoomPlan.Hazards`에 저장된다.
-6. `MapPlanValidator`가 기록된 지형·콘텐츠·함정 선택을 재계산해 계획과 일치하는지 확인한다. `MapBuilder`는 패턴·콘텐츠 프리팹을 배치하고 확률 셀을 채우며, 선택된 방의 비활성 함정 후보를 활성화한다.
+6. `MapPlanValidator`가 기록된 지형·콘텐츠·함정 선택을 재계산해 계획과 일치하는지 확인한다. `MapBuilder`는 각 Builder에 지형·콘텐츠·함정 적용을 맡긴다.
 7. 그래픽 타일이 설정된 경우 `MapVisualBuilder`가 방과 Tilemap 패턴의 충돌 지형을 수집해 맵 전체의 그래픽 Tilemap에 표시한다. 플랫폼 패턴은 별도 오브젝트로 생성되어 자체 Sprite와 동작을 사용한다. RuleTile은 이웃 셀에 따라 그래픽을 고르며 지형의 점유 여부를 결정하지 않는다.
 8. `RoomMapFactory`는 비활성 맵의 `BuiltRoom`별 실제 콘텐츠와 계획을 `RoomObjectiveSetup`에 전달한다. 지점·스위치 후보는 seed와 방 좌표·템플릿 ID·후보 ID를 이용해 개별 선택하고, 목표 슬롯에서 실제 생성된 몬스터만 추가한다. `RoomObjectiveController`는 전체 완료 시 계획의 진행 출구를 열며 목표가 없으면 잠그지 않는다.
 
@@ -62,9 +68,11 @@ classDiagram
 
 | 클래스 | 소스 | 역할 |
 | --- | --- | --- |
-| `RoomTemplate` | [RoomTemplate.cs](../../../../Assets/Scripts/Map/RoomTemplates/RoomTemplate.cs) | 방 ID·유형·출입구·통과 방향, 고정 Tilemap, 변형 영역, 슬롯과 마커를 보관한다. `OpeningCells()`가 출입구 셀의 기준이다. |
+| `RoomTemplate` | [RoomTemplate.cs](../../../../Assets/Scripts/Map/RoomTemplates/RoomTemplate.cs) | 방 ID·유형·출입구·통과 방향, 고정 Tilemap과 마커를 보관한다. `OpeningCells()`가 출입구 셀의 기준이다. |
+| `RoomTerrainSettings`, `RoomContentSettings`, `RoomHazardSettings` | [RoomTerrainSettings.cs](../../../../Assets/Scripts/Map/RoomTemplates/RoomTerrainSettings.cs), [RoomContentSettings.cs](../../../../Assets/Scripts/Map/RoomTemplates/RoomContentSettings.cs), [RoomHazardSettings.cs](../../../../Assets/Scripts/Map/RoomTemplates/RoomHazardSettings.cs) | 지형·콘텐츠·함정 제작 설정을 각각 보관한다. |
+| `RoomTerrainBuilder`, `RoomContentBuilder`, `RoomHazardBuilder` | [RoomTerrainBuilder.cs](../../../../Assets/Scripts/Map/RoomTemplates/RoomTerrainBuilder.cs), [RoomContentBuilder.cs](../../../../Assets/Scripts/Map/RoomTemplates/RoomContentBuilder.cs), [RoomHazardBuilder.cs](../../../../Assets/Scripts/Map/RoomTemplates/RoomHazardBuilder.cs) | 선택된 지형·콘텐츠·함정을 각각 적용한다. |
 | `RoomType`, `RoomOpening`, `RoomPassage` | [RoomTemplate.cs](../../../../Assets/Scripts/Map/RoomTemplates/RoomTemplate.cs) | 방 유형·출입구 방향·진입→진출 후보를 표현한다. |
-| `RoomTerrainVariation`, `RoomTerrainPattern`, `RoomChanceCell` | [RoomTemplate.cs](../../../../Assets/Scripts/Map/RoomTemplates/RoomTemplate.cs) | 변형 영역의 패턴 후보와 확률 셀·검증 표시를 보관한다. |
+| `RoomTerrainVariation`, `RoomTerrainPattern`, `RoomChanceCell` | [RoomTerrainSettings.cs](../../../../Assets/Scripts/Map/RoomTemplates/RoomTerrainSettings.cs) | 변형 영역의 패턴 후보와 확률 셀·검증 표시를 보관한다. |
 | `RoomContentSlot`, `RoomContentOption`, `ContentKind`, `ContentRoomRole` | [RoomContent.cs](../../../../Assets/Scripts/Map/RoomTemplates/RoomContent.cs) | 슬롯의 공간·설치면·방향, 후보 종류·가중치와 방 역할을 정의한다. |
 | `RoomTemplateChecks` | [RoomTemplateChecks.cs](../../../../Assets/Scripts/Map/RoomTemplates/RoomTemplateChecks.cs) | 원본의 지형·경계·마커·변형 및 슬롯 규격을 검사한다. |
 | `RoomTemplateValidator` | [RoomTemplateValidator.cs](../../../../Assets/Editor/MapGenerator/RoomTemplates/RoomTemplateValidator.cs) | 에디터 메뉴에서 선택한 방의 제작 데이터를 검사한다. |
@@ -84,10 +92,10 @@ classDiagram
 
 ## 검증과 코드 읽는 순서
 
-1. `RoomTemplate`의 고정 지형·변형과 콘텐츠 필드, `RoomTemplateChecks.Validate()`를 읽는다.
+1. `RoomTemplate`의 고정 지형과 기능별 설정 컴포넌트, `RoomTemplateChecks.Validate()`를 읽는다.
 2. `RoomTemplateCatalog.TryCreateSnapshot()`에서 원본의 어떤 값을 복사하는지 확인한다.
 3. `MapPlanner.TrySelect()`와 `AddOptionalRoom()`에서 지형과 콘텐츠 선택을 요청하는 지점을 찾는다. 각 선택의 난수 계산과 결과는 `RoomTerrainPlanner`와 `RoomContentPlanner`에서 확인한다.
-4. `MapBuilder.Build()`에서 패턴 프리팹·확률 셀·콘텐츠 프리팹을 적용하는 부분을 읽는다. 그래픽과 Collider의 분리는 `MapVisualBuilder`에서 확인한다.
+4. `MapBuilder.Build()`에서 지형·콘텐츠·함정 Builder의 호출을 찾는다. 그래픽과 Collider의 분리는 `MapVisualBuilder`에서 확인한다.
 5. [RoomTerrainTests.cs](../../../../Assets/Tests/EditMode/MapGeneration/RoomTerrainTests.cs), [OptionalRoomTests.cs](../../../../Assets/Tests/EditMode/MapGeneration/OptionalRoomTests.cs), [MapVisualBuilderTests.cs](../../../../Assets/Tests/EditMode/MapGeneration/MapVisualBuilderTests.cs)를 참고한다.
 
 `Passages Verified`, `Combinations Verified`, 함정의 `passageVerified`와 시작·Goal·왕복 방향은 실제 Player로 확인한 뒤 제작자가 기록한다. 지형이나 함정 발사 조건을 변경해도 표시가 자동 해제되지 않으며, 정적 검사만으로 투사체 범위나 Player 통과가 보장되지는 않는다. 함정 선택·안전 검사와 빌드 예시는 [RoomHazardTests.cs](../../../../Assets/Tests/EditMode/MapGeneration/RoomHazardTests.cs)를 참고한다.

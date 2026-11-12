@@ -89,9 +89,9 @@ namespace ProjectRE.MapGeneration.Tests
             var copy = Object.Instantiate(source).GetComponent<RoomTemplate>();
             try
             {
-                var pattern = copy.TerrainVariations[0].patterns[0];
+                var pattern = copy.Terrain.TerrainVariations[0].patterns[0];
                 Assert.That(pattern.kind, Is.EqualTo(RoomTerrainPatternKind.Platform));
-                Assert.That(copy.Hazards.Any(h => h.id == "platform.falling"), Is.False);
+                Assert.That(copy.Hazard.Hazards.Any(h => h.id == "platform.falling"), Is.False);
                 Assert.That(RoomTemplateChecks.Validate(copy), Is.Empty);
                 pattern.offset = new Vector2(-1, -1);
                 Assert.That(RoomTemplateChecks.Validate(copy).Any(e => e.Contains("플랫폼 충돌체가 변형 영역 밖")), Is.True);
@@ -135,9 +135,9 @@ namespace ProjectRE.MapGeneration.Tests
             var room = Object.Instantiate(prefab).GetComponent<RoomTemplate>();
             try
             {
-                var serialized = new SerializedObject(room);
+                var serialized = new SerializedObject(room.Terrain);
                 serialized.FindProperty("_terrainVariations").GetArrayElementAtIndex(0).FindPropertyRelative("combinationsVerified").boolValue = false;
-                serialized.FindProperty("_protectedRegions").GetArrayElementAtIndex(0).rectIntValue = room.VariationRegions[0];
+                serialized.FindProperty("_protectedRegions").GetArrayElementAtIndex(0).rectIntValue = room.Terrain.VariationRegions[0];
                 serialized.ApplyModifiedPropertiesWithoutUndo();
                 var errors = RoomTemplateChecks.Validate(room);
                 Assert.That(errors.Any(e => e.Contains("보호 구역")), Is.True);
@@ -182,6 +182,9 @@ namespace ProjectRE.MapGeneration.Tests
             Assert.That(room.TemplateId, Is.Not.EqualTo(baseRoom.TemplateId));
             Assert.That(room.BaseGroupId, Is.EqualTo(baseRoom.BaseGroupId));
             Assert.That(room.Openings, Is.EqualTo(baseRoom.Openings));
+            Assert.That(PrefabUtility.GetCorrespondingObjectFromSource(room.Terrain), Is.SameAs(baseRoom.Terrain));
+            Assert.That(PrefabUtility.GetCorrespondingObjectFromSource(room.Content), Is.SameAs(baseRoom.Content));
+            Assert.That(PrefabUtility.GetCorrespondingObjectFromSource(room.Hazard), Is.SameAs(baseRoom.Hazard));
             Assert.That(room.PassagesVerified, Is.True);
             Assert.That(room.Passages.Count, Is.EqualTo(baseRoom.Passages.Count));
             for (int i = 0; i < baseRoom.Passages.Count; i++)
@@ -189,11 +192,11 @@ namespace ProjectRE.MapGeneration.Tests
                 Assert.That(room.Passages[i].entry, Is.EqualTo(baseRoom.Passages[i].entry));
                 Assert.That(room.Passages[i].exit, Is.EqualTo(baseRoom.Passages[i].exit));
             }
-            Assert.That(room.VariationRegions, Is.EqualTo(baseRoom.VariationRegions));
-            Assert.That(room.TerrainVariations.Count, Is.EqualTo(1));
-            Assert.That(room.TerrainVariations[0].combinationsVerified, Is.True);
-            Assert.That(room.TerrainVariations[0].patterns[0].prefab, Is.SameAs(baseRoom.TerrainVariations[0].patterns[0].prefab));
-            Assert.That(room.TerrainVariations[0].chanceCells[0].chance, Is.EqualTo(baseRoom.TerrainVariations[0].chanceCells[0].chance));
+            Assert.That(room.Terrain.VariationRegions, Is.EqualTo(baseRoom.Terrain.VariationRegions));
+            Assert.That(room.Terrain.TerrainVariations.Count, Is.EqualTo(1));
+            Assert.That(room.Terrain.TerrainVariations[0].combinationsVerified, Is.True);
+            Assert.That(room.Terrain.TerrainVariations[0].patterns[0].prefab, Is.SameAs(baseRoom.Terrain.TerrainVariations[0].patterns[0].prefab));
+            Assert.That(room.Terrain.TerrainVariations[0].chanceCells[0].chance, Is.EqualTo(baseRoom.Terrain.TerrainVariations[0].chanceCells[0].chance));
             for (int x = 0; x < RoomTemplate.RoomSize; x++)
             for (int y = 0; y < RoomTemplate.RoomSize; y++)
             {
