@@ -5,7 +5,7 @@
 ## Map Assembly — 맵 조합
 
 - [x] **기본 맵 조합 구현:** 주 경로·방 선택, 계획 검증, 씬 생성과 Run 연결을 구현하고 대표 설정을 검증했다. 검증 범위와 조건은 [맵 조합 진행 현황](Map_Assembly/Map_Assembly_Progress.md)을 참고한다.
-- [ ] **여러 분기와 네 방향 방:** 선택 방을 최대 세 개 연결하고 실제 네 방향·선택 방 Variant의 통과와 왕복을 확인했다. 대표 맵 전체의 검증은 [분기 확장 계획](Map_Assembly/Map_Branch_Expansion_Plan.md)에 따른다.
+- [x] **여러 분기와 네 방향 방:** Base 20종의 실제 생성과 1,000개 seed의 계획·재현성을 확인했다. 대표 맵 두 개에서 각각 선택 방 세 곳을 왕복하고 Goal에 도달했다. [검증 결과](Map_Refactoring_Log.md#대표-맵-조합-검증).
 
 ## Chunk Generation — Chunk 내부 생성
 
