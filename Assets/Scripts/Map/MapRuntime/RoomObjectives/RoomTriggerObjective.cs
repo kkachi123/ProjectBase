@@ -8,6 +8,7 @@ namespace ProjectRE
     {
         public enum TriggerMode { Reach, Interact }
         [SerializeField] private TriggerMode mode;
+        public TriggerMode Mode => mode;
 
         private void OnTriggerEnter2D(Collider2D other)
         {

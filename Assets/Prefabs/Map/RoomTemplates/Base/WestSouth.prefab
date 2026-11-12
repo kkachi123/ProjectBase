@@ -2417,6 +2417,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ProjectRE.RoomObjectiveSetup
   controller: {fileID: 3751157173148291173}
+  conditionChance: 50
+  rules:
+  - {fileID: 11400000, guid: ff2041b34ea3fe1439b0f5a50443b261, type: 2}
+  - {fileID: 11400000, guid: fddf16cf9114b914e9c8b8051f5207ba, type: 2}
+  - {fileID: 11400000, guid: c5f6ae528f3195c41bd4d055373c42d5, type: 2}
+  - {fileID: 11400000, guid: 338d7ec9458b9c94bbb0e6bf37268760, type: 2}
   triggers:
   - id: reach
     objective: {fileID: 3257817616439143814}
@@ -2424,7 +2430,6 @@ MonoBehaviour:
   - id: switch
     objective: {fileID: 2897755229275441298}
     chance: 50
-  monsterSlots: 00000000i
   gates:
   - direction: 4
     gate: {fileID: 6578300135434984761}

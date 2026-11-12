@@ -8,7 +8,7 @@
 
 내부 지형 변형은 `sample.horizontal`의 고정 발판 패턴과 확률 셀, `NorthWest_Tiered`의 낙하 발판 패턴에 설정돼 있다. 실제 카탈로그의 Variant는 Base 설정을 상속한다. 검증 범위는 [진행 현황](../Chunk_Generation_Progress.md)을 따른다.
 
-방 목표는 `WestSouth` Base와 상속 Variant에 설정돼 있다. `RoomMapFactory`가 생성된 방과 콘텐츠 정보를 `RoomObjectiveSetup`에 전달하면 실제 몬스터와 seed로 선택된 트리거를 목표로 연결한다.
+방 목표는 `WestSouth`와 `Down` Base 및 상속 Variant에 설정돼 있다. `RoomMapFactory`가 실제 생성 결과를 `RoomObjectiveSetup`에 전달하면 적용 가능한 규칙 중 하나를 seed로 선택한다.
 
 ## 클래스 관계
 
@@ -47,6 +47,8 @@ classDiagram
     MapBuilder ..> RoomHazardBuilder : 함정 활성화
     MapBuilder ..> BuiltRoom : 생성된 방과 콘텐츠
     RoomMapFactory ..> RoomObjectiveSetup : 실제 목표 연결
+    RoomObjectiveSetup ..> RoomObjectiveRule : 적용 가능 규칙 선택
+    RoomObjectiveRule ..> RoomObjectiveCandidates : 실제 후보로 목표 생성
     RoomObjectiveSetup ..> RoomObjectiveController : 목표와 출구 구성
     RoomTemplateValidator ..> RoomTemplateChecks : 제작 데이터 검사
 ```
@@ -60,7 +62,7 @@ classDiagram
 5. `RoomHazardPlanner.Select()`가 중간 경로 방과 선택 방의 함정 후보별 생성 또는 빈 상태를 독립 난수로 정한다. seed·방 좌표·템플릿 ID·후보 ID를 사용하며 결과는 `MapRoomPlan.Hazards`에 저장된다.
 6. `MapPlanValidator`가 기록된 지형·콘텐츠·함정 선택을 재계산해 계획과 일치하는지 확인한다. `MapBuilder`는 각 Builder에 지형·콘텐츠·함정 적용을 맡긴다.
 7. 그래픽 타일이 설정된 경우 `MapVisualBuilder`가 방과 Tilemap 패턴의 충돌 지형을 수집해 맵 전체의 그래픽 Tilemap에 표시한다. 플랫폼 패턴은 별도 오브젝트로 생성되어 자체 Sprite와 동작을 사용한다. RuleTile은 이웃 셀에 따라 그래픽을 고르며 지형의 점유 여부를 결정하지 않는다.
-8. `RoomMapFactory`는 비활성 맵의 `BuiltRoom`별 실제 콘텐츠와 계획을 `RoomObjectiveSetup`에 전달한다. 지점·스위치 후보는 seed와 방 좌표·템플릿 ID·후보 ID를 이용해 개별 선택하고, 목표 슬롯에서 실제 생성된 몬스터만 추가한다. `RoomObjectiveController`는 전체 완료 시 계획의 진행 출구를 열며 목표가 없으면 잠그지 않는다.
+8. `RoomMapFactory`는 비활성 맵의 `BuiltRoom`별 콘텐츠와 계획을 `RoomObjectiveSetup`에 전달한다. 실제 몬스터와 확률로 선별된 트리거를 모은 뒤 조건 방 여부와 적용 가능한 규칙 하나를 독립 seed로 선택한다. 규칙이 생성한 목표를 `RoomObjectiveController`가 집계하고 전체 완료 시 임시 출구를 연다.
 
 지형·콘텐츠·함정 선택 난수는 주 경로·방 선택과 분리된다. 단, 카탈로그나 템플릿 ID 등의 입력을 변경하면 기존 seed의 결과가 달라질 수 있다.
 
@@ -85,6 +87,7 @@ classDiagram
 | `SawPatrol` | [SawPatrol.cs](../../../../Assets/Scripts/Trap/SawPatrol.cs) | 물리 갱신에서 톱니를 시작점과 지정된 거리 사이로 왕복시킨다. 재활성화하면 처음 위치로 돌아간다. |
 | `SpikeHeadTrap` | [SpikeHeadTrap.cs](../../../../Assets/Scripts/Trap/SpikeHeadTrap.cs) | 아래 Player 감지, 낙하 예고·지형 또는 거리 제한에 따른 정지·복귀·재작동 대기를 처리한다. 접촉 피해는 `TrapContactDamage`에 맡긴다. |
 | `RoomObjective`, `RoomTriggerObjective`, `RoomMonsterObjective` | [RoomObjectives](../../../../Assets/Scripts/Map/MapRuntime/RoomObjectives/) | 목표의 완료 이벤트, 지점·스위치 조건 및 지정 몬스터의 `Health.IsDead` 구독을 담당한다. |
+| `IRoomObjectiveRule`, `RoomObjectiveRule`, `RoomObjectiveCandidates` | [RoomObjectiveRule.cs](../../../../Assets/Scripts/Map/MapRuntime/RoomObjectives/RoomObjectiveRule.cs) | 규칙의 적용 가능 여부와 목표 생성 계약 및 실제 후보를 제공한다. 네 규칙 에셋은 상태를 보관하지 않는다. |
 | `RoomObjectiveSetup`, `BuiltRoom` | [RoomObjectiveSetup.cs](../../../../Assets/Scripts/Map/MapRuntime/RoomObjectives/RoomObjectiveSetup.cs), [MapBuilder.cs](../../../../Assets/Scripts/Map/RoomTemplates/MapBuilder.cs) | 실제 생성된 콘텐츠와 목표 후보를 연결하고 진행 출구를 선택한다. |
 | `RoomObjectiveController`, `RoomPresenceSensor`, `RoomObjectivePrototypeDisplay` | [RoomObjectives](../../../../Assets/Scripts/Map/MapRuntime/RoomObjectives/) | 목표를 집계해 문을 제어하고 Player 체류와 임시 목표 표시를 연결한다. 정식 UI는 별도 작업이다. |
 | `MapPlanner`, `MapRoomPlan`, `MapPlanValidator` | [MapPlanner.cs](../../../../Assets/Scripts/Map/RoomTemplates/MapPlanner.cs), [MapPlan.cs](../../../../Assets/Scripts/Map/RoomTemplates/MapPlan.cs), [MapPlanValidator.cs](../../../../Assets/Scripts/Map/RoomTemplates/MapPlanValidator.cs) | 내부 선택을 요청·기록하고 완성 계획을 검증한다. |

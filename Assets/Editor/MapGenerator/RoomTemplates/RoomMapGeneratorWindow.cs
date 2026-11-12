@@ -82,6 +82,7 @@ namespace ProjectRE.MapGeneration.Editor
                 },
                 AddComponent = (target, type) => Undo.AddComponent(target, type),
                 RecordComponent = target => Undo.RecordObject(target, "Set map positions"),
+                SetParent = (child, parent) => Undo.SetTransformParent(child, parent, "Parent map object"),
                 SetActive = (target, active) =>
                 {
                     Undo.RecordObject(target, "Set hazard state");

@@ -12,6 +12,7 @@ namespace ProjectRE.MapGeneration
         public Func<GameObject, Type, Component> AddComponent { get; set; } =
             (target, type) => target.AddComponent(type);
         public Action<Component> RecordComponent { get; set; } = _ => { };
+        public Action<Transform, Transform> SetParent { get; set; } = (child, parent) => child.SetParent(parent, false);
         public Action<GameObject, bool> SetActive { get; set; } = (target, active) => target.SetActive(active);
         public Action<GameObject> DestroyObject { get; set; } = DefaultDestroy;
 

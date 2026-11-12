@@ -5,7 +5,7 @@ namespace ProjectRE
     using ProjectRE.MapGeneration;
     using UnityEngine;
 
-    /// <summary>생성된 콘텐츠와 목표 후보를 해당 방의 진행 조건에 연결한다.</summary>
+    /// <summary>실제로 생성된 후보에 적용할 규칙 하나를 결정한다.</summary>
     public sealed class RoomObjectiveSetup : MonoBehaviour
     {
         [Serializable]
@@ -24,8 +24,10 @@ namespace ProjectRE
         }
 
         [SerializeField] private RoomObjectiveController controller;
+        [SerializeField, Range(0, 100)] private int conditionChance = 50;
+        [SerializeField] private List<RoomObjectiveRule> rules = new();
         [SerializeField] private List<TriggerCandidate> triggers = new();
-        [SerializeField] private List<int> monsterSlots = new();
+        // 자동 문을 도입하기 전까지 기존 출구를 사용한다.
         [SerializeField] private List<ExitGate> gates = new();
 
         public void Configure(BuiltRoom room, int seed, MapBuildContext context)
@@ -35,6 +37,7 @@ namespace ProjectRE
             if (room.Template.gameObject.activeInHierarchy)
                 throw new InvalidOperationException("비활성 맵에서 방 목표를 구성해야 합니다.");
 
+            bool mainRoom = !room.Plan.IsOptional && room.Plan.Entry != RoomOpening.None && room.Plan.Exit != RoomOpening.None;
             var directions = new HashSet<RoomOpening>();
             GameObject selectedGate = null;
             foreach (var entry in gates)
@@ -44,15 +47,14 @@ namespace ProjectRE
                      entry.direction != RoomOpening.South && entry.direction != RoomOpening.West) ||
                     !directions.Add(entry.direction))
                     throw new InvalidOperationException("방 출구 잠금 설정이 올바르지 않습니다.");
-                var gateCollider = entry.gate.GetComponent<Collider2D>();
-                if (gateCollider == null || !gateCollider.enabled || gateCollider.isTrigger)
+                var collider = entry.gate.GetComponent<Collider2D>();
+                if (collider == null || !collider.enabled || collider.isTrigger)
                     throw new InvalidOperationException("출구 잠금에 활성 충돌체가 필요합니다.");
                 context.SetActive(entry.gate, false);
                 if (entry.direction == room.Plan.Exit) selectedGate = entry.gate;
             }
 
-            bool mainRoom = !room.Plan.IsOptional && room.Plan.Entry != RoomOpening.None && room.Plan.Exit != RoomOpening.None;
-            var selected = new List<RoomObjective>();
+            var availableTriggers = new List<RoomTriggerObjective>();
             var ids = new HashSet<string>(StringComparer.Ordinal);
             var triggerObjects = new HashSet<RoomTriggerObjective>();
             foreach (var candidate in triggers)
@@ -62,58 +64,57 @@ namespace ProjectRE
                     candidate.objective.gameObject == gameObject || !candidate.objective.transform.IsChildOf(transform) ||
                     candidate.chance < 0 || candidate.chance > 100)
                     throw new InvalidOperationException("방 트리거 목표 후보가 올바르지 않습니다.");
-                var triggerCollider = candidate.objective.GetComponent<Collider2D>();
-                if (triggerCollider == null || !triggerCollider.enabled || !triggerCollider.isTrigger)
+                var collider = candidate.objective.GetComponent<Collider2D>();
+                if (collider == null || !collider.enabled || !collider.isTrigger)
                     throw new InvalidOperationException("목표 후보에 활성 Trigger Collider가 필요합니다.");
-                bool enabled = mainRoom && Select(seed, room.Plan.Cell, room.Template.TemplateId, candidate.id, candidate.chance);
-                context.SetActive(candidate.objective.gameObject, enabled);
-                if (enabled) selected.Add(candidate.objective);
+                context.SetActive(candidate.objective.gameObject, false);
+                if (mainRoom && Pick(seed, room, "trigger:" + candidate.id, 100) < candidate.chance)
+                    availableTriggers.Add(candidate.objective);
             }
 
-            var slots = new HashSet<int>();
-            foreach (int index in monsterSlots)
+            var monsters = new List<Health>();
+            foreach (var choice in room.Plan.Content)
             {
-                if (index < 0 || index >= room.Template.Content.ContentSlots.Count || !slots.Add(index))
-                    throw new InvalidOperationException("몬스터 목표 슬롯이 올바르지 않습니다.");
-                RoomContentSlot slot = null;
-                foreach (var candidate in room.Template.Content.ContentSettings)
-                    if (candidate.slotIndex == index) { slot = candidate; break; }
-                if (slot == null) throw new InvalidOperationException("몬스터 목표 슬롯에 콘텐츠 설정이 없습니다.");
-                if (!mainRoom || !room.Content.TryGetValue(index, out GameObject content)) continue;
-                ContentSelection choice = null;
-                foreach (var candidate in room.Plan.Content)
-                    if (candidate.SlotIndex == index) { choice = candidate; break; }
+                if (!room.Content.TryGetValue(choice.SlotIndex, out var content)) continue;
                 RoomContentOption option = null;
-                foreach (var candidate in slot.options)
-                    if (candidate.id == choice?.OptionId) { option = candidate; break; }
+                foreach (var slot in room.Template.Content.ContentSettings)
+                    if (slot.slotIndex == choice.SlotIndex)
+                        foreach (var candidate in slot.options)
+                            if (candidate.id == choice.OptionId) option = candidate;
                 if (option == null) throw new InvalidOperationException("생성된 콘텐츠의 선택 정보를 찾을 수 없습니다.");
                 if (option.kind != ContentKind.Monster && option.kind != ContentKind.EliteMonster) continue;
                 var health = content.GetComponent<Health>();
                 if (health == null || !health.enabled) throw new InvalidOperationException("목표 몬스터에 활성 Health가 없습니다.");
-                var objective = (RoomMonsterObjective)context.AddComponent(controller.gameObject, typeof(RoomMonsterObjective));
-                if (objective == null) throw new InvalidOperationException("몬스터 목표를 생성하지 못했습니다.");
-                context.RecordComponent(objective);
-                objective.SetDescription("몬스터 처치");
-                objective.SetTarget(health);
-                selected.Add(objective);
+                monsters.Add(health);
             }
 
-            if (mainRoom && selectedGate == null) throw new InvalidOperationException("진행 방향의 잠금 출구가 없습니다.");
+            var candidates = new RoomObjectiveCandidates(monsters, availableTriggers, controller.gameObject, context,
+                Pick(seed, room, "target", int.MaxValue));
+            var selected = new List<RoomObjective>();
+            var applicable = new List<RoomObjectiveRule>();
+            if (mainRoom && Pick(seed, room, "condition", 100) < conditionChance)
+                foreach (var rule in rules)
+                    if (rule != null && rule.CanApply(candidates)) applicable.Add(rule);
+            if (applicable.Count > 0)
+            {
+                if (selectedGate == null) throw new InvalidOperationException("진행 방향의 잠금 출구가 없습니다.");
+                applicable[Pick(seed, room, "rule", applicable.Count)].CreateObjectives(candidates, selected);
+            }
+
             context.RecordComponent(controller);
-            controller.Configure(selected, mainRoom ? selectedGate : null);
+            controller.Configure(selected, selectedGate);
             if (!mainRoom) context.SetActive(gameObject, false);
         }
 
-        private static bool Select(int seed, Vector2Int cell, string templateId, string id, int chance)
+        private static int Pick(int seed, BuiltRoom room, string domain, int count)
         {
             uint hash = 2166136261u;
             void Add(uint value) => hash = unchecked((hash ^ value) * 16777619u);
-            Add(unchecked((uint)seed)); Add(unchecked((uint)cell.x)); Add(unchecked((uint)cell.y));
-            foreach (char c in templateId) Add(c);
-            Add(0x4F424A45u);
-            foreach (char c in id) Add(c);
+            Add(unchecked((uint)seed)); Add(unchecked((uint)room.Plan.Cell.x)); Add(unchecked((uint)room.Plan.Cell.y));
+            foreach (char c in room.Template.TemplateId) Add(c);
+            foreach (char c in domain) Add(c);
             hash = unchecked(hash * 1664525u + 1013904223u);
-            return (int)(((ulong)hash * 100u) >> 32) < chance;
+            return (int)(((ulong)hash * (uint)count) >> 32);
         }
     }
 }
