@@ -3,12 +3,14 @@ namespace ProjectRE.MapGeneration.Tests
     using System;
     using System.Collections;
     using System.Collections.Generic;
+    using System.Linq;
     using System.Reflection;
     using NUnit.Framework;
     using UnityEditor;
     using UnityEngine;
     using UnityEngine.SceneManagement;
     using UnityEngine.TestTools;
+    using UnityEngine.UIElements;
 
     public sealed class RoomMapPreviewTests
     {
@@ -440,6 +442,103 @@ namespace ProjectRE.MapGeneration.Tests
             Assert.That(foundTile, Is.True);
             foreach (var room in root.GetComponentsInChildren<RoomTemplate>(true))
                 Assert.That(room.FixedGeometry.GetComponent<UnityEngine.Tilemaps.TilemapRenderer>().enabled, Is.False);
+        }
+
+        [Test]
+        public void RandomPreviewListsActualRoomsAndSurvivesFailureAndUndo()
+        {
+            EditorWindow window = null;
+            UnityEngine.Object previousSelection = Selection.activeObject;
+            try
+            {
+                Type type = Type.GetType("ProjectRE.MapGeneration.Editor.RoomMapGeneratorWindow, Assembly-CSharp-Editor");
+                window = (EditorWindow)ScriptableObject.CreateInstance(type);
+                type.GetMethod("CreateGUI").Invoke(window, null);
+                const BindingFlags flags = BindingFlags.Instance | BindingFlags.NonPublic;
+                var settings = AssetDatabase.LoadAssetAtPath<MapPlanningSettings>("Assets/Prefabs/@Data/Map/MapPlanningSettings.asset");
+                type.GetField("_settings", flags).SetValue(window, settings);
+                var owner = type.GetField("_previewRoot", flags);
+                var seedField = type.GetField("_seed", flags);
+                var displayedSeed = (IntegerField)type.GetField("_seedField", flags).GetValue(window);
+                var list = (ScrollView)type.GetField("_roomList", flags).GetValue(window);
+                var previewInfo = (Label)type.GetField("_previewInfo", flags).GetValue(window);
+                GameObject Root() => (GameObject)owner.GetValue(window);
+                RoomTemplate[] Rooms() => Root().GetComponentsInChildren<RoomTemplate>(true);
+                string[] Snapshot() => Rooms().Select(room =>
+                    $"{room.transform.localPosition}:{room.TemplateId}:{room.Openings}").ToArray();
+                void AssertList()
+                {
+                    var rooms = Rooms();
+                    var buttons = list.contentContainer.Children().OfType<Button>().ToArray();
+                    Assert.That(previewInfo.text, Does.Contain(Root().name));
+                    Assert.That(buttons.Length, Is.EqualTo(rooms.Length));
+                    for (int i = 0; i < rooms.Length; i++)
+                    {
+                        int x = Mathf.RoundToInt(rooms[i].transform.localPosition.x / RoomTemplate.RoomSize);
+                        int y = Mathf.RoundToInt(-rooms[i].transform.localPosition.y / RoomTemplate.RoomSize);
+                        Assert.That(buttons[i].text, Does.Contain($"({x}, {y})"));
+                        Assert.That(buttons[i].text, Does.Contain(rooms[i].TemplateId));
+                        string openings = (string)type.GetMethod("FormatOpenings", BindingFlags.Static | BindingFlags.NonPublic)
+                            .Invoke(null, new object[] { rooms[i].Openings });
+                        Assert.That(buttons[i].text, Does.Contain($"[{openings}]"));
+                    }
+                }
+
+                type.GetMethod("GenerateRandom", flags).Invoke(window, null);
+                Assert.That(Root(), Is.Not.Null);
+                int seed = (int)seedField.GetValue(window);
+                Assert.That(displayedSeed.value, Is.EqualTo(seed));
+                Assert.That(Root().name, Does.Contain($"seed={seed}"));
+                string[] snapshot = Snapshot();
+                Assert.That(snapshot.Length, Is.EqualTo(settings.Width * settings.Height));
+                AssertList();
+
+                type.GetMethod("FrameRoom", BindingFlags.Static | BindingFlags.NonPublic).Invoke(null, new object[] { Rooms()[0] });
+                Assert.That(Selection.activeGameObject, Is.SameAs(Rooms()[0].gameObject));
+                type.GetMethod("FramePreview", flags).Invoke(window, null);
+                Assert.That(Selection.activeGameObject, Is.SameAs(Root()));
+
+                GameObject beforeFailure = Root();
+                type.GetField("_settings", flags).SetValue(window, null);
+                type.GetMethod("Generate", flags).Invoke(window, null);
+                Assert.That(Root(), Is.SameAs(beforeFailure));
+                AssertList();
+
+                type.GetField("_settings", flags).SetValue(window, settings);
+                type.GetMethod("Generate", flags).Invoke(window, null);
+                CollectionAssert.AreEqual(snapshot, Snapshot());
+                AssertList();
+                seedField.SetValue(window, seed ^ 1);
+                displayedSeed.SetValueWithoutNotify(seed ^ 1);
+                type.GetMethod("Generate", flags).Invoke(window, null);
+                string[] nextSnapshot = Snapshot();
+                Assert.That(Root().name, Does.Contain($"seed={seed ^ 1}"));
+                AssertList();
+                Undo.PerformUndo();
+                CollectionAssert.AreEqual(snapshot, Snapshot());
+                AssertList();
+                Undo.PerformRedo();
+                CollectionAssert.AreEqual(nextSnapshot, Snapshot());
+                AssertList();
+                type.GetMethod("ClearPreview", flags).Invoke(window, null);
+                Assert.That(Root() == null, Is.True);
+                Assert.That(list.contentContainer.childCount, Is.Zero);
+                Undo.PerformUndo();
+                CollectionAssert.AreEqual(nextSnapshot, Snapshot());
+                AssertList();
+            }
+            finally
+            {
+                if (window != null)
+                {
+                    var owned = (System.Collections.IEnumerable)window.GetType()
+                        .GetField("_ownedRoots", BindingFlags.Instance | BindingFlags.NonPublic).GetValue(window);
+                    foreach (GameObject root in owned)
+                        if (root != null) UnityEngine.Object.DestroyImmediate(root);
+                    UnityEngine.Object.DestroyImmediate(window);
+                }
+                Selection.activeObject = previousSelection;
+            }
         }
 
         [Test]
