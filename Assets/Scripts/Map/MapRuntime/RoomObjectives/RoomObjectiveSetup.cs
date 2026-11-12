@@ -16,21 +16,11 @@ namespace ProjectRE
             [Range(0, 100)] public int chance = 50;
         }
 
-        [Serializable]
-        private sealed class ExitGate
-        {
-            public RoomOpening direction;
-            public GameObject gate;
-        }
-
         [SerializeField] private RoomObjectiveController controller;
         [SerializeField, Range(0, 100)] private int conditionChance = 50;
         [SerializeField] private List<RoomObjectiveRule> rules = new();
         [SerializeField] private List<TriggerCandidate> triggers = new();
-        // 자동 문을 도입하기 전까지 기존 출구를 사용한다.
-        [SerializeField] private List<ExitGate> gates = new();
-
-        public void Configure(BuiltRoom room, int seed, MapBuildContext context)
+        public void Configure(BuiltRoom room, int seed, MapBuildContext context, GameObject gatePrefab)
         {
             if (room == null || context == null || controller == null || !controller.transform.IsChildOf(transform))
                 throw new InvalidOperationException("방 목표 설정 또는 관리자가 올바르지 않습니다.");
@@ -38,22 +28,6 @@ namespace ProjectRE
                 throw new InvalidOperationException("비활성 맵에서 방 목표를 구성해야 합니다.");
 
             bool mainRoom = !room.Plan.IsOptional && room.Plan.Entry != RoomOpening.None && room.Plan.Exit != RoomOpening.None;
-            var directions = new HashSet<RoomOpening>();
-            GameObject selectedGate = null;
-            foreach (var entry in gates)
-            {
-                if (entry == null || entry.gate == null || !entry.gate.transform.IsChildOf(transform) ||
-                    (entry.direction != RoomOpening.North && entry.direction != RoomOpening.East &&
-                     entry.direction != RoomOpening.South && entry.direction != RoomOpening.West) ||
-                    !directions.Add(entry.direction))
-                    throw new InvalidOperationException("방 출구 잠금 설정이 올바르지 않습니다.");
-                var collider = entry.gate.GetComponent<Collider2D>();
-                if (collider == null || !collider.enabled || collider.isTrigger)
-                    throw new InvalidOperationException("출구 잠금에 활성 충돌체가 필요합니다.");
-                context.SetActive(entry.gate, false);
-                if (entry.direction == room.Plan.Exit) selectedGate = entry.gate;
-            }
-
             var availableTriggers = new List<RoomTriggerObjective>();
             var ids = new HashSet<string>(StringComparer.Ordinal);
             var triggerObjects = new HashSet<RoomTriggerObjective>();
@@ -97,12 +71,26 @@ namespace ProjectRE
                     if (rule != null && rule.CanApply(candidates)) applicable.Add(rule);
             if (applicable.Count > 0)
             {
-                if (selectedGate == null) throw new InvalidOperationException("진행 방향의 잠금 출구가 없습니다.");
                 applicable[Pick(seed, room, "rule", applicable.Count)].CreateObjectives(candidates, selected);
             }
 
+            RoomExitGate gate = null;
+            if (selected.Count > 0)
+            {
+                var gateComponent = gatePrefab == null ? null : gatePrefab.GetComponent<RoomExitGate>();
+                var gateCollider = gatePrefab == null ? null : gatePrefab.GetComponent<BoxCollider2D>();
+                var gateVisual = gatePrefab == null ? null : gatePrefab.GetComponent<SpriteRenderer>();
+                if (gateComponent == null || !gateComponent.enabled || !gatePrefab.activeSelf || gateCollider == null ||
+                    !gateCollider.enabled || gateCollider.isTrigger || gateVisual == null || !gateVisual.enabled || gateVisual.sprite == null)
+                    throw new InvalidOperationException("출구 문 프리팹에 활성 문·충돌체·Sprite가 필요합니다.");
+                var instance = context.InstantiatePrefab(gatePrefab, room.Template.transform);
+                if (instance == null) throw new InvalidOperationException("출구 문을 생성하지 못했습니다.");
+                gate = instance.GetComponent<RoomExitGate>();
+                context.RecordComponent(instance.transform);
+                gate.Place(room.Plan.Exit);
+            }
             context.RecordComponent(controller);
-            controller.Configure(selected, selectedGate);
+            controller.Configure(selected, gate);
             if (!mainRoom) context.SetActive(gameObject, false);
         }
 

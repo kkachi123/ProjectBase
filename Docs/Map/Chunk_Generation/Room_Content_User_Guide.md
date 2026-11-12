@@ -77,9 +77,10 @@ WestSouth에는 고블린·아이템·빈 상태의 가중치가 각각 1이다.
 | **Condition Chance** | 해당 방을 조건 방으로 만들 확률이다. 현재 대표 방의 기본값은 50%다. |
 | **Rules** | 이 방에서 사용할 목표 규칙 ScriptableObject 목록이다. 실제 후보에 적용 가능한 규칙 중 하나를 seed로 선택한다. 전체 몬스터 처치·무작위 몬스터 한 마리 처치·지점 도달·스위치 작동 규칙이 있다. |
 | **Triggers** | 방에 미리 둔 지점·스위치 후보 목록이다. 고유 `Id`, 후보 `Objective`와 출현 확률 `Chance`를 지정한다. 확률로 선택된 후보 중 선택한 규칙과 같은 종류만 활성화한다. |
-| **Gates** | 자동 문 구현 전 사용하는 임시 출구 목록이다. 방향과 일반 Collider가 있는 잠금 오브젝트를 연결하며 계획된 주 출구만 잠근다. |
 
 몬스터를 목표로 지정하기 위해 슬롯 번호를 따로 입력하지 않는다. 실제 생성된 몬스터가 있을 때만 몬스터 규칙이 후보가 되며, 아이템과 빈 슬롯은 제외한다. 지점·스위치 규칙은 선택된 같은 종류의 후보를 모두 완료해야 한다. 적용할 규칙이 없거나 조건 방으로 선택되지 않으면 출구는 열린 상태다. 규칙 에셋은 [Objectives](../../../Assets/Prefabs/@Data/Map/Objectives/)에서 확인할 수 있다.
+
+출구 문은 방마다 지정하지 않는다. [MapPlanningSettings](../../../Assets/Prefabs/@Data/Map/MapPlanningSettings.asset)의 **Exit Gate Prefab**에 [공통 문 프리팹](../../../Assets/Prefabs/Map/Progression/RoomExitGate.prefab)을 할당하면 목표가 생성된 방의 주 경로 출구에 자동 배치된다. 목표가 있는 방에서 프리팹이 없거나 문·Collider·Sprite가 비활성 상태면 맵 생성에 실패한다. 입구와 선택 방 분기는 열려 있다. 목표를 완료하면 충돌이 즉시 해제되고 `Room Exit Gate`의 **Fade Duration** 동안 Sprite가 사라진다. 현재 빨간 사각형은 임시 외형이다.
 
 후보 위치·출구를 바꾸거나 방을 추가하면 실제 Player로 접근·완료와 통과를 다시 확인한다. 정식 목표 UI는 별도 UI 작업에서 제작한다.
 

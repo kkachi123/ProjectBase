@@ -50,6 +50,8 @@ classDiagram
     RoomObjectiveSetup ..> RoomObjectiveRule : 적용 가능 규칙 선택
     RoomObjectiveRule ..> RoomObjectiveCandidates : 실제 후보로 목표 생성
     RoomObjectiveSetup ..> RoomObjectiveController : 목표와 출구 구성
+    RoomObjectiveSetup ..> RoomExitGate : 주 출구에 생성
+    RoomObjectiveController ..> RoomExitGate : 목표 완료 시 개방
     RoomTemplateValidator ..> RoomTemplateChecks : 제작 데이터 검사
 ```
 
@@ -62,7 +64,7 @@ classDiagram
 5. `RoomHazardPlanner.Select()`가 중간 경로 방과 선택 방의 함정 후보별 생성 또는 빈 상태를 독립 난수로 정한다. seed·방 좌표·템플릿 ID·후보 ID를 사용하며 결과는 `MapRoomPlan.Hazards`에 저장된다.
 6. `MapPlanValidator`가 기록된 지형·콘텐츠·함정 선택을 재계산해 계획과 일치하는지 확인한다. `MapBuilder`는 각 Builder에 지형·콘텐츠·함정 적용을 맡긴다.
 7. 그래픽 타일이 설정된 경우 `MapVisualBuilder`가 방과 Tilemap 패턴의 충돌 지형을 수집해 맵 전체의 그래픽 Tilemap에 표시한다. 플랫폼 패턴은 별도 오브젝트로 생성되어 자체 Sprite와 동작을 사용한다. RuleTile은 이웃 셀에 따라 그래픽을 고르며 지형의 점유 여부를 결정하지 않는다.
-8. `RoomMapFactory`는 비활성 맵의 `BuiltRoom`별 콘텐츠와 계획을 `RoomObjectiveSetup`에 전달한다. 실제 몬스터와 확률로 선별된 트리거를 모은 뒤 조건 방 여부와 적용 가능한 규칙 하나를 독립 seed로 선택한다. 규칙이 생성한 목표를 `RoomObjectiveController`가 집계하고 전체 완료 시 임시 출구를 연다.
+8. `RoomMapFactory`는 비활성 맵의 `BuiltRoom`과 공통 문 프리팹을 `RoomObjectiveSetup`에 전달한다. 실제 몬스터와 확률로 선별된 트리거를 모아 적용 가능한 규칙 하나를 선택한다. 목표가 있으면 `MapRoomPlan.Exit`과 `RoomTemplate.OpeningCells()`를 기준으로 문 하나를 생성한다. `RoomObjectiveController`가 목표 완료를 집계하고 `RoomExitGate`에 개방을 요청한다.
 
 지형·콘텐츠·함정 선택 난수는 주 경로·방 선택과 분리된다. 단, 카탈로그나 템플릿 ID 등의 입력을 변경하면 기존 seed의 결과가 달라질 수 있다.
 
@@ -90,6 +92,7 @@ classDiagram
 | `IRoomObjectiveRule`, `RoomObjectiveRule`, `RoomObjectiveCandidates` | [RoomObjectiveRule.cs](../../../../Assets/Scripts/Map/MapRuntime/RoomObjectives/RoomObjectiveRule.cs) | 규칙의 적용 가능 여부와 목표 생성 계약 및 실제 후보를 제공한다. 네 규칙 에셋은 상태를 보관하지 않는다. |
 | `RoomObjectiveSetup`, `BuiltRoom` | [RoomObjectiveSetup.cs](../../../../Assets/Scripts/Map/MapRuntime/RoomObjectives/RoomObjectiveSetup.cs), [MapBuilder.cs](../../../../Assets/Scripts/Map/RoomTemplates/MapBuilder.cs) | 실제 생성된 콘텐츠와 목표 후보를 연결하고 진행 출구를 선택한다. |
 | `RoomObjectiveController`, `RoomPresenceSensor`, `RoomObjectivePrototypeDisplay` | [RoomObjectives](../../../../Assets/Scripts/Map/MapRuntime/RoomObjectives/) | 목표를 집계해 문을 제어하고 Player 체류와 임시 목표 표시를 연결한다. 정식 UI는 별도 작업이다. |
+| `RoomExitGate` | [RoomExitGate.cs](../../../../Assets/Scripts/Map/MapRuntime/RoomObjectives/RoomExitGate.cs) | 주 출구에 배치되고 완료 시 Collider를 해제한 뒤 DOTween으로 페이드한다. 비활성화 시 진행 중인 Tween을 정리한다. |
 | `MapPlanner`, `MapRoomPlan`, `MapPlanValidator` | [MapPlanner.cs](../../../../Assets/Scripts/Map/RoomTemplates/MapPlanner.cs), [MapPlan.cs](../../../../Assets/Scripts/Map/RoomTemplates/MapPlan.cs), [MapPlanValidator.cs](../../../../Assets/Scripts/Map/RoomTemplates/MapPlanValidator.cs) | 내부 선택을 요청·기록하고 완성 계획을 검증한다. |
 | `MapBuilder`, `MapVisualBuilder` | [MapBuilder.cs](../../../../Assets/Scripts/Map/RoomTemplates/MapBuilder.cs), [MapVisualBuilder.cs](../../../../Assets/Scripts/Map/RoomTemplates/MapVisualBuilder.cs) | 확정된 내부 선택을 생성하고 선택적 공통 지형 그래픽을 만든다. |
 

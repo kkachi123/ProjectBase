@@ -32,7 +32,7 @@ namespace ProjectRE
                 foreach (BuiltRoom room in result.Rooms)
                 {
                     var objectives = room.Template.GetComponentInChildren<RoomObjectiveSetup>(true);
-                    if (objectives != null) objectives.Configure(room, result.Plan.Seed, context);
+                    if (objectives != null) objectives.Configure(room, result.Plan.Seed, context, settings.ExitGatePrefab);
                 }
                 info = (GeneratedMapInfo)context.AddComponent(result.Root, typeof(GeneratedMapInfo));
                 if (info == null) throw new System.InvalidOperationException("GeneratedMapInfo 생성 실패");

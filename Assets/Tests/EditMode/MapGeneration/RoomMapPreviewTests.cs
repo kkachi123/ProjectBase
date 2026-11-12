@@ -1,15 +1,43 @@
 namespace ProjectRE.MapGeneration.Tests
 {
     using System;
+    using System.Collections;
     using System.Collections.Generic;
     using System.Reflection;
     using NUnit.Framework;
     using UnityEditor;
     using UnityEngine;
     using UnityEngine.SceneManagement;
+    using UnityEngine.TestTools;
 
     public sealed class RoomMapPreviewTests
     {
+        [UnityTest]
+        public IEnumerator ExitGateCancelsFadeOnDisableAndStaysOpen()
+        {
+            yield return new EnterPlayMode();
+            GameObject instance = null;
+            try
+            {
+                var prefab = AssetDatabase.LoadAssetAtPath<GameObject>("Assets/Prefabs/Map/Progression/RoomExitGate.prefab");
+                instance = UnityEngine.Object.Instantiate(prefab);
+                var gateType = Type.GetType("ProjectRE.RoomExitGate, Assembly-CSharp");
+                var gate = instance.GetComponent(gateType);
+                var fade = gateType.GetField("fade", BindingFlags.NonPublic | BindingFlags.Instance);
+                gateType.GetMethod("Open").Invoke(gate, null);
+                Assert.That(instance.GetComponent<BoxCollider2D>().enabled, Is.False);
+                Assert.That(fade.GetValue(gate), Is.Not.Null);
+                instance.SetActive(false);
+                Assert.That(fade.GetValue(gate), Is.Null);
+                Assert.That(instance.GetComponent<SpriteRenderer>().color.a, Is.Zero);
+                instance.SetActive(true);
+                Assert.That(instance.GetComponent<BoxCollider2D>().enabled, Is.False);
+                Assert.That(instance.GetComponent<SpriteRenderer>().color.a, Is.Zero);
+            }
+            finally { if (instance != null) UnityEngine.Object.Destroy(instance); }
+            yield return new ExitPlayMode();
+        }
+
         [Test]
         public void ObjectiveRulesUseActualCandidatesAndKeepTheirStatePerRoom()
         {
@@ -143,31 +171,41 @@ namespace ProjectRE.MapGeneration.Tests
                 triggers.GetArrayElementAtIndex(0).FindPropertyRelative("id").stringValue = "always";
                 triggers.GetArrayElementAtIndex(0).FindPropertyRelative("objective").objectReferenceValue = trigger;
                 triggers.GetArrayElementAtIndex(0).FindPropertyRelative("chance").intValue = 100;
-                var gates = serialized.FindProperty("gates");
-                var directions = new[] { RoomOpening.North, RoomOpening.East, RoomOpening.South, RoomOpening.West };
-                var gateObjects = new List<GameObject>();
-                gates.arraySize = directions.Length;
-                for (int i = 0; i < directions.Length; i++)
-                {
-                    var gate = new GameObject(directions[i].ToString());
-                    gate.transform.SetParent(group.transform, false);
-                    gate.AddComponent<BoxCollider2D>();
-                    gate.SetActive(false);
-                    gateObjects.Add(gate);
-                    gates.GetArrayElementAtIndex(i).FindPropertyRelative("direction").intValue = (int)directions[i];
-                    gates.GetArrayElementAtIndex(i).FindPropertyRelative("gate").objectReferenceValue = gate;
-                }
                 serialized.ApplyModifiedPropertiesWithoutUndo();
                 var entry = exit == RoomOpening.South ? RoomOpening.North :
                     exit == RoomOpening.West ? RoomOpening.East : RoomOpening.West;
                 var branches = exit == RoomOpening.South ? RoomOpening.East | RoomOpening.West : RoomOpening.None;
                 var plan = new MapRoomPlan(Vector2Int.zero, "test", RoomType.Horizontal, entry | exit | branches,
                     entry, exit, branch: branches);
+                var prefab = AssetDatabase.LoadAssetAtPath<GameObject>("Assets/Prefabs/Map/Progression/RoomExitGate.prefab");
                 setup.GetType().GetMethod("Configure").Invoke(setup,
-                    new object[] { new BuiltRoom(plan, room, new Dictionary<int, GameObject>()), 42, new MapBuildContext() });
-                for (int i = 0; i < directions.Length; i++)
-                    Assert.That(gateObjects[i].activeSelf, Is.EqualTo(directions[i] == exit));
+                    new object[] { new BuiltRoom(plan, room, new Dictionary<int, GameObject>()), 42, new MapBuildContext(), prefab });
+                var gateType = Type.GetType("ProjectRE.RoomExitGate, Assembly-CSharp");
+                var gates = root.GetComponentsInChildren(gateType, true);
+                Assert.That(gates.Length, Is.EqualTo(1));
+                var gate = (Component)gates[0];
+                var expected = exit == RoomOpening.North ? new Vector3(15, 19.65f) :
+                    exit == RoomOpening.South ? new Vector3(15, .35f) :
+                    exit == RoomOpening.East ? new Vector3(19.65f, 6) : new Vector3(.35f, 6);
+                Assert.That(Vector3.Distance(gate.transform.localPosition, expected), Is.LessThan(.001f));
+                Assert.That(gate.transform.localEulerAngles.z, Is.EqualTo(exit == RoomOpening.North || exit == RoomOpening.South ? 90f : 0f).Within(.001f));
+                var barrier = gate.GetComponent<BoxCollider2D>();
+                Assert.That(barrier.enabled, Is.True);
+                Vector3 widthAxis = gate.transform.TransformVector(Vector3.right * barrier.size.x);
+                Vector3 heightAxis = gate.transform.TransformVector(Vector3.up * barrier.size.y);
+                float width = Mathf.Abs(widthAxis.x) + Mathf.Abs(heightAxis.x);
+                float height = Mathf.Abs(widthAxis.y) + Mathf.Abs(heightAxis.y);
+                bool horizontal = exit == RoomOpening.North || exit == RoomOpening.South;
+                Assert.That(width, Is.EqualTo(horizontal ? 4f : .5f).Within(.001f));
+                Assert.That(height, Is.EqualTo(horizontal ? .5f : 4f).Within(.001f));
+                var sprite = gate.GetComponent<SpriteRenderer>();
+                Assert.That(sprite.sprite.bounds.size.x, Is.EqualTo(barrier.size.x).Within(.001f));
+                Assert.That(sprite.sprite.bounds.size.y, Is.EqualTo(barrier.size.y).Within(.001f));
                 Assert.That(target.activeSelf, Is.True);
+                gateType.GetMethod("Open").Invoke(gate, null);
+                Assert.That(barrier.enabled, Is.False);
+                Assert.That(sprite.color.a, Is.Zero);
+                gateType.GetMethod("Open").Invoke(gate, null);
                 UnityEngine.Object.DestroyImmediate(rule);
             }
             finally { UnityEngine.Object.DestroyImmediate(root); }
@@ -200,11 +238,12 @@ namespace ProjectRE.MapGeneration.Tests
                     foreach (Component trigger in triggers) if (trigger.gameObject.activeSelf) activeTriggers++;
                     int monsters = setup.GetComponents(Type.GetType("ProjectRE.RoomMonsterObjective, Assembly-CSharp")).Length;
                     Assert.That(count, Is.EqualTo(activeTriggers + monsters));
-                    Assert.That(setup.Find("SouthGate").gameObject.activeSelf, Is.EqualTo(count > 0));
+                    bool gateExists = room.GetComponentInChildren(Type.GetType("ProjectRE.RoomExitGate, Assembly-CSharp"), true) != null;
+                    Assert.That(gateExists, Is.EqualTo(count > 0));
                     var monster = room.GetComponentInChildren(Type.GetType("ProjectRE.MonsterController, Assembly-CSharp"), true);
                     Assert.That(monsters == 0 || monster != null, Is.True);
                     Assert.That(activeTriggers == 0 || monsters == 0, Is.True);
-                    return $"{activeTriggers}:{monsters}:{count}:{setup.Find("SouthGate").gameObject.activeSelf}";
+                    return $"{activeTriggers}:{monsters}:{count}:{gateExists}";
                 }
                 finally { UnityEngine.Object.DestroyImmediate(root); }
             }
@@ -250,12 +289,13 @@ namespace ProjectRE.MapGeneration.Tests
                         var controller = group.GetComponent("RoomObjectiveController");
                         int count = (int)controller.GetType().GetProperty("TotalCount").GetValue(controller);
                         if (count == 0) continue;
-                        foreach (var direction in new[] { RoomOpening.West, RoomOpening.East, RoomOpening.South })
-                        {
-                            bool locked = group.Find(direction + "Gate").gameObject.activeSelf;
-                            Assert.That(locked, Is.EqualTo(direction == planned.Exit));
-                            if ((planned.Branch & direction) != 0) Assert.That(locked, Is.False);
-                        }
+                        var gates = room.GetComponentsInChildren(Type.GetType("ProjectRE.RoomExitGate, Assembly-CSharp"), true);
+                        Assert.That(gates.Length, Is.EqualTo(1));
+                        var position = ((Component)gates[0]).transform.localPosition;
+                        if (planned.Exit == RoomOpening.South) Assert.That(position.y, Is.EqualTo(.35f).Within(.001f));
+                        if (planned.Exit == RoomOpening.West) Assert.That(position.x, Is.EqualTo(.35f).Within(.001f));
+                        if (planned.Exit == RoomOpening.East) Assert.That(position.x, Is.EqualTo(19.65f).Within(.001f));
+                        Assert.That((planned.Branch & planned.Exit), Is.EqualTo(RoomOpening.None));
                         verified = true;
                     }
                 }
@@ -327,6 +367,46 @@ namespace ProjectRE.MapGeneration.Tests
                 Undo.PerformUndo();
                 Undo.PerformRedo();
                 Assert.That(HasMarker(), Is.True);
+            }
+            finally
+            {
+                if (window != null)
+                {
+                    var owned = (System.Collections.IEnumerable)window.GetType()
+                        .GetField("_ownedRoots", BindingFlags.Instance | BindingFlags.NonPublic).GetValue(window);
+                    foreach (GameObject root in owned)
+                        if (root != null) UnityEngine.Object.DestroyImmediate(root);
+                    UnityEngine.Object.DestroyImmediate(window);
+                }
+            }
+        }
+
+        [Test]
+        public void PreviewUndoRedoRestoresGeneratedExitGate()
+        {
+            EditorWindow window = null;
+            try
+            {
+                Type type = Type.GetType("ProjectRE.MapGeneration.Editor.RoomMapGeneratorWindow, Assembly-CSharp-Editor");
+                window = (EditorWindow)ScriptableObject.CreateInstance(type);
+                type.GetMethod("CreateGUI").Invoke(window, null);
+                const BindingFlags flags = BindingFlags.Instance | BindingFlags.NonPublic;
+                type.GetField("_settings", flags).SetValue(window,
+                    AssetDatabase.LoadAssetAtPath<MapPlanningSettings>("Assets/Prefabs/@Data/Map/MapPlanningSettings.asset"));
+                type.GetField("_seed", flags).SetValue(window, 0);
+                var owner = type.GetField("_previewRoot", flags);
+                type.GetMethod("Generate", flags).Invoke(window, null);
+                var gateType = Type.GetType("ProjectRE.RoomExitGate, Assembly-CSharp");
+                Component Gate() => ((GameObject)owner.GetValue(window)).GetComponentInChildren(gateType, true);
+                var gate = Gate();
+                Assert.That(gate, Is.Not.Null);
+                Vector3 before = gate.transform.position;
+                Undo.PerformUndo();
+                Undo.PerformRedo();
+                gate = Gate();
+                Assert.That(gate, Is.Not.Null);
+                Assert.That(Vector3.Distance(gate.transform.position, before), Is.LessThan(.001f));
+                Assert.That(gate.GetComponent<BoxCollider2D>().enabled, Is.True);
             }
             finally
             {

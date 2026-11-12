@@ -8,7 +8,7 @@ namespace ProjectRE
     public sealed class RoomObjectiveController : MonoBehaviour
     {
         [SerializeField] private RoomObjective[] objectives = Array.Empty<RoomObjective>();
-        [SerializeField] private GameObject exitGate;
+        [SerializeField] private RoomExitGate exitGate;
 
         public bool PlayerInside { get; private set; }
         public bool HasEntered { get; private set; }
@@ -18,7 +18,7 @@ namespace ProjectRE
         public bool IsComplete => CompletedCount == TotalCount;
         public event Action Changed;
 
-        public void Configure(IReadOnlyList<RoomObjective> selected, GameObject gate)
+        public void Configure(IReadOnlyList<RoomObjective> selected, RoomExitGate gate)
         {
             if (isActiveAndEnabled) throw new InvalidOperationException("비활성 방에서 목표를 구성해야 합니다.");
             objectives = new RoomObjective[selected.Count];
@@ -57,7 +57,7 @@ namespace ProjectRE
             CompletedCount = 0;
             foreach (var objective in objectives)
                 if (objective != null && objective.IsComplete) CompletedCount++;
-            if (exitGate != null) exitGate.SetActive(!IsComplete);
+            if (exitGate != null && IsComplete) exitGate.Open();
             Changed?.Invoke();
         }
     }

@@ -13,6 +13,7 @@ namespace ProjectRE.MapGeneration
         [SerializeField] private int _maxAttempts = 32;
         [SerializeField] private TileBase _visualGround;
         [SerializeField] private Material _visualGroundMaterial;
+        [SerializeField] private GameObject _exitGatePrefab;
 
         public RoomTemplateCatalog Catalog => _catalog;
         public int Width => _width;
@@ -20,6 +21,7 @@ namespace ProjectRE.MapGeneration
         public int MaxAttempts => _maxAttempts;
         public TileBase VisualGround => _visualGround;
         public Material VisualGroundMaterial => _visualGroundMaterial;
+        public GameObject ExitGatePrefab => _exitGatePrefab;
 
         public MapPlanningResult CreatePlan(int seed)
         {

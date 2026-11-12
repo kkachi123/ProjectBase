@@ -1,6 +1,6 @@
 # 방별 진행 조건 계획
 
-현재 구현과 이전 검증 범위를 기록한다. 목표 규칙과 자동 문의 다음 구현은 [프리팹 및 Chunk 리팩토링 계획](Prefab_Chunk_Refactoring_Plan.md)을 따른다.
+현재 구현과 검증 범위를 기록한다. 남은 작업은 [프리팹 및 Chunk 리팩토링 계획](Prefab_Chunk_Refactoring_Plan.md)을 따른다.
 
 ## 목표
 
