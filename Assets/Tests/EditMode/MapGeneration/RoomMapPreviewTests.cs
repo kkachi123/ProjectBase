@@ -56,8 +56,11 @@ namespace ProjectRE.MapGeneration.Tests
                     gates.GetArrayElementAtIndex(i).FindPropertyRelative("gate").objectReferenceValue = gate;
                 }
                 serialized.ApplyModifiedPropertiesWithoutUndo();
-                var entry = exit == RoomOpening.West ? RoomOpening.East : RoomOpening.West;
-                var plan = new MapRoomPlan(Vector2Int.zero, "test", RoomType.Horizontal, entry | exit, entry, exit);
+                var entry = exit == RoomOpening.South ? RoomOpening.North :
+                    exit == RoomOpening.West ? RoomOpening.East : RoomOpening.West;
+                var branches = exit == RoomOpening.South ? RoomOpening.East | RoomOpening.West : RoomOpening.None;
+                var plan = new MapRoomPlan(Vector2Int.zero, "test", RoomType.Horizontal, entry | exit | branches,
+                    entry, exit, branch: branches);
                 setup.GetType().GetMethod("Configure").Invoke(setup,
                     new object[] { new BuiltRoom(plan, room, new Dictionary<int, GameObject>()), 42, new MapBuildContext() });
                 for (int i = 0; i < directions.Length; i++)

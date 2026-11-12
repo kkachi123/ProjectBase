@@ -30,13 +30,60 @@ namespace ProjectRE.MapGeneration.Tests
                 Assert.That(branched.Plan.Goal, Is.EqualTo(plain.Plan.Goal));
                 Assert.That(MapPlanValidator.Validate(branched.Plan, withBranches), Is.Empty);
                 var optional = branched.Plan.Rooms.Where(r => r.IsOptional).ToArray();
-                Assert.That(optional.Length, Is.LessThanOrEqualTo(1));
+                Assert.That(optional.Length, Is.LessThanOrEqualTo(MapPlanner.MaxOptionalRooms));
                 if (optional.Length == 0) continue;
                 count++;
-                Assert.That(branched.Plan.Path.Contains(optional[0].Cell), Is.False);
-                Assert.That(branched.Plan.Rooms.Count(r => r.Branch != RoomOpening.None), Is.EqualTo(1));
+                Assert.That(optional.All(r => !branched.Plan.Path.Contains(r.Cell)), Is.True);
+                Assert.That(branched.Plan.Rooms.Sum(r => ((r.Branch & RoomOpening.East) != 0 ? 1 : 0) +
+                    ((r.Branch & RoomOpening.West) != 0 ? 1 : 0)), Is.EqualTo(optional.Length));
             }
             Assert.That(count, Is.GreaterThan(0));
+        }
+
+        [Test]
+        public void FourWayRoomConnectsTwoBranchesAndPlansRemainReproducible()
+        {
+            var settings = AssetDatabase.LoadAssetAtPath<MapPlanningSettings>(SettingsPath);
+            Assert.That(settings.Catalog.TryCreateSnapshot(out var original, out var error), Is.True, error);
+            var templates = new List<RoomTemplateSnapshot>(original);
+            var directions = new[] { RoomOpening.North, RoomOpening.East, RoomOpening.South, RoomOpening.West };
+            var passages = new List<RoomPassage>();
+            foreach (var entry in directions)
+            foreach (var exit in directions)
+                if (entry != exit) passages.Add(new RoomPassage { entry = entry, exit = exit });
+            templates.Add(new RoomTemplateSnapshot("test.four", RoomType.Down,
+                RoomOpening.North | RoomOpening.East | RoomOpening.South | RoomOpening.West, passages, true));
+            templates.Add(new RoomTemplateSnapshot("test.east.cap", RoomType.Horizontal, RoomOpening.East,
+                null, true, verifiedDeadEndReturns: RoomOpening.East));
+            int pairs = 0, multiple = 0;
+            for (int seed = 0; seed < 1000; seed++)
+            {
+                var first = MapPlanner.Create(4, 4, seed, 32, templates);
+                var repeat = MapPlanner.Create(4, 4, seed, 32, templates);
+                Assert.That(first.Success && repeat.Success, Is.True, $"seed {seed}: {first.Error}");
+                Assert.That(MapPlanValidator.Validate(first.Plan, templates), Is.Empty, $"seed {seed}");
+                Assert.That(first.Plan.Rooms.Select(r => (r.TemplateId, r.Branch, r.IsOptional)),
+                    Is.EqualTo(repeat.Plan.Rooms.Select(r => (r.TemplateId, r.Branch, r.IsOptional))), $"seed {seed}");
+                if (first.Plan.Rooms.Count(r => r.IsOptional) > 1) multiple++;
+                var four = first.Plan.Rooms.FirstOrDefault(r => r.TemplateId == "test.four");
+                if (four == null) continue;
+                pairs++;
+                Assert.That(four.Branch, Is.EqualTo(RoomOpening.East | RoomOpening.West));
+                Assert.That(first.Plan.Rooms.Count(r => r.IsOptional && r.Cell.y == four.Cell.y &&
+                    Mathf.Abs(r.Cell.x - four.Cell.x) == 1), Is.EqualTo(2));
+            }
+            Assert.That(multiple, Is.GreaterThan(0));
+            Assert.That(pairs, Is.GreaterThan(0));
+
+            var invalidPassages = passages.Where(p => !(p.entry == RoomOpening.East && p.exit == RoomOpening.West));
+            templates[templates.Count - 2] = new RoomTemplateSnapshot("test.four", RoomType.Down,
+                RoomOpening.North | RoomOpening.East | RoomOpening.South | RoomOpening.West, invalidPassages, true);
+            for (int seed = 0; seed < 500; seed++)
+            {
+                var result = MapPlanner.Create(4, 4, seed, 32, templates);
+                Assert.That(result.Success, Is.True, result.Error);
+                Assert.That(result.Plan.Rooms.Any(r => r.TemplateId == "test.four"), Is.False);
+            }
         }
 
         [Test]
@@ -62,20 +109,27 @@ namespace ProjectRE.MapGeneration.Tests
             }
         }
 
-        [TestCase(0, "item")]
-        public void BuilderPlacesSelectedPrefabInOptionalRoom(int seed, string id)
+        [Test]
+        public void BuilderPlacesSelectedPrefabInOptionalRoom()
         {
+            const string id = "item";
             var settings = AssetDatabase.LoadAssetAtPath<MapPlanningSettings>(SettingsPath);
             var goal = AssetDatabase.LoadAssetAtPath<GameObject>(GoalPath);
-            var plan = settings.CreatePlan(seed);
-            Assert.That(plan.Success, Is.True, plan.Error);
-            var side = plan.Plan.Rooms.Single(r => r.IsOptional);
-            Assert.That(side.Content.Single().OptionId, Is.EqualTo(id));
-            var built = MapBuilder.Build(plan.Plan, settings.Catalog, goal);
+            MapPlan plan = null;
+            MapRoomPlan side = null;
+            for (int seed = 0; seed < 500 && side == null; seed++)
+            {
+                var result = settings.CreatePlan(seed);
+                Assert.That(result.Success, Is.True, result.Error);
+                side = result.Plan.Rooms.FirstOrDefault(r => r.IsOptional && r.Content.Any(c => c.OptionId == id));
+                if (side != null) plan = result.Plan;
+            }
+            Assert.That(side, Is.Not.Null);
+            var built = MapBuilder.Build(plan, settings.Catalog, goal);
             Assert.That(built.Success, Is.True, built.Error);
             try
             {
-                int index = side.Cell.y * plan.Plan.Width + side.Cell.x;
+                int index = side.Cell.y * plan.Width + side.Cell.x;
                 var instance = built.Root.transform.GetChild(index).GetComponent<RoomTemplate>();
                 var slot = instance.ContentSettings.Single();
                 var option = slot.options.Single(o => o.id == id);

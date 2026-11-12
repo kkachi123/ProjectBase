@@ -5,7 +5,7 @@
 ## Map Assembly — 맵 조합
 
 - [x] **기본 맵 조합 구현:** 주 경로·방 선택, 계획 검증, 씬 생성과 Run 연결을 구현하고 대표 설정을 검증했다. 검증 범위와 조건은 [맵 조합 진행 현황](Map_Assembly/Map_Assembly_Progress.md)을 참고한다.
-- [ ] **여러 분기와 네 방향 방:** 접근 가능한 선택 방을 늘리는 연결 구조를 설계했다. 맵 조합 로직과 Variant 제작·검증은 [분기 확장 계획](Map_Assembly/Map_Branch_Expansion_Plan.md)에 따른다.
+- [ ] **여러 분기와 네 방향 방:** 선택 방을 최대 세 개 연결하는 조합 로직과 자동 테스트용 네 방향 방을 확인했다. 실제 Variant 제작과 Player 검증은 [분기 확장 계획](Map_Assembly/Map_Branch_Expansion_Plan.md)에 따른다.
 
 ## Chunk Generation — Chunk 내부 생성
 

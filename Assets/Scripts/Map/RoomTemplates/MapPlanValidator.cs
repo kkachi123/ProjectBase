@@ -158,7 +158,7 @@ namespace ProjectRE.MapGeneration
                             errors.Add($"함정 선택이 일치하지 않습니다: {room.Cell}");
                 }
             }
-            if (optionalCount > 1) errors.Add("선택 방은 최대 하나여야 합니다.");
+            if (optionalCount > MapPlanner.MaxOptionalRooms) errors.Add("선택 방이 최대 개수를 초과했습니다.");
             if (rooms.Count != plan.Width * plan.Height) errors.Add("격자의 방 개수가 일치하지 않습니다.");
             if (plan.Path.Count < 2) { errors.Add("주 경로가 너무 짧습니다."); return errors; }
             if (plan.Path[0].y != 0 || plan.Path[plan.Path.Count - 1].y != plan.Height - 1)
@@ -176,7 +176,7 @@ namespace ProjectRE.MapGeneration
                     exit == RoomOpening.North || entry == RoomOpening.South || room.Entry != entry || room.Exit != exit ||
                     room.IsOptional || room.Openings != (entry | exit | room.Branch) ||
                     (room.Branch != RoomOpening.None && (i == 0 || i == plan.Path.Count - 1 ||
-                     (room.Branch != RoomOpening.East && room.Branch != RoomOpening.West) || (room.Branch & (entry | exit)) != 0)))
+                     (room.Branch & ~(RoomOpening.East | RoomOpening.West)) != 0 || (room.Branch & (entry | exit)) != 0)))
                     errors.Add($"주 경로의 방향이나 출입구가 잘못됐습니다: {cell}");
                 if (!byId.TryGetValue(room.TemplateId ?? "", out var template)) continue;
                 if (i == 0 && (!template.HasPlayerStart || (template.VerifiedStartExits & exit) == 0 || plan.PlayerStart != RoomDirection.Origin(cell) + template.PlayerStart))
@@ -185,7 +185,7 @@ namespace ProjectRE.MapGeneration
                     errors.Add("Goal 마커가 없거나 위치가 다릅니다.");
                 if (i > 0 && i < plan.Path.Count - 1 && !template.Supports(entry, exit))
                     errors.Add($"검증된 통과 방향이 없습니다: {cell} {entry} → {exit}");
-                if (room.Branch != RoomOpening.None && (!template.Supports(entry, room.Branch) || !template.Supports(room.Branch, exit)))
+                if (room.Branch != RoomOpening.None && !MapPlanner.SupportsBranches(template, entry, exit, room.Branch))
                     errors.Add($"검증된 선택 방 연결이 없습니다: {cell}");
             }
             foreach (MapRoomPlan room in rooms.Values)
@@ -199,17 +199,17 @@ namespace ProjectRE.MapGeneration
                             !byId.TryGetValue(room.TemplateId ?? "", out var sideTemplate) ||
                             (sideTemplate.VerifiedDeadEndReturns & room.Entry) == 0 ||
                             !rooms.TryGetValue(room.Cell + RoomDirection.Offset(room.Entry), out var main) ||
-                            !seen.Contains(main.Cell) || main.Branch != RoomDirection.Opposite(room.Entry))
+                            !seen.Contains(main.Cell) || (main.Branch & RoomDirection.Opposite(room.Entry)) == 0)
                             errors.Add($"선택 방의 왕복 연결이 잘못됐습니다: {room.Cell}");
                     }
                     else if (room.Openings != RoomOpening.None || room.Entry != RoomOpening.None || room.Exit != RoomOpening.None || room.Branch != RoomOpening.None)
                         errors.Add($"경로 밖 방에 열린 출입구가 있습니다: {room.Cell}");
                 }
-                if (room.Branch != RoomOpening.None &&
-                    (!rooms.TryGetValue(room.Cell + RoomDirection.Offset(room.Branch), out var branchRoom) || !branchRoom.IsOptional))
-                    errors.Add($"선택 방이 없습니다: {room.Cell}");
                 foreach (RoomOpening side in RoomDirection.All)
                 {
+                    if ((room.Branch & side) != 0 &&
+                        (!rooms.TryGetValue(room.Cell + RoomDirection.Offset(side), out var branchRoom) || !branchRoom.IsOptional))
+                        errors.Add($"선택 방이 없습니다: {room.Cell} {side}");
                     if ((room.Openings & side) == 0) continue;
                     if (!rooms.TryGetValue(room.Cell + RoomDirection.Offset(side), out MapRoomPlan neighbor) ||
                         (neighbor.Openings & RoomDirection.Opposite(side)) == 0)

@@ -11,26 +11,34 @@ namespace ProjectRE.MapGeneration.Tests
         private const string SettingsPath = "Assets/Prefabs/@Data/Map/MapPlanningSettings.asset";
         private const string GoalPath = "Assets/Prefabs/Map/GridChunk/@BackGroundPrefab/GoalTrigger/EndLight-EndTrigger.prefab";
 
-        [TestCase(264, "item")]
-        [TestCase(151, "")]
-        [TestCase(337, "item")]
-        public void RuinedCourtBuildsOptionalBranchWithSelectedContent(int seed, string optionId)
+        [TestCase("item")]
+        [TestCase("")]
+        public void RuinedCourtBuildsOptionalBranchWithSelectedContent(string optionId)
         {
             var settings = AssetDatabase.LoadAssetAtPath<MapPlanningSettings>(SettingsPath);
             var goal = AssetDatabase.LoadAssetAtPath<GameObject>(GoalPath);
-            var result = MapGenerator.Generate(settings, seed, goal);
+            MapPlan selected = null;
+            MapRoomPlan planned = null;
+            for (int seed = 0; seed < 500 && planned == null; seed++)
+            {
+                var plan = settings.CreatePlan(seed);
+                Assert.That(plan.Success, Is.True, plan.Error);
+                foreach (var candidate in plan.Plan.Rooms)
+                    if (candidate.IsOptional && candidate.TemplateId == "production.optional.ruined_court_west" &&
+                        candidate.Content.Count == 1 && candidate.Content[0].OptionId == optionId)
+                    { selected = plan.Plan; planned = candidate; break; }
+            }
+            Assert.That(planned, Is.Not.Null);
+            var result = MapBuilder.Build(selected, settings.Catalog, goal, visualGround: settings.VisualGround);
             try
             {
                 Assert.That(result.Success, Is.True, result.Error);
-                MapRoomPlan planned = null;
-                foreach (var candidate in result.Plan.Rooms)
-                    if (candidate.IsOptional && candidate.TemplateId == "production.optional.ruined_court_west") planned = candidate;
-                Assert.That(planned, Is.Not.Null);
                 Assert.That(planned.Entry, Is.EqualTo(RoomOpening.West));
                 Assert.That(planned.Content.Count, Is.EqualTo(1));
                 Assert.That(planned.Content[0].OptionId, Is.EqualTo(optionId));
                 var rooms = result.Root.GetComponentsInChildren<RoomTemplate>(true);
-                var room = System.Array.Find(rooms, candidate => candidate.TemplateId == planned.TemplateId);
+                var room = System.Array.Find(rooms, candidate => candidate.transform.localPosition ==
+                    new Vector3(planned.Cell.x * RoomTemplate.RoomSize, -planned.Cell.y * RoomTemplate.RoomSize, 0));
                 Assert.That(room, Is.Not.Null);
                 Assert.That(room.VerifiedDeadEndReturns, Is.EqualTo(RoomOpening.West));
                 Assert.That(room.OptionalTarget, Is.Not.Null);
@@ -389,9 +397,16 @@ namespace ProjectRE.MapGeneration.Tests
         public void RuinedGalleryBuildsBetweenDescentAndWesternRoom()
         {
             var settings = AssetDatabase.LoadAssetAtPath<MapPlanningSettings>(SettingsPath);
-            var plan = settings.CreatePlan(0);
-            Assert.That(plan.Success, Is.True, plan.Error);
-            var build = MapBuilder.Build(plan.Plan, settings.Catalog, AssetDatabase.LoadAssetAtPath<GameObject>(GoalPath),
+            MapPlan plan = null;
+            for (int seed = 0; seed < 500 && plan == null; seed++)
+            {
+                var result = settings.CreatePlan(seed);
+                Assert.That(result.Success, Is.True, result.Error);
+                foreach (var room in result.Plan.Rooms)
+                    if (room.TemplateId == "production.arrival.northwest_gallery") { plan = result.Plan; break; }
+            }
+            Assert.That(plan, Is.Not.Null);
+            var build = MapBuilder.Build(plan, settings.Catalog, AssetDatabase.LoadAssetAtPath<GameObject>(GoalPath),
                 visualGround: settings.VisualGround);
             try
             {

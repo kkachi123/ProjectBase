@@ -7,6 +7,7 @@ namespace ProjectRE.MapGeneration
     /// <summary>좌우 이동과 하강으로 경로를 만들고 검증된 템플릿을 선택한다.</summary>
     public static class MapPlanner
     {
+        public const int MaxOptionalRooms = 3;
         public static MapPlanningResult Create(int width, int height, int seed, int maxAttempts,
             IReadOnlyList<RoomTemplateSnapshot> templates)
         {
@@ -87,7 +88,7 @@ namespace ProjectRE.MapGeneration
                 if (isStart) start = RoomDirection.Origin(cell) + chosen.PlayerStart;
                 if (isGoal) goal = RoomDirection.Origin(cell) + chosen.Goal;
             }
-            AddOptionalRoom(width, height, seed, path, indexes, templates, rooms);
+            AddOptionalRooms(width, height, seed, path, indexes, templates, rooms);
             var byId = new Dictionary<string, RoomTemplateSnapshot>(StringComparer.Ordinal);
             foreach (var template in templates) byId.Add(template.Id, template);
             for (int i = 0; i < rooms.Count; i++)
@@ -105,59 +106,86 @@ namespace ProjectRE.MapGeneration
             return true;
         }
 
-        // 필수 경로를 먼저 확정하고, 검증된 왕복 연결이 있는 경우에만 막다른 방 하나를 추가한다.
-        private static void AddOptionalRoom(int width, int height, int seed, List<Vector2Int> path,
+        // 필수 경로에 검증된 막다른 방을 연결한다.
+        private static void AddOptionalRooms(int width, int height, int seed, List<Vector2Int> path,
             Dictionary<Vector2Int, int> pathIndexes, List<RoomTemplateSnapshot> templates, List<MapRoomPlan> rooms)
         {
-            var choices = new List<(int mainIndex, int sideIndex, RoomOpening direction, RoomTemplateSnapshot main, RoomTemplateSnapshot side)>();
-            for (int i = 1; i < path.Count - 1; i++)
-            {
-                Vector2Int cell = path[i];
-                MapRoomPlan main = rooms[cell.y * width + cell.x];
-                foreach (RoomOpening direction in new[] { RoomOpening.East, RoomOpening.West })
-                {
-                    if ((main.Openings & direction) != 0) continue;
-                    Vector2Int sideCell = cell + RoomDirection.Offset(direction);
-                    if (sideCell.x < 0 || sideCell.x >= width || sideCell.y < 0 || sideCell.y >= height || pathIndexes.ContainsKey(sideCell)) continue;
-                    RoomOpening sideEntry = RoomDirection.Opposite(direction);
-                    foreach (RoomTemplateSnapshot candidate in templates)
-                    {
-                        if (candidate.Openings != (main.Openings | direction) ||
-                            !candidate.Supports(main.Entry, main.Exit) || !candidate.Supports(main.Entry, direction) ||
-                            !candidate.Supports(direction, main.Exit)) continue;
-                        foreach (RoomTemplateSnapshot side in templates)
-                            if (side.Openings == sideEntry && (side.VerifiedDeadEndReturns & sideEntry) != 0)
-                                choices.Add((cell.y * width + cell.x, sideCell.y * width + sideCell.x, direction, candidate, side));
-                    }
-                }
-            }
-            if (choices.Count == 0) return;
-            var locations = new List<(int mainIndex, int sideIndex, RoomOpening direction)>();
-            foreach (var candidate in choices)
-            {
-                var location = (candidate.mainIndex, candidate.sideIndex, candidate.direction);
-                if (!locations.Contains(location)) locations.Add(location);
-            }
             var branchRandom = new StableRandom(unchecked(seed ^ (int)0x6A09E667u));
             var branchVariantRandom = new StableRandom(MixSeed(seed, 0xBB67AE85u));
-            var chosenLocation = locations[branchRandom.Next(locations.Count)];
-            var mainCandidates = new List<RoomTemplateSnapshot>();
-            var sideCandidates = new List<RoomTemplateSnapshot>();
-            foreach (var candidate in choices)
+            int added = 0;
+            while (added < MaxOptionalRooms)
             {
-                if (candidate.mainIndex != chosenLocation.mainIndex || candidate.sideIndex != chosenLocation.sideIndex ||
-                    candidate.direction != chosenLocation.direction) continue;
-                if (!mainCandidates.Contains(candidate.main)) mainCandidates.Add(candidate.main);
-                if (!sideCandidates.Contains(candidate.side)) sideCandidates.Add(candidate.side);
+                var pairs = new List<(int index, RoomOpening directions)>();
+                var singles = new List<(int index, RoomOpening directions)>();
+                for (int i = 1; i < path.Count - 1; i++)
+                {
+                    Vector2Int cell = path[i];
+                    int index = cell.y * width + cell.x;
+                    MapRoomPlan main = rooms[index];
+                    if (main.Branch != RoomOpening.None) continue;
+                    foreach (RoomOpening directions in new[] { RoomOpening.East | RoomOpening.West, RoomOpening.East, RoomOpening.West })
+                    {
+                        bool pair = directions == (RoomOpening.East | RoomOpening.West);
+                        if ((directions & main.Openings) != 0 || (pair && added + 2 > MaxOptionalRooms)) continue;
+                        bool valid = true;
+                        foreach (RoomOpening direction in new[] { RoomOpening.East, RoomOpening.West })
+                        {
+                            if ((directions & direction) == 0) continue;
+                            Vector2Int sideCell = cell + RoomDirection.Offset(direction);
+                            if (sideCell.x < 0 || sideCell.x >= width || sideCell.y < 0 || sideCell.y >= height ||
+                                pathIndexes.ContainsKey(sideCell) || rooms[sideCell.y * width + sideCell.x].IsOptional ||
+                                SideCandidates(templates, RoomDirection.Opposite(direction)).Count == 0)
+                            { valid = false; break; }
+                        }
+                        if (!valid || MainCandidates(templates, main, directions).Count == 0) continue;
+                        (pair ? pairs : singles).Add((index, directions));
+                    }
+                }
+                var choices = pairs.Count > 0 ? pairs : singles;
+                if (choices.Count == 0) break;
+                var choice = choices[branchRandom.Next(choices.Count)];
+                MapRoomPlan oldMain = rooms[choice.index];
+                RoomTemplateSnapshot chosenMain = ChooseGrouped(MainCandidates(templates, oldMain, choice.directions), branchRandom, branchVariantRandom);
+                rooms[choice.index] = new MapRoomPlan(oldMain.Cell, chosenMain.Id, chosenMain.Type, chosenMain.Openings,
+                    oldMain.Entry, oldMain.Exit, RoomTerrainPlanner.Select(seed, oldMain.Cell, chosenMain), choice.directions);
+                foreach (RoomOpening direction in new[] { RoomOpening.East, RoomOpening.West })
+                {
+                    if ((choice.directions & direction) == 0) continue;
+                    Vector2Int sideCell = oldMain.Cell + RoomDirection.Offset(direction);
+                    int sideIndex = sideCell.y * width + sideCell.x;
+                    RoomOpening back = RoomDirection.Opposite(direction);
+                    RoomTemplateSnapshot chosenSide = ChooseGrouped(SideCandidates(templates, back), branchRandom, branchVariantRandom);
+                    rooms[sideIndex] = new MapRoomPlan(sideCell, chosenSide.Id, chosenSide.Type, chosenSide.Openings,
+                        back, back, RoomTerrainPlanner.Select(seed, sideCell, chosenSide), isOptional: true);
+                    added++;
+                }
             }
-            RoomTemplateSnapshot chosenMain = ChooseGrouped(mainCandidates, branchRandom, branchVariantRandom);
-            RoomTemplateSnapshot chosenSide = ChooseGrouped(sideCandidates, branchRandom, branchVariantRandom);
-            MapRoomPlan oldMain = rooms[chosenLocation.mainIndex], oldSide = rooms[chosenLocation.sideIndex];
-            RoomOpening back = RoomDirection.Opposite(chosenLocation.direction);
-            rooms[chosenLocation.mainIndex] = new MapRoomPlan(oldMain.Cell, chosenMain.Id, chosenMain.Type, chosenMain.Openings,
-                oldMain.Entry, oldMain.Exit, RoomTerrainPlanner.Select(seed, oldMain.Cell, chosenMain), chosenLocation.direction);
-            rooms[chosenLocation.sideIndex] = new MapRoomPlan(oldSide.Cell, chosenSide.Id, chosenSide.Type, chosenSide.Openings,
-                back, back, RoomTerrainPlanner.Select(seed, oldSide.Cell, chosenSide), isOptional: true);
+        }
+
+        private static List<RoomTemplateSnapshot> MainCandidates(List<RoomTemplateSnapshot> templates, MapRoomPlan main, RoomOpening directions)
+        {
+            var result = new List<RoomTemplateSnapshot>();
+            foreach (var candidate in templates)
+                if (candidate.Openings == (main.Entry | main.Exit | directions) && SupportsBranches(candidate, main.Entry, main.Exit, directions))
+                    result.Add(candidate);
+            return result;
+        }
+
+        private static List<RoomTemplateSnapshot> SideCandidates(List<RoomTemplateSnapshot> templates, RoomOpening entry)
+        {
+            var result = new List<RoomTemplateSnapshot>();
+            foreach (var side in templates)
+                if (side.Openings == entry && (side.VerifiedDeadEndReturns & entry) != 0) result.Add(side);
+            return result;
+        }
+
+        internal static bool SupportsBranches(RoomTemplateSnapshot template, RoomOpening entry, RoomOpening exit, RoomOpening branches)
+        {
+            if (!template.Supports(entry, exit)) return false;
+            foreach (RoomOpening direction in new[] { RoomOpening.East, RoomOpening.West })
+                if ((branches & direction) != 0 && (!template.Supports(entry, direction) || !template.Supports(direction, exit))) return false;
+            return branches != (RoomOpening.East | RoomOpening.West) ||
+                (template.Supports(RoomOpening.East, RoomOpening.West) && template.Supports(RoomOpening.West, RoomOpening.East));
         }
 
         private static RoomTemplateSnapshot ChooseGrouped(List<RoomTemplateSnapshot> candidates,
