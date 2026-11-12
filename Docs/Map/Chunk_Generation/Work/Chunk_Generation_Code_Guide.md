@@ -6,7 +6,7 @@
 
 `RoomTemplate`은 미리 제작한 기본 방을 보관한다. 생성 시 등록된 변형 영역마다 패턴 하나 또는 빈 패턴을 고르고, 지정된 확률 셀의 타일 채움 여부를 결정한다. 임의의 모든 셀을 자동으로 채우지는 않는다. 콘텐츠는 주 경로의 중간 방과 선택 방에서 최종 방 역할에 맞게 결정한다.
 
-내부 지형 변형은 `sample.horizontal`의 고정 발판 패턴과 확률 셀, `NorthWest_Tiered`의 낙하 발판 패턴에 설정돼 있다. 기존 `NovaPrototype` 방들은 독립 시제품이며 실제 카탈로그의 Variant는 Base 설정을 상속한다. 검증 범위는 [진행 현황](../Chunk_Generation_Progress.md)을 따른다.
+내부 지형 변형은 `sample.horizontal`의 고정 발판 패턴과 확률 셀, `NorthWest_Tiered`의 낙하 발판 패턴에 설정돼 있다. 실제 카탈로그의 Variant는 Base 설정을 상속한다. 검증 범위는 [진행 현황](../Chunk_Generation_Progress.md)을 따른다.
 
 방 목표는 `WestSouth` Base와 상속 Variant에 설정돼 있다. `RoomMapFactory`가 생성된 방과 콘텐츠 정보를 `RoomObjectiveSetup`에 전달하면 실제 몬스터와 seed로 선택된 트리거를 목표로 연결한다.
 

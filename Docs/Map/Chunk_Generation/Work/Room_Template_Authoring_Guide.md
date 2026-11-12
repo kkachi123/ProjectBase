@@ -2,7 +2,7 @@
 
 내부 패턴·확률 셀·콘텐츠의 코드 흐름은 [Chunk 내부 조합 코드 구조](Chunk_Generation_Code_Guide.md)를 참고한다. 지형 그래픽과 배경·장식의 구체적인 배치 및 정렬 기준은 [방 지형·배경·장식 제작 규칙](Room_Art_Authoring_Guide.md)을 따른다.
 
-`NovaPrototype`의 시제품은 독립 프리팹이다. 기본 카탈로그에는 시제품에 대응하는 Base 상속 방과 닫힌 방·분기용 `NovaVariants`가 등록돼 있다. 검증 범위는 [진행 현황](../Chunk_Generation_Progress.md)을 따른다.
+기본 카탈로그에는 Base 상속 방과 닫힌 방·분기용 `NovaVariants`가 등록돼 있다. 검증 범위는 [진행 현황](../Chunk_Generation_Progress.md)을 따른다.
 
 ## 기본 구성
 
@@ -63,35 +63,35 @@
 
 ### Nova 시제품 방
 
-아래는 독립 시제품의 지형과 당시 검증 기록이다. 현재 생성되는 방은 Base를 상속한 `NovaVariants`이며 시제품과 지형·seed별 배치가 다를 수 있다. 현재 설정과 검증 범위는 [진행 현황](../Chunk_Generation_Progress.md)을 따른다.
+아래는 삭제된 독립 시제품의 지형과 당시 검증 기록이다. 현재 생성되는 방은 Base를 상속한 `NovaVariants`이며 시제품과 지형·seed별 배치가 다를 수 있다. 현재 설정과 검증 범위는 [진행 현황](../Chunk_Generation_Progress.md)을 따른다.
 
-[Start_ForestGateway](../../../../Assets/Prefabs/Map/RoomTemplates/NovaPrototype/Start_ForestGateway.prefab)은 동쪽 출구를 가진 시작 전용 방이다. Demo 1·2의 숲과 아치를 참고해 시작 위치 주변을 구성했다. 실제 Player가 시작 마커에서 생성된 뒤 단차를 넘어 동쪽 이웃 방에 진입하는 것을 확인했다. Goal·선택 방 마커와 내부 랜덤 패턴은 없다.
+Start_ForestGateway은 동쪽 출구를 가진 시작 전용 방이다. Demo 1·2의 숲과 아치를 참고해 시작 위치 주변을 구성했다. 실제 Player가 시작 마커에서 생성된 뒤 단차를 넘어 동쪽 이웃 방에 진입하는 것을 확인했다. Goal·선택 방 마커와 내부 랜덤 패턴은 없다.
 
-[Start_ShrineWest](../../../../Assets/Prefabs/Map/RoomTemplates/NovaPrototype/Start_ShrineWest.prefab)는 서쪽 출구를 가진 시작 전용 방이다. Demo 2의 사당 조형물과 아치를 참고해 배경을 구성했다. 실제 Player가 시작 마커에서 단차를 넘어 서쪽 이웃 방에 진입하고 착지하는 것을 확인했다. Goal·선택 방 마커와 내부 랜덤 패턴은 없다.
+Start_ShrineWest는 서쪽 출구를 가진 시작 전용 방이다. Demo 2의 사당 조형물과 아치를 참고해 배경을 구성했다. 실제 Player가 시작 마커에서 단차를 넘어 서쪽 이웃 방에 진입하고 착지하는 것을 확인했다. Goal·선택 방 마커와 내부 랜덤 패턴은 없다.
 
-[Start_ForestDrop](../../../../Assets/Prefabs/Map/RoomTemplates/NovaPrototype/Start_ForestDrop.prefab)은 남쪽 출구를 가진 시작 전용 방이다. Demo 1의 숲과 울타리를 참고해 배경을 구성했다. 실제 Player가 시작 마커에서 단차를 넘어 아래 방의 발판에 착지하는 것을 확인했다. Goal·선택 방 마커와 내부 랜덤 패턴은 없다.
+Start_ForestDrop은 남쪽 출구를 가진 시작 전용 방이다. Demo 1의 숲과 울타리를 참고해 배경을 구성했다. 실제 Player가 시작 마커에서 단차를 넘어 아래 방의 발판에 착지하는 것을 확인했다. Goal·선택 방 마커와 내부 랜덤 패턴은 없다.
 
-[Goal_RuinedSanctuary](../../../../Assets/Prefabs/Map/RoomTemplates/NovaPrototype/Goal_RuinedSanctuary.prefab)는 서쪽 진입구를 가진 도착 전용 방이다. Demo 2의 숲과 아치를 참고해 Goal 주변을 구성했다. 실제 Player가 서쪽 이웃 방에서 진입해 Goal 트리거에 접촉하는 것을 확인했다. 시작·선택 방 마커와 내부 랜덤 패턴은 없다.
+Goal_RuinedSanctuary는 서쪽 진입구를 가진 도착 전용 방이다. Demo 2의 숲과 아치를 참고해 Goal 주변을 구성했다. 실제 Player가 서쪽 이웃 방에서 진입해 Goal 트리거에 접촉하는 것을 확인했다. 시작·선택 방 마커와 내부 랜덤 패턴은 없다.
 
-[Goal_ForestDescent](../../../../Assets/Prefabs/Map/RoomTemplates/NovaPrototype/Goal_ForestDescent.prefab)는 북쪽 진입구와 중간 착지 발판을 가진 도착 전용 방이다. Demo 3의 수관과 하층 식생에 폐허 조형물을 더했다. 실제 Player가 위쪽 방에서 발판으로 내려와 Goal 트리거에 접촉한 뒤 바닥에 착지하는 것을 확인했다. 시작·선택 방 마커와 내부 랜덤 패턴은 없다.
+Goal_ForestDescent는 북쪽 진입구와 중간 착지 발판을 가진 도착 전용 방이다. Demo 3의 수관과 하층 식생에 폐허 조형물을 더했다. 실제 Player가 위쪽 방에서 발판으로 내려와 Goal 트리거에 접촉한 뒤 바닥에 착지하는 것을 확인했다. 시작·선택 방 마커와 내부 랜덤 패턴은 없다.
 
-[Goal_OvergrownCourt](../../../../Assets/Prefabs/Map/RoomTemplates/NovaPrototype/Goal_OvergrownCourt.prefab)는 동쪽 진입구와 낮은 단차를 가진 도착 전용 방이다. Demo 1의 울타리와 나무를 참고해 폐허 정원을 구성했다. 실제 Player가 동쪽 이웃 방에서 진입해 단차를 넘고 Goal 트리거에 접촉하는 것을 확인했다. 시작·선택 방 마커와 내부 랜덤 패턴은 없다.
+Goal_OvergrownCourt는 동쪽 진입구와 낮은 단차를 가진 도착 전용 방이다. Demo 1의 울타리와 나무를 참고해 폐허 정원을 구성했다. 실제 Player가 동쪽 이웃 방에서 진입해 단차를 넘고 Goal 트리거에 접촉하는 것을 확인했다. 시작·선택 방 마커와 내부 랜덤 패턴은 없다.
 
-[Optional_RuinedCourt](../../../../Assets/Prefabs/Map/RoomTemplates/NovaPrototype/Optional_RuinedCourt.prefab)는 서쪽 입구와 콘텐츠 슬롯을 가진 막다른 선택 방이다. Demo 1의 나무·울타리와 폐허 조형물을 참고했다. 현재 선택 방에는 아이템 또는 빈 상태가 선택된다. Base를 상속한 [Nova Variant](../../../../Assets/Prefabs/Map/RoomTemplates/NovaVariants/Optional_RuinedCourt.prefab)는 생성 맵에서 실제 Player가 아이템을 획득하고 서쪽으로 복귀하는 것을 확인했다.
+Optional_RuinedCourt는 서쪽 입구와 콘텐츠 슬롯을 가진 막다른 선택 방이다. Demo 1의 나무·울타리와 폐허 조형물을 참고했다. 현재 선택 방에는 아이템 또는 빈 상태가 선택된다. Base를 상속한 [Nova Variant](../../../../Assets/Prefabs/Map/RoomTemplates/NovaVariants/Optional_RuinedCourt.prefab)는 생성 맵에서 실제 Player가 아이템을 획득하고 서쪽으로 복귀하는 것을 확인했다.
 
-[Horizontal_Step](../../../../Assets/Prefabs/Map/RoomTemplates/NovaPrototype/Horizontal_Step.prefab)은 중앙에 세 셀 폭의 한 단 지형과 수관·나무·하층 수풀로 구성한 숲 배경을 가진 좌우 통로 방이다. 서→동과 동→서 통과를 실제 Player의 이동·점프로 확인했다. 시작·Goal 마커의 연결 방향은 검증하지 않았으므로 시작·Goal 방으로 사용하지 않는다. 내부 랜덤 패턴은 설정하지 않았다.
+Horizontal_Step은 중앙에 세 셀 폭의 한 단 지형과 수관·나무·하층 수풀로 구성한 숲 배경을 가진 좌우 통로 방이다. 서→동과 동→서 통과를 실제 Player의 이동·점프로 확인했다. 시작·Goal 마커의 연결 방향은 검증하지 않았으므로 시작·Goal 방으로 사용하지 않는다. 내부 랜덤 패턴은 설정하지 않았다.
 
-[Horizontal_Shrine](../../../../Assets/Prefabs/Map/RoomTemplates/NovaPrototype/Horizontal_Shrine.prefab)은 같은 지형과 통과 조건을 사용하는 사당 테마 방이다. Demo 2의 아치·조형물·받침 배치를 참고했으며 조형물은 상호작용 기능이 없는 배경 Sprite다. 숲 방과 지형 타일·Collider·통과 방향이 같은지 비교하고 장식에 Collider가 없음을 확인했다. 실제 Player로 서→동, 동→서 점프 통과와 마지막 착지를 확인했다.
+Horizontal_Shrine은 같은 지형과 통과 조건을 사용하는 사당 테마 방이다. Demo 2의 아치·조형물·받침 배치를 참고했으며 조형물은 상호작용 기능이 없는 배경 Sprite다. 숲 방과 지형 타일·Collider·통과 방향이 같은지 비교하고 장식에 Collider가 없음을 확인했다. 실제 Player로 서→동, 동→서 점프 통과와 마지막 착지를 확인했다.
 
-[Down_ForestStep](../../../../Assets/Prefabs/Map/RoomTemplates/NovaPrototype/Down_ForestStep.prefab)은 서쪽으로 진입해 중앙 단차를 넘고 남쪽으로 하강하는 숲 방이다. 통과 방향은 서→남 한 가지다. 실제 Player가 점프해 단차를 넘고 남쪽 출입구를 통과해 아래 방에 착지한 것을 확인했다. 시작·Goal 마커와 내부 랜덤 패턴은 없다.
+Down_ForestStep은 서쪽으로 진입해 중앙 단차를 넘고 남쪽으로 하강하는 숲 방이다. 통과 방향은 서→남 한 가지다. 실제 Player가 점프해 단차를 넘고 남쪽 출입구를 통과해 아래 방에 착지한 것을 확인했다. 시작·Goal 마커와 내부 랜덤 패턴은 없다.
 
-[Arrival_RuinedGallery](../../../../Assets/Prefabs/Map/RoomTemplates/NovaPrototype/Arrival_RuinedGallery.prefab)는 북쪽에서 내려와 중간 발판에 착지하고 서쪽으로 이동하는 폐허 회랑 방이다. Demo 1·2의 사당 조형물을 참고해 부서진 기둥과 수풀을 배치했다. 통과 방향은 북→서 한 가지이며 실제 Player의 발판 착지와 서쪽 방 진입을 확인했다. 시작·Goal 마커와 내부 랜덤 패턴은 없다.
+Arrival_RuinedGallery는 북쪽에서 내려와 중간 발판에 착지하고 서쪽으로 이동하는 폐허 회랑 방이다. Demo 1·2의 사당 조형물을 참고해 부서진 기둥과 수풀을 배치했다. 통과 방향은 북→서 한 가지이며 실제 Player의 발판 착지와 서쪽 방 진입을 확인했다. 시작·Goal 마커와 내부 랜덤 패턴은 없다.
 
-[Arrival_ShrineAtrium](../../../../Assets/Prefabs/Map/RoomTemplates/NovaPrototype/Arrival_ShrineAtrium.prefab)은 북쪽에서 내려와 중간 발판에 착지하고 동쪽으로 이동하는 방이다. Demo 2의 아치와 조형물 배치를 참고해 사당 배경을 구성했다. 실제 Player가 위쪽 방에서 내려와 발판에 착지한 뒤 동쪽 방으로 이동하는 것을 확인했다. 시작·Goal 마커와 내부 랜덤 패턴은 없다.
+Arrival_ShrineAtrium은 북쪽에서 내려와 중간 발판에 착지하고 동쪽으로 이동하는 방이다. Demo 2의 아치와 조형물 배치를 참고해 사당 배경을 구성했다. 실제 Player가 위쪽 방에서 내려와 발판에 착지한 뒤 동쪽 방으로 이동하는 것을 확인했다. 시작·Goal 마커와 내부 랜덤 패턴은 없다.
 
-[Down_RuinedOverlook](../../../../Assets/Prefabs/Map/RoomTemplates/NovaPrototype/Down_RuinedOverlook.prefab)은 동쪽으로 진입해 단차를 넘고 남쪽으로 하강하는 방이다. Demo 2·3의 숲과 난간을 참고해 수관·나무·수풀과 부서진 기둥으로 전망대 배경을 구성했다. 실제 Player로 동→남 점프·하강과 아래 발판 착지를 확인했다. 시작·Goal 마커와 내부 랜덤 패턴은 없다.
+Down_RuinedOverlook은 동쪽으로 진입해 단차를 넘고 남쪽으로 하강하는 방이다. Demo 2·3의 숲과 난간을 참고해 수관·나무·수풀과 부서진 기둥으로 전망대 배경을 구성했다. 실제 Player로 동→남 점프·하강과 아래 발판 착지를 확인했다. 시작·Goal 마커와 내부 랜덤 패턴은 없다.
 
-[DownThrough_RuinedShaft](../../../../Assets/Prefabs/Map/RoomTemplates/NovaPrototype/DownThrough_RuinedShaft.prefab)은 북쪽 발판에 착지한 뒤 오른쪽으로 내려와 남쪽 출입구로 이동하는 연속 하강 방이다. Demo 1·3을 참고해 수관과 폐허 조형물·아치를 배치했다. 실제 Player로 북→남 이동과 아래 발판 착지를 확인했다. 시작·Goal 마커와 내부 랜덤 패턴은 없다.
+DownThrough_RuinedShaft은 북쪽 발판에 착지한 뒤 오른쪽으로 내려와 남쪽 출입구로 이동하는 연속 하강 방이다. Demo 1·3을 참고해 수관과 폐허 조형물·아치를 배치했다. 실제 Player로 북→남 이동과 아래 발판 착지를 확인했다. 시작·Goal 마커와 내부 랜덤 패턴은 없다.
 
 [기본 설정](../../../../Assets/Prefabs/@Data/Map/MapPlanningSettings.asset)은 Nova Variant 카탈로그와 지형 RuleTile을 사용한다. 아래 이미지는 이전 시제품 설정으로 생성한 참고 화면이다.
 

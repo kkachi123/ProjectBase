@@ -94,7 +94,7 @@
 
 ### 제작 후와 검증
 
-- [Horizontal_Step](../../Assets/Prefabs/Map/RoomTemplates/NovaPrototype/Horizontal_Step.prefab)에 한 단 높이의 고정 지형과 나무·수풀 Sprite를 배치했다. 충돌 지형을 변경했으므로 통과 표시를 해제한 뒤 서→동·동→서 점프 통과와 착지를 실제 Player로 확인하고 다시 표시했다. 시작·Goal 연결은 검증 표시를 남기지 않았다.
+- Horizontal_Step에 한 단 높이의 고정 지형과 나무·수풀 Sprite를 배치했다. 충돌 지형을 변경했으므로 통과 표시를 해제한 뒤 서→동·동→서 점프 통과와 착지를 실제 Player로 확인하고 다시 표시했다. 시작·Goal 연결은 검증 표시를 남기지 않았다.
 - 기존 카탈로그를 복사한 Nova 시제품 카탈로그에 새 방을 등록하고 시제품 설정에 연결했다. 당시 기본 카탈로그와 기본 설정은 그대로였다. seed `0`에서 실제 방과 공통 지형 그래픽, 배경이 생성됨을 확인했다.
 - Player 검증 중 가상 입력 장치와 콜백을 정리하고 입력 설정을 복원했다. 타이틀 씬과 시험 씬을 함께 연 상태에서 Audio Listener 중복 메시지가 반복되어 시험 씬의 Listener를 임시로 비활성화했다. 시험 씬은 저장하지 않고 닫았다.
 - 새 방 선택·지형 Collider·장식 생성을 포함해 맵 EditMode 테스트 40개가 통과했다. 중앙 지형 아래의 어두운 그래픽 표현은 추가 검토가 필요하다.
@@ -108,14 +108,14 @@
 ### 사당 배경 방
 
 - Demo 2의 아치 두 조각, 사당 조형물과 받침의 위치·크기·정렬, Collider 및 조명을 확인했다. 사당 프리팹은 6개 조명을 포함하므로 시각 장식에는 Sprite를 사용했다.
-- [Horizontal_Shrine](../../Assets/Prefabs/Map/RoomTemplates/NovaPrototype/Horizontal_Shrine.prefab)에 아치·조형물·받침과 숲 배경을 배치해 Nova 시제품 카탈로그에 등록했다. 생성된 seed `9`의 사당과 인접 숲 방을 Player 정지 자세와 함께 임시 카메라로 확인했다. 사당은 상호작용 오브젝트가 아니다.
+- Horizontal_Shrine에 아치·조형물·받침과 숲 배경을 배치해 Nova 시제품 카탈로그에 등록했다. 생성된 seed `9`의 사당과 인접 숲 방을 Player 정지 자세와 함께 임시 카메라로 확인했다. 사당은 상호작용 오브젝트가 아니다.
 - 숲 방과 고정 타일·Collider·통과 방향을 비교하고 사당 장식에 Collider가 없음을 확인했다. 실제 Player로 숲에서 사당에 진입해 단차를 넘은 뒤 반대 방향으로 돌아가고 착지했다. 가상 입력 장치·콜백과 임시 설정을 정리했다. 다른 인접 조합과 실제 카메라 움직임은 추가 확인이 필요하다.
 - 맵 EditMode 테스트 41개가 통과했다. 추가한 검사는 두 방의 지형과 통과 방향 일치, seed `9`의 인접 생성과 사당 장식을 확인한다.
 
 ### 숲 하강 방
 
 - 기존 `WestSouth`는 서쪽에서 들어와 남쪽으로 나가는 단일 통과 방향을 가진 평평한 방이다. 시작·Goal 마커와 내부 지형 변형은 없다.
-- [Down_ForestStep](../../Assets/Prefabs/Map/RoomTemplates/NovaPrototype/Down_ForestStep.prefab)에 한 단 높이의 고정 지형을 추가하고 Demo 3에서 확인한 수관·줄기·수풀로 숲을 구성했다. 남쪽 구멍 주변은 수풀을 피했다.
+- Down_ForestStep에 한 단 높이의 고정 지형을 추가하고 Demo 3에서 확인한 수관·줄기·수풀로 숲을 구성했다. 남쪽 구멍 주변은 수풀을 피했다.
 - 기존 통과 표시를 해제하고 실제 Player의 서→남 점프·하강과 아래 `Arrival` 방 착지를 확인한 뒤 검증 표시를 켰다. 가상 입력과 임시 씬을 정리하고 설정을 복원했다.
 - 시제품 카탈로그에 등록했으며 seed `0`에서 하강 방과 아래 방 연결을 생성·렌더링해 확인했다. 서로 다른 아래 방 전체 조합과 실제 카메라 움직임은 추가 확인이 필요하다.
 - 하강 방 선택, 단차의 Grid Collider, 남쪽 출입구와 아래 방의 북쪽 연결을 포함해 맵 EditMode 테스트 42개가 통과했다.
@@ -123,7 +123,7 @@
 ### 폐허 회랑 상부 진입 방
 
 - 기존 `NorthWest`는 북쪽에서 서쪽으로 나가는 단일 통과 방향을 가진 평평한 방이다. 시작·Goal 마커와 내부 지형 변형은 없다.
-- [Arrival_RuinedGallery](../../Assets/Prefabs/Map/RoomTemplates/NovaPrototype/Arrival_RuinedGallery.prefab)에 북쪽 출입구 아래의 중간 착지 발판과 Demo 1·2를 참고한 조형물·부서진 기둥·수풀 배경을 추가했다.
+- Arrival_RuinedGallery에 북쪽 출입구 아래의 중간 착지 발판과 Demo 1·2를 참고한 조형물·부서진 기둥·수풀 배경을 추가했다.
 - 기존 통과 표시를 해제하고 실제 Player가 위쪽 하강 방에서 내려와 중간 발판에 착지한 뒤 서쪽의 숲 방으로 이동하는 것을 확인하고 검증 표시를 켰다. 가상 입력과 임시 씬을 정리하고 설정을 복원했다. 이후 배경 Sprite 배치만 조정했다.
 - 시제품 카탈로그에 등록하고 seed `0`에서 하강 방·폐허 회랑·서쪽 숲 방의 연결을 생성·렌더링해 확인했다. 다른 인접 방 조합과 실제 카메라 움직임은 추가 확인이 필요하다.
 - 북쪽 진입·서쪽 출입구와 중간 발판의 Grid Collider, 인접 방의 연결을 포함해 맵 EditMode 테스트 43개가 통과했다.
@@ -143,70 +143,70 @@
 
 ### 동쪽 진입 폐허 전망대
 
-- 기존 `EastSouth`는 동쪽에서 진입해 남쪽으로 나가는 단일 통과 방향을 가진 방이다. [Down_RuinedOverlook](../../Assets/Prefabs/Map/RoomTemplates/NovaPrototype/Down_RuinedOverlook.prefab)에 진입 측 단차와 Demo 2·3을 참고한 수관·나무·수풀·난간·기둥을 배치했다. 배경에는 Collider가 없다.
+- 기존 `EastSouth`는 동쪽에서 진입해 남쪽으로 나가는 단일 통과 방향을 가진 방이다. Down_RuinedOverlook에 진입 측 단차와 Demo 2·3을 참고한 수관·나무·수풀·난간·기둥을 배치했다. 배경에는 Collider가 없다.
 - 실제 Player가 오른쪽 이웃 방에서 진입해 단차를 점프하고 남쪽으로 내려가 아래 폐허 회랑의 발판에 착지했다. 이 한 방향에 대한 검증을 기록하고 시제품 카탈로그에 등록했다. 검증 후 수관의 직선 경계를 가리도록 배경 Sprite만 조정했다.
 - seed `3`의 계획에는 새 방이 선택됐지만 기존 `Legacy_EW2_Horizontal`의 Sprite Collider 타일 때문에 시제품 그래픽 생성이 실패했다. 해당 전환 방을 Nova 시제품 카탈로그에서만 제외한 뒤 같은 seed의 맵 16개 방 생성과 [전망대 화면](Chunk_Generation/Work/Images/RuinedOverlookGenerated.png)을 확인했다. 기존 기본 카탈로그와 전환 프리팹은 변경하지 않았다.
 - 카탈로그의 고정 지형이 Grid Collider를 사용하는지 확인하는 회귀 검사를 추가했다. 시제품 카탈로그 변경으로 숲·사당 인접 조합 seed는 `14`로 바뀌었다. 실제 이동 검증은 오른쪽 숲 방과 아래 폐허 회랑의 한 조합에 한정된다.
 
 ### 북쪽 진입 사당 아트리움
 
-- `NorthEast`의 북→동 연결을 바탕으로 [Arrival_ShrineAtrium](../../Assets/Prefabs/Map/RoomTemplates/NovaPrototype/Arrival_ShrineAtrium.prefab)에 중간 착지 발판과 Demo 2의 아치·조형물 배치를 참고한 사당 배경을 추가했다. 장식에는 Collider가 없다.
+- `NorthEast`의 북→동 연결을 바탕으로 Arrival_ShrineAtrium에 중간 착지 발판과 Demo 2의 아치·조형물 배치를 참고한 사당 배경을 추가했다. 장식에는 Collider가 없다.
 - 실제 Player가 위쪽 숲 하강 방에서 내려와 발판에 착지하고 동쪽 숲 방에 완전히 진입해 접지했다. 해당 통과 방향을 기록하고 Nova 시제품 카탈로그에 등록했다. 이후 사당 Sprite 받침의 지면 정렬만 조정했다.
 - seed `0`의 맵 16개 방 생성과 [사당 아트리움 화면](Chunk_Generation/Work/Images/ShrineAtriumGenerated.png)을 확인했다. 렌더링은 생성 맵과 Player 정지 자세를 임시 카메라·전역 조명으로 확인한 결과다. 다른 이웃 방과 조명의 실제 이동 검증은 남아 있다.
 - 맵 EditMode 테스트 47개가 통과했다. 입력 장치와 임시 씬을 정리하고 설정을 복원했으며 확인 당시 Console의 현재 오류는 0개였다.
 
 ### 북쪽 진입 연속 하강 방
 
-- `NorthSouth`의 북→남 연결을 바탕으로 [DownThrough_RuinedShaft](../../Assets/Prefabs/Map/RoomTemplates/NovaPrototype/DownThrough_RuinedShaft.prefab)에 상부 착지 발판과 왼쪽 보조 발판을 만들었다. Demo 1·3을 참고해 수관, 폐허 조형물과 아치를 배치했다. 장식에는 Collider가 없다.
+- `NorthSouth`의 북→남 연결을 바탕으로 DownThrough_RuinedShaft에 상부 착지 발판과 왼쪽 보조 발판을 만들었다. Demo 1·3을 참고해 수관, 폐허 조형물과 아치를 배치했다. 장식에는 Collider가 없다.
 - 실제 Player가 위쪽 숲 하강 방에서 내려와 착지한 후 발판 오른쪽으로 내려가 남쪽 출입구를 통과해 아래 폐허 회랑에 착지했다. 이 통과 방향을 검증하고 Nova 시제품 카탈로그에 등록했다. 이후 배경 Sprite만 조정했다.
 - seed `1`의 맵에서 같은 방이 `(2, 1)`과 `(2, 2)`에 연속 배치된다. [수직 통로 화면](Chunk_Generation/Work/Images/RuinedShaftGenerated.png)은 생성 맵을 임시 카메라와 Player 정지 자세로 렌더링한 결과다. 두 방을 연속으로 통과하는 실제 Player 검증은 수행하지 않았다.
 - 연속 배치의 열린 출입구와 발판을 포함해 맵 EditMode 테스트 48개가 통과했다. 가상 입력과 임시 씬·설정을 정리했으며 확인 당시 Console의 현재 오류는 0개였다.
 
 ### 동쪽 출구 숲속 관문 시작 방
 
-- 시작·Goal·선택 방 마커를 함께 가진 `CapEast`를 바탕으로 [Start_ForestGateway](../../Assets/Prefabs/Map/RoomTemplates/NovaPrototype/Start_ForestGateway.prefab)를 만들었다. 새 방은 시작 마커와 동쪽 출구만 사용하며 단차와 Demo 1·2를 참고한 숲·아치 배경을 가진다.
+- 시작·Goal·선택 방 마커를 함께 가진 `CapEast`를 바탕으로 Start_ForestGateway를 만들었다. 새 방은 시작 마커와 동쪽 출구만 사용하며 단차와 Demo 1·2를 참고한 숲·아치 배경을 가진다.
 - 실제 Player가 시작 마커에서 생성돼 단차를 점프로 넘고 동쪽 숲 방에 완전히 진입해 착지했다. 동쪽 시작 출구를 검증해 Nova 시제품 카탈로그에 등록했다. 입력 장치와 임시 씬을 정리하고 설정을 복원했으며 확인 당시 Console의 현재 오류는 0개였다.
 - seed `1`의 생성 맵에서 방 `(1, 0)`과 시작 좌표 `(24.5, 5)`를 확인했다. [시작 방 화면](Chunk_Generation/Work/Images/ForestGatewayGenerated.png)은 실제 생성 맵과 Player 정지 자세를 임시 카메라·전역 조명으로 렌더링한 결과다. 실제 이동 검증은 오른쪽 숲 방과의 한 조합에 한정된다.
 - 시작 위치와 동쪽 이웃 연결을 포함해 맵 EditMode 테스트 49개가 통과했다.
 
 ### 서쪽 진입 폐허 사당 도착 방
 
-- `CapWest`를 바탕으로 [Goal_RuinedSanctuary](../../Assets/Prefabs/Map/RoomTemplates/NovaPrototype/Goal_RuinedSanctuary.prefab)를 만들었다. 서쪽 진입구와 Goal 마커를 사용하고 Demo 2의 아치·숲과 받침으로 도착 지점을 구성했다.
+- `CapWest`를 바탕으로 Goal_RuinedSanctuary를 만들었다. 서쪽 진입구와 Goal 마커를 사용하고 Demo 2의 아치·숲과 받침으로 도착 지점을 구성했다.
 - 실제 Player가 서쪽 숲 방에서 오른쪽 방향키로 진입해 Goal 트리거에 접촉한 것을 확인하고, 해당 진입 방향을 Nova 시제품 카탈로그에 등록했다. 입력 장치·임시 씬을 정리하고 설정을 복원했다. 전체 Run 클리어와 타이틀 복귀는 이번에 확인하지 않았다.
 - seed `9`의 생성 맵에서 방 `(3, 3)`과 Goal 좌표 `(70.5, -55)`를 확인했다. [도착 방 화면](Chunk_Generation/Work/Images/GoalSanctuaryGenerated.png)은 생성 맵과 Player 정지 자세를 임시 카메라·전역 조명으로 렌더링한 결과다. 실제 이동 검증은 서쪽 숲 방과의 한 조합에 한정된다.
 - 도착 방 선택, 서쪽 이웃과 Goal 배치를 포함해 맵 EditMode 테스트 50개가 통과했다. 검사 작성 중 어셈블리 참조 오류와 임시 렌더 텍스처 정리 오류를 수정했고 최종 확인 당시 Console의 현재 오류는 0개였다.
 
 ### 북쪽 진입 숲속 폐허 도착 방
 
-- `CapNorth`를 바탕으로 [Goal_ForestDescent](../../Assets/Prefabs/Map/RoomTemplates/NovaPrototype/Goal_ForestDescent.prefab)를 만들었다. 북쪽 진입구 아래 중간 발판을 두고 Demo 3의 수관과 하층 식생에 폐허 조형물·Goal 받침을 더했다.
+- `CapNorth`를 바탕으로 Goal_ForestDescent를 만들었다. 북쪽 진입구 아래 중간 발판을 두고 Demo 3의 수관과 하층 식생에 폐허 조형물·Goal 받침을 더했다.
 - 실제 Player가 위쪽 숲 하강 방에서 내려와 발판에 착지하고 왼쪽으로 이동해 Goal 트리거에 접촉한 뒤 바닥에 착지했다. 북쪽 진입을 Nova 시제품 카탈로그에 등록했다. 입력 장치와 임시 씬을 정리하고 설정을 복원했다. 전체 Run 클리어와 타이틀 복귀는 확인하지 않았다.
 - seed `4`의 생성 맵에서 방 `(3, 3)`과 Goal 좌표 `(70.5, -55)`를 확인했다. [도착 방 화면](Chunk_Generation/Work/Images/GoalForestDescentGenerated.png)은 생성 맵과 발판 위 Player 정지 자세를 임시 카메라·전역 조명으로 렌더링한 결과다. 실제 이동 검증은 위쪽 숲 하강 방과의 한 조합에 한정된다.
 - 도착 방 선택, 북쪽 이웃과 발판·Goal 배치를 포함해 맵 EditMode 테스트 51개가 통과했다. 확인 당시 Console의 현재 오류는 0개였다.
 
 ### 동쪽 진입 폐허 정원 도착 방
 
-- `CapEast`를 바탕으로 [Goal_OvergrownCourt](../../Assets/Prefabs/Map/RoomTemplates/NovaPrototype/Goal_OvergrownCourt.prefab)를 만들었다. 동쪽 진입로에 낮은 단차를 두고 Demo 1의 나무와 울타리를 참고해 Goal 주변을 구성했다.
+- `CapEast`를 바탕으로 Goal_OvergrownCourt를 만들었다. 동쪽 진입로에 낮은 단차를 두고 Demo 1의 나무와 울타리를 참고해 Goal 주변을 구성했다.
 - 실제 Player가 동쪽 숲 방에서 진입해 단차를 점프로 넘고 Goal 트리거에 접촉했다. 동쪽 진입을 Nova 시제품 카탈로그에 등록하고 입력 장치와 임시 씬을 정리했으며 설정을 복원했다. 전체 Run 클리어와 타이틀 복귀는 확인하지 않았다.
 - seed `0`의 생성 맵에서 방 `(1, 3)`과 Goal 좌표 `(27.5, -55)`를 확인했다. [도착 방 화면](Chunk_Generation/Work/Images/GoalOvergrownCourtGenerated.png)은 생성 맵과 단차 위 Player 정지 자세를 임시 카메라·전역 조명으로 렌더링한 결과다. 실제 이동 검증은 동쪽 숲 방과의 한 조합에 한정된다.
 - 도착 방 선택, 동쪽 이웃과 단차·Goal 배치를 포함해 맵 EditMode 테스트 52개가 통과했다. 확인 당시 Console의 현재 오류는 0개였다.
 
 ### 서쪽 출구 사당 시작 방
 
-- `CapWest`를 바탕으로 [Start_ShrineWest](../../Assets/Prefabs/Map/RoomTemplates/NovaPrototype/Start_ShrineWest.prefab)를 만들었다. 오른쪽 시작 위치와 낮은 단차를 두고 Demo 2의 사당 조형물과 아치로 배경을 구성했다.
+- `CapWest`를 바탕으로 Start_ShrineWest를 만들었다. 오른쪽 시작 위치와 낮은 단차를 두고 Demo 2의 사당 조형물과 아치로 배경을 구성했다.
 - 실제 Player가 시작 마커에서 단차를 점프로 넘어 서쪽 숲 방에 완전히 진입하고 착지했다. 서쪽 출구를 Nova 시제품 카탈로그에 등록하고 입력 장치와 임시 씬을 정리했으며 설정을 복원했다. 검증 후 사당 배경의 받침 위치만 조정했다.
 - seed `4`의 생성 맵에서 방 `(1, 0)`과 시작 좌표 `(35.5, 5)`를 확인했다. [시작 방 화면](Chunk_Generation/Work/Images/StartShrineWestGenerated.png)은 생성 맵의 시작 위치에 Player를 정지 자세로 두고 임시 카메라·전역 조명으로 렌더링한 결과다. 실제 이동 검증은 서쪽 숲 방과의 한 조합에 한정된다.
 - 시작 방 선택, 서쪽 이웃과 단차·시작 위치를 포함해 맵 EditMode 테스트 53개가 통과했다. 확인 당시 Console의 현재 오류는 0개였다.
 
 ### 남쪽 출구 숲 시작 방
 
-- `CapSouth`를 바탕으로 [Start_ForestDrop](../../Assets/Prefabs/Map/RoomTemplates/NovaPrototype/Start_ForestDrop.prefab)을 만들었다. 왼쪽 시작 위치와 낮은 단차를 두고 Demo 1의 숲과 울타리를 참고해 배경을 구성했다.
+- `CapSouth`를 바탕으로 Start_ForestDrop을 만들었다. 왼쪽 시작 위치와 낮은 단차를 두고 Demo 1의 숲과 울타리를 참고해 배경을 구성했다.
 - 실제 Player가 시작 마커에서 단차를 점프로 넘고 남쪽 출구로 내려가 아래 폐허 회랑의 발판에 착지했다. 남쪽 출구를 Nova 시제품 카탈로그에 등록하고 입력 장치와 임시 씬을 정리했으며 설정을 복원했다.
 - seed `10`의 생성 맵에서 방 `(1, 0)`과 시작 좌표 `(24.5, 5)`를 확인했다. [시작 방 화면](Chunk_Generation/Work/Images/StartForestDropGenerated.png)은 생성 맵의 시작 위치에 Player를 정지 자세로 두고 임시 카메라·전역 조명으로 렌더링한 결과다. 실제 이동 검증은 아래 폐허 회랑과의 한 조합에 한정된다.
 - 시작 방 선택, 아래 이웃과 출구·단차·시작 위치를 포함해 맵 EditMode 테스트 54개가 통과했다. 확인 당시 Console의 현재 오류는 0개였다.
 
 ### 서쪽 입구 폐허 정원 선택 방
 
-- 기존 `CapWest`의 평탄한 지형과 Goblin·아이템·빈 슬롯의 가중치를 유지해 [Optional_RuinedCourt](../../Assets/Prefabs/Map/RoomTemplates/NovaPrototype/Optional_RuinedCourt.prefab)를 만들고 Demo 1을 참고한 숲·울타리와 폐허 조형물을 배치했다. 기존 Goal과 공유하던 목표는 선택 방 전용 마커로 분리했다.
+- 기존 `CapWest`의 평탄한 지형과 Goblin·아이템·빈 슬롯의 가중치를 유지해 Optional_RuinedCourt를 만들고 Demo 1을 참고한 숲·울타리와 폐허 조형물을 배치했다. 기존 Goal과 공유하던 목표는 선택 방 전용 마커로 분리했다.
 - 실제 Player가 빈 슬롯 상태의 방에 서쪽으로 진입해 목표 지점까지 이동하고 같은 입구로 돌아와 착지했다. 해당 왕복 방향을 Nova 시제품 카탈로그에 등록했다. 입력 장치와 임시 씬을 정리하고 설정을 복원했다. 실제 생성 분기 방을 통한 왕복, Goblin과의 전투 및 아이템 획득은 이 방에서 확인하지 않았다.
 - 생성 맵의 seed `132`·`146`·`210`에서 각각 아이템·빈 슬롯·Goblin이 선택되고 슬롯에 맞게 생성되는 것을 확인했다. [선택 방 화면](Chunk_Generation/Work/Images/OptionalRuinedCourtGenerated.png)은 seed `132`의 생성 맵과 Player 정지 자세를 임시 카메라·전역 조명으로 렌더링한 결과다.
 - 새 선택 방과 콘텐츠 세 가지 경우를 포함해 맵 EditMode 테스트 57개가 통과했다. 확인 당시 Console의 현재 오류는 0개였다.
@@ -479,3 +479,7 @@
 - seed `69`의 실제 생성 맵에서 Player를 다층 방 북쪽 입구에 배치했다. 가시·가시 공·낙하 발판이 모두 생성된 상태에서 발판을 밟아 낙하시킨 뒤 아래 경로를 이용해 서쪽으로 통과했고 체력은 10이었다. 상층 경로의 무피해 통과는 확인하지 않았다.
 - 지점·스위치·고블린·화염이 생성된 seed `28`과 지점·고블린이 생성된 seed `109`의 전투 시도에서 각각 목표 하나를 완료한 뒤 Player가 사망했다. 목표와 몬스터의 동시 완료는 미검증이며 사망 원인을 특정하지 않았다. seed `109`에서는 `1/2`에 문이 잠겨 있었다.
 - 조건 방 진입 전 처치, 미완료 재입장, 대시 우회, 같은 방의 목표·분기 조합과 트리거·몬스터 동시 완료는 남았다. 가상 입력 장치를 제거하고 입력 설정을 복원했으며 Play 종료 후 Title 씬은 저장된 상태였다. 검증 중 잘못 입력한 Unity CLI 명령 오류 1건이 있었고 게임 Console에는 새 오류가 없었다.
+
+### Nova 시제품 정리
+
+- 기본 카탈로그에 등록되지 않은 독립 시제품 14개를 제거했다. 각 시제품에 대응하는 현재 Nova Variant와 Sprite 에셋 종류를 대조했으며, 프리팹 참조는 발견되지 않았다. 지형과 배치가 완전히 같다는 의미는 아니며 기존 Base와 Variant는 유지한다. 과거 검증 기록은 이력으로 남긴다.

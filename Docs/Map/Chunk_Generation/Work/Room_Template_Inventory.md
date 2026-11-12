@@ -41,27 +41,6 @@
 | `GoalEast`, `GoalWest` | E 또는 W | 해당 방향 Goal 전용 |
 | `OptionalWest` | W | 선택 방 왕복 W; 콘텐츠 슬롯 사용 |
 
-### NovaPrototype — Nova 시제품 14개
-
-| 프리팹 | 열린 면 | 역할과 기록된 방향 |
-| --- | --- | --- |
-| `Start_ForestGateway` | E | 시작 E |
-| `Start_ShrineWest` | W | 시작 W |
-| `Start_ForestDrop` | S | 시작 S |
-| `Goal_RuinedSanctuary` | W | Goal W |
-| `Goal_OvergrownCourt` | E | Goal E |
-| `Goal_ForestDescent` | N | Goal N |
-| `Horizontal_Step` | E, W | W→E, E→W |
-| `Horizontal_Shrine` | E, W | W→E, E→W |
-| `Down_ForestStep` | S, W | W→S |
-| `Down_RuinedOverlook` | E, S | E→S |
-| `Arrival_RuinedGallery` | N, W | N→W |
-| `Arrival_ShrineAtrium` | N, E | N→E |
-| `DownThrough_RuinedShaft` | N, S | N→S |
-| `Optional_RuinedCourt` | W | 선택 방 왕복 W; 콘텐츠 슬롯 사용 |
-
-이 14개 방의 내부 지형 변형은 비어 있다.
-
 ### NovaVariants — Base 상속 방 17개
 
 기존 Nova 시제품 방 14개에 대응하는 Variant와 `ClosedFill`, `Junction_Arrival`, `Junction_Down`이 기본 카탈로그에 등록돼 있다. 사당·숲 가로 Variant는 `Base/Horizontal`을 공유한다. 분기 방과 일부 인접 방의 배경 이음새·장식 배치를 수정했으며, 확인한 그래픽 및 Player 검증 범위와 남은 한계는 [진행 현황](../Chunk_Generation_Progress.md)을 참고한다.
@@ -79,7 +58,7 @@
 
 ## 공용 에셋과 직접 참조
 
-- [SampleSolid.asset](../../../../Assets/Prefabs/Map/RoomTemplates/Shared/SampleSolid.asset)과 [SampleSolid.png](../../../../Assets/Prefabs/Map/RoomTemplates/Shared/SampleSolid.png)는 Base와 NovaPrototype의 충돌 지형에 사용되며 Nova Variant도 부모 지형을 상속한다. `OptionalRoomTests`도 타일을 경로로 직접 읽는다.
+- [SampleSolid.asset](../../../../Assets/Prefabs/Map/RoomTemplates/Shared/SampleSolid.asset)과 [SampleSolid.png](../../../../Assets/Prefabs/Map/RoomTemplates/Shared/SampleSolid.png)는 Base의 충돌 지형에 사용되며 Nova Variant도 부모 지형을 상속한다. `OptionalRoomTests`도 타일을 경로로 직접 읽는다.
 - [Terrain_Platform](../../../../Assets/Prefabs/Map/RoomTemplates/Patterns/Terrain_Platform.prefab)은 `Base/Horizontal`이 지형 패턴으로 참조한다. 카탈로그에 직접 등록된 방은 아니지만 내부 조합에 사용된다.
 - [RoomTemplateMovementSample](../../../../Assets/Scenes/Tests/RoomTemplateMovementSample.unity)은 `Horizontal`, `Down`, `DownThrough`, `Arrival` Base 프리팹을 직접 참조한다.
 - [RoomTerrainTests](../../../../Assets/Tests/EditMode/MapGeneration/RoomTerrainTests.cs)는 `Base/DownThrough`, `Base/Horizontal`을, [OptionalRoomTests](../../../../Assets/Tests/EditMode/MapGeneration/OptionalRoomTests.cs)는 `Base/CapWest`와 `Shared/SampleSolid.asset`을 경로로 직접 읽는다.
@@ -93,12 +72,11 @@
 ```text
 RoomTemplates/
   Base/            기본 방·출입구 변형·역할 구분 19개
-  NovaPrototype/   Nova 시제품 14개 방
   NovaVariants/    Base를 상속하는 Nova Variant
   Patterns/        내부 변형 패턴
   Shared/          공용 지형 타일과 Sprite
 ```
 
-`Base`의 방은 Variant의 부모이며 일부는 이동 검증에도 쓰인다. 별도로 보관한 `NovaPrototype` 시제품은 기본 카탈로그에 등록돼 있지 않다. 방의 기능은 현재 프리팹 이름과 데이터로 구별할 수 있으므로 방마다 별도 폴더를 만들지는 않는다.
+`Base`의 방은 Variant의 부모이며 일부는 이동 검증에도 쓰인다. 방의 기능은 현재 프리팹 이름과 데이터로 구별할 수 있으므로 방마다 별도 폴더를 만들지는 않는다.
 
 폴더 정리 시 프리팹·타일·Sprite의 GUID, 템플릿 ID와 카탈로그 구성을 유지했다. 테스트의 하드코딩 경로와 문서 링크도 함께 갱신했다. 방 지형이나 Collider를 바꾸는 작업은 별도의 이동 검증이 필요하다.
