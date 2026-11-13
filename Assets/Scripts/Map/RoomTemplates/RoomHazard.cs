@@ -4,17 +4,16 @@ namespace ProjectRE.MapGeneration
     using System.Collections.Generic;
     using UnityEngine;
 
-    /// <summary>방에서 수동으로 검증한 함정 후보와 설치 공간.</summary>
+    /// <summary>방에 배치한 함정 후보와 설치 공간.</summary>
     [Serializable]
     public sealed class RoomHazardSlot
     {
-        public string id;
+        [HideInInspector] public string id;
         public GameObject candidate;
         public RectInt clearance;
         public RectInt support;
         public int spawnWeight = 1;
         public int emptyWeight = 1;
-        public bool passageVerified;
     }
 
     public sealed class RoomHazardSnapshot

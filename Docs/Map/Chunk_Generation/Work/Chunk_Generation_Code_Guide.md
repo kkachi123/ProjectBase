@@ -114,4 +114,4 @@ classDiagram
 4. `MapBuilder.Build()`에서 지형·콘텐츠·함정 Builder의 호출을 찾는다. 그래픽과 Collider의 분리는 `MapVisualBuilder`에서 확인한다.
 5. [RoomTerrainTests.cs](../../../../Assets/Tests/EditMode/MapGeneration/RoomTerrainTests.cs), [OptionalRoomTests.cs](../../../../Assets/Tests/EditMode/MapGeneration/OptionalRoomTests.cs), [MapVisualBuilderTests.cs](../../../../Assets/Tests/EditMode/MapGeneration/MapVisualBuilderTests.cs)를 참고한다.
 
-`Passages Verified`, `Combinations Verified`, 함정의 `passageVerified`와 시작·Goal·왕복 방향은 실제 Player로 확인한 뒤 제작자가 기록한다. 지형이나 함정 발사 조건을 변경해도 표시가 자동 해제되지 않으며, 정적 검사만으로 투사체 범위나 Player 통과가 보장되지는 않는다. 함정 선택·안전 검사와 빌드 예시는 [RoomHazardTests.cs](../../../../Assets/Tests/EditMode/MapGeneration/RoomHazardTests.cs)를 참고한다.
+`Passages Verified`, `Combinations Verified`와 시작·Goal·왕복 방향은 실제 Player로 확인한 뒤 제작자가 기록한다. 지형을 변경해도 표시가 자동 해제되지 않는다. 함정 통과 결과는 진행 문서에 기록하며 정적 검사만으로 투사체 범위나 Player 통과가 보장되지는 않는다. 함정 선택·안전 검사와 빌드 예시는 [RoomHazardTests.cs](../../../../Assets/Tests/EditMode/MapGeneration/RoomHazardTests.cs)를 참고한다.

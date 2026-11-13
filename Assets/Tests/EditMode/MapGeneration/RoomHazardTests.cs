@@ -17,6 +17,40 @@ namespace ProjectRE.MapGeneration.Tests
         private const string BasePath = "Assets/Prefabs/Map/RoomTemplates/Base/NorthEast.prefab";
 
         [Test]
+        public void HazardIdsAreAssignedAndRemainStableWhenSavedAndReordered()
+        {
+            var root = new GameObject("hazards");
+            string path = AssetDatabase.GenerateUniqueAssetPath("Assets/Tests/EditMode/MapGeneration/RoomHazardTemporary.prefab");
+            try
+            {
+                var settings = root.AddComponent<RoomHazardSettings>();
+                var edit = new SerializedObject(settings);
+                var slots = edit.FindProperty("_hazards");
+                slots.arraySize = 1;
+                edit.ApplyModifiedPropertiesWithoutUndo();
+                string first = settings.Hazards[0].id;
+                Assert.That(first, Is.Not.Empty);
+                edit.Update();
+                edit.FindProperty("_hazards").InsertArrayElementAtIndex(1);
+                edit.ApplyModifiedPropertiesWithoutUndo();
+                string second = settings.Hazards[1].id;
+                Assert.That(second, Is.Not.Empty.And.Not.EqualTo(first));
+                edit.Update();
+                edit.FindProperty("_hazards").MoveArrayElement(0, 1);
+                edit.ApplyModifiedPropertiesWithoutUndo();
+                Assert.That(settings.Hazards.Select(h => h.id), Is.EqualTo(new[] { second, first }));
+                PrefabUtility.SaveAsPrefabAsset(root, path);
+                var saved = AssetDatabase.LoadAssetAtPath<GameObject>(path).GetComponent<RoomHazardSettings>();
+                Assert.That(saved.Hazards.Select(h => h.id), Is.EqualTo(new[] { second, first }));
+            }
+            finally
+            {
+                UnityEngine.Object.DestroyImmediate(root);
+                AssetDatabase.DeleteAsset(path);
+            }
+        }
+
+        [Test]
         public void WeightBoundariesAndSeedSelectionAreDeterministic()
         {
             RoomTemplateSnapshot Template(int spawn, int empty) => new("hazard-test", RoomType.Horizontal,
@@ -115,9 +149,6 @@ namespace ProjectRE.MapGeneration.Tests
                 room.Hazard.Hazards.Single().candidate.SetActive(true);
                 Assert.That(RoomTemplateChecks.Validate(room).Any(e => e.Contains("함정 후보")), Is.True);
                 room.Hazard.Hazards.Single().candidate.SetActive(false);
-                room.Hazard.Hazards.Single().passageVerified = false;
-                Assert.That(RoomTemplateChecks.Validate(room).Any(e => e.Contains("통과 검증")), Is.True);
-                room.Hazard.Hazards.Single().passageVerified = true;
                 room.Hazard.Hazards.Single().spawnWeight = 0;
                 room.Hazard.Hazards.Single().emptyWeight = 0;
                 Assert.That(RoomTemplateChecks.Validate(room).Any(e => e.Contains("함정 가중치")), Is.True);

@@ -232,8 +232,8 @@ namespace ProjectRE.MapGeneration
             {
                 if (slot == null || string.IsNullOrWhiteSpace(slot.id) || !ids.Add(slot.id) ||
                     slot.candidate == null || slot.candidate == template.gameObject || !candidates.Add(slot.candidate) ||
-                    !slot.candidate.transform.IsChildOf(template.transform) || slot.candidate.activeSelf || !slot.passageVerified)
-                { errors.Add("함정 후보 ID, 연결, 기본 상태 또는 통과 검증이 올바르지 않습니다."); continue; }
+                    !slot.candidate.transform.IsChildOf(template.transform) || slot.candidate.activeSelf)
+                { errors.Add("함정 후보 ID, 연결 또는 기본 상태가 올바르지 않습니다."); continue; }
                 long weight = (long)slot.spawnWeight + slot.emptyWeight;
                 if (slot.spawnWeight < 0 || slot.emptyWeight < 0 || weight <= 0 || weight > 1000000)
                     errors.Add($"함정 가중치가 올바르지 않습니다: {slot.id}");
