@@ -15,6 +15,7 @@
 - [타일·그래픽 작업 지침](Work/Room_Tile_Visual_Plan.md): AI가 작업할 때 따르는 작업 방법과 검증 기준이다.
 - [방별 진행 조건 계획](Work/Room_Progression_Plan.md): 목표·출구 잠금과 검증 순서다.
 - [Claude Code 검토 요청](Work/Claude_Chunk_Review_Prompt.md): Chunk 콘텐츠 리팩토링을 독립적으로 검토하기 위한 요청문이다.
+- [Claude Code 검토 결과](Work/Claude_Chunk_Review_Result.md): 위 요청에 따른 발견 사항, 코드 구조 평가와 검사 범위다.
 - [Images](Work/Images/): 설명서와 작업 이력에서 함께 참조하는 이미지다.
 
 전체 맵 조합과 코드의 개요는 [맵 생성 코드 안내](../Map_Code_Architecture_Guide.md), 작업 이력은 [맵 제작·리팩토링 로그](../Map_Refactoring_Log.md)를 참고한다.
