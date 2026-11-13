@@ -100,5 +100,5 @@ WestSouth의 **Room Hazard Settings → Hazards**에 `floor.fire`와 `overhead.s
 
 1. 프리팹을 선택하고 **Map → Room Templates → Validate Selected**를 실행해 Console의 결과를 확인한다. 설정 오류나 필요한 검증 표시가 없으면 실패 사유가 표시된다.
 2. 지형·통로·함정 조건을 바꾼 뒤에는 해당 `Passages Verified`, `Combinations Verified`, `Passage Verified`와 시작·Goal·왕복 검증 표시를 직접 해제한다. 자동으로 해제되지 않는다. 별도 시험 환경에서 실제 Player의 이동과 조합을 확인한 다음 해당 표시를 다시 기록한다. 검증되지 않은 조합은 카탈로그 검사에 실패하므로 검증 전까지 실제 카탈로그에 반영하지 않는다.
-3. **Map → Room Map Generator**에서 `Planning Settings`, `Goal Prefab`, `Seed`를 확인하고 **Generate Preview**를 누르면 현재 활성 씬에 결과가 생성된다. 생성된 오브젝트와 방을 확인한 뒤 **Clear This Preview**로 해당 창의 미리보기를 지울 수 있다. 미리보기는 씬을 변경하므로 작업 중인 씬을 보존하려면 별도 씬에서 확인한다.
+3. **Map → Room Map Generator**에서 `Planning Settings`, `Goal Prefab`, `Seed`를 확인하고 **입력한 Seed로 생성**을 누르면 현재 활성 씬에 결과가 생성된다. **랜덤 맵 생성**으로 다른 seed를 고를 수도 있다. 확인한 뒤 **미리보기 삭제**로 해당 창의 미리보기를 지울 수 있다. 미리보기는 씬을 변경하므로 작업 중인 씬을 보존하려면 별도 씬에서 확인한다.
 4. 마지막으로 Title에서 게임을 시작해 실제 화면의 통과·회피와 콘텐츠 동작을 확인한다. 미리보기와 정적 검사만으로 플레이 통과가 보장되지는 않는다.
