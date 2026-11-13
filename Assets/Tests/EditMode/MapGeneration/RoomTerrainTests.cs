@@ -183,7 +183,8 @@ namespace ProjectRE.MapGeneration.Tests
             Assert.That(room.BaseGroupId, Is.EqualTo(baseRoom.BaseGroupId));
             Assert.That(room.Openings, Is.EqualTo(baseRoom.Openings));
             Assert.That(PrefabUtility.GetCorrespondingObjectFromSource(room.Terrain), Is.SameAs(baseRoom.Terrain));
-            Assert.That(PrefabUtility.GetCorrespondingObjectFromSource(room.Content), Is.SameAs(baseRoom.Content));
+            Assert.That(PrefabUtility.GetCorrespondingObjectFromSource(room.GetComponent<RoomMonsterSettings>()), Is.SameAs(baseRoom.GetComponent<RoomMonsterSettings>()));
+            Assert.That(PrefabUtility.GetCorrespondingObjectFromSource(room.GetComponent<RoomItemSettings>()), Is.SameAs(baseRoom.GetComponent<RoomItemSettings>()));
             Assert.That(PrefabUtility.GetCorrespondingObjectFromSource(room.Hazard), Is.SameAs(baseRoom.Hazard));
             Assert.That(room.PassagesVerified, Is.True);
             Assert.That(room.Passages.Count, Is.EqualTo(baseRoom.Passages.Count));

@@ -14,7 +14,7 @@ namespace ProjectRE.MapGeneration.Tests
     {
         private const string SettingsPath = "Assets/Prefabs/@Data/Map/MapPlanningSettings.asset";
         private const string GoalPath = "Assets/Prefabs/Map/Goals/GoalTrigger/EndLight-EndTrigger.prefab";
-        private const string BasePath = "Assets/Prefabs/Map/RoomTemplates/Base/NorthEast.prefab";
+        private const string BasePath = "Assets/Prefabs/Map/RoomTemplates/NovaVariants/Arrival_ShrineAtrium.prefab";
 
         [Test]
         public void HazardIdsAreAssignedAndRemainStableWhenSavedAndReordered()

@@ -1569,7 +1569,6 @@ GameObject:
   - component: {fileID: 4967844850214342538}
   - component: {fileID: 2555749101532911703}
   - component: {fileID: 1610651791270319716}
-  - component: {fileID: 7400832701221435132}
   - component: {fileID: 2414735836196982672}
   - component: {fileID: 3514005315244465477}
   - component: {fileID: 103381408636315751}
@@ -1674,21 +1673,6 @@ MonoBehaviour:
       tile: {fileID: 11400000, guid: e31061f2b8d035f4cb897c1d5365ba3c, type: 2}
       chance: 50
     combinationsVerified: 1
---- !u!114 &7400832701221435132
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4173926323440805179}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 21a7899ddd4b7e941bb767ecfd32e56b, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: ProjectRE.MapGeneration::ProjectRE.MapGeneration.RoomContentSettings
-  _contentSlots:
-  - {x: 7, y: 5}
-  _contentSettings: []
 --- !u!114 &2414735836196982672
 MonoBehaviour:
   m_ObjectHideFlags: 0

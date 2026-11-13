@@ -1640,7 +1640,6 @@ GameObject:
   - component: {fileID: 8866607565304653997}
   - component: {fileID: 7321160808095392475}
   - component: {fileID: 1682783239427306723}
-  - component: {fileID: 3536055908583188987}
   - component: {fileID: 8469182213215066791}
   - component: {fileID: 3230835625040388230}
   - component: {fileID: 4071961768972806943}
@@ -1725,41 +1724,6 @@ MonoBehaviour:
     height: 3
   _protectedRegions: []
   _terrainVariations: []
---- !u!114 &3536055908583188987
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8281538533096863456}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 21a7899ddd4b7e941bb767ecfd32e56b, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: ProjectRE.MapGeneration::ProjectRE.MapGeneration.RoomContentSettings
-  _contentSlots:
-  - {x: 7, y: 4}
-  _contentSettings:
-  - slotIndex: 0
-    clearance:
-      x: 7
-      y: 4
-      width: 2
-      height: 3
-    surface: 0
-    facing: 0
-    emptyWeight: 1
-    options:
-    - id: goblin
-      prefab: {fileID: 5718515402252523039, guid: c120b6b05a9159b4982ccc263a9c35c2, type: 3}
-      weight: 1
-      offset: {x: 0.5, y: 0.05}
-      kind: 2
-    - id: item
-      prefab: {fileID: 8191700671622900631, guid: 32279033c6dc94b4da0b372ff9461734, type: 3}
-      weight: 1
-      offset: {x: 0.5, y: 0.3135}
-      kind: 1
 --- !u!114 &8469182213215066791
 MonoBehaviour:
   m_ObjectHideFlags: 0

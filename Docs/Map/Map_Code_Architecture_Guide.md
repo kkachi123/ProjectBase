@@ -34,7 +34,7 @@ Chunk 원본·카탈로그 → 맵 경로와 Chunk 선택 → Chunk 내부 선�
 | 클래스 | 역할 |
 | --- | --- |
 | `RoomTemplate`, `RoomTemplateChecks`, `RoomTemplateValidator` | Chunk 원본과 제작 데이터 검사를 담당한다. |
-| `RoomTerrainSettings`, `RoomMonsterSettings`, `RoomItemSettings`, `RoomHazardSettings` | 방의 지형·플랫폼, 몬스터, 아이템, 함정 제작 설정을 각각 보관한다. 기존 `RoomContentSettings`는 후보 이전 동안 유지한다. |
+| `RoomTerrainSettings`, `RoomMonsterSettings`, `RoomItemSettings`, `RoomHazardSettings` | 방의 지형·플랫폼, 몬스터, 아이템, 함정 제작 설정을 각각 보관한다. |
 | `RoomTerrainVariation`, `RoomTerrainPattern`, `RoomChanceCell` | 내부 변형 영역의 패턴과 확률 셀을 정의한다. |
 | `RoomTerrainSnapshot`, `RoomTerrainPlanner`, `RoomTerrainSelection` | 지형 선택지를 계산용 데이터로 변환하고 선택 결과를 기록한다. |
 | `RoomContentSlot`, `RoomContentOption`, `RoomContentPlanner`, `ContentSelection` | 콘텐츠 슬롯과 후보를 정의하고 선택 결과를 기록한다. |

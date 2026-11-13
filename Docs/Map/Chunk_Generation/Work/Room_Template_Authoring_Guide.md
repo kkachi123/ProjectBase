@@ -7,8 +7,8 @@
 ## 기본 구성
 
 - 방 크기는 20×20 Unity 단위, Grid 셀은 1×1이다. 루트의 기준점은 왼쪽 아래이며 회전 0, 스케일 1이다.
-- 루트에는 `Grid`, `RoomTemplate`, `RoomTerrainSettings`, `RoomContentSettings`, `RoomHazardSettings`를 둔다. `FixedGeometry`는 루트 바로 아래에 위치 0·회전 0·스케일 1의 Tilemap으로 두고 지형 Collider를 연결한다.
-- `RoomTemplate`은 ID, 방 유형, 열린 출입구, 진입→진출 후보와 Player 시작·Goal 마커를 기록한다. 변형·보호 영역은 `RoomTerrainSettings`, 콘텐츠 슬롯은 `RoomContentSettings`, 함정 후보는 `RoomHazardSettings`에서 설정한다.
+- 루트에는 `Grid`, `RoomTemplate`, `RoomTerrainSettings`, `RoomMonsterSettings`, `RoomItemSettings`, `RoomHazardSettings`를 둔다. `FixedGeometry`는 루트 바로 아래에 위치 0·회전 0·스케일 1의 Tilemap으로 두고 지형 Collider를 연결한다.
+- `RoomTemplate`은 ID, 방 유형, 열린 출입구, 진입→진출 후보와 Player 시작·Goal 마커를 기록한다. Base에서 지형을 지정하고 Variant의 몬스터·아이템·함정 컴포넌트에 후보를 설정한다.
 - 방 유형은 출입구의 역할을 나타낸다. `Side`는 출입구가 없고, `Horizontal`은 동·서 중 하나 이상, `Down`은 남쪽, `Arrival`은 북쪽이 열려 있어야 한다. `Arrival`에는 남쪽 출입구를 지정하지 않는다.
 
 ## 출입구와 이동 기준
@@ -42,7 +42,7 @@
 - `Tilemap` 패턴은 셀 크기 1인 Grid 루트와 위치·회전 0, 크기 1인 단일 자식 Tilemap 및 활성 TilemapCollider2D로 구성한다. Tilemap은 고정 지형과 같은 레이어를 사용하며, Collider는 그 Tilemap의 TilemapCollider2D와 CompositeCollider2D만 허용한다. 타일 좌표는 영역의 왼쪽 아래를 `(0,0)`으로 사용한다.
 - `Platform` 패턴은 활성 프리팹 루트에 Kinematic Rigidbody2D와 비 Trigger BoxCollider2D 하나를 두고 고정 지형과 같은 레이어를 사용한다. 영역의 왼쪽 아래에서 `Offset`만큼 떨어진 위치에 생성되며 초기 Collider는 영역 안에 있어야 한다. 실제 이동 범위와 다른 함정·지형 조합은 Player로 확인한다.
 - `Combinations Verified`는 해당 방에서 패턴과 확률 셀의 모든 조합을 실제 Player의 기록된 각 통과 방향과 시작·Goal 연결에 대해 확인한 뒤 켠다. 검증되지 않은 설정은 카탈로그 검사에서 실패한다. 패턴, 확률 셀, 지형, 통로 또는 보호 영역을 수정하면 이 표시를 지우고 다시 확인한다. 표시는 자동으로 해제되지 않는다.
-- `Content Slots`에 기준 셀을 넣고 `Content Settings`에 슬롯 인덱스, 충돌 여유 공간(`Clearance`), 설치면, 좌우 방향과 선택지를 지정한다. 선택지는 ID, 프리팹, 양의 가중치, 기준 셀의 `(x+0.5, y)`에서의 위치 오프셋을 가진다. `Empty Weight`는 아무것도 배치하지 않을 가중치다.
+- `RoomMonsterSettings`와 `RoomItemSettings`에 각각 기준 셀, 충돌 여유 공간(`Clearance`), 설치면, 좌우 방향과 후보 프리팹을 지정한다. 후보는 양의 가중치와 기준 셀의 `(x+0.5, y)`에서의 위치 오프셋을 가진다. `Empty Weight`는 아무것도 배치하지 않을 가중치다. 내부 ID는 자동 생성된다.
 - 콘텐츠의 루트에는 활성 BoxCollider2D 또는 CapsuleCollider2D 하나가 필요하다. 지정된 방향의 Collider가 여유 공간 안에 들어가고 설치면에 닿아야 한다. 지지면은 전체 셀이 충돌하는 Grid 타입 타일이어야 하며, 여유 공간·지지면은 변형 영역과 겹치지 않는다. 여유 공간은 고정 지형·다른 슬롯·보호 영역·출입구와 겹치지 않는다.
 - 콘텐츠는 최종 역할이 중간 경로 방 또는 선택 방인 경우에만 생성한다. 슬롯 후보에 종류를 지정하면 일반 방은 아이템·일반 몬스터, 선택 방은 아이템·엘리트 몬스터와 빈 상태를 선택한다. 몬스터의 이동과 추적은 해당 FSM이 담당하므로 생성 이후에는 슬롯 영역 밖으로 이동할 수 있다.
 - 함정 후보를 방의 기본 비활성 자식으로 두고 `Hazards`에 후보, 위험 공간, 지지면과 생성·빈 상태 가중치를 지정한다. 내부 ID는 자동 생성된다. 위험 공간은 고정 지형·변형 영역·콘텐츠 공간·보호 영역·출입구와 겹치지 않고 지지면은 Grid 충돌 타일이어야 한다. 함정 발사 조건이나 지형이 바뀌면 함정 유무에 따른 실제 통과를 다시 확인하고 결과를 기록한다.

@@ -3,7 +3,7 @@ namespace ProjectRE.MapGeneration
     using System.Collections.Generic;
     using UnityEngine;
 
-    /// <summary>이전 설정과 분리된 설정을 공통 슬롯으로 읽는다.</summary>
+    /// <summary>몬스터와 아이템 설정을 공통 슬롯으로 읽는다.</summary>
     internal static class RoomContentLayout
     {
         internal readonly struct Entry
@@ -11,21 +11,13 @@ namespace ProjectRE.MapGeneration
             public readonly RoomContentSlot Slot;
             public readonly Vector2Int Position;
             public readonly bool HasPosition;
-            public readonly bool IsNew;
-            public Entry(RoomContentSlot slot, Vector2Int position, bool hasPosition, bool isNew = false)
-            { Slot = slot; Position = position; HasPosition = hasPosition; IsNew = isNew; }
+            public Entry(RoomContentSlot slot, Vector2Int position, bool hasPosition)
+            { Slot = slot; Position = position; HasPosition = hasPosition; }
         }
 
         internal static List<Entry> Read(RoomTemplate template)
         {
             var entries = new List<Entry>();
-            var legacy = template.Content;
-            if (legacy != null)
-                foreach (var slot in legacy.ContentSettings)
-                {
-                    bool valid = slot != null && slot.slotIndex >= 0 && slot.slotIndex < legacy.ContentSlots.Count;
-                    entries.Add(new Entry(slot, valid ? legacy.ContentSlots[slot.slotIndex] : default, valid));
-                }
             Add(entries, template.GetComponent<RoomMonsterSettings>(), "monster");
             Add(entries, template.GetComponent<RoomItemSettings>(), "item");
             return entries;
@@ -46,7 +38,7 @@ namespace ProjectRE.MapGeneration
                 foreach (var option in source.options)
                     slot.options.Add(option == null ? null : new RoomContentOption
                     { id = option.Id, prefab = option.prefab, weight = option.weight, offset = option.offset, kind = settings.Kind });
-                entries.Add(new Entry(slot, source.position, true, true));
+                entries.Add(new Entry(slot, source.position, true));
             }
         }
 

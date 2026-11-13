@@ -6,7 +6,7 @@
 
 Title에서 게임을 시작하면 설정된 카탈로그에서 방을 고르고, 각 방에 미리 설정된 패턴·확률 셀·콘텐츠·함정의 선택 결과를 자동으로 적용한다. 위치, 후보 프리팹, 타일과 확률은 방을 만들 때 직접 설정한다. 등록되지 않은 몬스터나 함정이 자동으로 추가되지는 않는다.
 
-방별 목표·출구 잠금은 현재 `WestSouth`와 `Down` Base 및 상속 Variant에 설정돼 있다. 주 경로의 중간 방으로 선택되면 실제 생성된 콘텐츠와 목표 후보를 바탕으로 규칙 하나를 정한다. 검증 상태는 [진행 현황](Chunk_Generation_Progress.md)을 참고한다.
+방별 목표·출구 잠금은 현재 `Down_ForestStep`과 `Junction_Down` Variant에 설정돼 있다. 주 경로의 중간 방으로 선택되면 실제 생성된 콘텐츠와 목표 후보를 바탕으로 규칙 하나를 정한다. 검증 상태는 [진행 현황](Chunk_Generation_Progress.md)을 참고한다.
 
 낙하 발판은 [맵 플랫폼](../../../Assets/Prefabs/Map/Platforms/FallingPlatform/)에, 함정은 [Trap](../../../Assets/Prefabs/Trap/)에 둔다. 몬스터 프리팹은 각 종류의 `Monster` 하위 폴더에서 확인한다.
 
@@ -14,9 +14,9 @@ Title에서 게임을 시작하면 설정된 카탈로그에서 방을 고르고
 
 ## 방 설정 열기
 
-1. Project 창에서 [Base 방 프리팹 폴더](../../../Assets/Prefabs/Map/RoomTemplates/Base/)의 방을 열고 루트 오브젝트를 선택한다.
-2. Inspector에서 **Room Template**은 방 구조, **Room Terrain Settings**는 지형·플랫폼, **Room Monster Settings**와 **Room Item Settings**는 각각 몬스터·아이템, **Room Hazard Settings**는 함정을 설정한다. 기존 후보는 이전이 끝날 때까지 **Room Content Settings**에 남아 있다.
-3. Scene 뷰에서 **Gizmos**를 켜면 회색은 방 경계, 초록색은 출입구, 청록색은 변형 영역, 빨간색은 보호 영역, 자홍색은 새 몬스터 슬롯, 노란색은 아이템과 기존 콘텐츠 슬롯 기준점이다. 함정 위험 공간은 주황색, 지지면은 파란색 사각형이다. 확률 셀은 Inspector에서 확인한다.
+1. Project 창에서 [Nova Variant 폴더](../../../Assets/Prefabs/Map/RoomTemplates/NovaVariants/)의 방을 열고 루트 오브젝트를 선택한다. 공통 방 구조는 [Base 폴더](../../../Assets/Prefabs/Map/RoomTemplates/Base/)에 있다.
+2. Inspector에서 **Room Template**은 방 구조, **Room Terrain Settings**는 지형·플랫폼, **Room Monster Settings**와 **Room Item Settings**는 각각 몬스터·아이템, **Room Hazard Settings**는 함정을 설정한다.
+3. Scene 뷰에서 **Gizmos**를 켜면 회색은 방 경계, 초록색은 출입구, 청록색은 변형 영역, 빨간색은 보호 영역, 자홍색은 몬스터 슬롯, 노란색은 아이템 슬롯 기준점이다. 함정 위험 공간은 주황색, 지지면은 파란색 사각형이다. 확률 셀은 Inspector에서 확인한다.
 
 방은 20×20 셀이며 방의 왼쪽 아래가 `(0, 0)`이다. 한 셀은 1×1 Unity 단위다. Base의 설정은 이를 상속한 Variant에 적용되지만 Variant에서 해당 항목을 Override했다면 그 값이 우선한다. 게임에서 사용하는 Variant가 카탈로그에 등록되어 있는지도 함께 확인한다.
 
@@ -29,13 +29,11 @@ Title에서 게임을 시작하면 설정된 카탈로그에서 방을 고르고
 | **Room Terrain Settings** | **Variation Regions** | 랜덤 지형을 적용할 사각형 영역의 위치와 크기다. | `(3, 10)`부터 `4×3` 크기로 지정한다. |
 | **Room Terrain Settings** | **Terrain Variations** | `Region Index`로 영역을 연결하고 패턴·확률 셀을 정한다. | 0번 영역에 발판 또는 빈 패턴을 고른다. |
 | **Room Terrain Settings** | **Protected Regions** | 변형 영역이나 콘텐츠가 침범하지 못하는 영역이다. | 통과에 필요한 공간을 보호한다. |
-| **Room Content Settings** | **Content Slots** | 몬스터·아이템을 배치할 기준 셀이다. | 0번 슬롯을 `(7, 5)`에 지정한다. |
-| **Room Content Settings** | **Content Settings** | 슬롯별 공간·지지면·방향·후보와 가중치를 정한다. | 0번 슬롯에 고블린·아이템·빈 상태를 설정한다. |
 | **Room Monster Settings** | **Kind, Slots** | 일반·엘리트 몬스터 종류와 각 위치·공간·프리팹 후보를 정한다. | 일반 몬스터 슬롯에 고블린 후보를 등록한다. |
 | **Room Item Settings** | **Slots** | 아이템 위치·공간·프리팹 후보를 별도로 정한다. | 몬스터와 다른 위치에 아이템 슬롯을 둔다. |
 | **Room Hazard Settings** | **Hazards** | 방 안의 함정 후보, 위험 공간·지지면과 출현 가중치를 정한다. | 화염 함정 후보와 빈 상태를 각각 가중치 1로 둔다. |
 
-목록의 항목 번호는 `0`부터 시작한다. 예를 들어 `Variation Regions`의 첫 영역을 사용하려면 `Terrain Variations`의 `Region Index`를 `0`으로 설정한다. 콘텐츠도 같은 방식으로 기준 셀과 설정을 연결한다. 한 콘텐츠 슬롯에서는 허용된 후보 하나 또는 빈 상태가 선택되며, 서로 다른 함정 후보는 각각 출현 여부를 고른다.
+목록의 항목 번호는 `0`부터 시작한다. 예를 들어 `Variation Regions`의 첫 영역을 사용하려면 `Terrain Variations`의 `Region Index`를 `0`으로 설정한다. 콘텐츠는 슬롯마다 위치와 후보를 함께 설정한다. 한 슬롯에서는 허용된 후보 하나 또는 빈 상태가 선택되며, 서로 다른 함정 후보는 각각 출현 여부를 고른다.
 
 ## 랜덤 지형 설정
 
@@ -46,7 +44,9 @@ Title에서 게임을 시작하면 설정된 카탈로그에서 방을 고르고
 3. **Patterns**에 고유 `Id`, `Prefab`과 `Kind`를 지정한다. 고정 타일 지형은 `Tilemap`, 움직이는 발판은 `Platform`을 선택한다. 플랫폼의 `Offset`은 영역의 왼쪽 아래를 기준으로 한 위치다. 같은 영역의 패턴은 빈 패턴을 포함해 동일한 비중으로 선택한다.
 4. **Chance Cells**에 방 내부 `Cell` 좌표, 배치할 `Tile`, `Chance` 0~100을 지정한다. 셀은 영역 안에 있어야 하며 패턴의 타일과 겹치지 않아야 한다. 확률 셀은 패턴 선택과 함께 적용될 수 있다.
 
-Horizontal의 현재 설정은 영역 `(3, 10)` 크기 `4×3`, 발판 패턴 또는 빈 패턴, 확률 셀 `(3, 12)`의 타일 배치 확률 50%다. Horizontal의 콘텐츠 기준점 `(7, 5)`은 있지만 콘텐츠 후보와 함정은 비어 있다.
+Horizontal의 현재 설정은 영역 `(3, 10)` 크기 `4×3`, 발판 패턴 또는 빈 패턴, 확률 셀 `(3, 12)`의 타일 배치 확률 50%다. 콘텐츠 후보는 각 Variant에서 설정한다.
+
+두 가로 Variant는 콘텐츠 슬롯 위치만 제외하도록 보호 영역을 각각 Override했다. Base의 고정 지형과 변형 영역은 유지된다.
 
 `NorthWest_Tiered`에는 `(15, 4)` 크기 `3×3`의 변형 영역에 낙하 발판 패턴과 빈 패턴이 있다. 발판의 Offset은 `(1.5, 2.2)`이므로 방 내부 위치는 `(16.5, 6.2)`다. 패턴 하나와 빈 패턴을 각각 50%로 선택하며, 같은 방의 가시와 가시 공은 별도로 선택한다.
 
@@ -54,28 +54,17 @@ Horizontal의 현재 설정은 영역 `(3, 10)` 크기 `4×3`, 발판 패턴 또
 
 ## 몬스터·아이템 설정
 
-새 설정은 Variant의 `Room Monster Settings`와 `Room Item Settings`에서 구분한다. 각 `Slots` 항목에 기준 셀 `Position`, 빈 공간 `Clearance`, 지지면 `Surface`, 방향 `Facing`, 빈 상태 가중치 `Empty Weight`와 `Options`의 프리팹·가중치·위치 오프셋을 넣는다. 몬스터의 `Kind`는 일반 경로용 `Normal` 또는 선택 방용 `Elite`다. 슬롯과 후보의 내부 식별자는 자동으로 관리한다.
+Variant의 `Room Monster Settings`와 `Room Item Settings`에서 구분한다. 각 `Slots` 항목에 기준 셀 `Position`, 빈 공간 `Clearance`, 지지면 `Surface`, 방향 `Facing`, 빈 상태 가중치 `Empty Weight`와 `Options`의 프리팹·가중치·위치 오프셋을 넣는다. 몬스터의 `Kind`는 일반 경로용 `Normal` 또는 선택 방용 `Elite`다. 슬롯과 후보의 내부 식별자는 자동으로 관리한다.
 
-각 슬롯은 후보 하나 또는 빈 상태를 선택한다. 몬스터와 아이템을 별도 슬롯에 설정하면 함께 나올 수 있으며, 공간·지지면 검사 조건은 아래 기존 설정과 같다. Base의 새 설정은 현재 비어 있고 기존 후보는 아직 이전하지 않았다.
+각 슬롯은 후보 하나 또는 빈 상태를 선택한다. 몬스터와 아이템은 별도 슬롯이므로 함께 나올 수 있다. 현재 일반 경로에 사용하는 Variant 11개는 각각 고블린과 아이템을 1:1 가중치로 선택하며, 선택 방 세 곳은 아이템을 1:1로 선택한다. 엘리트 몬스터는 아직 연결되지 않았다. `Offset`은 기준 셀의 `(x+0.5, y)`를 기준으로 한다.
 
-기존 설정 예시: [WestSouth Base](../../../Assets/Prefabs/Map/RoomTemplates/Base/WestSouth.prefab).
-
-방 루트의 `Room Content Settings`에서 설정한다.
-
-1. **Content Slots**에 배치 기준 셀을 추가한다. 좌표만 추가해서는 프리팹이 생성되지 않는다.
-2. **Content Settings**에 설정을 추가하고 `Slot Index`로 기준점 번호를 연결한다. `Clearance`에는 콘텐츠를 놓을 빈 공간의 좌표와 크기, `Surface`에는 지지면, `Facing`에는 방향을 지정한다.
-3. **Options**에 후보의 고유 `Id`, `Prefab`, `Kind`, `Weight`, `Offset`을 지정한다. `Empty Weight`는 그 슬롯을 비울 가중치다. `Offset`은 기준 셀의 `(x+0.5, y)`를 기준으로 한다.
-4. 한 슬롯에서는 허용된 후보 중 하나 또는 빈 상태가 선택된다. 일반 경로 방은 일반 몬스터·아이템, 선택 방은 엘리트 몬스터·아이템을 허용한다. 시작·Goal·닫힌 방은 콘텐츠 선택 대상이 아니다.
-
-WestSouth에는 고블린·아이템·빈 상태의 가중치가 각각 1이다. 이 일반 방 슬롯에서는 각각 1/3이며 한 슬롯에서 고블린과 아이템이 동시에 나오지는 않는다. 선택 방은 일반 몬스터 후보를 제외한다. 엘리트 몬스터는 아직 연결되지 않았다.
-
-`Optional_CapEast_Ruins`와 `Optional_CapWest_Ruins`는 Variant에서 콘텐츠 후보를 Override해 아이템과 빈 상태를 각각 가중치 1로 설정했다. `Junction_FourWay_Ruins`에는 콘텐츠 슬롯 설정이 없다.
+시작·Goal·닫힌 방은 콘텐츠 선택 대상이 아니다. `Arrival_ShrineAtrium`의 아이템은 화살 함정의 위험 공간을 피해 동쪽 벽에 배치되어 있으며 실제 획득은 아직 검증하지 않았다.
 
 콘텐츠 공간은 고정 지형·보호 영역·출입구·다른 슬롯과 겹치지 않아야 한다. 공간과 지지면은 변형 영역과 겹칠 수 없고, 지지면은 전체 셀이 충돌하는 Grid 타입 고정 타일이어야 한다. 후보는 루트에 활성 BoxCollider2D 또는 CapsuleCollider2D 하나가 있어야 하며 지정한 공간과 지지면에 맞아야 한다.
 
 ## 방별 진행 목표 설정
 
-예시: [WestSouth Base](../../../Assets/Prefabs/Map/RoomTemplates/Base/WestSouth.prefab)의 자식 **RoomObjectives**에 있는 `Room Objective Setup` 컴포넌트다.
+예시: [Down_ForestStep Variant](../../../Assets/Prefabs/Map/RoomTemplates/NovaVariants/Down_ForestStep.prefab)의 자식 **RoomObjectives**에 있는 `Room Objective Setup` 컴포넌트다.
 
 | 항목 | 의미 |
 | --- | --- |
@@ -92,9 +81,9 @@ WestSouth에는 고블린·아이템·빈 상태의 가중치가 각각 1이다.
 
 ## 함정 설정
 
-WestSouth의 **Room Hazard Settings → Hazards**에 `floor.fire`와 `overhead.spikehead`가 설정돼 있다.
+Down_ForestStep의 **Room Hazard Settings → Hazards**에 `floor.fire`와 `overhead.spikehead`가 설정돼 있다.
 
-1. Base 방 안에 함정 프리팹을 자식으로 배치하고 후보 오브젝트 자체를 비활성화한다.
+1. Variant 방 안에 함정 프리팹을 자식으로 배치하고 후보 오브젝트 자체를 비활성화한다.
 2. **Hazards**에 항목을 추가해 방 안의 `Candidate`를 연결한다. 내부 식별자는 자동 생성되며 기존 식별자도 유지된다.
 3. `Clearance`에는 위험 공간, `Support`에는 고정 지형 지지면을 지정한다. 위험 공간에 후보 기준점이 포함되어야 한다. 위험 공간과 지지면은 서로 겹치지 않고, 변형·보호 영역과 콘텐츠 공간을 피해야 한다. 지지면에는 Grid 타입 충돌 타일이 필요하다.
 4. `Spawn Weight`와 `Empty Weight`로 생성·빈 상태의 가중치를 정한다. 둘 다 1이면 해당 후보가 선택될 확률은 1/2이다. 서로 다른 함정 후보는 각각 생성 여부를 고르므로 한 방에서 함께 나올 수 있다.

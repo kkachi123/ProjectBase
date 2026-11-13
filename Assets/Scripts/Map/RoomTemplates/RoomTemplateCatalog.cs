@@ -50,7 +50,7 @@ namespace ProjectRE.MapGeneration
                     RoomContentSlot slot = entry.Slot;
                     var options = new List<ContentOptionSnapshot>();
                     foreach (RoomContentOption option in slot.options) options.Add(new ContentOptionSnapshot(option.id, option.weight, option.kind));
-                    content.Add(new ContentSlotSnapshot(slot.slotIndex, slot.emptyWeight, options, entry.IsNew));
+                    content.Add(new ContentSlotSnapshot(slot.slotIndex, slot.emptyWeight, options));
                 }
                 content.Sort((a, b) => a.SlotIndex.CompareTo(b.SlotIndex));
                 var hazards = new List<RoomHazardSnapshot>();

@@ -12,9 +12,9 @@ namespace ProjectRE.MapGeneration.Tests
         private const string SettingsPath = "Assets/Prefabs/@Data/Map/MapPlanningSettings.asset";
         private const string GoalPath = "Assets/Prefabs/Map/Goals/GoalTrigger/EndLight-EndTrigger.prefab";
 
-        [TestCase("item")]
-        [TestCase("")]
-        public void RuinedCourtBuildsOptionalBranchWithSelectedContent(string optionId)
+        [TestCase(true)]
+        [TestCase(false)]
+        public void RuinedCourtBuildsOptionalBranchWithSelectedContent(bool hasItem)
         {
             var settings = AssetDatabase.LoadAssetAtPath<MapPlanningSettings>(SettingsPath);
             var goal = AssetDatabase.LoadAssetAtPath<GameObject>(GoalPath);
@@ -26,7 +26,7 @@ namespace ProjectRE.MapGeneration.Tests
                 Assert.That(plan.Success, Is.True, plan.Error);
                 foreach (var candidate in plan.Plan.Rooms)
                     if (candidate.IsOptional && candidate.TemplateId == "production.optional.ruined_court_west" &&
-                        candidate.Content.Count == 1 && candidate.Content[0].OptionId == optionId)
+                        candidate.Content.Count == 1 && !string.IsNullOrEmpty(candidate.Content[0].OptionId) == hasItem)
                     { selected = plan.Plan; planned = candidate; break; }
             }
             Assert.That(planned, Is.Not.Null);
@@ -36,7 +36,7 @@ namespace ProjectRE.MapGeneration.Tests
                 Assert.That(result.Success, Is.True, result.Error);
                 Assert.That(planned.Entry, Is.EqualTo(RoomOpening.West));
                 Assert.That(planned.Content.Count, Is.EqualTo(1));
-                Assert.That(planned.Content[0].OptionId, Is.EqualTo(optionId));
+                Assert.That(!string.IsNullOrEmpty(planned.Content[0].OptionId), Is.EqualTo(hasItem));
                 var rooms = result.Root.GetComponentsInChildren<RoomTemplate>(true);
                 var room = System.Array.Find(rooms, candidate => candidate.transform.localPosition ==
                     new Vector3(planned.Cell.x * RoomTemplate.RoomSize, -planned.Cell.y * RoomTemplate.RoomSize, 0));
@@ -49,11 +49,11 @@ namespace ProjectRE.MapGeneration.Tests
                     room.transform.localPosition + new Vector3(-RoomTemplate.RoomSize, 0, 0));
                 Assert.That(west, Is.Not.Null);
                 Assert.That(west.Openings.HasFlag(RoomOpening.East), Is.True);
-                var slot = room.Content.ContentSettings[0];
+                var slot = room.GetComponent<RoomItemSettings>().Slots[0];
                 foreach (var option in slot.options)
                 {
                     var instance = room.transform.Find(option.prefab.name + "(Clone)");
-                    if (option.id != optionId) Assert.That(instance, Is.Null);
+                    if (!hasItem) Assert.That(instance, Is.Null);
                     else
                     {
                         Assert.That(instance, Is.Not.Null);
@@ -241,7 +241,8 @@ namespace ProjectRE.MapGeneration.Tests
                 Assert.That(room.VerifiedStartExits, Is.EqualTo(RoomOpening.East));
                 Assert.That(room.Goal, Is.Null);
                 Assert.That(room.OptionalTarget, Is.Null);
-                Assert.That(room.Content.ContentSettings, Is.Empty);
+                Assert.That(room.GetComponent<RoomMonsterSettings>().Slots, Is.Empty);
+                Assert.That(room.GetComponent<RoomItemSettings>().Slots, Is.Empty);
                 Assert.That(room.FixedGeometry.GetColliderType(new Vector3Int(12, 3, 0)), Is.EqualTo(Tile.ColliderType.Grid));
                 var east = System.Array.Find(rooms, candidate => candidate.transform.localPosition ==
                     room.transform.localPosition + new Vector3(RoomTemplate.RoomSize, 0, 0));

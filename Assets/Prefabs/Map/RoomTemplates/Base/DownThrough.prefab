@@ -1302,7 +1302,6 @@ GameObject:
   - component: {fileID: 8762294980626075118}
   - component: {fileID: 7610777746961325589}
   - component: {fileID: 2654548260551445650}
-  - component: {fileID: 3892709998147944266}
   - component: {fileID: 9200943101389257272}
   - component: {fileID: 2343756097552499398}
   - component: {fileID: 536541377241932561}
@@ -1401,21 +1400,6 @@ MonoBehaviour:
     height: 3
   _protectedRegions: []
   _terrainVariations: []
---- !u!114 &3892709998147944266
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5854319452106917889}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 21a7899ddd4b7e941bb767ecfd32e56b, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: ProjectRE.MapGeneration::ProjectRE.MapGeneration.RoomContentSettings
-  _contentSlots:
-  - {x: 7, y: 5}
-  _contentSettings: []
 --- !u!114 &9200943101389257272
 MonoBehaviour:
   m_ObjectHideFlags: 0

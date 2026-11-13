@@ -10,6 +10,38 @@ namespace ProjectRE.MapGeneration.Tests
     public sealed class RoomSpawnSettingsTests
     {
         [Test]
+        public void CatalogKeepsCandidatesOnVariantsAndCoversMainPathRooms()
+        {
+            var settings = AssetDatabase.LoadAssetAtPath<MapPlanningSettings>("Assets/Prefabs/@Data/Map/MapPlanningSettings.asset");
+            Assert.That(settings.Catalog.TryCreateSnapshot(out var snapshots, out var error), Is.True, error);
+            var variants = settings.Catalog.Templates.ToDictionary(t => t.TemplateId);
+            var seen = new HashSet<string>();
+            for (int seed = 0; seed < 1000; seed++)
+            {
+                var result = MapPlanner.Create(settings.Width, settings.Height, seed, settings.MaxAttempts, snapshots);
+                Assert.That(result.Success, Is.True, $"seed {seed}: {result.Error}");
+                for (int i = 1; i < result.Plan.Path.Count - 1; i++)
+                    seen.Add(result.Plan.Rooms.Single(r => r.Cell == result.Plan.Path[i]).TemplateId);
+            }
+            Assert.That(seen.Count, Is.EqualTo(11));
+            foreach (string id in seen)
+            {
+                var room = variants[id];
+                Assert.That(room.GetComponent<RoomMonsterSettings>().Slots, Has.Count.EqualTo(1), id);
+                Assert.That(room.GetComponent<RoomItemSettings>().Slots, Has.Count.EqualTo(1), id);
+            }
+            foreach (var room in variants.Values)
+            {
+                var parent = PrefabUtility.GetCorrespondingObjectFromSource(room.gameObject);
+                Assert.That(parent, Is.Not.Null, room.name);
+                Assert.That(parent.GetComponent<RoomMonsterSettings>().Slots, Is.Empty, parent.name);
+                Assert.That(parent.GetComponent<RoomItemSettings>().Slots, Is.Empty, parent.name);
+                Assert.That(parent.GetComponent<RoomHazardSettings>().Hazards, Is.Empty, parent.name);
+                Assert.That(parent.transform.Find("RoomObjectives"), Is.Null, parent.name);
+            }
+        }
+
+        [Test]
         public void SeparateSlotsAreReproducibleAndBuilderReturnsOnlyMonsters()
         {
             var source = AssetDatabase.LoadAssetAtPath<RoomTemplate>("Assets/Prefabs/Map/RoomTemplates/Base/WestSouth.prefab");
@@ -17,13 +49,8 @@ namespace ProjectRE.MapGeneration.Tests
             var catalog = ScriptableObject.CreateInstance<RoomTemplateCatalog>();
             try
             {
-                var original = room.Content.ContentSettings[0];
-                var monster = original.options.Single(o => o.kind == ContentKind.Monster);
-                var item = original.options.Single(o => o.kind == ContentKind.Item);
-                var legacy = new SerializedObject(room.Content);
-                legacy.FindProperty("_contentSettings").arraySize = 0;
-                legacy.FindProperty("_contentSlots").arraySize = 0;
-                legacy.ApplyModifiedPropertiesWithoutUndo();
+                var monster = new RoomContentOption { prefab = AssetDatabase.LoadAssetAtPath<GameObject>("Assets/Prefabs/Monster/Goblin/Goblin.prefab"), offset = new Vector2(.5f, .05f) };
+                var item = new RoomContentOption { prefab = AssetDatabase.LoadAssetAtPath<GameObject>("Assets/Prefabs/Item/Inventory/Item.prefab"), offset = new Vector2(.5f, .3135f) };
                 var hazards = new SerializedObject(room.Hazard);
                 hazards.FindProperty("_hazards").arraySize = 0;
                 hazards.ApplyModifiedPropertiesWithoutUndo();

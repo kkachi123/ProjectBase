@@ -18,9 +18,10 @@ namespace ProjectRE.MapGeneration
             }
 
             var terrain = template.Terrain;
-            var content = template.Content;
+            var monsters = template.GetComponent<RoomMonsterSettings>();
+            var items = template.GetComponent<RoomItemSettings>();
             var hazard = template.Hazard;
-            if (terrain == null || content == null || hazard == null)
+            if (terrain == null || monsters == null || items == null || hazard == null)
             {
                 errors.Add("지형·콘텐츠·함정 설정 컴포넌트가 필요합니다.");
                 return errors;
@@ -165,12 +166,6 @@ namespace ProjectRE.MapGeneration
                 }
             }
 
-            foreach (Vector2Int slot in content.ContentSlots)
-            {
-                if (!room.Contains(slot)) errors.Add($"콘텐츠 슬롯이 방 밖입니다: {slot}");
-                else if (map != null && map.HasTile(new Vector3Int(slot.x, slot.y, 0)))
-                    errors.Add($"콘텐츠 슬롯이 고정 지형과 겹칩니다: {slot}");
-            }
             ValidateContent(template, map, room, errors);
             ValidateHazards(template, map, room, errors);
 

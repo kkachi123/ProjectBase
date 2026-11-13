@@ -107,13 +107,13 @@ namespace ProjectRE.MapGeneration.Tests
                 {
                     Assert.That(room.OptionalTarget, Is.Not.Null);
                     Assert.That(room.VerifiedDeadEndReturns, Is.EqualTo(room.Openings));
-                    Assert.That(room.Content.ContentSettings.SelectMany(s => s.options).All(o => o.kind == ContentKind.Item), Is.True);
-                    var parentContent = PrefabUtility.GetCorrespondingObjectFromSource(room.Content);
+                    var content = room.GetComponent<RoomItemSettings>();
+                    var parentContent = PrefabUtility.GetCorrespondingObjectFromSource(content);
                     Assert.That(parentContent, Is.Not.Null);
-                    Assert.That(room.Content.ContentSlots, Is.EqualTo(parentContent.ContentSlots));
-                    Assert.That(room.Content.ContentSettings[0].emptyWeight, Is.EqualTo(parentContent.ContentSettings[0].emptyWeight));
+                    Assert.That(parentContent.Slots, Is.Empty);
+                    Assert.That(content.Slots.Single().options, Has.Count.EqualTo(1));
                     Assert.That(PrefabUtility.GetPropertyModifications(room.gameObject)
-                        .Any(m => m.target == parentContent && m.propertyPath.Contains("options")), Is.True,
+                        .Any(m => m.target == parentContent && m.propertyPath.Contains("_slots")), Is.True,
                         "아이템 후보는 부모 설정을 복제한 별도 컴포넌트가 아니라 Variant Override여야 합니다.");
                 }
                 else Assert.That(room.PassagesVerified, Is.True);
@@ -164,7 +164,6 @@ namespace ProjectRE.MapGeneration.Tests
         [Test]
         public void BuilderPlacesSelectedPrefabInOptionalRoom()
         {
-            const string id = "item";
             var settings = AssetDatabase.LoadAssetAtPath<MapPlanningSettings>(SettingsPath);
             var goal = AssetDatabase.LoadAssetAtPath<GameObject>(GoalPath);
             MapPlan plan = null;
@@ -173,7 +172,7 @@ namespace ProjectRE.MapGeneration.Tests
             {
                 var result = settings.CreatePlan(seed);
                 Assert.That(result.Success, Is.True, result.Error);
-                side = result.Plan.Rooms.FirstOrDefault(r => r.IsOptional && r.Content.Any(c => c.OptionId == id));
+                side = result.Plan.Rooms.FirstOrDefault(r => r.IsOptional && r.Content.Any(c => !string.IsNullOrEmpty(c.OptionId)));
                 if (side != null) plan = result.Plan;
             }
             Assert.That(side, Is.Not.Null);
@@ -183,14 +182,14 @@ namespace ProjectRE.MapGeneration.Tests
             {
                 int index = side.Cell.y * plan.Width + side.Cell.x;
                 var instance = built.Root.transform.GetChild(index).GetComponent<RoomTemplate>();
-                var slot = instance.Content.ContentSettings.Single();
-                var option = slot.options.Single(o => o.id == id);
+                var slot = instance.GetComponent<RoomItemSettings>().Slots.Single();
+                var option = slot.options.Single();
                 var matching = instance.GetComponentsInChildren<Collider2D>(true)
                     .Where(c => c.transform.parent == instance.transform && c.gameObject != instance.FixedGeometry.gameObject &&
                         instance.Hazard.Hazards.All(h => h.candidate != c.gameObject)).ToArray();
                 Assert.That(matching.Length, Is.EqualTo(1));
                 Assert.That(matching[0].transform.localPosition,
-                    Is.EqualTo(new Vector3(7.5f + option.offset.x, 4f + option.offset.y, 0)));
+                    Is.EqualTo(new Vector3(slot.position.x + .5f + option.offset.x, slot.position.y + option.offset.y, 0)));
                 Assert.That(matching[0].transform.localScale.x < 0, Is.EqualTo(slot.facing == ContentFacing.Left));
             }
             finally { Object.DestroyImmediate(built.Root); }
@@ -255,12 +254,15 @@ namespace ProjectRE.MapGeneration.Tests
             Assert.That(RoomContentPlanner.Select(0, Vector2Int.zero, eliteRoom, ContentRoomRole.Optional).Single().OptionId, Is.EqualTo("elite"));
         }
 
-        [TestCase("goblin")]
-        [TestCase("item")]
-        public void BuilderPlacesMainPathContentInInheritedSlot(string optionId)
+        [TestCase(ContentKind.Monster)]
+        [TestCase(ContentKind.Item)]
+        public void BuilderPlacesMainPathContentInVariantSlot(ContentKind kind)
         {
             var settings = AssetDatabase.LoadAssetAtPath<MapPlanningSettings>(SettingsPath);
             var goal = AssetDatabase.LoadAssetAtPath<GameObject>(GoalPath);
+            var variant = settings.Catalog.Templates.Single(t => t.TemplateId == "production.down.west_forest_step");
+            var variantSlot = kind == ContentKind.Monster ? variant.GetComponent<RoomMonsterSettings>().Slots.Single() : variant.GetComponent<RoomItemSettings>().Slots.Single();
+            string optionId = variantSlot.options.Single().Id;
             MapPlan selected = null;
             MapRoomPlan selectedRoom = null;
             for (int seed = 0; seed < 500 && selected == null; seed++)
@@ -278,10 +280,11 @@ namespace ProjectRE.MapGeneration.Tests
             {
                 var room = build.Root.transform.GetChild(selectedRoom.Cell.y * selected.Width + selectedRoom.Cell.x)
                     .GetComponent<RoomTemplate>();
-                var option = room.Content.ContentSettings.Single().options.Single(o => o.id == optionId);
+                var slot = kind == ContentKind.Monster ? room.GetComponent<RoomMonsterSettings>().Slots.Single() : room.GetComponent<RoomItemSettings>().Slots.Single();
+                var option = slot.options.Single();
                 var instance = room.transform.Find(option.prefab.name + "(Clone)");
                 Assert.That(instance, Is.Not.Null);
-                Assert.That(instance.localPosition, Is.EqualTo(new Vector3(7.5f + option.offset.x, 4f + option.offset.y, 0)));
+                Assert.That(instance.localPosition, Is.EqualTo(new Vector3(slot.position.x + .5f + option.offset.x, slot.position.y + option.offset.y, 0)));
             }
             finally { Object.DestroyImmediate(build.Root); }
         }
@@ -300,12 +303,12 @@ namespace ProjectRE.MapGeneration.Tests
             var invalid = new MapPlan(plan.Width, plan.Height, plan.Seed, rooms, plan.Path, plan.PlayerStart, plan.Goal);
             Assert.That(MapPlanValidator.Validate(invalid, templates), Is.Not.Empty);
 
-            var prefab = AssetDatabase.LoadAssetAtPath<GameObject>("Assets/Prefabs/Map/RoomTemplates/Base/CapWest.prefab");
+            var prefab = AssetDatabase.LoadAssetAtPath<GameObject>("Assets/Prefabs/Map/RoomTemplates/NovaVariants/Optional_CapWest_Ruins.prefab");
             var room = Object.Instantiate(prefab).GetComponent<RoomTemplate>();
             try
             {
-                var so = new SerializedObject(room.Content);
-                so.FindProperty("_contentSettings").GetArrayElementAtIndex(0).FindPropertyRelative("clearance").rectIntValue = new RectInt(7, 5, 1, 2);
+                var so = new SerializedObject(room.GetComponent<RoomItemSettings>());
+                so.FindProperty("_slots").GetArrayElementAtIndex(0).FindPropertyRelative("clearance").rectIntValue = new RectInt(7, 5, 1, 2);
                 so.ApplyModifiedPropertiesWithoutUndo();
                 Assert.That(RoomTemplateChecks.Validate(room), Is.Not.Empty);
             }
@@ -318,14 +321,14 @@ namespace ProjectRE.MapGeneration.Tests
         [TestCase(ContentSurface.EastWall, 1.2f, 1.2f)]
         public void PlacementRequiresTheRequestedSolidSurface(ContentSurface surface, float xOffset, float yOffset)
         {
-            var prefab = AssetDatabase.LoadAssetAtPath<GameObject>("Assets/Prefabs/Map/RoomTemplates/Base/CapWest.prefab");
+            var prefab = AssetDatabase.LoadAssetAtPath<GameObject>("Assets/Prefabs/Map/RoomTemplates/NovaVariants/Optional_CapWest_Ruins.prefab");
             var room = Object.Instantiate(prefab).GetComponent<RoomTemplate>();
             var tile = AssetDatabase.LoadAssetAtPath<UnityEngine.Tilemaps.TileBase>("Assets/Prefabs/Map/RoomTemplates/Shared/SampleSolid.asset");
             try
             {
-                var so = new SerializedObject(room.Content);
-                so.FindProperty("_contentSlots").GetArrayElementAtIndex(0).vector2IntValue = new Vector2Int(10, 10);
-                var slot = so.FindProperty("_contentSettings").GetArrayElementAtIndex(0);
+                var so = new SerializedObject(room.GetComponent<RoomItemSettings>());
+                var slot = so.FindProperty("_slots").GetArrayElementAtIndex(0);
+                slot.FindPropertyRelative("position").vector2IntValue = new Vector2Int(10, 10);
                 slot.FindPropertyRelative("clearance").rectIntValue = new RectInt(10, 10, 2, 3);
                 slot.FindPropertyRelative("surface").enumValueIndex = (int)surface;
                 var options = slot.FindPropertyRelative("options");

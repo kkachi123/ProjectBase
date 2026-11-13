@@ -555,7 +555,7 @@ namespace ProjectRE.MapGeneration.Tests
                 Assert.That(candidate.Success, Is.True, candidate.Error);
                 foreach (var room in candidate.Plan.Rooms)
                 foreach (var content in room.Content)
-                    if (room.IsOptional && content.OptionId == "item") { itemSeed = candidateSeed; itemCell = room.Cell; break; }
+                    if (room.IsOptional && !string.IsNullOrEmpty(content.OptionId)) { itemSeed = candidateSeed; itemCell = room.Cell; break; }
             }
             Assert.That(itemSeed, Is.GreaterThanOrEqualTo(0));
             EditorWindow window = null;

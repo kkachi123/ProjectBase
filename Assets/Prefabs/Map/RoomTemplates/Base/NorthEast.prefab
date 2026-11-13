@@ -1550,7 +1550,6 @@ GameObject:
   - component: {fileID: 3796709586424348529}
   - component: {fileID: 1330420870743675684}
   - component: {fileID: 7083855807809868526}
-  - component: {fileID: 2991910089968790800}
   - component: {fileID: 1544268743933917020}
   - component: {fileID: 3997758398823181042}
   - component: {fileID: 1517003396130630162}
@@ -1577,7 +1576,6 @@ Transform:
   - {fileID: 6895721784305915596}
   - {fileID: 8423301269633052391}
   - {fileID: 1114955139833720532}
-  - {fileID: 8494308137996630375}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!156049354 &3796709586424348529
@@ -1638,21 +1636,6 @@ MonoBehaviour:
     height: 3
   _protectedRegions: []
   _terrainVariations: []
---- !u!114 &2991910089968790800
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5215971926704486631}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 21a7899ddd4b7e941bb767ecfd32e56b, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: ProjectRE.MapGeneration::ProjectRE.MapGeneration.RoomContentSettings
-  _contentSlots:
-  - {x: 7, y: 5}
-  _contentSettings: []
 --- !u!114 &1544268743933917020
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1665,21 +1648,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a952c0ae7ee31ec43a9c084376553787, type: 3}
   m_Name: 
   m_EditorClassIdentifier: ProjectRE.MapGeneration::ProjectRE.MapGeneration.RoomHazardSettings
-  _hazards:
-  - id: west.arrow
-    candidate: {fileID: 3600165176526243880}
-    clearance:
-      x: 1
-      y: 4
-      width: 16
-      height: 2
-    support:
-      x: 0
-      y: 4
-      width: 1
-      height: 2
-    spawnWeight: 1
-    emptyWeight: 1
+  _hazards: []
 --- !u!114 &3997758398823181042
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1769,78 +1738,3 @@ Transform:
   m_Children: []
   m_Father: {fileID: 872312622720638117}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1001 &3149626511279712073
-PrefabInstance:
-  m_ObjectHideFlags: 0
-  serializedVersion: 2
-  m_Modification:
-    serializedVersion: 3
-    m_TransformParent: {fileID: 872312622720638117}
-    m_Modifications:
-    - target: {fileID: 1892606650732179297, guid: ed0c06169bd3d554b9faab153e93e8dd, type: 3}
-      propertyPath: m_Name
-      value: ArrowTrapCandidate_West
-      objectReference: {fileID: 0}
-    - target: {fileID: 1892606650732179297, guid: ed0c06169bd3d554b9faab153e93e8dd, type: 3}
-      propertyPath: m_IsActive
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 5755102200251597192, guid: ed0c06169bd3d554b9faab153e93e8dd, type: 3}
-      propertyPath: projectileLifetime
-      value: 3
-      objectReference: {fileID: 0}
-    - target: {fileID: 6797163981309304366, guid: ed0c06169bd3d554b9faab153e93e8dd, type: 3}
-      propertyPath: m_LocalPosition.x
-      value: 1.4
-      objectReference: {fileID: 0}
-    - target: {fileID: 6797163981309304366, guid: ed0c06169bd3d554b9faab153e93e8dd, type: 3}
-      propertyPath: m_LocalPosition.y
-      value: 5
-      objectReference: {fileID: 0}
-    - target: {fileID: 6797163981309304366, guid: ed0c06169bd3d554b9faab153e93e8dd, type: 3}
-      propertyPath: m_LocalPosition.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 6797163981309304366, guid: ed0c06169bd3d554b9faab153e93e8dd, type: 3}
-      propertyPath: m_LocalRotation.w
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 6797163981309304366, guid: ed0c06169bd3d554b9faab153e93e8dd, type: 3}
-      propertyPath: m_LocalRotation.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 6797163981309304366, guid: ed0c06169bd3d554b9faab153e93e8dd, type: 3}
-      propertyPath: m_LocalRotation.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 6797163981309304366, guid: ed0c06169bd3d554b9faab153e93e8dd, type: 3}
-      propertyPath: m_LocalRotation.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 6797163981309304366, guid: ed0c06169bd3d554b9faab153e93e8dd, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 6797163981309304366, guid: ed0c06169bd3d554b9faab153e93e8dd, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 6797163981309304366, guid: ed0c06169bd3d554b9faab153e93e8dd, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.z
-      value: 0
-      objectReference: {fileID: 0}
-    m_RemovedComponents: []
-    m_RemovedGameObjects: []
-    m_AddedGameObjects: []
-    m_AddedComponents: []
-  m_SourcePrefab: {fileID: 100100000, guid: ed0c06169bd3d554b9faab153e93e8dd, type: 3}
---- !u!1 &3600165176526243880 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 1892606650732179297, guid: ed0c06169bd3d554b9faab153e93e8dd, type: 3}
-  m_PrefabInstance: {fileID: 3149626511279712073}
-  m_PrefabAsset: {fileID: 0}
---- !u!4 &8494308137996630375 stripped
-Transform:
-  m_CorrespondingSourceObject: {fileID: 6797163981309304366, guid: ed0c06169bd3d554b9faab153e93e8dd, type: 3}
-  m_PrefabInstance: {fileID: 3149626511279712073}
-  m_PrefabAsset: {fileID: 0}

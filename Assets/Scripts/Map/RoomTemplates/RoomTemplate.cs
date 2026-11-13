@@ -33,7 +33,8 @@ namespace ProjectRE.MapGeneration
     /// <summary>방 하나의 제작 원본. 통로 조합과 지형은 각각 제작자가 지정한다.</summary>
     [DisallowMultipleComponent]
     [RequireComponent(typeof(Grid))]
-    [RequireComponent(typeof(RoomTerrainSettings), typeof(RoomContentSettings), typeof(RoomHazardSettings))]
+    [RequireComponent(typeof(RoomTerrainSettings), typeof(RoomHazardSettings))]
+    [RequireComponent(typeof(RoomMonsterSettings), typeof(RoomItemSettings))]
     public sealed class RoomTemplate : MonoBehaviour
     {
         public const int RoomSize = 20;
@@ -72,7 +73,6 @@ namespace ProjectRE.MapGeneration
         public IReadOnlyList<RoomPassage> Passages => _passages;
         public bool PassagesVerified => _passagesVerified;
         public RoomTerrainSettings Terrain => GetComponent<RoomTerrainSettings>();
-        public RoomContentSettings Content => GetComponent<RoomContentSettings>();
         public RoomHazardSettings Hazard => GetComponent<RoomHazardSettings>();
         public Transform PlayerStart => _playerStart;
         public Transform Goal => _goal;

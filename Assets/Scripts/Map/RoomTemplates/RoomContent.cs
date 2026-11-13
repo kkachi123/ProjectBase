@@ -44,12 +44,10 @@ namespace ProjectRE.MapGeneration
         public int SlotIndex { get; }
         public int EmptyWeight { get; }
         public IReadOnlyList<ContentOptionSnapshot> Options { get; }
-        public bool UseMixedSeed { get; }
-        public ContentSlotSnapshot(int index, int emptyWeight, IEnumerable<ContentOptionSnapshot> options, bool useMixedSeed = false)
+        public ContentSlotSnapshot(int index, int emptyWeight, IEnumerable<ContentOptionSnapshot> options)
         {
             SlotIndex = index;
             EmptyWeight = emptyWeight;
-            UseMixedSeed = useMixedSeed;
             var list = new List<ContentOptionSnapshot>(options);
             list.Sort((a, b) => string.CompareOrdinal(a.Id, b.Id));
             Options = list.AsReadOnly();
@@ -78,14 +76,11 @@ namespace ProjectRE.MapGeneration
                 foreach (char c in template.Id) Add(c);
                 Add(0xC071E17u); Add(unchecked((uint)slot.SlotIndex));
                 h = unchecked(h * 1664525u + 1013904223u);
-                if (slot.UseMixedSeed)
-                {
-                    h ^= h >> 16;
-                    h = unchecked(h * 0x7feb352du);
-                    h ^= h >> 15;
-                    h = unchecked(h * 0x846ca68bu);
-                    h ^= h >> 16;
-                }
+                h ^= h >> 16;
+                h = unchecked(h * 0x7feb352du);
+                h ^= h >> 15;
+                h = unchecked(h * 0x846ca68bu);
+                h ^= h >> 16;
                 int total = slot.EmptyWeight;
                 foreach (ContentOptionSnapshot option in slot.Options)
                     if (Allowed(option.Kind, role)) total += option.Weight;
