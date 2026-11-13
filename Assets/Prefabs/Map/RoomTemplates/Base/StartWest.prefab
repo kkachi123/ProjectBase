@@ -14,6 +14,8 @@ GameObject:
   - component: {fileID: 3487015763666865201}
   - component: {fileID: 5913977621078568498}
   - component: {fileID: 286898795710528549}
+  - component: {fileID: 7170402899339939506}
+  - component: {fileID: 2176518253364888380}
   m_Layer: 6
   m_Name: StartWest
   m_TagString: Untagged
@@ -122,6 +124,33 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: ProjectRE.MapGeneration::ProjectRE.MapGeneration.RoomHazardSettings
   _hazards: []
+--- !u!114 &7170402899339939506
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 584988077306979553}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9521a88e9e2653e489af77dc101489d8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: ProjectRE.MapGeneration::ProjectRE.MapGeneration.RoomMonsterSettings
+  _slots: []
+  _kind: 0
+--- !u!114 &2176518253364888380
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 584988077306979553}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4360fd7f5006b6b4d98fe45eaab84c12, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: ProjectRE.MapGeneration::ProjectRE.MapGeneration.RoomItemSettings
+  _slots: []
 --- !u!1 &3275019109115908945
 GameObject:
   m_ObjectHideFlags: 0

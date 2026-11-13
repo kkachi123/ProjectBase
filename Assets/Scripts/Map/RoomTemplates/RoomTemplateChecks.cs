@@ -224,7 +224,6 @@ namespace ProjectRE.MapGeneration
         private static void ValidateHazards(RoomTemplate template, Tilemap map, RectInt room, List<string> errors)
         {
             var terrain = template.Terrain;
-            var content = template.Content;
             var hazard = template.Hazard;
             var ids = new HashSet<string>(System.StringComparer.Ordinal);
             var candidates = new HashSet<GameObject>();
@@ -250,8 +249,8 @@ namespace ProjectRE.MapGeneration
                     if (area.Overlaps(region) || support.Overlaps(region)) errors.Add($"함정이 보호 구역과 겹칩니다: {slot.id}");
                 foreach (RectInt region in terrain.VariationRegions)
                     if (area.Overlaps(region) || support.Overlaps(region)) errors.Add($"함정이 변형 영역과 겹칩니다: {slot.id}");
-                foreach (RoomContentSlot contentSlot in content.ContentSettings)
-                    if (contentSlot != null && (area.Overlaps(contentSlot.clearance) || support.Overlaps(contentSlot.clearance)))
+                foreach (var entry in RoomContentLayout.Read(template))
+                    if (entry.Slot != null && (area.Overlaps(entry.Slot.clearance) || support.Overlaps(entry.Slot.clearance)))
                         errors.Add($"함정이 콘텐츠 공간과 겹칩니다: {slot.id}");
                 foreach (RoomOpening side in Sides)
                     if (area.Overlaps(RoomTemplate.OpeningCells(side))) errors.Add($"함정이 출입구와 겹칩니다: {slot.id}");
@@ -270,16 +269,19 @@ namespace ProjectRE.MapGeneration
         private static void ValidateContent(RoomTemplate template, Tilemap map, RectInt room, List<string> errors)
         {
             var terrain = template.Terrain;
-            var content = template.Content;
             var indices = new HashSet<int>();
             var usedAreas = new List<RectInt>();
-            foreach (RoomContentSlot slot in content.ContentSettings)
+            foreach (var entry in RoomContentLayout.Read(template))
             {
-                if (slot == null || slot.slotIndex < 0 || slot.slotIndex >= content.ContentSlots.Count || !indices.Add(slot.slotIndex))
+                RoomContentSlot slot = entry.Slot;
+                if (slot == null || !entry.HasPosition || slot.slotIndex < 0 || !indices.Add(slot.slotIndex))
                 { errors.Add("콘텐츠 설정의 슬롯이 없거나 중복됩니다."); continue; }
+                Vector2Int position = entry.Position;
+                if (!room.Contains(position) || (map != null && map.HasTile(new Vector3Int(position.x, position.y, 0))))
+                    errors.Add($"콘텐츠 슬롯이 방 밖이거나 고정 지형과 겹칩니다: {position}");
                 RectInt area = slot.clearance;
                 if (area.width <= 0 || area.height <= 0 || !room.Contains(area.min) || area.xMax > room.xMax || area.yMax > room.yMax ||
-                    !area.Contains(content.ContentSlots[slot.slotIndex]) || !System.Enum.IsDefined(typeof(ContentSurface), slot.surface) ||
+                    !area.Contains(position) || !System.Enum.IsDefined(typeof(ContentSurface), slot.surface) ||
                     !System.Enum.IsDefined(typeof(ContentFacing), slot.facing))
                 { errors.Add("콘텐츠 공간 또는 방향이 잘못됐습니다."); continue; }
                 foreach (RectInt other in usedAreas) if (area.Overlaps(other)) errors.Add("콘텐츠 슬롯의 충돌 공간이 겹칩니다.");
@@ -328,7 +330,7 @@ namespace ProjectRE.MapGeneration
                         float.IsNaN(scale.x) || float.IsInfinity(scale.x) || float.IsNaN(scale.y) || float.IsInfinity(scale.y) || scale.y <= 0 || scale.x <= 0)
                     { errors.Add($"콘텐츠 위치 또는 크기가 올바르지 않습니다: {option.id}"); continue; }
                     float sx = Mathf.Abs(scale.x), sy = Mathf.Abs(scale.y), facing = slot.facing == ContentFacing.Left ? -1f : 1f;
-                    Vector2 origin = (Vector2)content.ContentSlots[slot.slotIndex] + new Vector2(.5f, 0) + option.offset;
+                    Vector2 origin = (Vector2)position + new Vector2(.5f, 0) + option.offset;
                     Vector2 center = origin + new Vector2(colliders[0].offset.x * sx * facing, colliders[0].offset.y * sy);
                     Vector2 half = new Vector2(size.x * sx, size.y * sy) * .5f;
                     const float epsilon = .02f;

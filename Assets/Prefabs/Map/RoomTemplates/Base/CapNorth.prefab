@@ -14,6 +14,8 @@ GameObject:
   - component: {fileID: 406983774988614136}
   - component: {fileID: 6622012591786874978}
   - component: {fileID: 3295795255725108452}
+  - component: {fileID: 1953347299693081953}
+  - component: {fileID: 8783675554149898147}
   m_Layer: 6
   m_Name: CapNorth
   m_TagString: Untagged
@@ -123,6 +125,33 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: ProjectRE.MapGeneration::ProjectRE.MapGeneration.RoomHazardSettings
   _hazards: []
+--- !u!114 &1953347299693081953
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3917592517610378041}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9521a88e9e2653e489af77dc101489d8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: ProjectRE.MapGeneration::ProjectRE.MapGeneration.RoomMonsterSettings
+  _slots: []
+  _kind: 0
+--- !u!114 &8783675554149898147
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3917592517610378041}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4360fd7f5006b6b4d98fe45eaab84c12, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: ProjectRE.MapGeneration::ProjectRE.MapGeneration.RoomItemSettings
+  _slots: []
 --- !u!1 &4245077338593070101
 GameObject:
   m_ObjectHideFlags: 0

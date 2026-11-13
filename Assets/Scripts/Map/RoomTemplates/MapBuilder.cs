@@ -26,9 +26,14 @@ namespace ProjectRE.MapGeneration
         public MapRoomPlan Plan { get; }
         public RoomTemplate Template { get; }
         public IReadOnlyDictionary<int, GameObject> Content { get; }
+        public IReadOnlyList<GameObject> Monsters { get; }
 
         public BuiltRoom(MapRoomPlan plan, RoomTemplate template, IReadOnlyDictionary<int, GameObject> content)
-        { Plan = plan; Template = template; Content = content; }
+            : this(plan, template, content, Array.Empty<GameObject>()) { }
+
+        public BuiltRoom(MapRoomPlan plan, RoomTemplate template, IReadOnlyDictionary<int, GameObject> content,
+            IReadOnlyList<GameObject> monsters)
+        { Plan = plan; Template = template; Content = content; Monsters = monsters; }
     }
 
     /// <summary>검증된 계획을 비활성 루트에 생성한다. 기존 맵은 다루지 않는다.</summary>
@@ -80,9 +85,10 @@ namespace ProjectRE.MapGeneration
                     var template = instance.GetComponent<RoomTemplate>();
                     var roomOrigin = new Vector3Int(room.Cell.x * RoomTemplate.RoomSize, -room.Cell.y * RoomTemplate.RoomSize, 0);
                     RoomTerrainBuilder.Apply(room, template, roomOrigin, terrainMaps, visualGround != null, context);
-                    var builtContent = RoomContentBuilder.Build(room, template, context);
+                    var monsters = new List<GameObject>();
+                    var builtContent = RoomContentBuilder.Build(room, template, context, monsters);
                     RoomHazardBuilder.Apply(room, template.Hazard, context);
-                    builtRooms.Add(new BuiltRoom(room, template, builtContent));
+                    builtRooms.Add(new BuiltRoom(room, template, builtContent, monsters.AsReadOnly()));
                 }
                 GameObject goal = context.InstantiatePrefab(goalPrefab, root.transform);
                 if (goal == null) throw new InvalidOperationException("Goal 생성 실패");

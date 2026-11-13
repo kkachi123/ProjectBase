@@ -1636,6 +1636,8 @@ GameObject:
   - component: {fileID: 2487935393250000290}
   - component: {fileID: 737779126763441914}
   - component: {fileID: 6961908363530485721}
+  - component: {fileID: 8478046051151180903}
+  - component: {fileID: 1486877678020230051}
   m_Layer: 6
   m_Name: OptionalWest
   m_TagString: Untagged
@@ -1781,6 +1783,33 @@ MonoBehaviour:
     spawnWeight: 1
     emptyWeight: 1
     passageVerified: 1
+--- !u!114 &8478046051151180903
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7160222269490821041}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9521a88e9e2653e489af77dc101489d8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: ProjectRE.MapGeneration::ProjectRE.MapGeneration.RoomMonsterSettings
+  _slots: []
+  _kind: 0
+--- !u!114 &1486877678020230051
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7160222269490821041}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4360fd7f5006b6b4d98fe45eaab84c12, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: ProjectRE.MapGeneration::ProjectRE.MapGeneration.RoomItemSettings
+  _slots: []
 --- !u!1001 &2566432393703049629
 PrefabInstance:
   m_ObjectHideFlags: 0

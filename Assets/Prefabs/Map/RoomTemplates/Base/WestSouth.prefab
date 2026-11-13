@@ -1830,6 +1830,8 @@ GameObject:
   - component: {fileID: 8541289408099027169}
   - component: {fileID: 7730644924330084249}
   - component: {fileID: 2840899957987649785}
+  - component: {fileID: 3955165655866395007}
+  - component: {fileID: 8745416026161059834}
   m_Layer: 6
   m_Name: WestSouth
   m_TagString: Untagged
@@ -1994,6 +1996,33 @@ MonoBehaviour:
     spawnWeight: 1
     emptyWeight: 1
     passageVerified: 1
+--- !u!114 &3955165655866395007
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2884520630046717387}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9521a88e9e2653e489af77dc101489d8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: ProjectRE.MapGeneration::ProjectRE.MapGeneration.RoomMonsterSettings
+  _slots: []
+  _kind: 0
+--- !u!114 &8745416026161059834
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2884520630046717387}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4360fd7f5006b6b4d98fe45eaab84c12, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: ProjectRE.MapGeneration::ProjectRE.MapGeneration.RoomItemSettings
+  _slots: []
 --- !u!1 &3562164154404969455
 GameObject:
   m_ObjectHideFlags: 0

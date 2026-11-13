@@ -10,6 +10,8 @@
 
 방 목표는 `WestSouth`와 `Down` Base 및 상속 Variant에 설정돼 있다. `RoomMapFactory`가 실제 생성 결과를 `RoomObjectiveSetup`에 전달하면 적용 가능한 규칙 중 하나를 seed로 선택한다.
 
+몬스터·아이템 설정 컴포넌트는 분리되어 있지만 기존 후보는 아직 Base의 `RoomContentSettings`에 남아 있다. `RoomContentLayout`은 후보 이전 전까지 기존 설정과 새 설정을 함께 읽는다.
+
 ## 클래스 관계
 
 화살표는 호출하거나 사용하는 관계이고 `*--`는 데이터 포함 관계다. 맵 계획과 씬 생성은 내부 선택의 호출·적용 지점으로 표시한다.
@@ -18,11 +20,17 @@
 classDiagram
     RoomTemplate ..> RoomTerrainSettings : 지형 설정
     RoomTemplate ..> RoomContentSettings : 콘텐츠 설정
+    RoomTemplate ..> RoomMonsterSettings : 몬스터 설정
+    RoomTemplate ..> RoomItemSettings : 아이템 설정
     RoomTemplate ..> RoomHazardSettings : 함정 설정
     RoomTerrainSettings *-- RoomTerrainVariation : 변형 설정
     RoomTerrainVariation *-- RoomTerrainPattern : 패턴 후보
     RoomTerrainVariation *-- RoomChanceCell : 확률 셀
     RoomContentSettings *-- RoomContentSlot : 콘텐츠 슬롯
+    RoomMonsterSettings *-- RoomSpawnSlot : 몬스터 슬롯
+    RoomItemSettings *-- RoomSpawnSlot : 아이템 슬롯
+    RoomSpawnSlot *-- RoomSpawnOption : 프리팹 후보
+    RoomTemplateCatalog ..> RoomContentLayout : 설정 통합
     RoomHazardSettings *-- RoomHazardSlot : 함정 후보
     RoomContentSlot *-- RoomContentOption : 콘텐츠 후보
     RoomTemplateCatalog ..> RoomTemplateChecks : 원본 검사
@@ -57,7 +65,7 @@ classDiagram
 
 ## 선택과 적용 순서
 
-1. 제작자는 `RoomTemplate`에 고정 Tilemap·출입구·마커와 검증 표시를 지정한다. 변형·보호 영역, 콘텐츠 슬롯과 함정 후보는 각각 `RoomTerrainSettings`, `RoomContentSettings`, `RoomHazardSettings`에 지정한다.
+1. 제작자는 `RoomTemplate`에 고정 Tilemap·출입구·마커와 검증 표시를 지정한다. 변형·보호 영역, 몬스터·아이템 슬롯과 함정 후보는 각각 지형·몬스터·아이템·함정 설정에 지정한다. 이전 전의 기존 후보는 `RoomContentSettings`에서 읽는다.
 2. `RoomTemplateCatalog.TryCreateSnapshot()`이 `RoomTemplateChecks`로 원본을 검사하고, 계산에 필요한 ID·확률·가중치를 `RoomTemplateSnapshot`과 내부 스냅샷으로 복사한다. 스냅샷에는 생성할 프리팹 참조를 담지 않는다.
 3. `MapPlanner`가 해당 칸의 방을 고르면 `RoomTerrainPlanner.Select()`가 영역별 패턴 ID와 채울 셀을 선택한다. 결과는 `MapRoomPlan.Terrain`에 저장된다. 지형 선택에는 seed, 방 좌표, 템플릿 ID와 영역 인덱스를 사용한다.
 4. 경로와 선택 방이 확정되면 `RoomContentPlanner.Select()`가 중간 경로 방과 선택 방의 슬롯별 콘텐츠 ID 또는 빈 선택을 정한다. 일반 방에는 아이템·일반 몬스터, 선택 방에는 아이템·엘리트 몬스터가 허용된다. 시작·Goal과 닫힌 방에는 콘텐츠를 선택하지 않는다. 콘텐츠 난수에는 seed, 방 좌표, 템플릿 ID와 슬롯 인덱스를 사용한다.
@@ -74,6 +82,8 @@ classDiagram
 | --- | --- | --- |
 | `RoomTemplate` | [RoomTemplate.cs](../../../../Assets/Scripts/Map/RoomTemplates/RoomTemplate.cs) | 방 ID·유형·출입구·통과 방향, 고정 Tilemap과 마커를 보관한다. `OpeningCells()`가 출입구 셀의 기준이다. |
 | `RoomTerrainSettings`, `RoomContentSettings`, `RoomHazardSettings` | [RoomTerrainSettings.cs](../../../../Assets/Scripts/Map/RoomTemplates/RoomTerrainSettings.cs), [RoomContentSettings.cs](../../../../Assets/Scripts/Map/RoomTemplates/RoomContentSettings.cs), [RoomHazardSettings.cs](../../../../Assets/Scripts/Map/RoomTemplates/RoomHazardSettings.cs) | 지형·콘텐츠·함정 제작 설정을 각각 보관한다. |
+| `RoomMonsterSettings`, `RoomItemSettings`, `RoomSpawnSettings` | [RoomMonsterSettings.cs](../../../../Assets/Scripts/Map/RoomTemplates/RoomMonsterSettings.cs), [RoomItemSettings.cs](../../../../Assets/Scripts/Map/RoomTemplates/RoomItemSettings.cs), [RoomSpawnSettings.cs](../../../../Assets/Scripts/Map/RoomTemplates/RoomSpawnSettings.cs) | 몬스터와 아이템 슬롯을 구분하고 위치·후보·자동 식별자를 관리한다. |
+| `RoomContentLayout` | [RoomContentLayout.cs](../../../../Assets/Scripts/Map/RoomTemplates/RoomContentLayout.cs) | 기존 설정과 새 설정을 선택·검사·생성에 사용할 공통 슬롯으로 읽는다. |
 | `RoomTerrainBuilder`, `RoomContentBuilder`, `RoomHazardBuilder` | [RoomTerrainBuilder.cs](../../../../Assets/Scripts/Map/RoomTemplates/RoomTerrainBuilder.cs), [RoomContentBuilder.cs](../../../../Assets/Scripts/Map/RoomTemplates/RoomContentBuilder.cs), [RoomHazardBuilder.cs](../../../../Assets/Scripts/Map/RoomTemplates/RoomHazardBuilder.cs) | 선택된 지형·콘텐츠·함정을 각각 적용한다. |
 | `RoomType`, `RoomOpening`, `RoomPassage` | [RoomTemplate.cs](../../../../Assets/Scripts/Map/RoomTemplates/RoomTemplate.cs) | 방 유형·출입구 방향·진입→진출 후보를 표현한다. |
 | `RoomTerrainVariation`, `RoomTerrainPattern`, `RoomChanceCell` | [RoomTerrainSettings.cs](../../../../Assets/Scripts/Map/RoomTemplates/RoomTerrainSettings.cs) | 변형 영역의 패턴 후보와 확률 셀·검증 표시를 보관한다. |

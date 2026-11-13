@@ -14,6 +14,8 @@ GameObject:
   - component: {fileID: 4308241834486254442}
   - component: {fileID: 640575881431774861}
   - component: {fileID: 4380091023808591356}
+  - component: {fileID: 1644669252282469419}
+  - component: {fileID: 5843447626533190101}
   m_Layer: 6
   m_Name: NorthWest_Tiered
   m_TagString: Untagged
@@ -166,6 +168,33 @@ MonoBehaviour:
     spawnWeight: 1
     emptyWeight: 1
     passageVerified: 1
+--- !u!114 &1644669252282469419
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 755266346531966824}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9521a88e9e2653e489af77dc101489d8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: ProjectRE.MapGeneration::ProjectRE.MapGeneration.RoomMonsterSettings
+  _slots: []
+  _kind: 0
+--- !u!114 &5843447626533190101
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 755266346531966824}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4360fd7f5006b6b4d98fe45eaab84c12, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: ProjectRE.MapGeneration::ProjectRE.MapGeneration.RoomItemSettings
+  _slots: []
 --- !u!1 &1896368662506490583
 GameObject:
   m_ObjectHideFlags: 0

@@ -45,11 +45,12 @@ namespace ProjectRE.MapGeneration
                 }
                 terrain.Sort((a, b) => a.RegionIndex.CompareTo(b.RegionIndex));
                 var content = new List<ContentSlotSnapshot>();
-                foreach (RoomContentSlot slot in template.Content.ContentSettings)
+                foreach (var entry in RoomContentLayout.Read(template))
                 {
+                    RoomContentSlot slot = entry.Slot;
                     var options = new List<ContentOptionSnapshot>();
                     foreach (RoomContentOption option in slot.options) options.Add(new ContentOptionSnapshot(option.id, option.weight, option.kind));
-                    content.Add(new ContentSlotSnapshot(slot.slotIndex, slot.emptyWeight, options));
+                    content.Add(new ContentSlotSnapshot(slot.slotIndex, slot.emptyWeight, options, entry.IsNew));
                 }
                 content.Sort((a, b) => a.SlotIndex.CompareTo(b.SlotIndex));
                 var hazards = new List<RoomHazardSnapshot>();

@@ -9,7 +9,7 @@
 
 ## Chunk Generation — Chunk 내부 생성
 
-프리팹 및 Chunk 리팩토링을 완료했다. 목표 규칙과 자동 출구 문을 구현하고 실제 Player의 몬스터 목표 완료, 화염·스위치·Goal 연결을 확인했다. [단계별 진행 현황](Chunk_Generation/Chunk_Generation_Progress.md#프리팹-및-chunk-리팩토링).
+목표 규칙과 자동 출구 문을 구현하고 실제 Player의 몬스터 목표 완료, 화염·스위치·Goal 연결을 확인했다. 콘텐츠 설정을 몬스터·아이템 컴포넌트로 분리했으며 Variant별 후보 이전과 확장은 진행 전이다. [단계별 진행 현황](Chunk_Generation/Chunk_Generation_Progress.md#콘텐츠-설정-분리-및-claude-code-검토-준비).
 
 - [x] **내부 조합의 기본 기능:** 패턴·확률 셀과 선택 방 콘텐츠의 선택·적용을 구현했다. 내부 지형의 실제 조합 검증은 샘플 방에 한정된다.
 - [x] **Base·Nova Variant 전환:** Base를 상속한 Nova Variant를 기본 카탈로그에 등록하고 씬·에디터·테스트 연결을 확인했다. 현재 카탈로그에는 21개가 있다.

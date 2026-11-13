@@ -47,17 +47,9 @@ namespace ProjectRE
             }
 
             var monsters = new List<Health>();
-            foreach (var choice in room.Plan.Content)
+            foreach (var monster in room.Monsters)
             {
-                if (!room.Content.TryGetValue(choice.SlotIndex, out var content)) continue;
-                RoomContentOption option = null;
-                foreach (var slot in room.Template.Content.ContentSettings)
-                    if (slot.slotIndex == choice.SlotIndex)
-                        foreach (var candidate in slot.options)
-                            if (candidate.id == choice.OptionId) option = candidate;
-                if (option == null) throw new InvalidOperationException("생성된 콘텐츠의 선택 정보를 찾을 수 없습니다.");
-                if (option.kind != ContentKind.Monster && option.kind != ContentKind.EliteMonster) continue;
-                var health = content.GetComponent<Health>();
+                var health = monster.GetComponent<Health>();
                 if (health == null || !health.enabled) throw new InvalidOperationException("목표 몬스터에 활성 Health가 없습니다.");
                 monsters.Add(health);
             }
