@@ -9,15 +9,14 @@
 
 ## Chunk Generation — Chunk 내부 생성
 
-목표 규칙과 자동 출구 문을 구현하고 실제 Player의 몬스터 목표 완료, 화염·스위치·Goal 연결을 확인했다. 몬스터·아이템 설정을 분리하고 기존 함정·목표와 함께 Variant로 이전했다. 신규 콘텐츠 배치의 실제 Player 검증이 남아 있다. [단계별 진행 현황](Chunk_Generation/Chunk_Generation_Progress.md#콘텐츠-설정-분리-및-claude-code-검토-준비).
+목표 규칙과 자동 출구 문을 구현하고 실제 Player의 몬스터 목표 완료, 화염·스위치·Goal 연결을 확인했다. 몬스터·아이템 설정을 분리하고 기존 함정·목표와 함께 Variant로 이전했다. 신규 배치는 대표 가로 방에서 아이템 획득을 확인했다. [단계별 진행 현황](Chunk_Generation/Chunk_Generation_Progress.md#콘텐츠-설정-분리-및-claude-code-검토-준비).
 
 - [x] **내부 조합의 기본 기능:** 패턴·확률 셀과 선택 방 콘텐츠의 선택·적용을 구현했다. 내부 지형의 실제 조합 검증은 샘플 방에 한정된다.
 - [x] **Base·Nova Variant 전환:** Base를 상속한 Nova Variant를 기본 카탈로그에 등록하고 씬·에디터·테스트 연결을 확인했다. 현재 카탈로그에는 21개가 있다.
-- [x] **방 역할별 콘텐츠 배치:** 일반 경로 Variant 11개에 고블린·아이템 슬롯을 설정하고 선택 방 3곳의 아이템을 유지했다. 신규 배치의 실제 Player 검증은 남아 있으며 엘리트 몬스터는 제작 후 연결한다.
+- [x] **방 역할별 콘텐츠 배치:** 일반 경로 Variant 11개에 고블린·아이템 슬롯을 설정하고 선택 방 3곳의 아이템을 유지했다. 엘리트 몬스터는 제작 후 연결한다.
 - [x] **그래픽과 내부 조합 확인:** 수관 이음새와 대표 인접 방의 반복 배치를 정리하고, 두 가로 Variant의 내부 지형 조합과 대표 연결을 임시 화면으로 확인했다. 실제 게임 조명과 모든 방 연결은 미검증이며 작은 확률 셀의 대비와 같은 방의 연속 배치는 추가 확인이 필요하다.
 - [ ] **방 구조와 함정 배치:** 화살 함정·투사체 풀과 Spikes·Fire·Saw·SpikeHead·SpikedBall을 구현해 대표 방에 확률 배치했다. FallingPlatform은 다층 방의 플랫폼 패턴으로 설정했다. 가시·가시 공·낙하 발판이 함께 생성된 다층 방의 아래 경로를 체력 10으로 통과했다. 상층 경로의 무피해 통과는 미확인이다. [세부 단계](Chunk_Generation/Chunk_Generation_Progress.md)를 참고한다.
-- [x] **방별 진행 조건:** `Down_ForestStep`과 `Junction_Down`에서 실제 생성된 대상에 적용 가능한 목표 규칙 하나를 선택하고 주 출구에 공통 문을 자동 배치한다. 이전 설정에서 실제 Player의 몬스터·스위치 목표 완료, 남쪽 문 통과와 미완료 분기 왕복을 확인했다. 이전 후 실제 Player 검증은 남아 있다. 정식 목표 UI는 [UI 작업](../UI/UI_Progress.md)으로 이월한다. [검증 범위](Chunk_Generation/Chunk_Generation_Progress.md#프리팹-및-chunk-리팩토링).
-- [ ] **방·콘텐츠 확장 검증:** 일반 방의 신규 몬스터·아이템 배치와 기존 목표·함정 조합의 실제 Player 이동을 확인한다. [세부 체크리스트](Chunk_Generation/Chunk_Generation_Progress.md#남은-단계).
+- [x] **방별 진행 조건:** `Down_ForestStep`과 `Junction_Down`에서 실제 생성된 대상에 적용 가능한 목표 규칙 하나를 선택하고 주 출구에 공통 문을 자동 배치한다. 이전 설정에서 실제 Player의 몬스터·스위치 목표 완료, 남쪽 문 통과와 미완료 분기 왕복을 확인했다. 이전 후 목표 완료는 실제 Player로 확인하지 않았다. 정식 목표 UI는 [UI 작업](../UI/UI_Progress.md)으로 이월한다. [검증 범위](Chunk_Generation/Chunk_Generation_Progress.md#프리팹-및-chunk-리팩토링).
 - [ ] **난이도별 출현 확률:** 마지막 단계에서 난이도 설정에 따라 몬스터·아이템·함정의 슬롯별 출현 확률을 조절한다.
 
 세부 완료 상태, 남은 확인과 다음 작업은 [Chunk 내부 생성 진행 현황](Chunk_Generation/Chunk_Generation_Progress.md)을 기준으로 한다.
