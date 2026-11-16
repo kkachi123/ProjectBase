@@ -13,6 +13,7 @@
 - [NovaDevs 그래픽 설계](Work/NovaDevs_Level_Art_Design.md): 에셋과 지형 그래픽의 구성이다.
 - [지형·배경·장식 제작 규칙](Work/Room_Art_Authoring_Guide.md): 방의 그래픽을 배치하고 확인하는 방법이다.
 - [타일·그래픽 작업 지침](Work/Room_Tile_Visual_Plan.md): AI가 작업할 때 따르는 작업 방법과 검증 기준이다.
+- [탐사형 방 계획](Work/Exploration_Room_Plan.md): 대표 방의 컨셉·이동 구조·콘텐츠 배치와 완료 기준이다.
 - [방별 진행 조건 계획](Work/Room_Progression_Plan.md): 목표·출구 잠금과 검증 순서다.
 - [Claude Code 검토 요청](Work/Claude_Chunk_Review_Prompt.md): Chunk 콘텐츠 리팩토링을 독립적으로 검토하기 위한 요청문이다.
 - [Claude Code 검토 결과](Work/Claude_Chunk_Review_Result.md): 위 요청에 따른 발견 사항, 코드 구조 평가와 검사 범위다.
