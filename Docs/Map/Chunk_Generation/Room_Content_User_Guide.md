@@ -54,7 +54,7 @@ Horizontal의 현재 설정은 영역 `(3, 10)` 크기 `4×3`, 발판 패턴 또
 
 ## 몬스터·아이템 설정
 
-Variant의 `Room Monster Settings`와 `Room Item Settings`에서 구분한다. 각 `Slots` 항목에 기준 셀 `Position`, 빈 공간 `Clearance`, 지지면 `Surface`, 방향 `Facing`, 빈 상태 가중치 `Empty Weight`와 `Options`의 프리팹·가중치·위치 오프셋을 넣는다. 몬스터의 `Kind`는 일반 경로용 `Normal` 또는 선택 방용 `Elite`다. 슬롯과 후보의 내부 식별자는 자동으로 관리한다.
+Variant의 `Room Monster Settings`와 `Room Item Settings`에서 구분한다. 각 `Slots` 항목에 기준 셀 `Position`, 빈 공간 `Clearance`, 지지면 `Surface`, 방향 `Facing`, 빈 상태 가중치 `Empty Weight`와 `Options`의 프리팹·가중치·위치 오프셋을 넣는다. 몬스터의 `Kind`는 일반 경로용 `Normal` 또는 선택 방용 `Elite`다. Inspector에서 슬롯과 후보를 편집하면 내부 식별자가 부여된다. 편집한 프리팹은 저장한다.
 
 각 슬롯은 후보 하나 또는 빈 상태를 선택한다. 몬스터와 아이템은 별도 슬롯이므로 함께 나올 수 있다. 현재 일반 경로에 사용하는 Variant 11개는 각각 고블린과 아이템을 1:1 가중치로 선택하며, 선택 방 세 곳은 아이템을 1:1로 선택한다. 엘리트 몬스터는 아직 연결되지 않았다. `Offset`은 기준 셀의 `(x+0.5, y)`를 기준으로 한다.
 
@@ -84,7 +84,7 @@ Variant의 `Room Monster Settings`와 `Room Item Settings`에서 구분한다. �
 Down_ForestStep의 **Room Hazard Settings → Hazards**에 `floor.fire`와 `overhead.spikehead`가 설정돼 있다.
 
 1. Variant 방 안에 함정 프리팹을 자식으로 배치하고 후보 오브젝트 자체를 비활성화한다.
-2. **Hazards**에 항목을 추가해 방 안의 `Candidate`를 연결한다. 내부 식별자는 자동 생성되며 기존 식별자도 유지된다.
+2. **Hazards**에 항목을 추가해 방 안의 `Candidate`를 연결한다. Inspector에서 편집하면 내부 식별자가 부여된다. 편집한 프리팹은 저장한다.
 3. `Clearance`에는 위험 공간, `Support`에는 고정 지형 지지면을 지정한다. 위험 공간에 후보 기준점이 포함되어야 한다. 위험 공간과 지지면은 서로 겹치지 않고, 변형·보호 영역과 콘텐츠 공간을 피해야 한다. 지지면에는 Grid 타입 충돌 타일이 필요하다.
 4. `Spawn Weight`와 `Empty Weight`로 생성·빈 상태의 가중치를 정한다. 둘 다 1이면 해당 후보가 선택될 확률은 1/2이다. 서로 다른 함정 후보는 각각 생성 여부를 고르므로 한 방에서 함께 나올 수 있다.
 5. 함정이 없을 때와 있을 때 기록된 통과 방향과 콘텐츠·함정의 대표 조합을 실제 Player로 확인하고 결과를 진행 현황에 기록한다.
@@ -94,6 +94,7 @@ Down_ForestStep의 **Room Hazard Settings → Hazards**에 `floor.fire`와 `over
 ## 검사와 결과 확인
 
 1. 프리팹을 선택하고 **Map → Room Templates → Validate Selected**를 실행해 Console의 결과를 확인한다. 설정 오류나 필요한 검증 표시가 없으면 실패 사유가 표시된다.
+   - 슬롯·후보 ID가 비어 있거나 중복됐다는 오류가 있으면 Project 창에서 해당 방 프리팹을 선택하고 **Map → Room Templates → Repair Selected Slot IDs**를 실행한 뒤 다시 검사한다. 정상 ID는 유지하고 잘못된 ID만 새로 저장한다. 새 ID가 부여된 슬롯은 같은 seed에서도 선택 결과가 달라질 수 있다.
 2. 지형·통로 조건을 바꾼 뒤에는 해당 `Passages Verified`, `Combinations Verified`와 시작·Goal·왕복 검증 표시를 직접 해제한다. 자동으로 해제되지 않는다. 실제 Player의 이동과 조합을 확인한 다음 표시를 다시 기록한다. 함정 통과는 별도 표시 없이 실제 확인 결과를 진행 문서에 기록한다.
 3. **Map → Room Map Generator**에서 `Planning Settings`, `Goal Prefab`, `Seed`를 확인하고 **입력한 Seed로 생성**을 누르면 현재 활성 씬에 결과가 생성된다. **랜덤 맵 생성**으로 다른 seed를 고를 수도 있다. 확인한 뒤 **미리보기 삭제**로 해당 창의 미리보기를 지울 수 있다. 미리보기는 씬을 변경하므로 작업 중인 씬을 보존하려면 별도 씬에서 확인한다.
 4. 마지막으로 Title에서 게임을 시작해 실제 화면의 통과·회피와 콘텐츠 동작을 확인한다. 미리보기와 정적 검사만으로 플레이 통과가 보장되지는 않는다.

@@ -13,15 +13,6 @@ namespace ProjectRE.MapGeneration
         public Vector2 offset;
         public string Id => _id;
 
-#if UNITY_EDITOR
-        internal void EnsureId(HashSet<string> used)
-        {
-            if (string.IsNullOrEmpty(_id) || !used.Add(_id))
-            {
-                do { _id = Guid.NewGuid().ToString("N"); } while (!used.Add(_id));
-            }
-        }
-#endif
     }
 
     [Serializable]
@@ -36,17 +27,6 @@ namespace ProjectRE.MapGeneration
         public List<RoomSpawnOption> options = new();
         public string Id => _id;
 
-#if UNITY_EDITOR
-        internal void EnsureId(HashSet<string> used)
-        {
-            if (string.IsNullOrEmpty(_id) || !used.Add(_id))
-            {
-                do { _id = Guid.NewGuid().ToString("N"); } while (!used.Add(_id));
-            }
-            var optionIds = new HashSet<string>(StringComparer.Ordinal);
-            foreach (var option in options) option?.EnsureId(optionIds);
-        }
-#endif
     }
 
     /// <summary>방에 설정할 생성 위치와 프리팹 후보.</summary>
@@ -65,12 +45,5 @@ namespace ProjectRE.MapGeneration
                     Gizmos.DrawWireSphere(new Vector3(slot.position.x + 0.5f, slot.position.y + 0.5f), 0.25f);
         }
 
-#if UNITY_EDITOR
-        protected void OnValidate()
-        {
-            var ids = new HashSet<string>(StringComparer.Ordinal);
-            foreach (var slot in _slots) slot?.EnsureId(ids);
-        }
-#endif
     }
 }

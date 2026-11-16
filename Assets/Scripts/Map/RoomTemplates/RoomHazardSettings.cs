@@ -1,6 +1,5 @@
 namespace ProjectRE.MapGeneration
 {
-    using System;
     using System.Collections.Generic;
     using UnityEngine;
 
@@ -27,17 +26,5 @@ namespace ProjectRE.MapGeneration
             }
         }
 
-#if UNITY_EDITOR
-        private void OnValidate()
-        {
-            var ids = new HashSet<string>(StringComparer.Ordinal);
-            foreach (var slot in _hazards)
-            {
-                if (slot == null) continue;
-                if (!string.IsNullOrWhiteSpace(slot.id) && ids.Add(slot.id)) continue;
-                do { slot.id = Guid.NewGuid().ToString("N"); } while (!ids.Add(slot.id));
-            }
-        }
-#endif
     }
 }

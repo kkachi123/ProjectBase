@@ -28,11 +28,13 @@ namespace ProjectRE.MapGeneration.Tests
                 var slots = edit.FindProperty("_hazards");
                 slots.arraySize = 1;
                 edit.ApplyModifiedPropertiesWithoutUndo();
+                RepairIds(settings);
                 string first = settings.Hazards[0].id;
                 Assert.That(first, Is.Not.Empty);
                 edit.Update();
                 edit.FindProperty("_hazards").InsertArrayElementAtIndex(1);
                 edit.ApplyModifiedPropertiesWithoutUndo();
+                RepairIds(settings);
                 string second = settings.Hazards[1].id;
                 Assert.That(second, Is.Not.Empty.And.Not.EqualTo(first));
                 edit.Update();
@@ -48,6 +50,13 @@ namespace ProjectRE.MapGeneration.Tests
                 UnityEngine.Object.DestroyImmediate(root);
                 AssetDatabase.DeleteAsset(path);
             }
+        }
+
+        private static void RepairIds(Component component)
+        {
+            var type = Type.GetType("ProjectRE.MapGeneration.Editor.RoomSlotIdEditor, Assembly-CSharp-Editor");
+            Assert.That(type, Is.Not.Null);
+            type.GetMethod("Repair").Invoke(null, new object[] { component });
         }
 
         [Test]

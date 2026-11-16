@@ -26,6 +26,15 @@ namespace ProjectRE.MapGeneration
                 errors.Add("지형·콘텐츠·함정 설정 컴포넌트가 필요합니다.");
                 return errors;
             }
+            ValidateIds(monsters, "몬스터", errors);
+            ValidateIds(items, "아이템", errors);
+            var hazardIds = new HashSet<string>(System.StringComparer.Ordinal);
+            for (int i = 0; i < hazard.Hazards.Count; i++)
+            {
+                var slot = hazard.Hazards[i];
+                if (slot != null && (string.IsNullOrWhiteSpace(slot.id) || !hazardIds.Add(slot.id)))
+                    errors.Add($"함정 슬롯 #{i + 1}의 ID가 비어 있거나 중복됩니다. Repair Selected Slot IDs를 실행하세요.");
+            }
 
             if (string.IsNullOrWhiteSpace(template.TemplateId)) errors.Add("템플릿 ID가 비어 있습니다.");
             if (!System.Enum.IsDefined(typeof(RoomType), template.Type)) errors.Add("알 수 없는 방 유형입니다.");
@@ -260,6 +269,25 @@ namespace ProjectRE.MapGeneration
 
         private static bool ValidArea(RectInt area, RectInt room) =>
             area.width > 0 && area.height > 0 && room.Contains(area.min) && area.xMax <= room.xMax && area.yMax <= room.yMax;
+
+        private static void ValidateIds(RoomSpawnSettings settings, string label, List<string> errors)
+        {
+            var ids = new HashSet<string>(System.StringComparer.Ordinal);
+            for (int i = 0; i < settings.Slots.Count; i++)
+            {
+                var slot = settings.Slots[i];
+                if (slot == null) continue;
+                if (string.IsNullOrWhiteSpace(slot.Id) || !ids.Add(slot.Id))
+                    errors.Add($"{label} 슬롯 #{i + 1}의 ID가 비어 있거나 중복됩니다. Repair Selected Slot IDs를 실행하세요.");
+                var optionIds = new HashSet<string>(System.StringComparer.Ordinal);
+                for (int j = 0; j < slot.options.Count; j++)
+                {
+                    var option = slot.options[j];
+                    if (option != null && (string.IsNullOrWhiteSpace(option.Id) || !optionIds.Add(option.Id)))
+                        errors.Add($"{label} 슬롯 #{i + 1} 후보 #{j + 1}의 ID가 비어 있거나 중복됩니다. Repair Selected Slot IDs를 실행하세요.");
+                }
+            }
+        }
 
         private static void ValidateContent(RoomTemplate template, Tilemap map, RectInt room, List<string> errors)
         {
