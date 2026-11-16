@@ -17,7 +17,7 @@
 - [x] **그래픽과 내부 조합 확인:** 수관 이음새와 대표 인접 방의 반복 배치를 정리하고, 두 가로 Variant의 내부 지형 조합과 대표 연결을 임시 화면으로 확인했다. 실제 게임 조명과 모든 방 연결은 미검증이며 작은 확률 셀의 대비와 같은 방의 연속 배치는 추가 확인이 필요하다.
 - [ ] **방 구조와 함정 배치:** 화살 함정·투사체 풀과 Spikes·Fire·Saw·SpikeHead·SpikedBall을 구현해 대표 방에 확률 배치했다. FallingPlatform은 다층 방의 플랫폼 패턴으로 설정했다. 가시·가시 공·낙하 발판이 함께 생성된 다층 방의 아래 경로를 체력 10으로 통과했다. 상층 경로의 무피해 통과는 미확인이다. [세부 단계](Chunk_Generation/Chunk_Generation_Progress.md)를 참고한다.
 - [x] **방별 진행 조건:** `Down_ForestStep`과 `Junction_Down`에서 실제 생성된 대상에 적용 가능한 목표 규칙 하나를 선택하고 주 출구에 공통 문을 자동 배치한다. 이전 설정에서 실제 Player의 몬스터·스위치 목표 완료, 남쪽 문 통과와 미완료 분기 왕복을 확인했다. 이전 후 목표 완료는 실제 Player로 확인하지 않았다. 정식 목표 UI는 [UI 작업](../UI/UI_Progress.md)으로 이월한다. [검증 범위](Chunk_Generation/Chunk_Generation_Progress.md#프리팹-및-chunk-리팩토링).
-- [ ] **탐사형 방 구조와 콘텐츠 배치:** 다층 통로·우회 경로 등 새로운 Base의 범위를 정하고 대표 방을 제작한다. 기존 방과 함께 전투·아이템 접근·함정 회피를 고려해 콘텐츠를 배치한다. [세부 단계](Chunk_Generation/Chunk_Generation_Progress.md)를 따른다.
+- [ ] **탐사형 방 구조와 콘텐츠 배치:** 방 컨셉과 다층 통로·우회 경로 등 이동 구조를 함께 정하고, 기본 지형 구조가 다른 대표 Base를 제작한다. 기존 방과 함께 전투·아이템 접근·함정 회피를 고려해 콘텐츠를 배치한다. [세부 단계](Chunk_Generation/Chunk_Generation_Progress.md)를 따른다.
 - [ ] **난이도별 출현 확률:** 마지막 단계에서 난이도 설정에 따라 몬스터·아이템·함정의 슬롯별 출현 확률을 조절한다.
 
 세부 완료 상태, 남은 확인과 다음 작업은 [Chunk 내부 생성 진행 현황](Chunk_Generation/Chunk_Generation_Progress.md)을 기준으로 한다.
