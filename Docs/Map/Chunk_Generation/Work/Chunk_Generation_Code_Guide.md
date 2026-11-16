@@ -10,7 +10,7 @@
 
 방 목표는 `Down_ForestStep`과 `Junction_Down` Variant에 설정돼 있다. `RoomMapFactory`가 실제 생성 결과를 `RoomObjectiveSetup`에 전달하면 적용 가능한 규칙 중 하나를 seed로 선택한다.
 
-`RoomContentLayout`은 Variant의 몬스터·아이템 설정을 계획·검사·생성에 필요한 공통 슬롯으로 읽는다.
+`RoomSpawnSlot`과 `RoomSpawnOption`은 Variant의 Inspector에서 설정하는 슬롯과 후보이다. `RoomContentLayout`은 이를 계획·검사·생성에 필요한 `RoomContentSlot`과 `RoomContentOption`으로 변환한다.
 
 ## 클래스 관계
 
@@ -28,6 +28,10 @@ classDiagram
     RoomMonsterSettings *-- RoomSpawnSlot : 몬스터 슬롯
     RoomItemSettings *-- RoomSpawnSlot : 아이템 슬롯
     RoomSpawnSlot *-- RoomSpawnOption : 프리팹 후보
+    RoomContentLayout ..> RoomSpawnSlot : 설정 읽기
+    RoomContentLayout ..> RoomContentSlot : 공통 데이터 변환
+    RoomSlotIdEditor ..> RoomSpawnSlot : 편집 시 ID 부여
+    RoomSlotIdEditor ..> RoomHazardSlot : 편집 시 ID 부여
     RoomTemplateCatalog ..> RoomContentLayout : 설정 통합
     RoomHazardSettings *-- RoomHazardSlot : 함정 후보
     RoomContentSlot *-- RoomContentOption : 콘텐츠 후보
@@ -52,6 +56,8 @@ classDiagram
     MapBuilder ..> RoomContentBuilder : 콘텐츠 생성
     MapBuilder ..> RoomHazardBuilder : 함정 활성화
     MapBuilder ..> BuiltRoom : 생성된 방과 콘텐츠
+    RoomContentBuilder ..> RoomContentLayout : 슬롯과 프리팹 조회
+    RoomMapFactory ..> RoomObjectiveSetup : 카탈로그 목표 사전 검사
     RoomMapFactory ..> RoomObjectiveSetup : 실제 목표 연결
     RoomObjectiveSetup ..> RoomObjectiveRule : 적용 가능 규칙 선택
     RoomObjectiveRule ..> RoomObjectiveCandidates : 실제 후보로 목표 생성
@@ -59,20 +65,29 @@ classDiagram
     RoomObjectiveSetup ..> RoomExitGate : 주 출구에 생성
     RoomObjectiveController ..> RoomExitGate : 목표 완료 시 개방
     RoomTemplateValidator ..> RoomTemplateChecks : 제작 데이터 검사
+    RoomTemplateValidator ..> RoomObjectiveSetup : 목표 설정 검사
 ```
 
 ## 선택과 적용 순서
 
 1. 제작자는 Base의 `RoomTemplate`에 고정 Tilemap·출입구·마커와 검증 표시를 지정한다. Variant에 몬스터·아이템 슬롯과 함정 후보를 지정한다.
-2. `RoomTemplateCatalog.TryCreateSnapshot()`이 `RoomTemplateChecks`로 원본을 검사하고, 계산에 필요한 ID·확률·가중치를 `RoomTemplateSnapshot`과 내부 스냅샷으로 복사한다. 스냅샷에는 생성할 프리팹 참조를 담지 않는다.
+2. `RoomMapFactory.TryCreate()`는 맵 생성 전에 카탈로그 방의 목표 관리자·트리거 연결과 목표 설정 방의 몬스터 후보에 있는 `Health`를 검사한다. 이어 `RoomTemplateCatalog.TryCreateSnapshot()`이 `RoomTemplateChecks`로 원본을 검사하고, 계산에 필요한 ID·확률·가중치를 `RoomTemplateSnapshot`과 내부 스냅샷으로 복사한다. 스냅샷에는 생성할 프리팹 참조를 담지 않는다.
 3. `MapPlanner`가 해당 칸의 방을 고르면 `RoomTerrainPlanner.Select()`가 영역별 패턴 ID와 채울 셀을 선택한다. 결과는 `MapRoomPlan.Terrain`에 저장된다. 지형 선택에는 seed, 방 좌표, 템플릿 ID와 영역 인덱스를 사용한다.
-4. 경로와 선택 방이 확정되면 `RoomContentPlanner.Select()`가 중간 경로 방과 선택 방의 슬롯별 콘텐츠 ID 또는 빈 선택을 정한다. 일반 방에는 아이템·일반 몬스터, 선택 방에는 아이템·엘리트 몬스터가 허용된다. 시작·Goal과 닫힌 방에는 콘텐츠를 선택하지 않는다. 콘텐츠 난수에는 seed, 방 좌표, 템플릿 ID와 슬롯 인덱스를 사용한다.
+4. 경로와 선택 방이 확정되면 `RoomContentPlanner.Select()`가 중간 경로 방과 선택 방의 슬롯별 콘텐츠 ID 또는 빈 선택을 정한다. 일반 방에는 아이템·일반 몬스터, 선택 방에는 아이템·엘리트 몬스터가 허용된다. 시작·Goal과 닫힌 방에는 콘텐츠를 선택하지 않는다. 콘텐츠 난수에는 seed·방 좌표·템플릿 ID와 슬롯의 문자열 ID에서 변환한 정수를 사용한다.
 5. `RoomHazardPlanner.Select()`가 중간 경로 방과 선택 방의 함정 후보별 생성 또는 빈 상태를 독립 난수로 정한다. seed·방 좌표·템플릿 ID·후보 ID를 사용하며 결과는 `MapRoomPlan.Hazards`에 저장된다.
 6. `MapPlanValidator`가 기록된 지형·콘텐츠·함정 선택을 재계산해 계획과 일치하는지 확인한다. `MapBuilder`는 각 Builder에 지형·콘텐츠·함정 적용을 맡긴다.
 7. 그래픽 타일이 설정된 경우 `MapVisualBuilder`가 방과 Tilemap 패턴의 충돌 지형을 수집해 맵 전체의 그래픽 Tilemap에 표시한다. 플랫폼 패턴은 별도 오브젝트로 생성되어 자체 Sprite와 동작을 사용한다. RuleTile은 이웃 셀에 따라 그래픽을 고르며 지형의 점유 여부를 결정하지 않는다.
-8. `RoomMapFactory`는 비활성 맵의 `BuiltRoom`과 공통 문 프리팹을 `RoomObjectiveSetup`에 전달한다. 실제 몬스터와 확률로 선별된 트리거를 모아 적용 가능한 규칙 하나를 선택한다. 목표가 있으면 `MapRoomPlan.Exit`과 `RoomTemplate.OpeningCells()`를 기준으로 문 하나를 생성한다. `RoomObjectiveController`가 목표 완료를 집계하고 `RoomExitGate`에 개방을 요청한다.
+8. `RoomMapFactory`는 비활성 맵의 `BuiltRoom`과 공통 문 프리팹을 `RoomObjectiveSetup`에 전달한다. 실제 몬스터와 확률로 선별된 트리거를 모아 적용 가능한 규칙 하나를 선택한다. 목표가 있으면 문 프리팹을 검사하고 `MapRoomPlan.Exit`과 `RoomTemplate.OpeningCells()`를 기준으로 문 하나를 생성한다. 목표가 없으면 문을 만들지 않는다. `RoomObjectiveController`가 목표 완료를 집계하고 `RoomExitGate`에 개방을 요청한다.
 
 지형·콘텐츠·함정 선택 난수는 주 경로·방 선택과 분리된다. 단, 카탈로그나 템플릿 ID 등의 입력을 변경하면 기존 seed의 결과가 달라질 수 있다.
+
+### 콘텐츠 슬롯의 ID와 생성
+
+`RoomSlotIdEditor`는 Inspector에서 슬롯·후보를 편집하거나 복구 메뉴를 실행할 때 빈 ID와 중복 ID를 채운다. 기존 유효 ID는 유지하고, 프리팹을 로드하기만 했을 때 ID를 바꾸지 않는다. 자세한 사용법은 [방 내부 생성 설정과 확인 방법](../Room_Content_User_Guide.md)을 따른다.
+
+`RoomContentLayout.StableIndex()`는 슬롯 종류와 문자열 ID를 해시해 `RoomContentSlot.slotIndex`를 만든다. 이 값은 Inspector의 목록 순서가 아니다. 카탈로그는 공통 슬롯에서 ID·가중치·종류만 `ContentSlotSnapshot`에 복사하고, 선택 결과인 `ContentSelection`에 정수 슬롯 ID와 후보 ID를 기록한다.
+
+`RoomContentBuilder`는 생성된 Variant의 설정을 다시 읽어 두 ID로 후보 프리팹과 위치를 찾는다. 생성한 오브젝트는 `BuiltRoom.Content`에, 그중 몬스터는 `BuiltRoom.Monsters`에도 담아 목표 설정에 전달한다. 목록을 재정렬해도 ID가 유지되면 결과가 유지되지만 ID·후보·가중치가 달라지면 같은 seed의 결과도 달라질 수 있다.
 
 ## 클래스와 소스
 
@@ -80,14 +95,16 @@ classDiagram
 | --- | --- | --- |
 | `RoomTemplate` | [RoomTemplate.cs](../../../../Assets/Scripts/Map/RoomTemplates/RoomTemplate.cs) | 방 ID·유형·출입구·통과 방향, 고정 Tilemap과 마커를 보관한다. `OpeningCells()`가 출입구 셀의 기준이다. |
 | `RoomTerrainSettings`, `RoomHazardSettings` | [RoomTerrainSettings.cs](../../../../Assets/Scripts/Map/RoomTemplates/RoomTerrainSettings.cs), [RoomHazardSettings.cs](../../../../Assets/Scripts/Map/RoomTemplates/RoomHazardSettings.cs) | 지형·함정 제작 설정을 각각 보관한다. |
-| `RoomMonsterSettings`, `RoomItemSettings`, `RoomSpawnSettings` | [RoomMonsterSettings.cs](../../../../Assets/Scripts/Map/RoomTemplates/RoomMonsterSettings.cs), [RoomItemSettings.cs](../../../../Assets/Scripts/Map/RoomTemplates/RoomItemSettings.cs), [RoomSpawnSettings.cs](../../../../Assets/Scripts/Map/RoomTemplates/RoomSpawnSettings.cs) | 몬스터와 아이템 슬롯을 구분하고 위치·후보·자동 식별자를 관리한다. |
-| `RoomContentLayout` | [RoomContentLayout.cs](../../../../Assets/Scripts/Map/RoomTemplates/RoomContentLayout.cs) | 몬스터·아이템 설정을 선택·검사·생성에 사용할 공통 슬롯으로 읽는다. |
+| `RoomMonsterSettings`, `RoomItemSettings`, `RoomSpawnSettings` | [RoomMonsterSettings.cs](../../../../Assets/Scripts/Map/RoomTemplates/RoomMonsterSettings.cs), [RoomItemSettings.cs](../../../../Assets/Scripts/Map/RoomTemplates/RoomItemSettings.cs), [RoomSpawnSettings.cs](../../../../Assets/Scripts/Map/RoomTemplates/RoomSpawnSettings.cs) | 몬스터와 아이템 설정을 구분하고 슬롯 목록을 보관한다. |
+| `RoomSpawnSlot`, `RoomSpawnOption` | [RoomSpawnSettings.cs](../../../../Assets/Scripts/Map/RoomTemplates/RoomSpawnSettings.cs) | Inspector에서 설정하는 위치·공간·후보 프리팹·가중치와 내부 ID를 보관한다. |
+| `RoomSlotIdEditor` | [RoomSlotIdEditor.cs](../../../../Assets/Editor/MapGenerator/RoomTemplates/RoomSlotIdEditor.cs) | Inspector 편집과 복구 메뉴에서 콘텐츠·함정의 빈 ID와 중복 ID를 부여한다. |
+| `RoomContentLayout` | [RoomContentLayout.cs](../../../../Assets/Scripts/Map/RoomTemplates/RoomContentLayout.cs) | 제작 설정을 공통 슬롯으로 변환하고 문자열 슬롯 ID에서 선택용 정수를 만든다. |
 | `RoomTerrainBuilder`, `RoomContentBuilder`, `RoomHazardBuilder` | [RoomTerrainBuilder.cs](../../../../Assets/Scripts/Map/RoomTemplates/RoomTerrainBuilder.cs), [RoomContentBuilder.cs](../../../../Assets/Scripts/Map/RoomTemplates/RoomContentBuilder.cs), [RoomHazardBuilder.cs](../../../../Assets/Scripts/Map/RoomTemplates/RoomHazardBuilder.cs) | 선택된 지형·콘텐츠·함정을 각각 적용한다. |
 | `RoomType`, `RoomOpening`, `RoomPassage` | [RoomTemplate.cs](../../../../Assets/Scripts/Map/RoomTemplates/RoomTemplate.cs) | 방 유형·출입구 방향·진입→진출 후보를 표현한다. |
 | `RoomTerrainVariation`, `RoomTerrainPattern`, `RoomChanceCell` | [RoomTerrainSettings.cs](../../../../Assets/Scripts/Map/RoomTemplates/RoomTerrainSettings.cs) | 변형 영역의 패턴 후보와 확률 셀·검증 표시를 보관한다. |
-| `RoomContentSlot`, `RoomContentOption`, `ContentKind`, `ContentRoomRole` | [RoomContent.cs](../../../../Assets/Scripts/Map/RoomTemplates/RoomContent.cs) | 슬롯의 공간·설치면·방향, 후보 종류·가중치와 방 역할을 정의한다. |
+| `RoomContentSlot`, `RoomContentOption`, `ContentKind`, `ContentRoomRole` | [RoomContent.cs](../../../../Assets/Scripts/Map/RoomTemplates/RoomContent.cs) | 제작 설정에서 변환된 공통 슬롯·후보와 콘텐츠 종류·방 역할을 정의한다. |
 | `RoomTemplateChecks` | [RoomTemplateChecks.cs](../../../../Assets/Scripts/Map/RoomTemplates/RoomTemplateChecks.cs) | 원본의 지형·경계·마커·변형 및 슬롯 규격을 검사한다. |
-| `RoomTemplateValidator` | [RoomTemplateValidator.cs](../../../../Assets/Editor/MapGenerator/RoomTemplates/RoomTemplateValidator.cs) | 에디터 메뉴에서 선택한 방의 제작 데이터를 검사한다. |
+| `RoomTemplateValidator` | [RoomTemplateValidator.cs](../../../../Assets/Editor/MapGenerator/RoomTemplates/RoomTemplateValidator.cs) | 선택한 방 또는 카탈로그의 제작 데이터와 목표 설정을 검사하고 문 설정을 안내한다. |
 | `RoomTemplateCatalog`, `RoomTemplateSnapshot` | [RoomTemplateCatalog.cs](../../../../Assets/Scripts/Map/RoomTemplates/RoomTemplateCatalog.cs), [RoomTemplateSnapshot.cs](../../../../Assets/Scripts/Map/RoomTemplates/RoomTemplateSnapshot.cs) | 프리팹 목록을 검사하고 계산용 방 데이터를 만든다. |
 | `RoomTerrainSnapshot`, `RoomTerrainPlanner`, `RoomTerrainSelection` | [RoomTerrainPlan.cs](../../../../Assets/Scripts/Map/RoomTemplates/RoomTerrainPlan.cs) | 지형 선택지의 복사본, 선택 계산과 확정된 패턴·셀을 담당한다. |
 | `ContentOptionSnapshot`, `ContentSlotSnapshot`, `RoomContentPlanner`, `ContentSelection` | [RoomContent.cs](../../../../Assets/Scripts/Map/RoomTemplates/RoomContent.cs) | 콘텐츠 선택지의 복사본, 가중치 계산과 확정된 슬롯 결과를 담당한다. |
@@ -98,7 +115,7 @@ classDiagram
 | `SpikeHeadTrap` | [SpikeHeadTrap.cs](../../../../Assets/Scripts/Trap/SpikeHeadTrap.cs) | 아래 Player 감지, 낙하 예고·지형 또는 거리 제한에 따른 정지·복귀·재작동 대기를 처리한다. 접촉 피해는 `TrapContactDamage`에 맡긴다. |
 | `RoomObjective`, `RoomTriggerObjective`, `RoomMonsterObjective` | [RoomObjectives](../../../../Assets/Scripts/Map/MapRuntime/RoomObjectives/) | 목표의 완료 이벤트, 지점·스위치 조건 및 지정 몬스터의 `Health.IsDead` 구독을 담당한다. |
 | `IRoomObjectiveRule`, `RoomObjectiveRule`, `RoomObjectiveCandidates` | [RoomObjectiveRule.cs](../../../../Assets/Scripts/Map/MapRuntime/RoomObjectives/RoomObjectiveRule.cs) | 규칙의 적용 가능 여부와 목표 생성 계약 및 실제 후보를 제공한다. 네 규칙 에셋은 상태를 보관하지 않는다. |
-| `RoomObjectiveSetup`, `BuiltRoom` | [RoomObjectiveSetup.cs](../../../../Assets/Scripts/Map/MapRuntime/RoomObjectives/RoomObjectiveSetup.cs), [MapBuilder.cs](../../../../Assets/Scripts/Map/RoomTemplates/MapBuilder.cs) | 실제 생성된 콘텐츠와 목표 후보를 연결하고 진행 출구를 선택한다. |
+| `RoomObjectiveSetup`, `BuiltRoom` | [RoomObjectiveSetup.cs](../../../../Assets/Scripts/Map/MapRuntime/RoomObjectives/RoomObjectiveSetup.cs), [MapBuilder.cs](../../../../Assets/Scripts/Map/RoomTemplates/MapBuilder.cs) | 목표 설정을 검사하고 생성된 몬스터·트리거로 목표를 구성한다. 출구 방향은 `MapRoomPlan.Exit`에서 받는다. |
 | `RoomObjectiveController`, `RoomPresenceSensor`, `RoomObjectivePrototypeDisplay` | [RoomObjectives](../../../../Assets/Scripts/Map/MapRuntime/RoomObjectives/) | 목표를 집계해 문을 제어하고 Player 체류와 임시 목표 표시를 연결한다. 정식 UI는 별도 작업이다. |
 | `RoomExitGate` | [RoomExitGate.cs](../../../../Assets/Scripts/Map/MapRuntime/RoomObjectives/RoomExitGate.cs) | 주 출구에 배치되고 완료 시 Collider를 해제한 뒤 DOTween으로 페이드한다. 비활성화 시 진행 중인 Tween을 정리한다. |
 | `MapPlanner`, `MapRoomPlan`, `MapPlanValidator` | [MapPlanner.cs](../../../../Assets/Scripts/Map/RoomTemplates/MapPlanner.cs), [MapPlan.cs](../../../../Assets/Scripts/Map/RoomTemplates/MapPlan.cs), [MapPlanValidator.cs](../../../../Assets/Scripts/Map/RoomTemplates/MapPlanValidator.cs) | 내부 선택을 요청·기록하고 완성 계획을 검증한다. |
@@ -108,7 +125,7 @@ classDiagram
 
 1. `RoomTemplate`의 고정 지형과 기능별 설정 컴포넌트, `RoomTemplateChecks.Validate()`를 읽는다.
 2. `RoomTemplateCatalog.TryCreateSnapshot()`에서 원본의 어떤 값을 복사하는지 확인한다.
-3. `MapPlanner.TrySelect()`와 `AddOptionalRoom()`에서 지형과 콘텐츠 선택을 요청하는 지점을 찾는다. 각 선택의 난수 계산과 결과는 `RoomTerrainPlanner`와 `RoomContentPlanner`에서 확인한다.
+3. `MapPlanner.TrySelect()`와 `AddOptionalRooms()`에서 지형과 콘텐츠 선택을 요청하는 지점을 찾는다. 각 선택의 난수 계산과 결과는 `RoomTerrainPlanner`와 `RoomContentPlanner`에서 확인한다.
 4. `MapBuilder.Build()`에서 지형·콘텐츠·함정 Builder의 호출을 찾는다. 그래픽과 Collider의 분리는 `MapVisualBuilder`에서 확인한다.
 5. [RoomTerrainTests.cs](../../../../Assets/Tests/EditMode/MapGeneration/RoomTerrainTests.cs), [OptionalRoomTests.cs](../../../../Assets/Tests/EditMode/MapGeneration/OptionalRoomTests.cs), [MapVisualBuilderTests.cs](../../../../Assets/Tests/EditMode/MapGeneration/MapVisualBuilderTests.cs)를 참고한다.
 

@@ -37,11 +37,13 @@ Chunk 원본·카탈로그 → 맵 경로와 Chunk 선택 → Chunk 내부 선�
 | `RoomTerrainSettings`, `RoomMonsterSettings`, `RoomItemSettings`, `RoomHazardSettings` | 방의 지형·플랫폼, 몬스터, 아이템, 함정 제작 설정을 각각 보관한다. |
 | `RoomTerrainVariation`, `RoomTerrainPattern`, `RoomChanceCell` | 내부 변형 영역의 패턴과 확률 셀을 정의한다. |
 | `RoomTerrainSnapshot`, `RoomTerrainPlanner`, `RoomTerrainSelection` | 지형 선택지를 계산용 데이터로 변환하고 선택 결과를 기록한다. |
-| `RoomContentSlot`, `RoomContentOption`, `RoomContentPlanner`, `ContentSelection` | 콘텐츠 슬롯과 후보를 정의하고 선택 결과를 기록한다. |
+| `RoomSpawnSlot`, `RoomSpawnOption`, `RoomContentLayout` | Variant의 슬롯·후보를 설정하고 선택에 사용할 공통 데이터로 읽는다. |
+| `RoomContentSlot`, `RoomContentOption`, `RoomContentPlanner`, `ContentSelection` | 공통 슬롯과 후보를 바탕으로 콘텐츠를 선택하고 결과를 기록한다. |
 | `RoomHazardSlot`, `RoomHazardPlanner`, `RoomHazardSelection` | 함정 후보와 설치 조건을 정의하고 생성 여부를 기록한다. |
 | `MapPlanner`, `MapBuilder` | 각각 내부 선택을 요청하고 지형·콘텐츠·함정 적용을 조율한다. |
 | `RoomTerrainBuilder`, `RoomContentBuilder`, `RoomHazardBuilder` | 선택된 방 내부 지형·콘텐츠·함정을 각각 생성하거나 활성화한다. |
 | `RoomObjectiveSetup`, `RoomObjectiveRule`, `RoomObjectiveCandidates`, `RoomObjectiveController`, `RoomObjective`, `RoomExitGate`, `RoomPresenceSensor` | 실제 후보에 적용할 규칙을 선택하고 방별 목표·집계·자동 출구 문과 방 진입을 담당한다. 현재 대표 방과 분기 방에 설정돼 있다. |
+| `RoomSlotIdEditor` | Inspector 편집과 복구 메뉴에서 콘텐츠·함정의 내부 ID를 부여한다. |
 
 현재 내부 지형 변형은 가로방의 고정 발판과 다층 방의 낙하 발판에 설정돼 있다. 검증 범위는 [진행 현황](Chunk_Generation/Chunk_Generation_Progress.md)을 따른다. 콘텐츠 선택은 주 경로의 중간 방과 선택 방에 적용되며, 실제 배치는 슬롯이 설정된 방에서만 일어난다.
 

@@ -40,6 +40,7 @@ classDiagram
     MapBuilder ..> MapPlan : 선택 적용
     MapBuilder ..> MapVisualBuilder : 지형 그래픽
     RoomMapFactory ..> MapGenerator : 공통 생성
+    RoomMapFactory ..> RoomObjectiveSetup : 목표 설정 사전 검사와 연결
     RoomMapFactory ..> GeneratedMapInfo : 좌표 연결
     MapManager ..> RoomMapFactory : 런타임 생성
     MapManager --> GeneratedMapInfo : 현재 맵
@@ -66,9 +67,9 @@ classDiagram
 ### 씬 생성과 Run
 
 1. `AdventureRunManager.StartRun()`이 `MapManager.GenerateMap()`을 요청한다. `MapManager`는 Inspector 설정에 따라 고정 또는 랜덤 seed를 사용한다.
-2. `RoomMapFactory.TryCreate()`가 Goal 프리팹을 검사하고 `MapGenerator`를 호출한다.
+2. `RoomMapFactory.TryCreate()`가 Goal 프리팹과 카탈로그에 등록된 방의 목표 설정을 검사한 뒤 `MapGenerator`를 호출한다. 목표 설정 오류는 해당 방이 선택되지 않는 seed에서도 생성 전에 반환된다.
 3. `MapBuilder.Build()`가 카탈로그와 계획을 다시 검사한 뒤 비활성 루트 아래에 방과 확정된 패턴·콘텐츠·Goal을 만든다. 지형 그래픽이 설정돼 있으면 `MapVisualBuilder`가 방과 패턴의 지형을 공통 그래픽 Tilemap으로 표시한다.
-4. `RoomMapFactory`가 루트에 `GeneratedMapInfo`를 추가해 시작·Goal 좌표를 기록한다. `MapManager`는 새 맵을 활성화한 뒤 이전 맵을 정리한다.
+4. `RoomMapFactory`가 생성된 방의 목표와 주 출구 문을 구성하고 루트에 `GeneratedMapInfo`를 추가해 시작·Goal 좌표를 기록한다. 문은 목표가 선택된 경우에만 필요하다. `MapManager`는 새 맵을 활성화한 뒤 이전 맵을 정리한다.
 5. `AdventureRunManager`가 시작 좌표에 Player를 생성하고 준비를 확인해 등록한다. `GoalTrigger`는 접촉 또는 상호작용 시 `EndRun()`을 요청한다.
 
 생성 도중 실패하면 새 루트를 정리하고 오류를 반환한다. 새 맵 생성에 실패하면 기존 맵을 유지하고, 활성화 중 예외가 나면 기존 맵을 다시 활성화한다.
@@ -92,7 +93,7 @@ classDiagram
 | `MapBuilder`, `MapBuildResult` | [MapBuilder.cs](../../../Assets/Scripts/Map/RoomTemplates/MapBuilder.cs) | 검증된 계획으로 씬을 생성하고 결과 또는 오류를 반환한다. |
 | `MapVisualBuilder` | [MapVisualBuilder.cs](../../../Assets/Scripts/Map/RoomTemplates/MapVisualBuilder.cs) | Grid 충돌 셀을 수집해 공통 그래픽 Tilemap에 표시한다. 중복 셀이나 미지원 충돌 타입은 실패한다. |
 | `MapBuildContext` | [MapBuildContext.cs](../../../Assets/Scripts/Map/RoomTemplates/MapBuildContext.cs) | 오브젝트 생성·기록·삭제 방식을 런타임과 에디터에서 제공한다. |
-| `RoomMapFactory`, `GeneratedMapInfo` | [RoomMapFactory.cs](../../../Assets/Scripts/Map/MapRuntime/RoomMapFactory.cs), [GeneratedMapInfo.cs](../../../Assets/Scripts/Map/MapRuntime/GeneratedMapInfo.cs) | Goal을 검사하고 맵 결과에 Run용 시작·종료 위치를 연결한다. |
+| `RoomMapFactory`, `GeneratedMapInfo` | [RoomMapFactory.cs](../../../Assets/Scripts/Map/MapRuntime/RoomMapFactory.cs), [GeneratedMapInfo.cs](../../../Assets/Scripts/Map/MapRuntime/GeneratedMapInfo.cs) | Goal과 방 목표 설정을 검사하고, 목표 구성과 Run용 시작·종료 위치를 연결한다. |
 | `MapManager` | [MapManager.cs](../../../Assets/Scripts/Managers/GameManager/MapManger/MapManager.cs) | 런타임 seed와 현재 맵의 활성화·교체·정리를 담당한다. |
 | `RoomMapGeneratorWindow` | [RoomMapGeneratorWindow.cs](../../../Assets/Editor/MapGenerator/RoomTemplates/RoomMapGeneratorWindow.cs) | 에디터 미리보기와 Undo·Redo를 담당한다. |
 | `AdventureRunManager`, `PlayerSpawnManager`, `GoalTrigger`, `SceneFlowManager` | [AdventureRunManager.cs](../../../Assets/Scripts/Managers/AdventureRunManager/AdventureRunManager.cs), [PlayerSpawnManager.cs](../../../Assets/Scripts/Managers/PlayerManager/PlayerSpawnManager.cs), [GoalTrigger.cs](../../../Assets/Scripts/Managers/AdventureRunManager/GoalTrigger.cs), [SceneFlowManager.cs](../../../Assets/Scripts/Managers/GameManager/SceneFlowManager.cs) | 씬·Player·Run 시작과 종료를 연결한다. |
