@@ -310,7 +310,7 @@ namespace ProjectRE.MapGeneration.Tests
                 var so = new SerializedObject(room.GetComponent<RoomItemSettings>());
                 so.FindProperty("_slots").GetArrayElementAtIndex(0).FindPropertyRelative("clearance").rectIntValue = new RectInt(7, 5, 1, 2);
                 so.ApplyModifiedPropertiesWithoutUndo();
-                Assert.That(RoomTemplateChecks.Validate(room), Is.Not.Empty);
+                Assert.That(RoomTemplateChecks.Validate(room).Any(e => e.Contains("아이템 슬롯 #1")), Is.True);
             }
             finally { Object.DestroyImmediate(room.gameObject); }
         }

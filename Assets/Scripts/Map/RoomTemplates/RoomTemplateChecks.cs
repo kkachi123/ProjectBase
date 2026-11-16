@@ -232,43 +232,85 @@ namespace ProjectRE.MapGeneration
             var ids = new HashSet<string>(System.StringComparer.Ordinal);
             var candidates = new HashSet<GameObject>();
             var areas = new List<RectInt>();
-            foreach (RoomHazardSlot slot in hazard.Hazards)
+            for (int index = 0; index < hazard.Hazards.Count; index++)
             {
+                RoomHazardSlot slot = hazard.Hazards[index];
+                string label = $"함정 슬롯 #{index + 1}";
+                void Add(string message) => errors.Add($"{label}: {message}");
                 if (slot == null || string.IsNullOrWhiteSpace(slot.id) || !ids.Add(slot.id) ||
                     slot.candidate == null || slot.candidate == template.gameObject || !candidates.Add(slot.candidate) ||
                     !slot.candidate.transform.IsChildOf(template.transform) || slot.candidate.activeSelf)
-                { errors.Add("함정 후보 ID, 연결 또는 기본 상태가 올바르지 않습니다."); continue; }
+                { Add("함정 후보 ID, 연결 또는 기본 상태가 올바르지 않습니다."); continue; }
                 long weight = (long)slot.spawnWeight + slot.emptyWeight;
                 if (slot.spawnWeight < 0 || slot.emptyWeight < 0 || weight <= 0 || weight > 1000000)
-                    errors.Add($"함정 가중치가 올바르지 않습니다: {slot.id}");
+                    Add("함정 가중치가 올바르지 않습니다.");
                 RectInt area = slot.clearance, support = slot.support;
                 if (!ValidArea(area, room) || !ValidArea(support, room) || area.Overlaps(support))
-                { errors.Add($"함정 공간 또는 지지면이 올바르지 않습니다: {slot.id}"); continue; }
+                { Add("함정 공간 또는 지지면이 올바르지 않습니다."); continue; }
+                if (!Touches(area, support)) Add("함정 지지면이 위험 공간에 맞닿아 있지 않습니다.");
                 Vector3 local = template.transform.InverseTransformPoint(slot.candidate.transform.position);
                 if (!area.Contains(new Vector2Int(Mathf.FloorToInt(local.x), Mathf.FloorToInt(local.y))))
-                    errors.Add($"함정 후보가 설정된 공간 밖입니다: {slot.id}");
-                foreach (RectInt other in areas) if (area.Overlaps(other)) errors.Add($"함정 공간이 겹칩니다: {slot.id}");
+                    Add($"함정 후보가 설정된 공간 밖입니다: {local}");
+                ValidateHazardColliders(template, slot.candidate, area, label, errors);
+                foreach (RectInt other in areas) if (area.Overlaps(other)) Add("함정 공간이 겹칩니다.");
                 areas.Add(area);
                 foreach (RectInt region in terrain.ProtectedRegions)
-                    if (area.Overlaps(region) || support.Overlaps(region)) errors.Add($"함정이 보호 구역과 겹칩니다: {slot.id}");
+                    if (area.Overlaps(region) || support.Overlaps(region)) Add("함정이 보호 구역과 겹칩니다.");
                 foreach (RectInt region in terrain.VariationRegions)
-                    if (area.Overlaps(region) || support.Overlaps(region)) errors.Add($"함정이 변형 영역과 겹칩니다: {slot.id}");
+                    if (area.Overlaps(region) || support.Overlaps(region)) Add("함정이 변형 영역과 겹칩니다.");
                 foreach (var entry in RoomContentLayout.Read(template))
                     if (entry.Slot != null && (area.Overlaps(entry.Slot.clearance) || support.Overlaps(entry.Slot.clearance)))
-                        errors.Add($"함정이 콘텐츠 공간과 겹칩니다: {slot.id}");
+                        Add($"함정이 콘텐츠 공간과 겹칩니다: {entry.Label}");
                 foreach (RoomOpening side in Sides)
-                    if (area.Overlaps(RoomTemplate.OpeningCells(side))) errors.Add($"함정이 출입구와 겹칩니다: {slot.id}");
+                    if (area.Overlaps(RoomTemplate.OpeningCells(side))) Add($"함정이 출입구와 겹칩니다: {side}");
                 if (map == null) continue;
                 foreach (Vector2Int p in area.allPositionsWithin)
-                    if (map.HasTile(new Vector3Int(p.x, p.y, 0))) errors.Add($"함정 공간에 고정 지형이 있습니다: {slot.id} {p}");
+                    if (map.HasTile(new Vector3Int(p.x, p.y, 0))) Add($"함정 공간에 고정 지형이 있습니다: {p}");
                 foreach (Vector2Int p in support.allPositionsWithin)
                     if (!map.HasTile(new Vector3Int(p.x, p.y, 0)) || map.GetColliderType(new Vector3Int(p.x, p.y, 0)) != Tile.ColliderType.Grid)
-                        errors.Add($"함정 지지면에 전체 셀 충돌이 없습니다: {slot.id} {p}");
+                        Add($"함정 지지면에 전체 셀 충돌이 없습니다: {p}");
             }
         }
 
         private static bool ValidArea(RectInt area, RectInt room) =>
             area.width > 0 && area.height > 0 && room.Contains(area.min) && area.xMax <= room.xMax && area.yMax <= room.yMax;
+
+        private static bool Touches(RectInt area, RectInt support) =>
+            ((area.xMax == support.xMin || support.xMax == area.xMin) &&
+                area.yMin < support.yMax && support.yMin < area.yMax) ||
+            ((area.yMax == support.yMin || support.yMax == area.yMin) &&
+                area.xMin < support.xMax && support.xMin < area.xMax);
+
+        private static void ValidateHazardColliders(RoomTemplate template, GameObject candidate, RectInt area,
+            string label, List<string> errors)
+        {
+            foreach (var collider in candidate.GetComponentsInChildren<Collider2D>(true))
+            {
+                if (!collider.enabled) continue;
+                bool active = true;
+                for (Transform current = collider.transform; current != candidate.transform; current = current.parent)
+                    if (!current.gameObject.activeSelf) { active = false; break; }
+                if (!active) continue;
+                Matrix4x4 matrix = template.transform.worldToLocalMatrix * collider.transform.localToWorldMatrix;
+                Vector3 center = matrix.MultiplyPoint3x4(collider.offset);
+                float x, y;
+                if (collider is BoxCollider2D box)
+                {
+                    x = (Mathf.Abs(matrix.m00) * box.size.x + Mathf.Abs(matrix.m01) * box.size.y) * .5f;
+                    y = (Mathf.Abs(matrix.m10) * box.size.x + Mathf.Abs(matrix.m11) * box.size.y) * .5f;
+                }
+                else if (collider is CircleCollider2D circle)
+                {
+                    x = circle.radius * Mathf.Sqrt(matrix.m00 * matrix.m00 + matrix.m01 * matrix.m01);
+                    y = circle.radius * Mathf.Sqrt(matrix.m10 * matrix.m10 + matrix.m11 * matrix.m11);
+                }
+                else continue;
+                const float epsilon = .02f;
+                if (center.x - x < area.xMin - epsilon || center.x + x > area.xMax + epsilon ||
+                    center.y - y < area.yMin - epsilon || center.y + y > area.yMax + epsilon)
+                    errors.Add($"{label}: {collider.name}의 초기 Collider가 함정 공간 밖입니다.");
+            }
+        }
 
         private static void ValidateIds(RoomSpawnSettings settings, string label, List<string> errors)
         {
@@ -296,62 +338,58 @@ namespace ProjectRE.MapGeneration
             var usedAreas = new List<RectInt>();
             foreach (var entry in RoomContentLayout.Read(template))
             {
+                void Add(string message) => errors.Add($"{entry.Label} ({entry.Position}): {message}");
                 RoomContentSlot slot = entry.Slot;
                 if (slot == null || !entry.HasPosition || slot.slotIndex < 0 || !indices.Add(slot.slotIndex))
-                { errors.Add("콘텐츠 설정의 슬롯이 없거나 중복됩니다."); continue; }
+                { Add("콘텐츠 설정의 슬롯이 없거나 중복됩니다."); continue; }
                 Vector2Int position = entry.Position;
                 if (!room.Contains(position) || (map != null && map.HasTile(new Vector3Int(position.x, position.y, 0))))
-                    errors.Add($"콘텐츠 슬롯이 방 밖이거나 고정 지형과 겹칩니다: {position}");
+                    Add($"콘텐츠 슬롯이 방 밖이거나 고정 지형과 겹칩니다: {position}");
                 RectInt area = slot.clearance;
                 if (area.width <= 0 || area.height <= 0 || !room.Contains(area.min) || area.xMax > room.xMax || area.yMax > room.yMax ||
                     !area.Contains(position) || !System.Enum.IsDefined(typeof(ContentSurface), slot.surface) ||
                     !System.Enum.IsDefined(typeof(ContentFacing), slot.facing))
-                { errors.Add("콘텐츠 공간 또는 방향이 잘못됐습니다."); continue; }
-                foreach (RectInt other in usedAreas) if (area.Overlaps(other)) errors.Add("콘텐츠 슬롯의 충돌 공간이 겹칩니다.");
+                { Add("콘텐츠 공간 또는 방향이 잘못됐습니다."); continue; }
+                foreach (RectInt other in usedAreas) if (area.Overlaps(other)) Add("콘텐츠 슬롯의 충돌 공간이 겹칩니다.");
                 usedAreas.Add(area);
                 foreach (RectInt protectedRegion in terrain.ProtectedRegions)
-                    if (area.Overlaps(protectedRegion)) errors.Add("콘텐츠 공간이 보호 구역과 겹칩니다.");
+                    if (area.Overlaps(protectedRegion)) Add("콘텐츠 공간이 보호 구역과 겹칩니다.");
                 foreach (RoomOpening side in Sides)
-                    if (area.Overlaps(RoomTemplate.OpeningCells(side))) errors.Add("콘텐츠 공간이 출입구와 겹칩니다.");
-                RectInt support;
-                switch (slot.surface)
-                {
-                    case ContentSurface.Floor: support = new RectInt(area.xMin, area.yMin - 1, area.width, 1); break;
-                    case ContentSurface.Ceiling: support = new RectInt(area.xMin, area.yMax, area.width, 1); break;
-                    case ContentSurface.WestWall: support = new RectInt(area.xMin - 1, area.yMin, 1, area.height); break;
-                    default: support = new RectInt(area.xMax, area.yMin, 1, area.height); break;
-                }
+                    if (area.Overlaps(RoomTemplate.OpeningCells(side))) Add("콘텐츠 공간이 출입구와 겹칩니다.");
+                RectInt support = RoomContentLayout.Support(area, slot.surface);
                 foreach (RectInt region in terrain.VariationRegions)
-                    if (area.Overlaps(region) || support.Overlaps(region)) errors.Add("콘텐츠 공간 또는 지지면이 변형 영역과 겹칩니다.");
+                    if (area.Overlaps(region) || support.Overlaps(region)) Add("콘텐츠 공간 또는 지지면이 변형 영역과 겹칩니다.");
                 if (map != null)
                 {
                     foreach (Vector2Int p in area.allPositionsWithin)
-                        if (map.HasTile(new Vector3Int(p.x, p.y, 0))) errors.Add($"콘텐츠 공간에 고정 지형이 있습니다: {p}");
+                        if (map.HasTile(new Vector3Int(p.x, p.y, 0))) Add($"콘텐츠 공간에 고정 지형이 있습니다: {p}");
                     foreach (Vector2Int p in support.allPositionsWithin)
                         if (!room.Contains(p) || !map.HasTile(new Vector3Int(p.x, p.y, 0)) ||
                             map.GetColliderType(new Vector3Int(p.x, p.y, 0)) != Tile.ColliderType.Grid)
-                            errors.Add($"콘텐츠 지지면에 전체 셀 충돌이 없습니다: {p}");
+                            Add($"콘텐츠 지지면에 전체 셀 충돌이 없습니다: {p}");
                 }
                 long total = slot.emptyWeight;
-                if (slot.emptyWeight < 0) errors.Add("빈 슬롯 가중치가 음수입니다.");
+                if (slot.emptyWeight < 0) Add("빈 슬롯 가중치가 음수입니다.");
                 var ids = new HashSet<string>(System.StringComparer.Ordinal);
-                foreach (RoomContentOption option in slot.options)
+                for (int optionIndex = 0; optionIndex < slot.options.Count; optionIndex++)
                 {
+                    RoomContentOption option = slot.options[optionIndex];
+                    string optionLabel = $"후보 #{optionIndex + 1}";
                     if (option == null || string.IsNullOrWhiteSpace(option.id) || !ids.Add(option.id) || option.prefab == null || option.weight <= 0 ||
                         option.kind == ContentKind.Unspecified || !System.Enum.IsDefined(typeof(ContentKind), option.kind))
-                    { errors.Add("콘텐츠 ID, 프리팹 또는 가중치가 올바르지 않습니다."); continue; }
+                    { Add($"{optionLabel}: 콘텐츠 ID, 프리팹 또는 가중치가 올바르지 않습니다."); continue; }
                     total += option.weight;
                     var prefab = option.prefab;
                     var colliders = prefab.GetComponentsInChildren<Collider2D>(true);
                     if (!prefab.activeSelf || prefab.transform.localRotation != Quaternion.identity || colliders.Length != 1 ||
                         colliders[0].gameObject != prefab || !colliders[0].enabled ||
                         !(colliders[0] is BoxCollider2D || colliders[0] is CapsuleCollider2D))
-                    { errors.Add($"콘텐츠의 루트 Collider가 올바르지 않습니다: {option.id}"); continue; }
+                    { Add($"{optionLabel}: 콘텐츠의 루트 Collider가 올바르지 않습니다."); continue; }
                     Vector2 size = colliders[0] is BoxCollider2D box ? box.size : ((CapsuleCollider2D)colliders[0]).size;
                     Vector3 scale = prefab.transform.localScale;
                     if (float.IsNaN(option.offset.x) || float.IsInfinity(option.offset.x) || float.IsNaN(option.offset.y) || float.IsInfinity(option.offset.y) ||
                         float.IsNaN(scale.x) || float.IsInfinity(scale.x) || float.IsNaN(scale.y) || float.IsInfinity(scale.y) || scale.y <= 0 || scale.x <= 0)
-                    { errors.Add($"콘텐츠 위치 또는 크기가 올바르지 않습니다: {option.id}"); continue; }
+                    { Add($"{optionLabel}: 콘텐츠 위치 또는 크기가 올바르지 않습니다."); continue; }
                     float sx = Mathf.Abs(scale.x), sy = Mathf.Abs(scale.y), facing = slot.facing == ContentFacing.Left ? -1f : 1f;
                     Vector2 origin = (Vector2)position + new Vector2(.5f, 0) + option.offset;
                     Vector2 center = origin + new Vector2(colliders[0].offset.x * sx * facing, colliders[0].offset.y * sy);
@@ -363,9 +401,9 @@ namespace ProjectRE.MapGeneration
                         (slot.surface == ContentSurface.Ceiling && Mathf.Abs(center.y + half.y - area.yMax) > epsilon) ||
                         (slot.surface == ContentSurface.WestWall && Mathf.Abs(center.x - half.x - area.xMin) > epsilon) ||
                         (slot.surface == ContentSurface.EastWall && Mathf.Abs(center.x + half.x - area.xMax) > epsilon))
-                        errors.Add($"콘텐츠 Collider가 공간이나 지지면에 맞지 않습니다: {option.id}");
+                        Add($"{optionLabel}: 콘텐츠 Collider가 공간이나 지지면에 맞지 않습니다.");
                 }
-                if (total <= 0 || total > 1000000) errors.Add("콘텐츠 전체 가중치가 올바르지 않습니다.");
+                if (total <= 0 || total > 1000000) Add("콘텐츠 전체 가중치가 올바르지 않습니다.");
             }
         }
 

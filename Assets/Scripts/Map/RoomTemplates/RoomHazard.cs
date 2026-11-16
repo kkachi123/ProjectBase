@@ -9,11 +9,11 @@ namespace ProjectRE.MapGeneration
     public sealed class RoomHazardSlot
     {
         [HideInInspector] public string id;
-        public GameObject candidate;
-        public RectInt clearance;
-        public RectInt support;
-        public int spawnWeight = 1;
-        public int emptyWeight = 1;
+        [Tooltip("방 안에 미리 배치하고 비활성화한 함정 후보입니다.")] public GameObject candidate;
+        [Tooltip("함정 후보와 위험 공간을 포함하는 방 내부 영역입니다.")] public RectInt clearance;
+        [Tooltip("위험 공간에 맞닿은 고정 지형 영역입니다.")] public RectInt support;
+        [Tooltip("함정을 활성화할 상대 가중치입니다.")] public int spawnWeight = 1;
+        [Tooltip("함정을 생성하지 않을 상대 가중치입니다.")] public int emptyWeight = 1;
     }
 
     public sealed class RoomHazardSnapshot

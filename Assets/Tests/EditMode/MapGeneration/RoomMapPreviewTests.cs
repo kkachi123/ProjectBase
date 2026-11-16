@@ -14,6 +14,103 @@ namespace ProjectRE.MapGeneration.Tests
 
     public sealed class RoomMapPreviewTests
     {
+        [Test]
+        public void InvalidObjectiveSetupIsFoundBeforeMapCreation()
+        {
+            var settingsAsset = AssetDatabase.LoadAssetAtPath<MapPlanningSettings>("Assets/Prefabs/@Data/Map/MapPlanningSettings.asset");
+            var goal = AssetDatabase.LoadAssetAtPath<GameObject>("Assets/Prefabs/Map/Goals/GoalTrigger/EndLight-EndTrigger.prefab");
+            var prefab = AssetDatabase.LoadAssetAtPath<GameObject>("Assets/Prefabs/Map/RoomTemplates/NovaVariants/Down_ForestStep.prefab");
+            var room = UnityEngine.Object.Instantiate(prefab).GetComponent<RoomTemplate>();
+            var catalog = ScriptableObject.CreateInstance<RoomTemplateCatalog>();
+            var settings = UnityEngine.Object.Instantiate(settingsAsset);
+            try
+            {
+                var type = Type.GetType("ProjectRE.RoomObjectiveSetup, Assembly-CSharp");
+                var setup = room.GetComponentInChildren(type, true);
+                var validate = type.GetMethod("ValidateTemplate");
+                var configuration = new SerializedObject(setup);
+                configuration.FindProperty("controller").objectReferenceValue = null;
+                configuration.ApplyModifiedPropertiesWithoutUndo();
+                var errors = (List<string>)validate.Invoke(null, new object[] { room });
+                Assert.That(errors.Any(e => e.Contains("관리자")), Is.True);
+                var editorValidator = Type.GetType("ProjectRE.MapGeneration.Editor.RoomTemplateValidator, Assembly-CSharp-Editor");
+                var editorErrors = (List<string>)editorValidator.GetMethod("Validate").Invoke(null, new object[] { room });
+                Assert.That(editorErrors.Any(e => e.Contains("관리자")), Is.True);
+
+                var catalogData = new SerializedObject(catalog);
+                var entries = catalogData.FindProperty("_templates");
+                entries.arraySize = 1;
+                entries.GetArrayElementAtIndex(0).objectReferenceValue = room;
+                catalogData.ApplyModifiedPropertiesWithoutUndo();
+                var settingsData = new SerializedObject(settings);
+                settingsData.FindProperty("_catalog").objectReferenceValue = catalog;
+                settingsData.ApplyModifiedPropertiesWithoutUndo();
+                int roots = 0;
+                var context = new MapBuildContext { CreateRoot = name => { roots++; return new GameObject(name); } };
+                var factory = Type.GetType("ProjectRE.RoomMapFactory, Assembly-CSharp");
+                object[] args = { settings, 0, goal, context, null, null, null };
+                Assert.That(factory.GetMethod("TryCreate").Invoke(null, args), Is.EqualTo(false));
+                Assert.That((string)args[6], Does.Contain("방 목표 검사 실패"));
+                Assert.That(roots, Is.Zero);
+            }
+            finally
+            {
+                UnityEngine.Object.DestroyImmediate(settings);
+                UnityEngine.Object.DestroyImmediate(catalog);
+                UnityEngine.Object.DestroyImmediate(room.gameObject);
+            }
+        }
+
+        [Test]
+        public void ObjectiveValidationReportsInvalidTriggerAndMonsterCandidates()
+        {
+            var prefab = AssetDatabase.LoadAssetAtPath<GameObject>("Assets/Prefabs/Map/RoomTemplates/NovaVariants/Down_ForestStep.prefab");
+            var room = UnityEngine.Object.Instantiate(prefab).GetComponent<RoomTemplate>();
+            try
+            {
+                var type = Type.GetType("ProjectRE.RoomObjectiveSetup, Assembly-CSharp");
+                var setup = room.GetComponentInChildren(type, true);
+                var validate = type.GetMethod("ValidateTemplate");
+                Assert.That((List<string>)validate.Invoke(null, new object[] { room }), Is.Empty);
+                var data = new SerializedObject(setup);
+                var candidate = data.FindProperty("triggers").GetArrayElementAtIndex(0);
+                var trigger = (Component)candidate.FindPropertyRelative("objective").objectReferenceValue;
+                trigger.GetComponent<Collider2D>().isTrigger = false;
+                var errors = (List<string>)validate.Invoke(null, new object[] { room });
+                Assert.That(errors.Any(e => e.Contains("후보 #1") && e.Contains("Trigger Collider")), Is.True);
+                trigger.GetComponent<Collider2D>().isTrigger = true;
+                var monsterData = new SerializedObject(room.GetComponent<RoomMonsterSettings>());
+                var option = monsterData.FindProperty("_slots").GetArrayElementAtIndex(0).FindPropertyRelative("options").GetArrayElementAtIndex(0);
+                option.FindPropertyRelative("prefab").objectReferenceValue =
+                    AssetDatabase.LoadAssetAtPath<GameObject>("Assets/Prefabs/Item/Inventory/Item.prefab");
+                monsterData.ApplyModifiedPropertiesWithoutUndo();
+                errors = (List<string>)validate.Invoke(null, new object[] { room });
+                Assert.That(errors.Any(e => e.Contains("몬스터 슬롯 #1 후보 #1") && e.Contains("Health")), Is.True);
+            }
+            finally { UnityEngine.Object.DestroyImmediate(room.gameObject); }
+        }
+
+        [Test]
+        public void NoSelectedObjectiveDoesNotRequireExitGate()
+        {
+            var prefab = AssetDatabase.LoadAssetAtPath<GameObject>("Assets/Prefabs/Map/RoomTemplates/NovaVariants/Down_ForestStep.prefab");
+            var room = UnityEngine.Object.Instantiate(prefab).GetComponent<RoomTemplate>();
+            try
+            {
+                room.gameObject.SetActive(false);
+                var type = Type.GetType("ProjectRE.RoomObjectiveSetup, Assembly-CSharp");
+                var setup = room.GetComponentInChildren(type, true);
+                var data = new SerializedObject(setup);
+                data.FindProperty("conditionChance").intValue = 0;
+                data.ApplyModifiedPropertiesWithoutUndo();
+                var plan = new MapRoomPlan(Vector2Int.zero, room.TemplateId, room.Type, room.Openings,
+                    RoomOpening.West, RoomOpening.South);
+                Assert.DoesNotThrow(() => type.GetMethod("Configure").Invoke(setup,
+                    new object[] { new BuiltRoom(plan, room, new Dictionary<int, GameObject>()), 0, new MapBuildContext(), null }));
+            }
+            finally { UnityEngine.Object.DestroyImmediate(room.gameObject); }
+        }
+
         [UnityTest]
         public IEnumerator ExitGateCancelsFadeOnDisableAndStaysOpen()
         {

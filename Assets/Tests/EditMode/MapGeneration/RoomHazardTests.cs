@@ -170,6 +170,26 @@ namespace ProjectRE.MapGeneration.Tests
         }
 
         [Test]
+        public void HazardSupportAndInitialColliderMustFitTheirDeclaredSpace()
+        {
+            var prefab = AssetDatabase.LoadAssetAtPath<GameObject>("Assets/Prefabs/Map/RoomTemplates/NovaVariants/Arrival_RuinedGallery.prefab");
+            var room = UnityEngine.Object.Instantiate(prefab).GetComponent<RoomTemplate>();
+            try
+            {
+                Assert.That(RoomTemplateChecks.Validate(room), Is.Empty);
+                var hazard = room.Hazard.Hazards.Single();
+                var support = hazard.support;
+                hazard.support = new RectInt(1, 0, 1, 1);
+                Assert.That(RoomTemplateChecks.Validate(room).Any(e => e.Contains("함정 슬롯 #1") && e.Contains("맞닿아")), Is.True);
+                hazard.support = support;
+                var box = hazard.candidate.GetComponent<BoxCollider2D>();
+                box.size = new Vector2(5, 5);
+                Assert.That(RoomTemplateChecks.Validate(room).Any(e => e.Contains("함정 슬롯 #1") && e.Contains("초기 Collider")), Is.True);
+            }
+            finally { UnityEngine.Object.DestroyImmediate(room.gameObject); }
+        }
+
+        [Test]
         public void PreviewUndoRedoPreservesSelectedHazardState()
         {
             Scene scene = SceneManager.GetActiveScene();

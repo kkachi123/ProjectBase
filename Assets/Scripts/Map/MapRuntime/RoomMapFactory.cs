@@ -25,6 +25,16 @@ namespace ProjectRE
                 error = "맵 컴포넌트 생성 컨텍스트가 없습니다.";
                 return false;
             }
+            if (settings != null && settings.Catalog != null)
+            {
+                foreach (var template in settings.Catalog.Templates)
+                {
+                    var errors = RoomObjectiveSetup.ValidateTemplate(template);
+                    if (errors.Count == 0) continue;
+                    error = $"방 목표 검사 실패 ({template.name}): {string.Join(" ", errors)}";
+                    return false;
+                }
+            }
             MapBuildResult result = MapGenerator.Generate(settings, seed, goalPrefab, context);
             if (!result.Success) { error = result.Error; return false; }
             try

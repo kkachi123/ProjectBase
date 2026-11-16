@@ -11,8 +11,9 @@ namespace ProjectRE.MapGeneration
             public readonly RoomContentSlot Slot;
             public readonly Vector2Int Position;
             public readonly bool HasPosition;
-            public Entry(RoomContentSlot slot, Vector2Int position, bool hasPosition)
-            { Slot = slot; Position = position; HasPosition = hasPosition; }
+            public readonly string Label;
+            public Entry(RoomContentSlot slot, Vector2Int position, bool hasPosition, string label)
+            { Slot = slot; Position = position; HasPosition = hasPosition; Label = label; }
         }
 
         internal static List<Entry> Read(RoomTemplate template)
@@ -26,10 +27,12 @@ namespace ProjectRE.MapGeneration
         private static void Add(List<Entry> entries, RoomSpawnSettings settings, string domain)
         {
             if (settings == null) return;
-            foreach (var source in settings.Slots)
+            for (int index = 0; index < settings.Slots.Count; index++)
             {
+                var source = settings.Slots[index];
+                string label = $"{(settings.Kind == ContentKind.Item ? "아이템" : "몬스터")} 슬롯 #{index + 1}";
                 if (source == null || string.IsNullOrWhiteSpace(source.Id))
-                { entries.Add(new Entry(null, default, false)); continue; }
+                { entries.Add(new Entry(null, default, false, label)); continue; }
                 var slot = new RoomContentSlot
                 {
                     slotIndex = StableIndex(domain, source.Id), clearance = source.clearance,
@@ -38,7 +41,7 @@ namespace ProjectRE.MapGeneration
                 foreach (var option in source.options)
                     slot.options.Add(option == null ? null : new RoomContentOption
                     { id = option.Id, prefab = option.prefab, weight = option.weight, offset = option.offset, kind = settings.Kind });
-                entries.Add(new Entry(slot, source.position, true));
+                entries.Add(new Entry(slot, source.position, true, label));
             }
         }
 
@@ -49,5 +52,14 @@ namespace ProjectRE.MapGeneration
             foreach (char c in id) hash = unchecked((hash ^ c) * 16777619u);
             return (int)(hash & 0x7fffffffu);
         }
+
+        internal static RectInt Support(RectInt area, ContentSurface surface) => surface switch
+        {
+            ContentSurface.Floor => new RectInt(area.xMin, area.yMin - 1, area.width, 1),
+            ContentSurface.Ceiling => new RectInt(area.xMin, area.yMax, area.width, 1),
+            ContentSurface.WestWall => new RectInt(area.xMin - 1, area.yMin, 1, area.height),
+            ContentSurface.EastWall => new RectInt(area.xMax, area.yMin, 1, area.height),
+            _ => new RectInt()
+        };
     }
 }
