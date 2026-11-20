@@ -1,6 +1,5 @@
 namespace ProjectRE
 {
-    using System;
     using UnityEngine;
 
     /// <summary>비행 Monster 대상 갱신과 FSM 초기화.</summary>
@@ -13,7 +12,6 @@ namespace ProjectRE
         private FlyingMonsterTargetHandler _target;
         private TestPlayerManager _playerManager;
         private bool _started;
-        public Type CurrentStateType => _currentState?.GetType();
 
         protected override void Awake()
         {
