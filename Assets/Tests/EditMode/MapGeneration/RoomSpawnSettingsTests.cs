@@ -52,7 +52,7 @@ namespace ProjectRE.MapGeneration.Tests
             var catalog = ScriptableObject.CreateInstance<RoomTemplateCatalog>();
             try
             {
-                var monster = new RoomContentOption { prefab = AssetDatabase.LoadAssetAtPath<GameObject>("Assets/Prefabs/Monster/Goblin/Goblin.prefab"), offset = new Vector2(.5f, .05f) };
+                var monster = new RoomContentOption { prefab = AssetDatabase.LoadAssetAtPath<GameObject>("Assets/Prefabs/Monster/Grounded/Goblin/Goblin.prefab"), offset = new Vector2(.5f, .05f) };
                 var item = new RoomContentOption { prefab = AssetDatabase.LoadAssetAtPath<GameObject>("Assets/Prefabs/Item/Inventory/Item.prefab"), offset = new Vector2(.5f, .3135f) };
                 var hazards = new SerializedObject(room.Hazard);
                 hazards.FindProperty("_hazards").arraySize = 0;

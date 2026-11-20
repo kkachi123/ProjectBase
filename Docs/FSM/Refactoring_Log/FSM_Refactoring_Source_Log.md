@@ -462,10 +462,17 @@ Player 지상 1·2·3타의 피해·범위·비용과 공중 데이터를 각 �
 - Skeleton Sprite 시트 복사본을 모션별로 150×150 프레임, PPU 20, 공통 발 Pivot `(75, 49)`로 분할했다. Idle·Move·Hit·Death는 각 4장, Attack1·Attack2는 각 8장이다. 원본 시트의 기존 분할 설정은 유지했다.
 - 종별 Animation Clip 6개와 Animator Override를 만들었다. 두 공격 Clip은 7번째 프레임에 `OnAnimationOnFrame(0)`, 마지막 프레임 중간에 `OnAnimationEnd`를 사용한다. Hit·Death에도 종료 Event를 배치했다.
 - 공용 Animator에 두 번째 공격 슬롯과 `AttackType` 1·2 진입 전이를 추가했다. Grounded·Hit에서 공격 타입을 선택하고 공격 종료 후 Grounded로 복귀한다. Goblin의 두 공격은 기존처럼 타입 1을 사용한다.
-- Collider·감지 범위·타격 범위는 Goblin 설정을 초기값으로 사용한다. Skeleton 모션에 맞는 세부 범위와 밸런스는 추가 확인 대상이다.
+- Collider·감지 범위·타격 범위는 Goblin 설정을 초기값으로 사용했다. 이후 Skeleton의 일반·배후 공격 범위를 AgentCombatEditor로 조정하고 검증했다. 사용자 확인: 2026-11-20. Collider·감지 범위와 밸런스는 추가 확인 대상이다.
 - 공용 MonsterAnimationData를 Animator가 있는 `Monster/Animations`로 이동하고, BasicMonster의 기본 Behavior Data를 제거했다. Behavior Data는 각 Variant에서 할당하며 Goblin·Skeleton의 기존 전용 설정을 유지한다.
 
 Unity에서 Variant 상속·필수 참조·Animator Override·Event 수신 함수와 Missing Script 0을 확인했고 컴파일 실패는 없었다. 사용자 조작 중 Skeleton의 대상 인식·추적, Player 타격에 따른 체력 감소를 관찰했으며, 일반 공격과 배후 공격 재생은 사용자가 정상으로 확인했다. 사망·상실 후 복귀·Goblin 회귀와 공격 SO 실행 상태 독립성은 충분히 검증하지 못했다. InGame 직접 실행 중 기존 Managers 연결과 관련된 InGameUI 초기화·Player 사망 처리 오류가 발생했다.
+
+### 4.13 Flying Eye 모션 에셋 준비와 Monster 폴더 분류
+
+- `Monster/Grounded/`에 지상 공용 Prefab·Animator와 Goblin·Skeleton을, `Monster/Flying/FlyingEye/`에 Flying Eye 에셋을 배치했다. 기존 지상 에셋은 GUID를 유지하며 이동했다.
+- 원본 Sprite 시트를 복사해 기존 분할과 Pivot을 보존하고, Flight·Hit·Death·Attack 1~3 및 투사체 비행·소멸 Clip을 12 FPS로 제작했다. Flight와 투사체 비행만 반복한다.
+- 공중 행동과 Animator 설계가 확정되지 않아 Animator와 Animation Event는 연결하지 않았다. Clip 시각 확인과 실제 공중 동작 검증은 남아 있다.
+- Monster 스크립트는 `Assets/Scripts/FSM/Monster/` 아래 지상 `Grounded/`, 공중 `Flying/`으로 분류했다. 이전 `NPC/AIMonstor/` 스크립트는 지상 폴더로 옮겼다. 사용하지 않는 기존 Behavior Action 2개와 해당 폴더는 제거했다.
 
 ## 5. 검증 상태
 

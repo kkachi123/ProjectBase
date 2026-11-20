@@ -47,9 +47,10 @@ Player, 지상 Monster, Flying Monster와 Boss 1종의 개발·검증 상태와 
 목표: Goblin·Skeleton이 공용 FSM을 사용하면서 각 공격 설정과 모션에 맞게 동작한다.
 
 - [x] Skeleton의 대상 인식·추적과 피격에 따른 체력 감소를 관찰했다. 일반·배후 공격 재생은 사용자 확인을 받았다.
+- [x] Skeleton의 일반·배후 공격 범위를 AgentCombatEditor로 조정하고 검증했다. 사용자 확인: 2026-11-20.
 - [ ] Goblin·Skeleton의 순찰·추적·대상 상실 대기·복귀·재인식을 현재 FSM에서 확인한다.
-- [ ] 일반·배후 공격의 타격 시점·범위·간격과 피격·사망 중단 및 종료 후 전이를 확인한다.
-- [ ] Skeleton과 Goblin의 Collider·공격 범위·모션 속도·밸런스를 확인하고 필요한 종별 설정을 조정한다.
+- [ ] 일반·배후 공격의 타격 시점·간격과 피격·사망 중단 및 종료 후 전이를 확인한다. Goblin의 공격 범위를 확인한다.
+- [ ] Skeleton과 Goblin의 Collider·모션 속도·밸런스를 확인하고 필요한 종별 설정을 조정한다.
 - [ ] 같은 공격 SO를 장착한 두 개체의 참조·실행 상태·타이머가 독립적인지, 원본에 실행 상태가 남지 않고 개체 제거 시 해당 복제본이 정리되는지 확인한다.
 - [ ] 배후 준비 중 대상 상실·재인식과 Disable/Enable 시 SO 재사용, 정상 종료 후 공격 간격을 확인한다.
 
@@ -60,6 +61,7 @@ Player, 지상 Monster, Flying Monster와 Boss 1종의 개발·검증 상태와 
 목표: 공중 이동과 요구된 공격을 수행하는 Flying Monster를 제작한다.
 
 - [x] 기존 비행 이동 기반과 Flying Eye 원본 에셋이 있다.
+- [x] Flying Eye Sprite 복사본과 Flight·Hit·Death·Attack 1~3·투사체 Animation Clip을 제작했다. Animator와 Animation Event는 행동 설계 후 연결한다.
 - [ ] 대상 행동·상태·전이·공격 및 피격·사망 정책을 현재 구조 기준으로 확정하고 개별 계획을 작성한다.
 - [ ] 필요한 State·Transition·공격 실행과 종별 Sprite·Animation·SO·Prefab을 구성한다.
 - [ ] 공중 이동·공격·벽·중단·복귀를 검증하고 Player·지상 Monster 회귀를 확인한다.

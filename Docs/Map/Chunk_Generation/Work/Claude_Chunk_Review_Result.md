@@ -87,7 +87,7 @@
 - **근거:**
   - 사망 구독만 사용: [RoomMonsterObjective.cs:53](../../../../Assets/Scripts/Map/MapRuntime/RoomObjectives/RoomMonsterObjective.cs#L53)
   - 완료 집계: [RoomObjectiveController.cs:58](../../../../Assets/Scripts/Map/MapRuntime/RoomObjectives/RoomObjectiveController.cs#L58)
-  - 현재 제거는 사망 후에만 일어난다: [MonsterController.cs:160](../../../../Assets/Scripts/FSM/NPC/AIMonstor/@Hub/MonsterController.cs#L160)
+  - 현재 제거는 사망 후에만 일어난다: [MonsterController.cs:160](../../../../Assets/Scripts/FSM/Monster/Grounded/@Hub/MonsterController.cs#L160)
 - **권장 수정 방향:** 대상이 파괴되면 완료로 처리한다.
 
 ### 6. 슬롯 변환 계층과 해시·검사 중복 — 낮음

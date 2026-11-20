@@ -20,7 +20,7 @@
 | --- | --- |
 | 실행·전환·구독 수명 | `Agent/@Hub/AgentController.cs`, `Agent/StateControl/AgentStateBase.cs` |
 | 공통 Factory·DI | `Agent/StateControl/AgentStateFactory.cs`(StateFactoryData 포함) |
-| 대상 Factory | `Player/PlayerState/PlayerStateFactory.cs` 또는 `NPC/AIMonstor/MonsterState/` |
+| 대상 Factory | `Player/PlayerState/PlayerStateFactory.cs` 또는 `Monster/Grounded/MonsterState/` |
 | 입력·Rule 계약 | `Agent/Input/IAgentInput.cs`, `Agent/StateControl/TransitionRules/ITransitionRule.cs` |
 | Animator·Event 계약 | `Agent/@Hub/AgentAnimator.cs`, `IAgentAnimator.cs`(같은 폴더), `Agent/Handler/AgentAnimationEventProxy.cs` |
 | 유사 행동·실제 연결 | 관련 공용/전용 State·Handler, 대상 Animator·AnimationDataSO·Prefab·Controller·Override·Clip |

@@ -19,10 +19,10 @@
 | State·Factory·DI | `Agent/StateControl/AgentStateBase.cs`, `AgentStateFactory.cs`(같은 폴더) |
 | 입력·공격 시작 | `Agent/Input/IAgentInput.cs`, `Agent/@Hub/IAgentController.cs` |
 | Animator·Clip Event·피해 | `Agent/@Hub/AgentAnimator.cs`, `IAgentAnimator.cs`(같은 폴더), `Agent/Handler/AgentAnimationEventProxy.cs`, `AgentMeleeHitHandler2D.cs`(같은 폴더) |
-| 기본 Monster 재사용 사례 | `NPC/AIMonstor/@Hub/`, `MonsterState/`, `Attack/`, `Handler/`, `SOData/` |
+| 기본 Monster 재사용 사례 | `Monster/Grounded/@Hub/`, `MonsterState/`, `Attack/`, `Handler/`, `SOData/` |
 | 추가 행동이 있을 때 | `GroundedAgent/`, `Player/`의 해당 State·Factory·Handler |
 
-에셋은 `Assets/Prefabs/Monster/BasicMonster.prefab`, `Goblin/Goblin.prefab`, `Animations/BasicMonster_Anim.controller`를 확인한다. 지상 일반 Monster는 [현재 제작 가이드](FSM_Grounded_Monster_Creation_Guide.md)를 따른다. 과거 계획·가상 설계를 구현된 기능으로 취급하지 않는다.
+지상 에셋은 `Assets/Prefabs/Monster/Grounded/`의 `BasicMonster.prefab`, `Goblin/Goblin.prefab`, `Animations/BasicMonster_Anim.controller`를 확인한다. 지상 일반 Monster는 [현재 제작 가이드](FSM_Grounded_Monster_Creation_Guide.md)를 따른다. 과거 계획·가상 설계를 구현된 기능으로 취급하지 않는다.
 
 ## 3. 재사용 또는 확장 결정
 
@@ -73,13 +73,14 @@ Monster: 대상·거리·간격 → MonsterAttackTransition → TryPrepareAttack
 
 ## 5. 에셋·Prefab 연결
 
-기본 Monster는 다음 배치를 따른다. `AIMonstor`는 실제 스크립트 폴더명이다. 다른 Agent는 해당 영역의 기존 분류를 따른다.
+기본 Monster는 다음 배치를 따른다. 지상 Monster 스크립트는 `Assets/Scripts/FSM/Monster/Grounded/`, 공중 Monster 스크립트는 `Assets/Scripts/FSM/Monster/Flying/`에 둔다. 다른 Agent는 해당 영역의 기존 분류를 따른다.
 
 | 결과물 | 경로 |
 | --- | --- |
-| 공용 템플릿·Animator·이름 데이터 | `Assets/Prefabs/Monster/BasicMonster.prefab`, `Animations/`, `ScriptableObjects/`(같은 Monster 폴더) |
-| 완성 Variant | `Assets/Prefabs/Monster/{AgentName}/{AgentName}.prefab` |
-| 종별 Clip·Override·Stat·Motor·작업용 Sprite | `Assets/Prefabs/Monster/{AgentName}/` 아래 `Animations/`, `ScriptableObjects/`, `Sprites/` |
+| 지상 공용 템플릿·Animator·이름 데이터 | `Assets/Prefabs/Monster/Grounded/BasicMonster.prefab`, `Grounded/Animations/` |
+| 지상 완성 Variant | `Assets/Prefabs/Monster/Grounded/{AgentName}/{AgentName}.prefab` |
+| 지상 종별 Clip·Override·Stat·Motor·작업용 Sprite | `Assets/Prefabs/Monster/Grounded/{AgentName}/` 아래 `Animations/`, `ScriptableObjects/`, `Sprites/` |
+| 공중 Monster 에셋 | `Assets/Prefabs/Monster/Flying/{AgentName}/` 아래 종별 분류 |
 
 - `BasicMonster.prefab`은 Stat·Motor 데이터가 비어 있는 템플릿이다. `Goblin.prefab`을 연결 사례로 삼고 Variant에 종별 참조를 채운다.
 - Root에는 Controller·Animator 어댑터·Motor·Rigidbody2D·Collider2D·Health·근접 타격·GroundDetector·PlayerDetector를 둔다. Monster에는 Input·BT를 추가하지 않는다. Visual에는 SpriteRenderer·실제 Unity Animator·Proxy를 둔다.
