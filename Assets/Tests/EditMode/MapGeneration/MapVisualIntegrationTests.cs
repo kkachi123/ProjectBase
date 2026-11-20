@@ -524,8 +524,17 @@ namespace ProjectRE.MapGeneration.Tests
             Assert.That(shrine.transform.Find("BackgroundArt").GetComponentsInChildren<Collider2D>(true), Is.Empty);
 
             var settings = AssetDatabase.LoadAssetAtPath<MapPlanningSettings>(SettingsPath);
-            var plan = settings.CreatePlan(8);
-            Assert.That(plan.Success, Is.True, plan.Error);
+            MapPlanningResult plan = null;
+            for (int seed = 0; seed < 1000 && plan == null; seed++)
+            {
+                var candidate = settings.CreatePlan(seed);
+                Assert.That(candidate.Success, Is.True, candidate.Error);
+                var forestPlan = candidate.Plan.Rooms.FirstOrDefault(room => room.TemplateId == forest.TemplateId);
+                var shrinePlan = candidate.Plan.Rooms.FirstOrDefault(room => room.TemplateId == shrine.TemplateId);
+                if (forestPlan != null && shrinePlan != null && shrinePlan.Cell == forestPlan.Cell + Vector2Int.right)
+                    plan = candidate;
+            }
+            Assert.That(plan, Is.Not.Null, "인접한 숲·사당 방이 생성되지 않았습니다.");
             var build = MapBuilder.Build(plan.Plan, settings.Catalog, AssetDatabase.LoadAssetAtPath<GameObject>(GoalPath),
                 visualGround: settings.VisualGround);
             try

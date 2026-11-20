@@ -655,6 +655,20 @@ namespace ProjectRE.MapGeneration.Tests
                     if (room.IsOptional && !string.IsNullOrEmpty(content.OptionId)) { itemSeed = candidateSeed; itemCell = room.Cell; break; }
             }
             Assert.That(itemSeed, Is.GreaterThanOrEqualTo(0));
+            int terrainSeed = -1;
+            Vector2Int terrainCell = default;
+            for (int candidateSeed = 0; candidateSeed < 1000 && terrainSeed < 0; candidateSeed++)
+            {
+                if (candidateSeed == itemSeed) continue;
+                var candidate = settings.CreatePlan(candidateSeed);
+                Assert.That(candidate.Success, Is.True, candidate.Error);
+                var room = candidate.Plan.Rooms.FirstOrDefault(r => r.TemplateId == "production.horizontal.step" &&
+                    r.Terrain.Any(t => !string.IsNullOrEmpty(t.PatternId) && t.FilledCells.Contains(new Vector2Int(3, 12))));
+                if (room == null) continue;
+                terrainSeed = candidateSeed;
+                terrainCell = room.Cell;
+            }
+            Assert.That(terrainSeed, Is.GreaterThanOrEqualTo(0));
             EditorWindow window = null;
             try
             {
@@ -668,12 +682,12 @@ namespace ProjectRE.MapGeneration.Tests
                 FieldInfo owner = type.GetField("_previewRoot", flags);
                 FieldInfo seed = type.GetField("_seed", flags);
 
-                seed.SetValue(window, 3);
+                seed.SetValue(window, terrainSeed);
                 generate.Invoke(window, null);
                 var first = (GameObject)owner.GetValue(window);
                 Assert.That(first != null && first.activeSelf, Is.True);
                 Assert.That(first.GetComponent("GeneratedMapInfo"), Is.Not.Null);
-                AssertTerrain(first);
+                AssertTerrain(first, terrainCell);
                 seed.SetValue(window, itemSeed);
                 generate.Invoke(window, null);
                 Assert.That(scene.rootCount, Is.EqualTo(initialRoots + 1));
@@ -681,7 +695,7 @@ namespace ProjectRE.MapGeneration.Tests
 
                 Undo.PerformUndo();
                 AssertOwnedRoot(scene, owner, window);
-                AssertTerrain((GameObject)owner.GetValue(window));
+                AssertTerrain((GameObject)owner.GetValue(window), terrainCell);
                 Undo.PerformRedo();
                 AssertOwnedRoot(scene, owner, window);
                 AssertItem((GameObject)owner.GetValue(window), itemCell);
@@ -713,10 +727,10 @@ namespace ProjectRE.MapGeneration.Tests
             Assert.That(Array.Exists(components, component => component != null && component.GetType().Name == "ItemPickup"), Is.True);
         }
 
-        private static void AssertTerrain(GameObject root)
+        private static void AssertTerrain(GameObject root, Vector2Int cell)
         {
             var room = Array.Find(root.GetComponentsInChildren<RoomTemplate>(true),
-                candidate => candidate.TemplateId == "production.horizontal.step" && candidate.transform.localPosition == new Vector3(20, -20, 0));
+                candidate => candidate.TemplateId == "production.horizontal.step" && candidate.transform.localPosition == new Vector3(cell.x * 20, -cell.y * 20, 0));
             Assert.That(room, Is.Not.Null);
             Assert.That(room.FixedGeometry.HasTile(new Vector3Int(3, 12, 0)), Is.True);
             Assert.That(room.GetComponentsInChildren<Grid>(true).Length, Is.EqualTo(2));

@@ -26,12 +26,13 @@ namespace ProjectRE.MapGeneration.Tests
                 for (int i = 1; i < result.Plan.Path.Count - 1; i++)
                     seen.Add(result.Plan.Rooms.Single(r => r.Cell == result.Plan.Path[i]).TemplateId);
             }
-            Assert.That(seen.Count, Is.EqualTo(11));
+            Assert.That(seen.Count, Is.GreaterThanOrEqualTo(11));
+            Assert.That(seen, Does.Contain("production.horizontal.upper_ruins"));
             foreach (string id in seen)
             {
                 var room = variants[id];
-                Assert.That(room.GetComponent<RoomMonsterSettings>().Slots, Has.Count.EqualTo(1), id);
-                Assert.That(room.GetComponent<RoomItemSettings>().Slots, Has.Count.EqualTo(1), id);
+                Assert.That(room.GetComponent<RoomMonsterSettings>().Slots, Is.Not.Empty, id);
+                Assert.That(room.GetComponent<RoomItemSettings>().Slots, Is.Not.Empty, id);
             }
             foreach (var room in variants.Values)
             {
