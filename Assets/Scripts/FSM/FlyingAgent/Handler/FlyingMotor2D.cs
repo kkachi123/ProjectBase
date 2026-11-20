@@ -13,9 +13,17 @@ namespace ProjectRE
         // 입력 방향에 따른 XY 속도·좌우 시선 적용.
         public void Move2D(Vector2 input, float speed)
         {
-            if (input.x > 0f) transform.localScale = new Vector3(1f, 1f, 1f);
-            else if (input.x < 0f) transform.localScale = new Vector3(-1f, 1f, 1f);
+            Face(input.x);
             _body.linearVelocity = input * speed;
+        }
+
+        // 기존 크기를 유지하며 좌우 방향 전환.
+        public void Face(float direction)
+        {
+            Vector3 scale = transform.localScale;
+            if (direction > 0f) scale.x = Mathf.Abs(scale.x);
+            else if (direction < 0f) scale.x = -Mathf.Abs(scale.x);
+            transform.localScale = scale;
         }
 
         public void Stop() => _body.linearVelocity = Vector2.zero;

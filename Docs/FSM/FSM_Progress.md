@@ -11,7 +11,7 @@ Player, 지상 Monster, Flying Monster와 Boss 1종의 개발·검증 상태와 
 | 기존 FSM | 진행 중 | 공용 State·Transition·Factory와 Player·지상 Monster 구성이 있음. 현재 연결과 기존 검증 이력을 대조한다. |
 | Player | 구현 완료/검증 필요 | Grounded·Jump·Fall·Dash·Attack·Hit·Death 구성. 이동·공격·중단·복귀를 현재 에셋 기준으로 회귀 검증한다. |
 | 지상 Monster | 구현 완료/검증 필요 | 공용 판단 FSM과 Goblin·Skeleton Variant가 있음. 두 몬스터의 전체 행동·범위·밸런스를 확인한다. |
-| Flying Monster | 진행 중 | Flying Motor·이동 Handler·추상 Controller·FactoryData가 있음. 구체 행동·공격·에셋·검증은 별도 설계와 제작이 필요하다. |
+| Flying Monster | 진행 중 | Flying Eye의 순찰·추적·복귀·피격·사망 FSM과 Attack1 모션을 연결했다. 실제 Play 검증과 공격 동작 제작이 남았다. |
 | Boss 1종 | 미시작 | 보스 FSM 조사 자료가 있음. 대상·패턴·전이·중단·사망 요구사항을 정하고 제작한다. |
 | 통합 마무리 | 미시작 | 공용 코드 영향, Agent 간 회귀와 문서·설정 연결을 확인한다. |
 
@@ -61,9 +61,12 @@ Player, 지상 Monster, Flying Monster와 Boss 1종의 개발·검증 상태와 
 목표: 공중 이동과 요구된 공격을 수행하는 Flying Monster를 제작한다.
 
 - [x] 기존 비행 이동 기반과 Flying Eye 원본 에셋이 있다.
-- [x] Flying Eye Sprite 복사본과 Flight·Hit·Death·Attack 1~3·투사체 Animation Clip을 제작했다. Animator와 Animation Event는 행동 설계 후 연결한다.
-- [ ] 대상 행동·상태·전이·공격 및 피격·사망 정책을 현재 구조 기준으로 확정하고 개별 계획을 작성한다.
-- [ ] 필요한 State·Transition·공격 실행과 종별 Sprite·Animation·SO·Prefab을 구성한다.
+- [x] Flying Eye Sprite 복사본과 Flight·Hit·Death·Attack 1~3·투사체 Animation Clip을 제작했다. Flight·Attack1·Hit·Death를 Animator에 연결하고 종료 Event를 설정했다.
+- [x] 원형 XY 순찰·대상 추적·상실 대기·복귀·피격·사망 FSM과 Attack1 모션 전이, Animator·SO·Prefab을 연결했다. Attack1에는 피해·돌진이 없다.
+- [x] Play에서 순찰 대기·XY 추적·Attack1 모션 반복과 상실 대기 전환을 관찰했다. 피격 넉백과 사망 모션 후 제거는 사용자 확인을 받았다.
+- [x] Play에서 Player 위치를 이동하며 대상 상실 대기 → 복귀와 복귀 중 재인식 → 추적 전이를 확인했다.
+- [ ] 원형 순찰 경계·공격 간격·공격 피해 없음과 공격 중 피격·사망 중단을 확인한다.
+- [ ] 공격 동작과 나머지 공격 모션·투사체의 요구사항을 확정하고 별도로 구현한다.
 - [ ] 공중 이동·공격·벽·중단·복귀를 검증하고 Player·지상 Monster 회귀를 확인한다.
 
 완료 기준: 확정된 행동과 공격이 Prefab에서 동작하고 정상·중단 흐름을 Play에서 확인한다.

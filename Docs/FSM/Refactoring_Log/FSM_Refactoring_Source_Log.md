@@ -538,6 +538,13 @@ ScenePlayerManager가 실제 Player를 참조하는 InGame에서 사용자가 Pl
 | Player 이동·Jump·Dash·지상/공중 공격 | 기존 조작·콤보·Event·단계별 범위·Stamina 유지 |
 | 같은 SO를 사용하는 두 Monster와 개체 제거 | 참조·Status·타이머 독립, 제거된 개체의 실행 SO만 정리 |
 
+### Flying Eye 비행 FSM
+
+- 비행 Motor·이동 Handler를 재사용하고 최초 위치 주변 원형 순찰, XY 추적·상실 대기·복귀와 피격·사망 전이를 구성했다. Player 연결은 지상 Monster와 같은 ScenePlayerManager 우선·Player Manager 등록 흐름을 사용한다.
+- Attack Sub State Machine에서 AttackType 1의 Attack1 모션을 재생한다. 공격 거리·간격은 행동 SO로 설정하며 돌진·피해·다른 공격은 후속 작업이다.
+- 피격 시 이전 State 이동을 정리한 뒤 대기 중인 넉백을 적용하고, 사망 시 이동을 정지한다. 비행 Motor의 좌우 전환은 기존 Scale 크기를 유지한다.
+- Flying 공용 Prefab·Animator와 Flying Eye Variant·Override·SO를 연결했다. Unity 컴파일과 Prefab 참조·Clip Event 구성을 확인했다. Play에서 순찰 대기·XY 추적·Attack1 모션 반복을 관찰했고, 피격 넉백과 사망 모션 후 제거는 사용자 확인을 받았다. 별도 Play에서 `eval`로 Player 위치를 이동하여 상실 대기 → 복귀와 복귀 중 재인식 → 추적을 확인했다. 공격 간격·중단과 전체 회귀는 확인이 필요하다.
+
 ## 6. 보류 및 예정 사항
 
 ### 보류
